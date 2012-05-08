@@ -15,7 +15,7 @@ TO_REFLECT=[ON+CI(1) ON+CI(2) ON+CI(3) ON+CI(4) ...
 REFLECTED= [ON+CI(5) ON+CI(6) ON+CI(7) ON+CI(8) ...
             ON+CI(1) ON+CI(2) ON+CI(3) ON+CI(4)];
 avu=1; prevavu=1; ts=0; deltaU=1e-7; numactivenodes=sum(sum(1-BOUND));
-while (ts<4000 & 1e-10<abs((prevavu-avu)/avu)) | ts<100
+while (ts<4000 && 1e-10<abs((prevavu-avu)/avu)) || ts<100
     % Propagate
     F(:,:,4)=F([2:nx 1],[ny 1:ny-1],4);F(:,:,3)=F(:,[ny 1:ny-1],3);
     F(:,:,2)=F([nx 1:nx-1],[ny 1:ny-1],2);F(:,:,5)=F([2:nx 1],:,5);

@@ -4,9 +4,9 @@ clc; clear; %close all;
 
 %% Domain Grid
 L = 30;    % Length
-H = 30;    % Height
+H = 100;    % Height
 n = 30;    % Nodes in x
-m = 30;    % Nodes in y
+m = 100;    % Nodes in y
 dx = L/n; dy = H/m; dt = 1;
 x = 1:dx:L; y = 1:dy:H;
 
@@ -23,7 +23,10 @@ csq   = (dx^2)/(dt^2);
 alpha = 0.25;
 omega = 1/(2*alpha/(dt*csq)+0.5);
 w     = [1/4,1/4,1/4,1/4];
-iter  = 200; % time steps
+cx    = [  1, -1,  0,  0];
+cy    = [  0,  0,  1, -1];
+link  = [  1,  2,  3,  4];
+iter  = 400; % time steps
 
 %% Boundary Conditions
 twall = 1; 
@@ -44,22 +47,16 @@ for k = 2:iter;
     f2 = omega * feq + (1-omega) * f2;
     f3 = omega * feq + (1-omega) * f3;
     f4 = omega * feq + (1-omega) * f4;
+ 
     % Streaming process
-    for i = 1:1:n-1;
-        f1(i,:) = f1(i+1,:);  % Streaming
-    end
-    for i = n:-1:2;
-        f2(i,:) = f2(i-1,:);  % Streaming        
-    end
-    for j = 1:1:m-1;
-        f3(:,j) = f3(:,j+1);  % Streaming
-    end
-    for j = m:-1:2;
-        f4(:,j) = f4(:,j-1);  % Streaming
-    end
+    f1 = stream2d( f1 , [cx(1),cy(1)]);
+    f2 = stream2d( f2 , [cx(2),cy(2)]);
+    f3 = stream2d( f3 , [cx(3),cy(3)]);
+    f4 = stream2d( f4 , [cx(4),cy(4)]);
+    
     % Boundary conditions
-    f1(:,1) = twall*w(1) - f2(:,1);    %Dirichlet BC
-    f3(:,1) = twall*w(2) - f4(:,1);    %Dirichlet BC
+    f1(:,1) = twall*w(1) + twall*w(2) - f2(:,1); %Dirichlet BC
+    f3(:,1) = twall*w(3) + twall*w(4) - f4(:,1); %Dirichlet BC
     
     f1(m,:) = 0;        %Dirichlet BC
     f2(m,:) = 0;        %Dirichlet BC
