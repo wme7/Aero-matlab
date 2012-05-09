@@ -26,15 +26,19 @@ w     = [1/4,1/4,1/4,1/4];
 cx    = [  1, -1,  0,  0];
 cy    = [  0,  0,  1, -1];
 link  = [  1,  2,  3,  4];
-iter  = 400; % time steps
+tEnd  = 400; % time steps
+tPlot = 10;
+frames= tEnd/tPlot;
+count = 0;
 
 %% Boundary Conditions
 twall = 1; 
 
 %% Main Loop
-for k = 2:iter;
+for cycle = 2:tEnd;
     % Collision process  
     rho = f1 + f2 + f3 + f4;
+    
     % for this case k1=k2=k3=k4=1/4 then feq1=...feq4=feq
     feq = 0.25 * rho; 
         
@@ -72,9 +76,16 @@ for k = 2:iter;
     f2(1,:) = f2(2,:);  %Neumann BC
     f3(1,:) = f3(2,:);  %Neumann BC
     f4(1,:) = f4(2,:);  %Neumann BC    
+    
+    % Visualization
+    if mod(cycle,tPlot) == 1
+        count = count + 1;
+        contourf(rho)
+        colormap hot
+        colorbar('location','southoutside')
+        M(count)=getframe;
+    end
 end
 
-%% Make pretty pictures
-contourf(rho)
-colormap hot
-colorbar('location','southoutside')
+%% Make Movie
+movie(M,2,10); % movie(M,n,fps)

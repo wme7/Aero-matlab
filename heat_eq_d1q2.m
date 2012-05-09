@@ -22,13 +22,16 @@ w     = [1/2,1/2];
 cx    = [  1, -1];
 cy    = [  0,  0];
 links = [  1,  2];
-iter  = 200; % time steps
+tEnd  = 200; % time steps
+tPlot = 10;
+frames= tEnd/tPlot;
+count = 0;
 
 %% Boundary Conditions
 twall = 1; 
 
 %% Main Loop
-for k = 1:iter;
+for cycle = 1:tEnd;
     % Collision process
     rho = f1+f2;
     
@@ -51,7 +54,18 @@ for k = 1:iter;
     f1(1) = twall-f2(1);    %Dirichlet BC
     f1(n) = f1(n-1);        %Neumann BC
     f2(n) = f2(n-1);        %Neumann BC
+    
+    % Visualization every tPlot
+    if mod(cycle,tPlot) == 1
+        count = count + 1;
+        plot(x,rho);
+        M(count)=getframe;
+    end
 end
 
 %% Make pretty figures
+figure
 plot(x,rho);
+
+%% Make Movie
+movie(M,3,10); % movie(M,n,fps)

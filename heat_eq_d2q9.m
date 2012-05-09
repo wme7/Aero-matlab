@@ -25,7 +25,10 @@ w     = [4/9,1/9,1/9,1/9,1/9,1/36,1/36,1/36,1/36];
 cx    = [  0,  1,  0, -1,  0,   1,  -1,  -1,   1];
 cy    = [  0,  0, -1,  0,  1,  -1,  -1,   1,   1];
 links = [  1,  2,  3,  4,  5,   6,   7,   8,   9];
-iter  = 10; % time steps
+tEnd  = 100; % time steps
+tPlot = 10;
+frames= tEnd/tPlot;
+count = 0;
 
 %% Boundary Conditions
 twall = 1; 
@@ -40,7 +43,7 @@ for k = links;
 end
 
 %% Main Loop
-for iterations = 2:iter;
+for cycle = 1:tEnd;
     % Collision process
     for k = links;
         sum = sum + f(:,:,k);
@@ -69,20 +72,6 @@ for iterations = 2:iter;
     f(m,:,5) = -f(m,:,3);
     f(m,:,9) = -f(m,:,7);
 
-%     f(:,n,4) = 0;
-%     f(:,n,2) = 0;
-%     f(:,n,7) = 0;
-%     f(:,n,9) = 0;
-%     f(:,n,8) = 0;
-%     f(:,n,6) = 0;
-%     
-%     f(m,:,8) = 0;
-%     f(m,:,6) = 0;
-%     f(m,:,5) = 0;
-%     f(m,:,3) = 0;
-%     f(m,:,9) = 0;
-%     f(m,:,7) = 0;
-
     f(1,:,1) = f(2,:,1);
     f(1,:,2) = f(2,:,2);
     f(1,:,3) = f(2,:,3);
@@ -92,9 +81,16 @@ for iterations = 2:iter;
     f(1,:,7) = f(2,:,7);
     f(1,:,8) = f(2,:,8);
     f(1,:,9) = f(2,:,9);
+    
+    % Visualization
+    if mod(cycle,tPlot) == 1
+        count = count + 1;
+        contourf(rho)
+        colormap hot
+        colorbar('location','southoutside')
+        M(count)=getframe;
+    end
 end
 
-%% Make pretty pictures
-contourf(rho)
-colormap hot
-colorbar('location','southoutside')
+%% Make Movie
+movie(M,2,10); % movie(M,n,fps)
