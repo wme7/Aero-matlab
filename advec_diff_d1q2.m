@@ -26,9 +26,11 @@ cx    = [  1, -1];
 cy    = [  0,  0];
 links = [  1,  2];
 tEnd  = 500; % time steps
-tPlot = 10;
-frames= tEnd/tPlot;
-count = 0;
+
+%% Movie Parameters
+tPlot = 10; frames= tEnd/tPlot; count = 0;
+figure(1) 
+colordef white
 
 %% Boundary Conditions
 twall = 1; 
@@ -59,6 +61,19 @@ for cycle = 1:tEnd;
         plot(x,rho);
         M(count)=getframe;
     end
+    
+        % Animated gif file
+    if mod(cycle,tPlot) == 1
+        F = getframe;
+        if count == 1
+            [im,map] = rgb2ind(F.cdata,256,'nodither');
+            im(1,1,1,tEnd/tPlot) = 0;
+        end
+        im(:,:,1,count) = rgb2ind(F.cdata,map,'nodither');
+    end
 end
 %% Make Movie
 movie(M,2,10); % movie(M,n,fps)
+
+%% Export to Gif
+imwrite(im,map,'advec_diff_d1q2.gif','DelayTime',0,'LoopCount',3)
