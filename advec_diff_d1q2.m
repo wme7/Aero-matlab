@@ -47,8 +47,8 @@ for cycle = 1:tEnd;
     f2 = (1-omega) * f2 + omega * feq2;
     % Streaming process
     
-    f1 = stream2d( f1 , [cx(1),cy(1)]);
-    f2 = stream2d( f2 , [cx(2),cy(2)]);
+    f1 = stream2d( f1 , [cy(1),cx(1)]);
+    f2 = stream2d( f2 , [cy(2),cx(2)]);
 
     % Boundary condition
     f1(1) = twall-f2(1);    %Dirichlet BC
@@ -59,6 +59,9 @@ for cycle = 1:tEnd;
     if mod(cycle,tPlot) == 1
         count = count + 1;
         plot(x,rho);
+        title '1D Advection-Diffusion using LBM D1Q2'
+        xlabel 'x cell'
+        ylabel 'Temperature'
         M(count)=getframe;
     end
     

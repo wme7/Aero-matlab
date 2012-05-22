@@ -37,7 +37,7 @@ tEnd  = 400; % time steps
 %% Movie Parameters
 tPlot = 10; frames= tEnd/tPlot; count = 0;
 figure(1)
-colordef black
+colordef white %black
 
 %% Boundary Conditions
 twall = 1; 
@@ -63,10 +63,10 @@ for cycle = 2:tEnd;
     f4 = omega * feq4 + (1-omega) * f4;
  
     % Streaming process
-    f1 = stream2d( f1 , [cx(1),cy(1)]);
-    f2 = stream2d( f2 , [cx(2),cy(2)]);
-    f3 = stream2d( f3 , [cx(3),cy(3)]);
-    f4 = stream2d( f4 , [cx(4),cy(4)]);
+    f1 = stream2d( f1 , [cy(1),cx(1)]);
+    f2 = stream2d( f2 , [cy(2),cx(2)]);
+    f3 = stream2d( f3 , [cy(3),cx(3)]);
+    f4 = stream2d( f4 , [cy(4),cx(4)]);
     
     % Boundary conditions
     f1(:,1) = twall*w(1) + twall*w(2) - f2(:,1); %Dirichlet BC

@@ -10,8 +10,8 @@ function F = stream2d(A,vector)
 
 v = length(vector);
 
-    x = vector(1);
-    y = vector(2);
+    y = vector(1);
+    x = vector(2);
 
 [m,n] = size(A);
 

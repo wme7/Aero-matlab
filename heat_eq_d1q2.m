@@ -27,6 +27,11 @@ tPlot = 10;
 frames= tEnd/tPlot;
 count = 0;
 
+%% Movie Parameters
+tPlot = 10; frames= tEnd/tPlot; count = 0;
+figure(1) 
+colordef white
+
 %% Boundary Conditions
 twall = 1; 
 
@@ -41,8 +46,8 @@ for cycle = 1:tEnd;
     f1 = (1-omega) * f1 + omega * feq;
     f2 = (1-omega) * f2 + omega * feq;
     % Streaming process
-    f1 = stream2d( f1 , [cx(1),cy(1)]);
-    f2 = stream2d( f2 , [cx(2),cy(2)]);
+    f1 = stream2d( f1 , [cy(1),cx(1)]);
+    f2 = stream2d( f2 , [cy(2),cx(2)]);
 
 %   % Original streaming process in A.A.Mohamad    
 %     for i = 2:n-1;  % Double streaming in one loop
@@ -59,13 +64,28 @@ for cycle = 1:tEnd;
     if mod(cycle,tPlot) == 1
         count = count + 1;
         plot(x,rho);
+        title '1D Heat Equation using LBM D1Q2'
+        xlabel 'x cell'
+        ylabel 'Temperature'
         M(count)=getframe;
+    end
+    
+    % Animated gif file
+    if mod(cycle,tPlot) == 1
+        F = getframe;
+        if count == 1
+            [im,map] = rgb2ind(F.cdata,256,'nodither');
+            im(1,1,1,tEnd/tPlot) = 0;
+        end
+        im(:,:,1,count) = rgb2ind(F.cdata,map,'nodither');
     end
 end
 
 %% Make pretty figures
-figure
-plot(x,rho);
+%plot(x,rho);
 
 %% Make Movie
 movie(M,3,10); % movie(M,n,fps)
+
+%% Export to Gif
+imwrite(im,map,'heat_eq_d1q2.gif','DelayTime',0,'LoopCount',3)
