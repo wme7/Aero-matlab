@@ -26,9 +26,11 @@ cx    = [  1, -1];
 cy    = [  0,  0];
 links = [  1,  2];
 tEnd  = 500; % time steps
-tPlot = 10;
-frames= tEnd/tPlot;
-count = 0;
+
+%% Movie Parameters
+tPlot = 10; frames= tEnd/tPlot; count = 0;
+figure(1) 
+colordef white
 
 %% Boundary Conditions
 twall = 1; 
@@ -45,8 +47,8 @@ for cycle = 1:tEnd;
     f2 = (1-omega) * f2 + omega * feq2;
     % Streaming process
     
-    f1 = stream2d( f1 , [cx(1),cy(1)]);
-    f2 = stream2d( f2 , [cx(2),cy(2)]);
+    f1 = stream2d( f1 , [cy(1),cx(1)]);
+    f2 = stream2d( f2 , [cy(2),cx(2)]);
 
     % Boundary condition
     f1(1) = twall-f2(1);    %Dirichlet BC
@@ -57,8 +59,24 @@ for cycle = 1:tEnd;
     if mod(cycle,tPlot) == 1
         count = count + 1;
         plot(x,rho);
+        title '1D Advection-Diffusion using LBM D1Q2'
+        xlabel 'x cell'
+        ylabel 'Temperature'
         M(count)=getframe;
+    end
+    
+        % Animated gif file
+    if mod(cycle,tPlot) == 1
+        F = getframe;
+        if count == 1
+            [im,map] = rgb2ind(F.cdata,256,'nodither');
+            im(1,1,1,tEnd/tPlot) = 0;
+        end
+        im(:,:,1,count) = rgb2ind(F.cdata,map,'nodither');
     end
 end
 %% Make Movie
 movie(M,2,10); % movie(M,n,fps)
+
+%% Export to Gif
+imwrite(im,map,'advec_diff_d1q2.gif','DelayTime',0,'LoopCount',3)

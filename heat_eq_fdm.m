@@ -33,4 +33,8 @@ for k = 2:iter;
 end
 
 %% Make pretty figures
+figure
 plot(x,fo)
+title '1D Heat Equation using FDM'
+xlabel 'x cell'
+ylabel 'Temperature'

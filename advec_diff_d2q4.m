@@ -23,7 +23,7 @@ rho  = zeros(m,n); % initial value of the dependent variable rho = T(x,t)
 
 %% Constants
 u     = 0.1;
-v     = 0.2; % <- interesting result if we change to -v!
+v     = -0.2; % <- interesting result if we change to -v!
 ck    = dx/dt;
 csq   = (dx^2)/(dt^2);
 alpha = 0.25;
@@ -35,9 +35,9 @@ link  = [  1,  2,  3,  4];
 tEnd  = 400; % time steps
 
 %% Movie Parameters
-tPlot = 10;
-frames= tEnd/tPlot; % Total frames
-count = 0;
+tPlot = 10; frames= tEnd/tPlot; count = 0;
+figure(1)
+colordef white %black
 
 %% Boundary Conditions
 twall = 1; 
@@ -63,10 +63,10 @@ for cycle = 2:tEnd;
     f4 = omega * feq4 + (1-omega) * f4;
  
     % Streaming process
-    f1 = stream2d( f1 , [cx(1),cy(1)]);
-    f2 = stream2d( f2 , [cx(2),cy(2)]);
-    f3 = stream2d( f3 , [cx(3),cy(3)]);
-    f4 = stream2d( f4 , [cx(4),cy(4)]);
+    f1 = stream2d( f1 , [cy(1),cx(1)]);
+    f2 = stream2d( f2 , [cy(2),cx(2)]);
+    f3 = stream2d( f3 , [cy(3),cx(3)]);
+    f4 = stream2d( f4 , [cy(4),cx(4)]);
     
     % Boundary conditions
     f1(:,1) = twall*w(1) + twall*w(2) - f2(:,1); %Dirichlet BC
@@ -93,13 +93,23 @@ for cycle = 2:tEnd;
         contourf(rho)
         colormap hot
         colorbar('location','southoutside')
-        M(count)=getframe;
-        %im(:,:,1,k) = rgb2ind(M.cdata,map,'nodither');
+        axis tight
+        M(count) = getframe;
+    end
+    
+    % Animated gif file
+    if mod(cycle,tPlot) == 1
+        F = getframe;
+        if count == 1
+            [im,map] = rgb2ind(F.cdata,256,'nodither');
+            im(1,1,1,tEnd/tPlot) = 0;
+        end
+        im(:,:,1,count) = rgb2ind(F.cdata,map,'nodither');
     end
 end
 
 %% Make Movie
-movie(M,2,10); % movie(M,n,fps)
+movie(M,1,10); % movie(M,n,fps)
 
 %% Export to Gif
-%imwrite(im,map,'DancingPeaks.gif','DelayTime',0,'LoopCount',inf)
+imwrite(im,map,'advec_diff_d2q4.gif','DelayTime',0,'LoopCount',3)

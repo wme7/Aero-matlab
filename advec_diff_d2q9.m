@@ -1,4 +1,4 @@
-%% 2D Heat Transfer D2Q9
+%% 2D Advection-Diffusion D2Q9
 % by Manuel Diaz 05/2012
 clc; clear; close all;
 
@@ -56,7 +56,7 @@ for cycle = 1:tEnd;
     
     % Streaming process
     for k = links
-        f(:,:,k) = stream2d(f(:,:,k) , [cx(k),cy(k)]);
+        f(:,:,k) = stream2d(f(:,:,k) , [cy(k),cx(k)]);
     end
     
     % Boundary conditions
@@ -88,7 +88,7 @@ for cycle = 1:tEnd;
         contourf(rho)
         colormap hot
         colorbar('location','southoutside')
-        title '2D Heat_Equation using LBM D2Q9'
+        title '2D Advection-Diffusion using LBM D2Q9'
         M(count)=getframe;
     end
 end
