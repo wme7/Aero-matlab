@@ -17,9 +17,9 @@
 clc; clear; close all;
 
 %% Domain Grid
-lx = 100;    % cells in x
-ly = 40;    % cells in y
-lz = 40;    % cells in z
+lx = 200;    % cells in x
+ly = 100;    % cells in y
+lz = 100;    % cells in z
 m  = lx; n = ly; p  = lz; dx = lx/n; dy = ly/m; dt = 1; dz = lz/p;
 x  = 1:dx:lx; y = 1:dy:ly; z = 1:dz:lz;
 K  = 19;    % Total linkages
@@ -66,11 +66,12 @@ count = 0;
 %% Find the cells of our obstacles
 [x,y,z] = meshgrid(1:lx,1:ly,1:lz);
 obst    = (x - obst_x).^2 + (y - obst_y).^2 + (z - obst_z).^2 <= obst_r^2;
-obst([1,ly],:,:) = 4;   % top and bottom bb-cells 
-obst(:,:,[1,lz]) = 4;   % left and right bb-cells 
+%obst([1,ly],:,:) = 4;   % top and bottom bb-cells 
+%obst(:,:,[1,lz]) = 4;   % left and right bb-cells 
 bbRegion = find(obst);  % boolean mask for the bb-cells
+
 % Un comment to view boolean Region:
-% PATCH_3Darray(obst,1:ly,1:lx,1:lz)
+PATCH_3Darray(obst,1:ly,1:lx,1:lz)
 
 % L   = y - 2; y_phys = y - 1.5;
 % ux  = 4*uMax*(y_phys.*L-y_phys.^2)/L^2;

@@ -2,11 +2,12 @@
 % Heat equation with variable coeficients using Succesive Over Relaxation
 % Method with relaxation parameter $\omega = 1.8$
 %
-% $\frac{\partial}{\partial x}\left (k(x,y)\frac{\partial{T}}{\partial{x}} \right )+\frac{\partial}{\partial x}\left (k(x,y)\frac{\partial{T}}{\partial{y}} \right)=0$
+% $$\frac{\partial}{\partial x}\left (k(x,y)\frac{\partial{T}}{\partial{x}}
+% \right )+\frac{\partial}{\partial x}\left (k(x,y)\frac{\partial{T}}{\partial{y}} \right)=0$$
 %
 % where:
 %
-% $k(x,y)=1+exp\left[-\left( \frac{x-0.25-0.5y}{0.25} \right)^2 \right]$
+% $$k(x,y)=1+exp\left[-\left( \frac{x-0.25-0.5y}{0.25} \right)^2 \right]$$
 
 %close all
 clear all
