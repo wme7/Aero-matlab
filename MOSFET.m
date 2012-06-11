@@ -1,7 +1,7 @@
-%% Escalar Poisson Equation rutine solver for
+%% Escalar Poisson Equation 
 % 
 % Routine for solving a PNP-MOSFET junction for the region:
-%┌________________________┐
+% ________________________
 %|++++|    ---N---   |++++|
 %|+P++|              |+P++|
 %|++++|              |++++|
