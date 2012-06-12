@@ -26,12 +26,14 @@
 clear, clc, %close all;
 
 %% IC's
-omega = 1.6;    % Relaxation constant
-delta = 0.1;    % using an uniform grid: delta = dx = dy 
-tau   = 1.0;    % any constant, tau=0: laplace eqn problem
+omega = 1.50;    % Relaxation constant
+delta = 0.10;    % using an uniform grid: delta = dx = dy 
+tau   = 1.00;    % any constant, tau=0: laplace eqn problem
 
-L = 1.8; dx = delta; x = 0.1:dx:L; n  = 18;
-H = 1.2; dy = delta; y = 0.1:dy:H; m  = 12;
+dx = delta; dy = delta;
+
+n = 18; L = n*dy; % Length of our domain
+m = 12; H = m*dx; % Height of our domain
 
 %% Grid
 n_d = ones(m,n);            % initial doping value for silicon
