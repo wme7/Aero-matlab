@@ -137,23 +137,23 @@ for s = 1:sEnd
     phi = phi_next;
         
     % Visualization
-%     if mod(s,sPlot) == 1
-%         counter = counter + 1;
-%         contourf(phi)
-%         colormap hot
-%         colorbar('location','southoutside')
-%         M(count) = getframe;
-%     end
+    if mod(s,sPlot) == 1
+        counter = counter + 1;
+        contourf(phi)
+        colormap hot
+        colorbar('location','southoutside')
+        M(counter) = getframe;
+    end
     
     % Animated gif file
-%     if mod(s,sPlot) == 1
-%         F = getframe;
-%         if count == 1
-%             [im,map] = rgb2ind(F.cdata,256,'nodither');
-%             im(1,1,1,sEnd/sPlot) = 0;
-%         end
-%         im(:,:,1,count) = rgb2ind(F.cdata,map,'nodither');
-%     end
+    if mod(s,sPlot) == 1
+        F = getframe;
+        if counter == 1
+            [im,map] = rgb2ind(F.cdata,256,'nodither');
+            im(1,1,1,sEnd/sPlot) = 0;
+        end
+        im(:,:,1,counter) = rgb2ind(F.cdata,map,'nodither');
+    end
     
 end
 
@@ -167,7 +167,7 @@ colormap hot
 colorbar('location','southoutside')
 
 %% Make Movie
-% movie(M,1,10); % movie(M,n,fps)
+movie(M,2,10); % movie(M,n,fps)
 
 %% Export to Gif
-% imwrite(im,map,'SOR_poisson.gif','DelayTime',0,'LoopCount',3)
+imwrite(im,map,'SOR_poisson.gif','DelayTime',0,'LoopCount',3)
