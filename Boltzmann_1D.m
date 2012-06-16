@@ -9,8 +9,8 @@ H  = 1;     % Physical domain height
 lx = 12;    % number of cells in x direction
 ly = 12;    % number of cells in y direction
 [y,x] = meshgrid(1:ly,1:lx); % get coordinate of matrix indices
-dx = 1/lx;  % delta x
-dy = 1/ly;  % delta y
+dx = L/lx;  % delta x
+dy = H/ly;  % delta y
 
 %% Velocity Grid
 V  = [-20,20];
@@ -30,20 +30,13 @@ fnext = zeros(ly,lx);
 [nx,w] = GaussHermite(20);
 
 %% Initial Conditions
-u = zeros(1,lx);
-t = zeros(1,lx);
-z = zeros(1,lx);
-
 % Left side:
-    ul = 0;         % velocity
-    tl = 4.383850;  % temperature
-    zl = 0.2253353; % fugacity
+    u(1,1:lx/2)    = 0;         % velocity
+    t(1,1:lx/2)    = 4.383850;  % temperature
+    z(1,1:lx/2)    = 0.2253353; % fugacity
 % Right side:
-    ur = 0;         % velocity
-    tr = 8.972544;  % temperature
-    zr = 0.1204582; % fugacity
+    u(1,lx/2+1:lx) = 0;         % velocity
+    t(1,lx/2+1:lx) = 8.972544;  % temperature
+    z(1,lx/2+1:lx) = 0.1204582; % fugacity
 
-u(1,1:lx/2) = ul;  u(1,lx/2+1:lx) = ur;
-t(1,1:lx/2) = tl;  t(1,lx/2+1:lx) = tr;
-z(1,1:lx/2) = zl;  z(1,lx/2+1:lx) = zr;
 
