@@ -1,7 +1,7 @@
-function f = myfunction(x,m)
+function f = myfunction(x)
 %% Function for Exercise problem:
 % (1.) Just for this case if x = 0 then must be f(x)=0,
-% (2.) m = is predefinet to evaluate the cases x={2,9,5.5}.
+% (2.) m = is predefinet to evaluate the cases m={2,9,5.5}.
 m=9;
 if x==0
     f=0;

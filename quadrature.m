@@ -1,6 +1,5 @@
 %% Quadrature
 % Using quad to integrate f(x)
-
 clear
 clc
 
