@@ -52,5 +52,5 @@ end
     t(1,lx/2+1:lx) = 8.972544;  % temperature
     z(1,lx/2+1:lx) = 0.1204582; % fugacity
 
-% Equilibrium Distribution:
+% Equilibrium Distribution function:
 %f = 1 /(z^(-1)*exp(()^2/t)+theta);
