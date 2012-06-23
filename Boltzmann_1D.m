@@ -75,11 +75,11 @@ f = zeros(lv,lx);  feq = zeros(lv,lx); fnext = zeros(lv,lx);
 
 %% Recover Initial Macroscopic Properties:
 % Using Quadrature rules to integrate for:
-    n = k*sum(w .* feq);    % Number density
-    u = k*sum(v .* w .* feq);   % Macrospic velocity in x
-    E = k*sum(1/2*( v.^2 ).* w .* feq); % Energy
+    n   = k*sum(w .* feq);    % Number density
+    u_n = k*sum(v .* w .* feq);   % Macrospic velocity in x
+    E   = k*sum(1/2*( v.^2 ).* w .* feq); % Energy
 % Plot Macroscopic Properties of feq:
-    % plot(x,n,x,u,x,E) 
+    %plot(x,n,x,u,x,E) 
 
 %% Advection Scheme
 % By negleting any force field acting over our domian, The Boltzmann equation
@@ -97,8 +97,8 @@ end
 
 %% Recover Macroscopic Properties:
 % Using Quadrature rules to integrate for:
-    n = k*sum(w .* feq);    % Number density
-    u = k*sum(v .* w .* feq);   % Macrospic velocity in x
-    E = k*sum(1/2*( v.^2 ).* w .* feq); % Energy
+    n   = k*sum(w .* feq)    % Number density
+    u_n = k*sum(v .* w .* feq)   % Macrospic velocity in x
+    E   = k*sum(1/2*( v.^2 ).* w .* feq) % Energy
 % Plot Macroscopic Properties of feq:
-    % plot(x,n,x,u,x,E) 
+     plot(x,n,x,u,x,E) 

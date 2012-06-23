@@ -28,11 +28,11 @@ function Q=cotes(f,a,b,N,nodes)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-N=(nodes-1)*ceil(N/(nodes-1));  N1=N+1;
-x=linspace(a,b,N1)';
-h=x(2)-x(1);    g=f(x);
+N = (nodes-1)*ceil(N/(nodes-1));  N1=N+1;
+x = linspace(a,b,N1)';
+h = x(2)-x(1);    g=f(x);
 
-endpts=g(1)+g(N1);
+endpts = g(1)+g(N1);
 
 switch nodes
 

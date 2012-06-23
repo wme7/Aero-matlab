@@ -1,0 +1,241 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Boltzmann_1D</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-06-21"><meta name="DC.source" content="Boltzmann_1D.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">1D Boltzmann Equation</a></li><li><a href="#2">Simulation Parameters</a></li><li><a href="#3">Space Discretization</a></li><li><a href="#4">Velocity Discretization:</a></li><li><a href="#5">Velocity-Space Grid:</a></li><li><a href="#6">Initial Conditions</a></li><li><a href="#7">Distribution function:</a></li><li><a href="#8">Recover Initial Macroscopic Properties:</a></li><li><a href="#9">Advection Scheme</a></li><li><a href="#10">Recover Macroscopic Properties:</a></li></ul></div><h2>1D Boltzmann Equation<a name="1"></a></h2><p>Numerical solution of the boltzmann equation to recover Euler macroscopic continuum solution. By Manuel Diaz</p><p>Boltzmann Trasnport Equation:</p><p><img src="Boltzmann_1D_eq19014.png" alt="$$\frac{\partial f}{\partial t}+\vec F\cdot \nabla_p f + \vec v&#xA;\cdot\nabla_{\vec x} f =\widehat{\Omega } (f)$$"></p><pre class="codeinput">clc;  clear <span class="string">all</span>;  close <span class="string">all</span>;
+</pre><h2>Simulation Parameters<a name="2"></a></h2><pre class="codeinput">CFL   = 0.8;    <span class="comment">% CFL condition</span>
+tEnd  = 0.1;    <span class="comment">% Out time</span>
+theta = 0;      <span class="comment">% for FD = -1, MB = 0, BE = +1</span>
+quad  = 1;      <span class="comment">% for NC = 1 , GH = 2</span>
+advec = 1;      <span class="comment">% for TVD = 1, WENO5 = 2</span>
+</pre><h2>Space Discretization<a name="3"></a></h2><pre class="codeinput">L  = [0 1];     <span class="comment">% Physical domain Length</span>
+H  = [0 0];     <span class="comment">% Physical domain Height</span>
+D  = [0 0];     <span class="comment">% Physical domain Depth</span>
+lx = 12;        <span class="comment">% number of nodes</span>
+ly = 12;        <span class="comment">% number of nodes</span>
+lz = 12;        <span class="comment">% number of nodes</span>
+dx = (L(2)-L(1))/(lx-1);  <span class="comment">% delta x</span>
+dy = (H(2)-H(1))/(ly-1);  <span class="comment">% delta y</span>
+dz = (D(2)-D(1))/(lz-1);  <span class="comment">% delta z</span>
+x = L(1):dx:L(2); y = H(1):dy:H(2); z = D(1):dz:D(2);
+</pre><h2>Velocity Discretization:<a name="4"></a></h2><pre class="codeinput"><span class="keyword">switch</span> quad
+
+    <span class="keyword">case</span>{1} <span class="comment">% Newton Cotes Quadrature:</span>
+    V  = [-10,10];  <span class="comment">% range: a to b</span>
+    lv = 40;       <span class="comment">% nodes desired (may not the actual value)</span>
+    [v,w,k] = cotes_xw(V(1),V(2),lv,5); <span class="comment">% cotes Degree 5</span>
+
+    <span class="keyword">case</span>{2} <span class="comment">% Gauss Hermite Quadrature:</span>
+    lv = 20;        <span class="comment">% nodes desired (the actual value)</span>
+    [v,w] = GaussHermite(lv); <span class="comment">% for integrating range: -inf to inf</span>
+     k = 1;         <span class="comment">% quadrature constant.</span>
+
+    <span class="keyword">otherwise</span>
+        error(<span class="string">'Order must be between 1 and 2'</span>);
+<span class="keyword">end</span>
+</pre><h2>Velocity-Space Grid:<a name="5"></a></h2><p>The actual lv and lx value will be computed using 'lenght' vector function:</p><pre class="codeinput">clear <span class="string">lv</span>; lv = length(v);
+clear <span class="string">lx</span>; lx = length(x);
+[nv,nx] = meshgrid(1:lv,1:lx); <span class="comment">% get coordinate of matrix indices</span>
+<span class="comment">% Initialize Arrays</span>
+u = zeros(lv,lx);  t = zeros(lv,lx);   r=zeros(lv,lx);
+v = v*ones(1,lx);  w = w*ones(1,lx);
+f = zeros(lv,lx);  feq = zeros(lv,lx); fnext = zeros(lv,lx);
+</pre><h2>Initial Conditions<a name="6"></a></h2><p>Macroscopic Velocity, Temperature and Fugacity</p><pre class="codeinput"><span class="comment">% Left side:</span>
+    u(1:lv,1:lx/2) = 0;             <span class="comment">% velocity</span>
+    t(1:lv,1:lx/2) = 4.383850;      <span class="comment">% temperature</span>
+    r(1:lv,1:lx/2) = 0.2253353;     <span class="comment">% fugacity</span>
+<span class="comment">% Right side:</span>
+    u(1:lv,lx/2+1:lx) = 0;          <span class="comment">% velocity</span>
+    t(1:lv,lx/2+1:lx) = 8.972544;   <span class="comment">% temperature</span>
+    r(1:lv,lx/2+1:lx) = 0.1204582;  <span class="comment">% fugacity</span>
+</pre><h2>Distribution function:<a name="7"></a></h2><p>Compute initial Equilibrium distribution function:</p><pre class="codeinput">    feq = 1 ./ ( exp( (v-u).^2 ./ t) ./ r  + theta );
+<span class="comment">% Plot initial Equilibrium function:</span>
+    surface(feq)
+</pre><img vspace="5" hspace="5" src="Boltzmann_1D_01.png" alt=""> <h2>Recover Initial Macroscopic Properties:<a name="8"></a></h2><p>Using Quadrature rules to integrate for:</p><pre class="codeinput">    n = k*sum(w .* feq);    <span class="comment">% Number density</span>
+    u = k*sum(v .* w .* feq);   <span class="comment">% Macrospic velocity in x</span>
+    E = k*sum(1/2*( v.^2 ).* w .* feq); <span class="comment">% Energy</span>
+<span class="comment">% Plot Macroscopic Properties of feq:</span>
+    <span class="comment">% plot(x,n,x,u,x,E)</span>
+</pre><h2>Advection Scheme<a name="9"></a></h2><p>By negleting any force field acting over our domian, The Boltzmann equation would resemble to a pure advection equation. Thus we use WENO or TVD subroutine to compute the advection of the information in the grid:</p><pre class="codeinput"><span class="keyword">switch</span> advec
+
+    <span class="keyword">case</span>{1} <span class="comment">%TVD</span>
+
+    <span class="keyword">case</span>{2} <span class="comment">%WENO5</span>
+
+    <span class="keyword">otherwise</span>
+        error(<span class="string">'Order must be between 1 and 2'</span>);
+<span class="keyword">end</span>
+</pre><h2>Recover Macroscopic Properties:<a name="10"></a></h2><p>Using Quadrature rules to integrate for:</p><pre class="codeinput">    n = k*sum(w .* feq);    <span class="comment">% Number density</span>
+    u = k*sum(v .* w .* feq);   <span class="comment">% Macrospic velocity in x</span>
+    E = k*sum(1/2*( v.^2 ).* w .* feq); <span class="comment">% Energy</span>
+<span class="comment">% Plot Macroscopic Properties of feq:</span>
+    <span class="comment">% plot(x,n,x,u,x,E)</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% 1D Boltzmann Equation
+% Numerical solution of the boltzmann equation to recover Euler macroscopic
+% continuum solution.
+% By Manuel Diaz
+%
+% Boltzmann Trasnport Equation:
+%
+% $$\frac{\partial f}{\partial t}+\vec F\cdot \nabla_p f + \vec v
+% \cdot\nabla_{\vec x} f =\widehat{\Omega } (f)$$
+%
+clc;  clear all;  close all;
+
+%% Simulation Parameters
+CFL   = 0.8;    % CFL condition
+tEnd  = 0.1;    % Out time
+theta = 0;      % for FD = -1, MB = 0, BE = +1
+quad  = 1;      % for NC = 1 , GH = 2
+advec = 1;      % for TVD = 1, WENO5 = 2
+
+%% Space Discretization
+L  = [0 1];     % Physical domain Length
+H  = [0 0];     % Physical domain Height
+D  = [0 0];     % Physical domain Depth
+lx = 12;        % number of nodes 
+ly = 12;        % number of nodes
+lz = 12;        % number of nodes
+dx = (L(2)-L(1))/(lx-1);  % delta x
+dy = (H(2)-H(1))/(ly-1);  % delta y
+dz = (D(2)-D(1))/(lz-1);  % delta z
+x = L(1):dx:L(2); y = H(1):dy:H(2); z = D(1):dz:D(2);
+
+%% Velocity Discretization:
+switch quad
+
+    case{1} % Newton Cotes Quadrature:
+    V  = [-10,10];  % range: a to b
+    lv = 40;       % nodes desired (may not the actual value)
+    [v,w,k] = cotes_xw(V(1),V(2),lv,5); % cotes Degree 5
+        
+    case{2} % Gauss Hermite Quadrature:
+    lv = 20;        % nodes desired (the actual value)
+    [v,w] = GaussHermite(lv); % for integrating range: -inf to inf
+     k = 1;         % quadrature constant.
+    
+    otherwise
+        error('Order must be between 1 and 2');
+end
+%% Velocity-Space Grid:
+% The actual lv and lx value will be computed using 'lenght' vector function:
+clear lv; lv = length(v);
+clear lx; lx = length(x);
+[nv,nx] = meshgrid(1:lv,1:lx); % get coordinate of matrix indices
+% Initialize Arrays
+u = zeros(lv,lx);  t = zeros(lv,lx);   r=zeros(lv,lx);    
+v = v*ones(1,lx);  w = w*ones(1,lx);
+f = zeros(lv,lx);  feq = zeros(lv,lx); fnext = zeros(lv,lx);
+
+%% Initial Conditions
+% Macroscopic Velocity, Temperature and Fugacity
+
+% Left side:
+    u(1:lv,1:lx/2) = 0;             % velocity
+    t(1:lv,1:lx/2) = 4.383850;      % temperature
+    r(1:lv,1:lx/2) = 0.2253353;     % fugacity
+% Right side:
+    u(1:lv,lx/2+1:lx) = 0;          % velocity
+    t(1:lv,lx/2+1:lx) = 8.972544;   % temperature
+    r(1:lv,lx/2+1:lx) = 0.1204582;  % fugacity
+
+%% Distribution function:
+% Compute initial Equilibrium distribution function:
+    feq = 1 ./ ( exp( (v-u).^2 ./ t) ./ r  + theta );
+% Plot initial Equilibrium function:
+    surface(feq)
+
+%% Recover Initial Macroscopic Properties:
+% Using Quadrature rules to integrate for:
+    n = k*sum(w .* feq);    % Number density
+    u = k*sum(v .* w .* feq);   % Macrospic velocity in x
+    E = k*sum(1/2*( v.^2 ).* w .* feq); % Energy
+% Plot Macroscopic Properties of feq:
+    % plot(x,n,x,u,x,E) 
+
+%% Advection Scheme
+% By negleting any force field acting over our domian, The Boltzmann equation
+% would resemble to a pure advection equation. Thus we use WENO or TVD
+% subroutine to compute the advection of the information in the grid:
+switch advec
+    
+    case{1} %TVD
+        
+    case{2} %WENO5 
+        
+    otherwise
+        error('Order must be between 1 and 2');
+end
+
+%% Recover Macroscopic Properties:
+% Using Quadrature rules to integrate for:
+    n = k*sum(w .* feq);    % Number density
+    u = k*sum(v .* w .* feq);   % Macrospic velocity in x
+    E = k*sum(1/2*( v.^2 ).* w .* feq); % Energy
+% Plot Macroscopic Properties of feq:
+    % plot(x,n,x,u,x,E) 
+##### SOURCE END #####
+--></body></html>
