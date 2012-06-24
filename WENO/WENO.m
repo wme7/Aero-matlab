@@ -1,235 +1,112 @@
-%function u_next = WENO5(f,x,u)
-%% Weighted Essentially Non-Oscilatory for 5th order Accuracy
-% WENO 5 implementation subroutine for computing numerical fluxes at the
-% right and left boundaries of the every cell, that is 
-% $v_{i+\frac{1}{2}}^{-}$ and % $v_{i-\frac{1}{2}}^{+}$. To solve for a 1D 
-% scalar advection equation. 
+% Weighted Essentially non-Oscilaroty (WENO) Scheme 
+% by Manuel Diaz
+% Example Algorithm to solve a 2D scalar advection equation:
 %
-% This algorithm based on lectures notes of:
+% $$du/dt + dF(u)/dx + dG(u)/dy = 0$$
+% where $dF/du = a$ and $dG/du = b$
 %
-%   Chi-Wang Shu; High-Order ENO and WENO schemes for Computational
-%   Fluid Dynamics, High-Order Methods for Computational Physics.
-%   Springer 1999.
-%
-% The basic idea is the following: instead of using only one of ENO
-% stencils to form a reconstruction, one uses a convex combination of all
-% of them as:
-%
-% For the right boundary: $v_{i+\frac{1}{2}}^{-}=\sum_{r=0}^{k-1}\omega_{r}
-% v_{i+\frac{1}{2}}^{(r)}$
-%
-% For the left boundary: $v_{i-\frac{1}{2}}^{+}=\sum_{r=0}^{k-1}
-% \widetilde{\omega}_{r} v_{i-\frac{1}{2}}^{(r)}$
-
-if lx == lenfth(u) 
-    error('the grid and data do not have the same length');
-end
-
+clear; clc; close all;
 %% Parameters
-k = 3;          % Polynomial degree
+a = 0.5;  % Scalar velocity in x direction
+b = 0.5;  % Scalar velocity in y direction
+k = 3;    % Degree of Polynomial to use
+CFL  = 0.55;
+sEnd = 10; % iterations
+
+%% Domain Discretization
+% Do nx and ny always > 4, for any 2D computation.
+% Do nx or  ny == 1 to perform a 1D case.
+dx = 1;     dy = 1; 
+nx = 10;    ny = 1;
+[x,y,d] = WENO_grid(nx,ny);
+
+% Parameters of Blocks dimensions
+l_1 = 1:ceil(nx/2); l_2 = ceil(nx/2)+1:nx;
+h_1 = 1:ceil(ny/2); h_2 = ceil(ny/2)+1:ny;
+
+%% Initial Condition: u(x,y,0)
+u = zeros(ny,nx);
+u(h_1,l_1) = 0.70; % block 1
+%u(h_1,l_2) = 0.10; % block 2
+%u(h_2,l_1) = 0.90; % block 3
+u(h_2,l_2) = 0.50; % block 4
 
 %% Constants
-epsilon = 1e-6; % to avoid any alpha's denominator to become zero.
+dt = min(dy,dx)*CFL/max(a,b);  % in this case dx = dy
+nu_x = a*dt/dx;
+nu_y = b*dt/dy;
 
-%% Compute the weights:
-for i = 1:lx
-end
-    switch k 
+%% Movie Parameters
+%sEnd  = 500; % iterations
+sPlot = 2; frames = sEnd/sPlot; counter = 0;
+figure(1)
+colordef white %black
 
-        case{1} % When k = 1; for 2nd order WENO
+%% TVD Method
+time = 0;
+for s = 1:sEnd
+    % Compute weights (W_rj)
+    w = WENO_weights(u,k,d);
 
-            d = 1;
-            w = 1; % not sure yet
-
-        case{2} % When k = 2; for 3rd order WENO
-
-            % Smooth Indicators:
-            beta(1) = (v(i+1)-v(i))^2; 
-            beta(2) = (v(i)-v(i-1))^2;
-            % dr contanst
-            d = [2/3 1/3];
-            % Smooth coeficients:
-            alpha(1) = d(1)/(epsilon + beta(1));
-            alpha(2) = d(2)/(epsilon + beta(2));
-            % Weights 
-            w(1) = alpha(1)/(sum(alpha));
-            w(2) = alpha(2)/(sum(alpha));
-
-        case{3} % When k = 3; for 5th order WENO
-
-            % Smooth Indicators:
-            beta(1) = 13/12*(v(i)-2*v(i+1)+vi(i+2))^2 + ...
-                1/4*(3*v(i)-4*v(i+1)+v(i+2))^2;
-            beta(2) = 13/12*(v(i-1)-2*v(i)+vi(i+1))^2 + ...
-                1/4*(v(i-1)-v(i+1))^2;
-            beta(3) = 13/12*(v(i-2)-2*v(i-1)+vi(i))^2 + ...
-                1/4*(3*v(i-2)-4*v(i-1)+v(i))^2;
-            % dr contanst
-            d = [3/10 6/10 1/10];
-            % Smooth coeficients:
-            alpha(1) = d(1)/(epsilon + beta(1));
-            alpha(2) = d(2)/(epsilon + beta(2));
-            alpha(3) = d(3)/(epsilon + beta(3));
-            % Weights 
-            w(1) = alpha(1)/(sum(alpha));
-            w(2) = alpha(2)/(sum(alpha));
-            w(3) = alpha(3)/(sum(alpha));
-
-        otherwise
-            error('only options: 1, 2 and 3');
+    % Compute WENO Fluxes:
+    [F_left,F_right,G_left,G_right]=WENO_flux(u,a,b,dx,dy,dt,w,d);
+    
+    % Compute new step:
+    u_next = u - dt/dx*(F_right-F_left) - dt/dy*(G_right-G_left);
+    u = u_next;
+    
+    % Update Boundary Conditions: All Neumann BC's
+    switch d % Dimension
+        case{1} %1D problem
+            u(y,1) = u(y,2); u(y,nx) = u(y,nx-1);
+        case{2} %2D problem
+            u(y,1) = u(y,2); u(y,nx) = u(y,nx-1);
+            u(1,:) = u(2,:); u(ny,:) = u(ny-1,:);
     end
     
-r   = [-1 0 1 2];
-j   = [ 1 2];
-c_rj = [11/6 -7/6  1/3; 1/3  5/6 -1/6; -1/6  5/6  1/3; 1/3 -7/6 11/6];
-
-%% Reconstruction:
-% Following the formulation of reconstuction polinomials for Right and Left
-% side; that is $v_{i+\frac{1}{2}}^{(r)}$ and $v_{i-\frac{1}{2}}^{(r)}$
-%
-% Polinomials are defined as: $v_{i+\frac{1}{2}}^{-}=\sum_{j=0}^{k-1}c_{rj}
-% \overline{v}_{i-r+j}$ and $v_{i-\frac{1}{2}}^{+}=\sum_{j=0}^{k-1}
-% \widetilde{c}_{rj} \overline{v}_{i-r+j}$
-
-% k = 1
-
-% k = 2
-
-% k = 3
-    % right    
-        vr(i) = c_rj(1,1)*v() + c_rj(1,2)*v() + c_rj(1,3)*v()
-    % left 
- 
-    eps = 1E-10
-    c1 = - 1./6.
-    c2 = 2./6.
-    c3 = 5./6.
-    c4 = - 7./6.
-    c5 = 11./6. 
-
-DO K = 1, NV
-DO L = 1, NV
-    vxp = max(v(k),0.)
-    vxm = min(v(k),0.) 
-    vyp = max(v(l),0.)
-    vym = min(v(l),0.) 
+    % Update time
+    time = time + dt;
     
-    DO I = 4, NX-3
-    DO J = 4, NY-3     
-             sl0mx = vxm*(13./12.)*(f(k,l,i-2,j)-2*f(k,l,i-1,j)+f(k,l,i,j))**2 + vxm*(1./4.)*(f(k,l,i-2,j)-4.*f(k,l,i-1,j)+3.*f(k,l,i,j))**2
-             sl1mx = vxm*(13./12.)*(f(k,l,i-1,j)-2*f(k,l,i,j)+f(k,l,i+1,j))**2 + vxm*(1./4.)*(f(k,l,i-1,j)-f(k,l,i+1,j))**2
-             sl2mx = vxm*(13./12.)*(f(k,l,i,j)-2*f(k,l,i+1,j)+f(k,l,i+2,j))**2 + vxm*(1./4.)*(3.*f(k,l,i,j)-4.*f(k,l,i+1,j)+f(k,l,i+2,j))**2
-             sl0px = vxp*(13./12.)*(f(k,l,i-3,j)-2*f(k,l,i-2,j)+f(k,l,i-1,j))**2 + vxp*(1./4.)*(f(k,l,i-3,j)-4.*f(k,l,i-2,j)+3.*f(k,l,i-1,j))**2
-             sl1px = vxp*(13./12.)*(f(k,l,i-2,j)-2*f(k,l,i-1,j)+f(k,l,i,j))**2 + vxp*(1./4.)*(f(k,l,i-2,j)-f(k,l,i,j))**2
-             sl2px = vxp*(13./12.)*(f(k,l,i-1,j)-2*f(k,l,i,j)+f(k,l,i+1,j))**2 + vxp*(1./4.)*(3.*f(k,l,i-1,j)-4.*f(k,l,i,j)+f(k,l,i+1,j))**2
-             sr0mx = vxm*(13./12.)*(f(k,l,i-1,j)-2*f(k,l,i,j)+f(k,l,i+1,j))**2 + vxm*(1./4.)*(f(k,l,i-1,j)-4.*f(k,l,i,j)+3.*f(k,l,i+1,j))**2
-             sr1mx = vxm*(13./12.)*(f(k,l,i,j)-2*f(k,l,i+1,j)+f(k,l,i+2,j))**2 + vxm*(1./4.)*(f(k,l,i,j)-f(k,l,i+2,j))**2
-             sr2mx = vxm*(13./12.)*(f(k,l,i+1,j)-2*f(k,l,i+2,j)+f(k,l,i+3,j))**2 + vxm*(1./4.)*(3.*f(k,l,i+1,j)-4.*f(k,l,i+2,j)+f(k,l,i+3,j))**2
-             sr0px = vxp*(13./12.)*(f(k,l,i-2,j)-2*f(k,l,i-1,j)+f(k,l,i,j))**2 + vxp*(1./4.)*(f(k,l,i-2,j)-4.*f(k,l,i-1,j)+3.*f(k,l,i,j))**2
-             sr1px = vxp*(13./12.)*(f(k,l,i-1,j)-2*f(k,l,i,j)+f(k,l,i+1,j))**2 + vxp*(1./4.)*(f(k,l,i-1,j)-f(k,l,i+1,j))**2
-             sr2px = vxp*(13./12.)*(f(k,l,i,j)-2*f(k,l,i+1,j)+f(k,l,i+2,j))**2 + vxp*(1./4.)*(3.*f(k,l,i,j)-4.*f(k,l,i+1,j)+f(k,l,i+2,j))**2
-             
-             sl0my = vym*(13./12.)*(f(k,l,i,j-2)-2*f(k,l,i,j-1)+f(k,l,i,j))**2 + vym*(1./4.)*(f(k,l,i,j-2)-4.*f(k,l,i,j-1)+3.*f(k,l,i,j))**2
-             sl1my = vym*(13./12.)*(f(k,l,i,j-1)-2*f(k,l,i,j)+f(k,l,i,j+1))**2 + vym*(1./4.)*(f(k,l,i,j-1)-f(k,l,i,j+1))**2
-             sl2my = vym*(13./12.)*(f(k,l,i,j)-2*f(k,l,i,j+1)+f(k,l,i,j+2))**2 + vym*(1./4.)*(3.*f(k,l,i,j)-4.*f(k,l,i,j+1)+f(k,l,i,j+2))**2
-             sl0py = vyp*(13./12.)*(f(k,l,i,j-3)-2*f(k,l,i,j-2)+f(k,l,i,j-1))**2 + vyp*(1./4.)*(f(k,l,i,j-3)-4.*f(k,l,i,j-2)+3.*f(k,l,i,j-1))**2
-             sl1py = vyp*(13./12.)*(f(k,l,i,j-2)-2*f(k,l,i,j-1)+f(k,l,i,j))**2 + vyp*(1./4.)*(f(k,l,i,j-2)-f(k,l,i,j))**2
-             sl2py = vyp*(13./12.)*(f(k,l,i,j-1)-2*f(k,l,i,j)+f(k,l,i,j+1))**2 + vyp*(1./4.)*(3.*f(k,l,i,j-1)-4.*f(k,l,i,j)+f(k,l,i,j+1))**2
-             sr0my = vym*(13./12.)*(f(k,l,i,j-1)-2*f(k,l,i,j)+f(k,l,i,j+1))**2 + vym*(1./4.)*(f(k,l,i,j-1)-4.*f(k,l,i,j)+3.*f(k,l,i,j+1))**2
-             sr1my = vym*(13./12.)*(f(k,l,i,j)-2*f(k,l,i,j+1)+f(k,l,i,j+2))**2 + vym*(1./4.)*(f(k,l,i,j)-f(k,l,i,j+2))**2
-             sr2my = vym*(13./12.)*(f(k,l,i,j+1)-2*f(k,l,i,j+2)+f(k,l,i,j+3))**2 + vym*(1./4.)*(3.*f(k,l,i,j+1)-4.*f(k,l,i,j+2)+f(k,l,i,j+3))**2
-             sr0py = vyp*(13./12.)*(f(k,l,i,j-2)-2*f(k,l,i,j-1)+f(k,l,i,j))**2 + vyp*(1./4.)*(f(k,l,i,j-2)-4.*f(k,l,i,j-1)+3.*f(k,l,i,j))**2
-             sr1py = vyp*(13./12.)*(f(k,l,i,j-1)-2*f(k,l,i,j)+f(k,l,i,j+1))**2 + vyp*(1./4.)*(f(k,l,i,j-1)-f(k,l,i,j+1))**2
-             sr2py = vyp*(13./12.)*(f(k,l,i,j)-2*f(k,l,i,j+1)+f(k,l,i,j+2))**2 + vyp*(1./4.)*(3.*f(k,l,i,j)-4.*f(k,l,i,j+1)+f(k,l,i,j+2))**2
-             
-             al0mx  = 1. / (10. * (eps + sl0mx))**2
-             al1mx  = 6. / (10. * (eps + sl1mx))**2
-             al2mx  = 3. / (10. * (eps + sl2mx))**2
-             al0px  = 1. / (10. * (eps + sl0px))**2
-             al1px  = 6. / (10. * (eps + sl1px))**2
-             al2px  = 3. / (10. * (eps + sl2px))**2
-             ar0mx  = 3. / (10. * (eps + sr0mx))**2
-             ar1mx  = 6. / (10. * (eps + sr1mx))**2
-             ar2mx  = 1. / (10. * (eps + sr2mx))**2
-             ar0px  = 3. / (10. * (eps + sr0px))**2
-             ar1px  = 6. / (10. * (eps + sr1px))**2
-             ar2px  = 1. / (10. * (eps + sr2px))**2
-             
-             al0my  = 1. / (10. * (eps + sl0my))**2
-             al1my  = 6. / (10. * (eps + sl1my))**2
-             al2my  = 3. / (10. * (eps + sl2my))**2
-             al0py  = 1. / (10. * (eps + sl0py))**2
-             al1py  = 6. / (10. * (eps + sl1py))**2
-             al2py  = 3. / (10. * (eps + sl2py))**2
-             ar0my  = 3. / (10. * (eps + sr0my))**2
-             ar1my  = 6. / (10. * (eps + sr1my))**2
-             ar2my  = 1. / (10. * (eps + sr2my))**2
-             ar0py  = 3. / (10. * (eps + sr0py))**2
-             ar1py  = 6. / (10. * (eps + sr1py))**2
-             ar2py  = 1. / (10. * (eps + sr2py))**2
-             !weightings x             
-             wl0mx  = al0mx / (al0mx+al1mx+al2mx)
-             wl1mx  = al1mx / (al0mx+al1mx+al2mx)
-             wl2mx  = al2mx / (al0mx+al1mx+al2mx)
-             wl0px  = al0px / (al0px+al1px+al2px)
-             wl1px  = al1px / (al0px+al1px+al2px)
-             wl2px  = al2px / (al0px+al1px+al2px)
-             wr0mx  = ar0mx / (ar0mx+ar1mx+ar2mx)
-             wr1mx  = ar1mx / (ar0mx+ar1mx+ar2mx)
-             wr2mx  = ar2mx / (ar0mx+ar1mx+ar2mx)
-             wr0px  = ar0px / (ar0px+ar1px+ar2px)
-             wr1px  = ar1px / (ar0px+ar1px+ar2px)
-             wr2px  = ar2px / (ar0px+ar1px+ar2px)
-             !weightings y
-             wl0my  = al0my / (al0my+al1my+al2my)
-             wl1my  = al1my / (al0my+al1my+al2my)
-             wl2my  = al2my / (al0my+al1my+al2my)
-             wl0py  = al0py / (al0py+al1py+al2py)
-             wl1py  = al1py / (al0py+al1py+al2py)
-             wl2py  = al2py / (al0py+al1py+al2py)
-             wr0my  = ar0my / (ar0my+ar1my+ar2my)
-             wr1my  = ar1my / (ar0my+ar1my+ar2my)
-             wr2my  = ar2my / (ar0my+ar1my+ar2my)
-             wr0py  = ar0py / (ar0py+ar1py+ar2py)
-             wr1py  = ar1py / (ar0py+ar1py+ar2py)
-             wr2py  = ar2py / (ar0py+ar1py+ar2py) 
-             !negative & positive fluxes x
-             flmx=vxm * (wl0mx*(c1*f(k,l,i-2,j)+c3*f(k,l,i-1,j)+c2*f(k,l,i,j))+wl1mx*(c2*f(k,l,i-1,j)+c3*f(k,l,i,j)+c1*f(k,l,i+1,j))+wl2mx*(c5*f(k,l,i,j)+c4*f(k,l,i+1,j)+c2*f(k,l,i+2,j))) 
-             flpx=vxp * (wl0px*(c2*f(k,l,i-3,j)+c4*f(k,l,i-2,j)+c5*f(k,l,i-1,j))+wl1px*(c1*f(k,l,i-2,j)+c3*f(k,l,i-1,j)+c2*f(k,l,i,j))+wl2px*(c2*f(k,l,i-1,j)+c3*f(k,l,i,j)+c1*f(k,l,i+1,j)))
-             frmx=vxm * (wr0mx*(c1*f(k,l,i-1,j)+c3*f(k,l,i,j)+c2*f(k,l,i+1,j))+wr1mx*(c2*f(k,l,i,j)+c3*f(k,l,i+1,j)+c1*f(k,l,i+2,j))+wr2mx*(c5*f(k,l,i+1,j)+c4*f(k,l,i+2,j)+c2*f(k,l,i+3,j)))
-             frpx=vxp * (wr0px*(c2*f(k,l,i-2,j)+c4*f(k,l,i-1,j)+c5*f(k,l,i,j))+wr1px*(c1*f(k,l,i-1,j)+c3*f(k,l,i,j)+c2*f(k,l,i+1,j))+wr2px*(c2*f(k,l,i,j)+c3*f(k,l,i+1,j)+c1*f(k,l,i+2,j)))
-             !negative & positive fluxes y
-             flmy=vym * (wl0my*(c1*f(k,l,i,j-2)+c3*f(k,l,i,j-1)+c2*f(k,l,i,j))+wl1my*(c2*f(k,l,i,j-1)+c3*f(k,l,i,j)+c1*f(k,l,i,j+1))+wl2my*(c5*f(k,l,i,j)+c4*f(k,l,i,j+1)+c2*f(k,l,i,j+2))) 
-             flpy=vyp * (wl0py*(c2*f(k,l,i,j-3)+c4*f(k,l,i,j-2)+c5*f(k,l,i,j-1))+wl1py*(c1*f(k,l,i,j-2)+c3*f(k,l,i,j-1)+c2*f(k,l,i,j))+wl2py*(c2*f(k,l,i,j-1)+c3*f(k,l,i,j)+c1*f(k,l,i,j+1)))
-             frmy=vym * (wr0my*(c1*f(k,l,i,j-1)+c3*f(k,l,i,j)+c2*f(k,l,i,j+1))+wr1my*(c2*f(k,l,i,j)+c3*f(k,l,i,j+1)+c1*f(k,l,i,j+2))+wr2my*(c5*f(k,l,i,j+1)+c4*f(k,l,i,j+2)+c2*f(k,l,i,j+3)))
-             frpy=vyp * (wr0py*(c2*f(k,l,i,j-2)+c4*f(k,l,i,j-1)+c5*f(k,l,i,j))+wr1py*(c1*f(k,l,i,j-1)+c3*f(k,l,i,j)+c2*f(k,l,i,j+1))+wr2py*(c2*f(k,l,i,j)+c3*f(k,l,i,j+1)+c1*f(k,l,i,j+2)))
-             !fluxes x
-             flx = flmx + flpx
-             frx = frmx + frpx
-             !fluxes y
-             fly = flmy + flpy
-             fry = frmy + frpy
-             
-             fn(i,j)  =  f(k,l,i,j) - dt/dx * (frx - flx) - dt/dy * (fry - fly)
-             f(k,l,i,j) = fn(i,j)
-        
-        f(k,l,i,1) = fn(i,6)
-        f(k,l,i,2) = fn(i,5)
-        f(k,l,i,3) = fn(i,4)
+    % Visualization
+    if mod(s,sPlot) == 1
+        counter = counter + 1;
+        if d == 1
+            plot(u)
+        else
+            contourf(u)
+            colormap Autumn
+            colorbar('location','southoutside')
+        end
+        M(counter) = getframe;
+    end
+    
+    % Animated gif file
+    if mod(s,sPlot) == 1
+        F = getframe;
+        if counter == 1
+            [im,map] = rgb2ind(F.cdata,256,'nodither');
+            im(1,1,1,sEnd/sPlot) = 0;
+        end
+        im(:,:,1,counter) = rgb2ind(F.cdata,map,'nodither');
+    end
+    
+end
 
-        f(k,l,i,ny)  = fn(i,ny-6)
-        f(k,l,i,ny-1)= fn(i,ny-5) 
-        f(k,l,i,ny-2)= fn(i,ny-4)
-        
-        f(k,l,1,j) = fn(6,j)
-        f(k,l,2,j) = fn(5,j)
-        f(k,l,3,j) = fn(4,j)
-        
-        f(k,l,nx,j)  = fn(nx-6,j)
-        f(k,l,nx-1,j)= fn(nx-5,j)
-        f(k,l,nx-2,j)= fn(nx-4,j) 
-    END DO
-    END DO  
-END DO
-END DO
+%% Simple Plot
+figure(2)
+if d == 1
+    plot(u)
+else
+    contourf(u)
+    colormap Autumn
+    colorbar('location','southoutside')
+end
+title(['TVD Method, dx = ',num2str(dx),', dy = ',num2str(dy),', time: ',num2str(time)])
+xlabel('x points')
+ylabel('y points')
 
+%% Make Movie
+movie(M,2,10); % movie(M,n,fps)
+
+%% Export to Gif
+imwrite(im,map,'TVD.gif','DelayTime',0,'LoopCount',3)
