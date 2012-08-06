@@ -1,7 +1,7 @@
 %% Linear 1D Advection equation
 % Routine for solving the following PDE
 %
-%    du/dx + a du/dt = 0
+%    du/dt + a du/dx = 0
 %
 % Using the following scheemes:
 %
