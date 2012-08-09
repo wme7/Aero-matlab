@@ -12,7 +12,7 @@
 %
 clc; clear; close all; 
 %% Parameters
-cfl   = 0.6; % CFL = a*dt/dx
+cfl   = 0.8; % CFL = a*dt/dx
 tend  = 0.2; % End time
 a     = 0.5; % Scalar wave speed 
 
