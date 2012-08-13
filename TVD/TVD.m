@@ -16,7 +16,7 @@ sEnd = 10; % iterations
 % Do nx and ny always > 4, for any 2D computation.
 % Do nx or  ny == 1 to perform a 1D case.
 dx = 1;     dy = 1; 
-nx = 10;    ny = 1;
+nx = 100;    ny = 1;
 [x,y,d] = TVD_grid(nx,ny);
 
 % Parameters of Blocks dimensions
