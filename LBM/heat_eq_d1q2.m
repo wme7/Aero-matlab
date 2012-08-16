@@ -65,7 +65,7 @@ for cycle = 1:tEnd;
     % Visualization every tPlot
     if mod(cycle,tPlot) == 1
         count = count + 1;
-        plot(x,rho);
+        plot(x,rho,'.');
         title '1D Heat Equation using LBM D1Q2'
         xlabel 'x cell'
         ylabel 'Temperature'
@@ -84,7 +84,7 @@ for cycle = 1:tEnd;
 end
 
 %% Make pretty figures
-%plot(x,rho);
+%plot(x,rho,'.');
 
 %% Make Movie
 movie(M,3,10); % movie(M,n,fps)
