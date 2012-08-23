@@ -12,7 +12,8 @@ x  = 1:dx:L;
 f1 = zeros(1,n);
 f2 = zeros(1,n);
 rho= zeros(1,n); % initial value of the dependent variable rho = T(x,t)
-feq= zeros(1,n);
+feq1= zeros(1,n);
+feq2= zeros(1,n);
 
 %% Constants
 csq   = (dx^2)/(dt^2);
@@ -40,11 +41,12 @@ for cycle = 1:tEnd;
     % Collision process
     rho = f1+f2;
     
-    % for this case k1=k2=1/2m then feq1=feq2=feq
-    feq = 0.5*rho;  
+    % even that for this case k1=k2=1/2m then feq1=feq2=feq
+    feq1 = 0.5*rho;
+    feq2 = 0.5*rho;
                
-    f1 = (1-omega) * f1 + omega * feq;
-    f2 = (1-omega) * f2 + omega * feq;
+    f1 = (1-omega) * f1 + omega * feq1;
+    f2 = (1-omega) * f2 + omega * feq2;
     % Streaming process
     f1 = stream2d( f1 , [cy(1),cx(1)]);
     f2 = stream2d( f2 , [cy(2),cx(2)]);

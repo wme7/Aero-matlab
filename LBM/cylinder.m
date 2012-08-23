@@ -29,8 +29,8 @@
 clear
 
 % GENERAL FLOW CONSTANTS
-lx     = 40;      % number of cells in x-direction
-ly     = 10;      % number of cells in y-direction
+lx     = 200;      % number of cells in x-direction
+ly     = 100;      % number of cells in y-direction
 obst_x = lx/5+1;   % position of the cylinder; (exact
 obst_y = ly/2+3;   % y-symmetry is avoided)
 obst_r = ly/10+1;  % radius of the cylinder
