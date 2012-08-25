@@ -1,8 +1,16 @@
-%% 1D Linear Advection Equation
+%% Total Variation Diminishing (TVD) 1D subroutine
+% to solve the scalar advection equation:
 %
-% du/dt + a du/dx = 0
+% du/dt + dF(u)/dx = 0
 %
-% Subroutine to solve using a TVD Method
+% where $dF/du = a$
+%
+% Using flux limiter functions: 
+% Cases: {1} Van Leer
+%        {2} Superbee
+%        {3} Minmod
+%        {4} Koren
+%
 % by Manuel Diaz, manuel.ade'at'gmail.com 
 % Institute of Applied Mechanics, 2012.08.12
 
@@ -14,8 +22,9 @@ a_p = max(0,a); a_m = min(0,a);
 dx = 0.01;
 cfl = 0.8;
 dt = cfl*dx/abs(a);
+dtdx = dt/dx; % precomputed to save some flops
 t_end = 0.2;
-limiter = 1;
+limiter = 2;
 
 %% Discretization of Domain
 x = 1:dx:2;
@@ -62,11 +71,16 @@ for k = t
         case{1} % Van Leer
             phi = (r + abs(r))./(1 + abs(r));
         case{2} % Superbee
-            phi = max(0,min(2.*r,0),min(r,2));
+            %phi = max(0,min(2.*r,0),min(r,2));
+            phi_star = max(min(2.*r,0),min(r,2));
+            phi = max(0,phi_star);
         case{3} % Minmod
             phi = max(0,min(1,r));
         case{4} % koren
-            phi = max(0,min([2*r,(2/3)*r+1/3,2]));
+            %phi = max(0,min(2*r,(2/3)*r+1/3,2));
+            phi_star = min(2*r,(2/3)*r+1/3);
+            phi_hat  = min(phi_star,2);
+            phi = max(0,phi_hat);
         otherwise 
             error('Limiters available: 1, 2, 3, and 4')
     end
@@ -74,15 +88,15 @@ for k = t
     for j = 2:n-1    
         % Compute fluxes for TVD
         F_rl(j) = a_p*u(j) + a_m*u(j+1);
-        F_rh(j) = (1/2)*a*(u(j)+u(j+1)) - (1/2)*(a^2)*(dt/dx)*(u(j+1)-u(j));
+        F_rh(j) = (1/2)*a*(u(j)+u(j+1)) - (1/2)*(a^2)*dtdx*(u(j+1)-u(j));
         F_right(j) = F_rl(j) + phi(j)*( F_rh(j) - F_rl(j) );
         
         F_ll(j) = a_p*u(j-1) + a_m*u(j);
-        F_lh(j) = (1/2)*a*(u(j-1)+u(j)) - (1/2)*(a^2)*(dt/dx)*(u(j)-u(j-1));
+        F_lh(j) = (1/2)*a*(u(j-1)+u(j)) - (1/2)*(a^2)*dtdx*(u(j)-u(j-1));
         F_left(j)  = F_ll(j) + phi(j-1)*( F_lh(j) - F_ll(j) );
         
         % Compute next time step
-        u_next(j) = u(j) - dt/dx*(F_right(j) - F_left(j));
+        u_next(j) = u(j) - dtdx*(F_right(j) - F_left(j));
     end
     
     % BC

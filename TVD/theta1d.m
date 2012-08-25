@@ -6,7 +6,7 @@ function [r_x] = theta1d(u,a)
 
 %% Compute r_x 
 % Initialize variables
-nx= length(u);
+nx  = length(u);
 r_x = zeros(1,nx);
 
 % Main loop
@@ -24,4 +24,3 @@ end
 r_x(1) = 1; r_x(nx) = 1;
 
 return
-        

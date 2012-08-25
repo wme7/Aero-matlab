@@ -1,35 +1,42 @@
-%% 2D Total Variation Diminishing (TVD) subroutine
-% by Manuel Diaz
-%
-% to solve a 2D scalar advection equation:
+%% 2D Total Variation Diminishing (TVD) 2D subroutine
+% to solve the scalar advection equation:
 %
 % $$du/dt + dF(u)/dx + dG(u)/dy = 0$$
+%
 % where $dF/du = a$ and $dG/du = b$
 %
+% Using flux limiter functions: 
+% Cases: {1} Van Leer
+%        {2} Superbee
+%        {3} Minmod
+%        {4} Koren
+%
+% by Manuel Diaz, manuel.ade'at'gmail.com 
+% Institute of Applied Mechanics, 2012.08.25
+
 clear; clc; close all;
 
 %% Main Parameters
-    a = 0.45;  % Scalar velocity in x direction
-    b = 0.65;  % Scalar velocity in y direction
-  cfl = 0.60;  % CFL condition
-t_end = 0.50;  % iterations
+      a = 0.60; % Scalar velocity in x direction
+      b =-0.40; % Scalar velocity in y direction
+    cfl = 0.60; % CFL condition
+  t_end = 2.00; % iterations
+limiter = 2;    % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 
 %% Domain 
     d = 2; % 2D domain is used
 % 2D domain where dx = dy, nx > 1 and ny > 4!!
-   nx = 10;   ny = 4;
-[x,dx,y,dy] = grid2d(0,9,nx,0,3,ny);
+   nx = 8;   ny = 16;
+[x,dx,y,dy] = grid2d(0,7,nx,0,15,ny);
 
-% time discreti zation
-   dt = min(dy,dx)*cfl/max(a,b); 
-    t = 0:dt:t_end;
- dtdx = dt/dx;
- dtdy = dt/dy;
+% time discretization
+   dt = min(dy,dx)*cfl/max(abs(a),abs(b)); 
+    t = 0:dt:t_end; 
+ dtdx = dt/dx; % precomputed to save flops
+ dtdy = dt/dy; % precomputed to save flops
 
 %% Initial Condition: u(x,y,0)
 % Domain Velocity
-a = a*ones(ny,nx); % map the x-velocity 
-b = b*ones(ny,nx); % map the y-velocity 
 a_p = max(0,a); a_m = min(0,a);
 b_p = max(0,b); b_m = min(0,b);
 
@@ -40,7 +47,6 @@ l_1 = 1:x_middle; l_2 = x_middle+1:nx;
 h_1 = 1:y_middle; h_2 = y_middle+1:ny;
 
 % Initial Condition for our 2D domain
-u = zeros(ny,nx);
 u_0 = zeros(ny,nx);
 u_0(h_1,l_1) = 0.70; % region 1
 u_0(h_1,l_2) = 0.10; % region 2
@@ -58,44 +64,38 @@ u_0(h_2,l_2) = 0.50; % region 4
 u = u_0; 
 
 % Initialize Matrix Arrays
-u_next(ny,nx);
+u_next = zeros(ny,nx);
 
-r_x = zeros(ny,nx);
-r_y = zeros(ny,nx);
+rx = zeros(ny,nx);
+ry = zeros(ny,nx);
 
-F_rl = zeros(ny,nx);
-F_rh = zeros(ny,nx);
-F_ll = zeros(ny,nx);
-F_lh = zeros(ny,nx);
-F_right = zeros(ny,nx);
-F_left  = zeros(ny,nx);
+F_r = zeros(ny,nx);
+F_l = zeros(ny,nx);
 
-G_rl = zeros(ny,nx);
-G_rh = zeros(ny,nx);
-G_ll = zeros(ny,nx);
-G_lh = zeros(ny,nx);
-G_right = zeros(ny,nx);
-G_left  = zeros(ny,nx);
+G_r = zeros(ny,nx);
+G_l = zeros(ny,nx);
 
 for k = t
     % Compute Theta (smoothness coeficient)
-    [r_x,r_y] = theta(u,nu_x,nu_y,d);
-
+    [rx,ry] = theta2d(u,a,b);
+    
     % Compute flux Limiter 
-    [phi_x,phi_y] = van_leer(u,r_x,r_y,d);
-
+    [phix,phiy] = fluxlimiter2d(rx,ry,limiter);
+        
     % Compute TVD Fluxes:
-    [F_left,F_right,G_left,G_right]=TVD_flux(u,a,b,dx,dy,dt,phi_x,phi_y,d);
+    [F_l,F_r,G_l,G_r] = flux2d(u,a,b,dtdx,dtdy,phix,phiy);
     
     % Compute new Step:
-    u_next = u - dt/dx*(F_right-F_left) - dt/dy*(G_right-G_left);
+    u_next = u - dtdx*(F_r - F_l) - dtdy*(G_r - G_l);
+    
+    % Update BCs: All Neumann BC's
+   	u_next(:,1)  = u_next(:,2); 
+    u_next(:,nx) = u_next(:,nx-1);
+    u_next(1,:)  = u_next(2,:); 
+    u_next(ny,:) = u_next(ny-1,:);
     
     % Update Information
     u = u_next;
-    
-    % Update Boundary Conditions: All Neumann BC's
-   	u(y,1) = u(y,2); u(y,nx) = u(y,nx-1);
-    u(1,:) = u(2,:); u(ny,:) = u(ny-1,:);
     
     % Update Iteration counter
     % s = s + 1;
@@ -126,17 +126,26 @@ for k = t
 end
 
 %% Simple Plot
-figure(2)
-if d == 1
-    plot(u)
-else
-    contourf(u)
+subplot(1,2,1)
+hold on
+    %contourf(u)
+    surface(u)
     colormap Autumn
     colorbar('location','southoutside')
-end
-title(['TVD Method, dx = ',num2str(dx),', dy = ',num2str(dy),', time: ',num2str(time)])
-xlabel('x points')
-ylabel('y points')
+title(['TVD Method, dx = ',num2str(dx),', dy = ',num2str(dy),', time: ',num2str(t_end)])
+xlabel('x points'); ylabel('y points')
+hold off
+
+subplot(1,2,2)
+hold on
+    %contourf(u_0)
+    surface(u_0)
+    colormap Autumn
+    colorbar('location','southoutside')
+title(['Initial Condition, dx = ',num2str(dx),', dy = ',num2str(dy),', time: ',num2str(t(1))])
+xlabel('x points'); ylabel('y points')
+hold off
+
 
 % %% Make Movie
 % movie(M,2,10); % movie(M,n,fps)
