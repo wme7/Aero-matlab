@@ -23,7 +23,7 @@ dx = 0.01;
 cfl = 0.8;
 dt = cfl*dx/abs(a);
 dtdx = dt/dx; % precomputed to save some flops
-t_end = 0.2;
+t_end = 0.5;
 limiter = 2;
 
 %% Discretization of Domain

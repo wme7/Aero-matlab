@@ -40,7 +40,7 @@ for j = 1:ny
         elseif a(j,i) > 0
             r_x(j,i) = (u(j,i) - u(j,i-1))/(u(j,i+1) - u(j,i));
         elseif a(j,i) < 0
-            u(j,nx+1) = u(j,xn); % we will need an extra column value
+            u(j,nx+1) = u(j,nx); % we will need an extra column value
             r_x(j,i) = (u(j,i+2) - u(j,i+1))/(u(j,i+1) - u(j,i));
         end
     end

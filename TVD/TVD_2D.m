@@ -17,16 +17,16 @@
 clear; clc; close all;
 
 %% Main Parameters
-      a = 0.60; % Scalar velocity in x direction
-      b =-0.40; % Scalar velocity in y direction
-    cfl = 0.60; % CFL condition
-  t_end = 2.00; % iterations
+      a =-0.60; % Scalar velocity in x direction
+      b = 0.40; % Scalar velocity in y direction
+    cfl = 0.40; % CFL condition
+  t_end = 1.70; % iterations
 limiter = 2;    % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 
 %% Domain 
     d = 2; % 2D domain is used
 % 2D domain where dx = dy, nx > 1 and ny > 4!!
-   nx = 8;   ny = 16;
+   nx = 16;   ny = 32;
 [x,dx,y,dy] = grid2d(0,7,nx,0,15,ny);
 
 % time discretization
@@ -53,13 +53,16 @@ u_0(h_1,l_2) = 0.10; % region 2
 u_0(h_2,l_1) = 0.90; % region 3
 u_0(h_2,l_2) = 0.50; % region 4
 
-% %% Movie Parameters
-% %sEnd  = 500; % iterations
-% sPlot = 2; frames = sEnd/sPlot; counter = 0;
-% figure(1)
-% colordef white %black
+%% Movie Parameters
+sEnd  = length(t); % iterations
+sPlot = 1; frames = sEnd/sPlot; counter = 0;
+figure(1)
+colordef white %black
 
 %% Main Loop 
+% iteration counter
+s = 1;
+
 % load Initial condition into our Domain
 u = u_0; 
 
@@ -98,38 +101,39 @@ for k = t
     u = u_next;
     
     % Update Iteration counter
-    % s = s + 1;
+    s = s + 1;
     
-%     % Visualization
-%     if mod(s,sPlot) == 1
-%         counter = counter + 1;
-%         if d == 1
-%             plot(u)
-%         else
-%             contourf(u)
-%             colormap Autumn
-%             colorbar('location','southoutside')
-%         end
-%         M(counter) = getframe;
-%     end
-%     
-%     % Animated gif file
-%     if mod(s,sPlot) == 1
-%         F = getframe;
-%         if counter == 1
-%             [im,map] = rgb2ind(F.cdata,256,'nodither');
-%             im(1,1,1,sEnd/sPlot) = 0;
-%         end
-%         im(:,:,1,counter) = rgb2ind(F.cdata,map,'nodither');
-%     end
+    % Visualization
+    if mod(s,sPlot) == 0 % I want 1 frame per iteration
+        counter = counter + 1;
+        if d == 1
+            plot(u)
+        else
+            contourf(u)
+            colormap Autumn
+            colorbar('location','southoutside')
+        end
+        M(counter) = getframe;
+    end
+    
+    % Animated gif file
+    if mod(s,sPlot) == 0 % I want 1 frame per iteration
+        F = getframe;
+        if counter == 1
+            [im,map] = rgb2ind(F.cdata,256,'nodither');
+            im(1,1,1,sEnd/sPlot) = 0;
+        end
+        im(:,:,1,counter) = rgb2ind(F.cdata,map,'nodither');
+    end
     
 end
 
 %% Simple Plot
+figure(2)
 subplot(1,2,1)
 hold on
-    %contourf(u)
-    surface(u)
+    contourf(u)
+    %surface(u)
     colormap Autumn
     colorbar('location','southoutside')
 title(['TVD Method, dx = ',num2str(dx),', dy = ',num2str(dy),', time: ',num2str(t_end)])
@@ -138,8 +142,8 @@ hold off
 
 subplot(1,2,2)
 hold on
-    %contourf(u_0)
-    surface(u_0)
+    contourf(u_0)
+    %surface(u_0)
     colormap Autumn
     colorbar('location','southoutside')
 title(['Initial Condition, dx = ',num2str(dx),', dy = ',num2str(dy),', time: ',num2str(t(1))])
@@ -147,8 +151,8 @@ xlabel('x points'); ylabel('y points')
 hold off
 
 
-% %% Make Movie
-% movie(M,2,10); % movie(M,n,fps)
-% 
+%% Make Movie
+movie(M,2,10); % movie(M,n,fps)
+
 % %% Export to Gif
-% imwrite(im,map,'TVD.gif','DelayTime',0,'LoopCount',3)
+imwrite(im,map,'TVD_2D.gif','DelayTime',0,'LoopCount',5)
