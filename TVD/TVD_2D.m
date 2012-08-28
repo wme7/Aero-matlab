@@ -17,16 +17,16 @@
 clear; clc; close all;
 
 %% Main Parameters
-      a =-0.60; % Scalar velocity in x direction
-      b = 0.40; % Scalar velocity in y direction
+      a = 0.40; % Scalar velocity in x direction
+      b =-0.60; % Scalar velocity in y direction
     cfl = 0.40; % CFL condition
-  t_end = 1.70; % iterations
-limiter = 2;    % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
+  t_end = 2.50; % iterations
+limiter = 1;    % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 
 %% Domain 
     d = 2; % 2D domain is used
 % 2D domain where dx = dy, nx > 1 and ny > 4!!
-   nx = 16;   ny = 32;
+   nx = 80;   ny = 160;
 [x,dx,y,dy] = grid2d(0,7,nx,0,15,ny);
 
 % time discretization
@@ -132,8 +132,8 @@ end
 figure(2)
 subplot(1,2,1)
 hold on
-    contourf(u)
-    %surface(u)
+    %contourf(u)
+    surface(u)
     colormap Autumn
     colorbar('location','southoutside')
 title(['TVD Method, dx = ',num2str(dx),', dy = ',num2str(dy),', time: ',num2str(t_end)])
@@ -142,8 +142,8 @@ hold off
 
 subplot(1,2,2)
 hold on
-    contourf(u_0)
-    %surface(u_0)
+    %contourf(u_0)
+    surface(u_0)
     colormap Autumn
     colorbar('location','southoutside')
 title(['Initial Condition, dx = ',num2str(dx),', dy = ',num2str(dy),', time: ',num2str(t(1))])

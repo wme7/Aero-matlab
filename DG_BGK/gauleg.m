@@ -1,7 +1,5 @@
 function [x,w]=gauleg(n)
-
-% 
-
+%
 x=zeros(n,1);
 w=zeros(n,1);
 m=(n+1)/2;
