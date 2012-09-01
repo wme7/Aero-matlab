@@ -20,13 +20,13 @@ clear; clc; close all;
       a = 0.40; % Scalar velocity in x direction
       b =-0.60; % Scalar velocity in y direction
     cfl = 0.40; % CFL condition
-  t_end = 2.50; % iterations
+  t_end = 2.50; % end time
 limiter = 1;    % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 
 %% Domain 
     d = 2; % 2D domain is used
 % 2D domain where dx = dy, nx > 1 and ny > 4!!
-   nx = 80;   ny = 160;
+   nx = 40;   ny = 40;
 [x,dx,y,dy] = grid2d(0,7,nx,0,15,ny);
 
 % time discretization

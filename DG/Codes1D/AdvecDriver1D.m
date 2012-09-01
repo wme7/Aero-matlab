@@ -5,7 +5,7 @@ Globals1D;
 N = 8;
 
 % Generate simple mesh
-[Nv, VX, K, EToV] = MeshGen1D(0.0,2.0,10);
+[Nv, VX, K, EToV] = MeshGen1D(0.0,4.0,10);
 
 % Initialize solver and construct grid and metric
 StartUp1D;

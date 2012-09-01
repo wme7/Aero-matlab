@@ -1,7 +1,6 @@
 % Purpose : Setup script, building operators, grid, metric and connectivity for 1D solver.     
 
 % Definition of constants
-
 Globals1D; NODETOL = 1e-10;
 Np = N+1; Nfp = 1; Nfaces=2;
 

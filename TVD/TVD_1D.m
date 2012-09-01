@@ -17,14 +17,15 @@
 clear all; close all; clc;
 
 %% Parameters
-a = 0.5; 
-a_p = max(0,a); a_m = min(0,a);
-dx = 0.01;
-cfl = 0.8;
-dt = cfl*dx/abs(a);
-dtdx = dt/dx; % precomputed to save some flops
-t_end = 0.5;
-limiter = 2;
+      a = -0.5;      % Scalar velocity in x direction
+    a_p = max(0,a); % a^{+}
+    a_m = min(0,a); % a^{-}
+     dx = 0.025;     % Spatial step size
+    cfl = 0.8;      % Courant Number
+     dt = cfl*dx/abs(a); % time step size
+   dtdx = dt/dx;    % precomputed to save some flops
+  t_end = 0.5;      % End time
+limiter = 1;        % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 
 %% Discretization of Domain
 x = 1:dx:2;
@@ -67,23 +68,7 @@ for k = t
     end
     
     % Compute the Flux Limiter
-    switch limiter
-        case{1} % Van Leer
-            phi = (r + abs(r))./(1 + abs(r));
-        case{2} % Superbee
-            %phi = max(0,min(2.*r,0),min(r,2));
-            phi_star = max(min(2.*r,0),min(r,2));
-            phi = max(0,phi_star);
-        case{3} % Minmod
-            phi = max(0,min(1,r));
-        case{4} % koren
-            %phi = max(0,min(2*r,(2/3)*r+1/3,2));
-            phi_star = min(2*r,(2/3)*r+1/3);
-            phi_hat  = min(phi_star,2);
-            phi = max(0,phi_hat);
-        otherwise 
-            error('Limiters available: 1, 2, 3, and 4')
-    end
+    phi = fluxlimiter1d(r,limiter);
     
     for j = 2:n-1    
         % Compute fluxes for TVD
@@ -124,7 +109,7 @@ u_next = zeros(1,n);
 u_LW = u_0;
 for k = t
     for j = 2:n-1
-    u_next(j) = u_LW(j) - 1/2*cfl*(u_LW(j+1)-u_LW(j-1)) + ...
+    u_next(j) = u_LW(j) - 1/2*a*dt/dx*(u_LW(j+1)-u_LW(j-1)) + ...
         1/2*(cfl^2)*(u_LW(j+1)-2*u_LW(j)+u_LW(j-1));
     end
     u_LW = u_next;
