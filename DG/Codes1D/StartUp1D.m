@@ -22,7 +22,7 @@ x = ones(N+1,1)*VX(va) + 0.5*(r+1)*(VX(vb)-VX(va));
 [rx,J] = GeometricFactors1D(x,Dr);
 
 % Compute masks for edge nodes
-fmask1 = find( abs(r+1) < NODETOL)'; 
+fmask1 = find( abs(r+1) < NODETOL)';
 fmask2 = find( abs(r-1) < NODETOL)';
 Fmask  = [fmask1;fmask2]';
 Fx = x(Fmask(:), :);
