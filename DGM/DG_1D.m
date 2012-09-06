@@ -82,20 +82,25 @@ Fscale = 1./(J(Fmask,:));
 [vmapM, vmapP, vmapB, mapB] = BuildMaps1D;
  
 %% IC
-  % Initial Condition
-  u_0 = ones(1,Nx);
-  v_1 = ceil(2*Nx/5); % point v1 = 0.4 [-]
-  v_2 = ceil(3*Nx/5); % point v2 = 0.6 [-]
-  u_0(v_1:v_2) = 2;
+% Initial Condition
+u_0 = zeros(1,Nv*Np);
+jump = [0.9 1.1];
+for i = 1:Nv*Np
+    if jump(1) <= x(i) && x(i) <= jump(2)
+        u_0(i) = 2;
+    else
+        u_0(i) = 1;
+    end
+end
+% Load Initial Condition
+u = reshape(u_0,Np,Nv);
+%u = sin(x);
 
-  % Load Initial Condition
-  time = 0;
-  u = u_0;
-  
 %% Main Loop
 % Runge-Kutta residual storage  
-resu = zeros(Np,k); 
+resu = zeros(Np,Nv); 
 
+time = 0;
 % outer time step loop 
 for tstep=1:Nsteps
     for INTRK = 1:5
@@ -107,3 +112,16 @@ for tstep=1:Nsteps
     % Increment time
     time = time+dt;
 end;
+
+%% Compute exact Solution
+% Displacement = a*time;
+u_exact = zeros(1,Nv*Np);
+jump = [0.9+a*time,1.1+a*time];
+for i = 1:Nv*Np
+    if jump(1) <= x(i) && x(i) <= jump(2)
+        u_exact(i) = 2;
+    else
+        u_exact(i) = 1;
+    end
+end
+u_exact = reshape(u_exact,Np,Nv);

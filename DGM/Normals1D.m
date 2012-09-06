@@ -4,7 +4,7 @@ function [nx] = Normals1D
 % Purpose : Compute outward pointing normals at elements faces
 
 Globals1D;
-nx = zeros(Nfp*Nfaces, k); 
+nx = zeros(Nfp*Nfaces, Nv); 
 
 % Define outward normals
 nx(1, :) = -1.0; nx(2, :) = 1.0;
