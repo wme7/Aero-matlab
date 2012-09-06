@@ -35,23 +35,13 @@ limiter = 1;    % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
  dtdx = dt/dx; % precomputed to save flops
  dtdy = dt/dy; % precomputed to save flops
 
-%% Initial Condition: u(x,y,0)
-% Domain Velocity
+% Build prescribed domain Velocities
 a_p = max(0,a); a_m = min(0,a);
 b_p = max(0,b); b_m = min(0,b);
 
-% Parameters of regions dimensions
-x_middle = ceil(nx/2);
-y_middle = ceil(ny/2);
-l_1 = 1:x_middle; l_2 = x_middle+1:nx;
-h_1 = 1:y_middle; h_2 = y_middle+1:ny;
-
-% Initial Condition for our 2D domain
-u_0 = zeros(ny,nx);
-u_0(h_1,l_1) = 0.70; % region 1
-u_0(h_1,l_2) = 0.10; % region 2
-u_0(h_2,l_1) = 0.90; % region 3
-u_0(h_2,l_2) = 0.50; % region 4
+%% Initial Condition (IC)
+% Build IC
+u_0 = u_zero2d(x,y);
 
 %% Movie Parameters
 sEnd  = length(t); % iterations

@@ -14,7 +14,7 @@ clear all; close all; clc;
       a = -0.5;     % Scalar velocity in x direction
     a_p = max(0,a); % a^{+}
     a_m = min(0,a); % a^{-}
-     dx = 0.01;      % Spatial step size
+     dx = 0.01;     % Spatial step size
     cfl = 0.8;      % Courant Number
      dt = cfl*dx/abs(a); % time step size
    dtdx = dt/dx;    % precomputed to save some flops
@@ -22,11 +22,11 @@ clear all; close all; clc;
       k = 3;        % WENO Order: 1st, 2nd and 3rd Orders available.
 
 %% Discretization of Domain
-x = 1:dx:2;
-t = 0:dt:t_end;
+x = 1:dx:2;     % x grid
+n = length(x);  % number of points
+t = 0:dt:t_end; % time steps
 
 %% Initial Condition
-   n = length(x);
  u_0 = ones(1,n);
  x_1 = ceil(2*n/5);
  x_2 = ceil(3*n/5);
