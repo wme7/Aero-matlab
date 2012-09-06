@@ -17,14 +17,14 @@
 clear all; close all; clc;
 
 %% Parameters
-      a = 0.5;      % Scalar velocity in x direction
+      a = -0.5;      % Scalar velocity in x direction
     a_p = max(0,a); % a^{+}
     a_m = min(0,a); % a^{-}
      dx = 0.01;     % Spatial step size
-    cfl = 0.8;      % Courant Number
+    cfl = 0.9;      % Courant Number
      dt = cfl*dx/abs(a); % time step size
    dtdx = dt/dx;    % precomputed to save some flops
-  t_end = 0.3;      % End time
+  t_end = 0.2;      % End time
 %limiter = 1;        % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 
 %% Discretization of Domain

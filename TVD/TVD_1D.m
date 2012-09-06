@@ -95,16 +95,13 @@ end
 u_next = zeros(1,n);
 
 %% Exact Solution
-x_exact_1 = 1.4 + a*t_end;
-x_exact_2 = 1.6 + a*t_end;
-u_exact = zeros(1,n);
-for j = 1:n
-    if x(j) >= x_exact_1 && x(j) <= x_exact_2
-    u_exact(j) = 2;
-    else
-    u_exact(j) = 1;
-    end
-end
+% Displacement:
+x_add = ceil(a*t_end/dx);
+% Computing exact solution:
+u_exact = ones(1,n);
+ x_1 = ceil(2*n/5) + x_add;
+ x_2 = ceil(3*n/5) + x_add;
+u_exact(x_1:x_2) = 2;
     
 %% Plot Results
 subplot(311);
