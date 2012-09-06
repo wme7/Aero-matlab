@@ -1,18 +1,12 @@
-%% Total Variation Diminishing (TVD) 1D subroutine
+%% Weighted Essentially non-Oscilaroty (WENO) Routine
 % to solve the scalar advection equation:
 %
 % du/dt + dF(u)/dx = 0
 %
 % where $dF/du = a$
 %
-% Using flux limiter functions: 
-% Cases: {1} Van Leer
-%        {2} Superbee
-%        {3} Minmod
-%        {4} Koren
-%
 % by Manuel Diaz, manuel.ade'at'gmail.com 
-% Institute of Applied Mechanics, 2012.08.12
+% Institute of Applied Mechanics, 2012.08.20
 
 clear all; close all; clc;
 
@@ -20,20 +14,20 @@ clear all; close all; clc;
       a = -0.5;     % Scalar velocity in x direction
     a_p = max(0,a); % a^{+}
     a_m = min(0,a); % a^{-}
-     dx = 0.025;    % Spatial step size
+     dx = 0.01;      % Spatial step size
     cfl = 0.8;      % Courant Number
      dt = cfl*dx/abs(a); % time step size
    dtdx = dt/dx;    % precomputed to save some flops
   t_end = 0.5;      % End time
-limiter = 1;        % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
+      k = 3;        % WENO Order: 1st, 2nd and 3rd Orders available.
 
 %% Discretization of Domain
 x = 1:dx:2;
 t = 0:dt:t_end;
 
 %% Initial Condition
-n = length(x);
-u_0 = ones(1,n);
+   n = length(x);
+ u_0 = ones(1,n);
  x_1 = ceil(2*n/5);
  x_2 = ceil(3*n/5);
 u_0(x_1:x_2) = 2;
@@ -44,51 +38,25 @@ u = u_0;
 
 % Initialize vector variables 
 u_next = zeros(1,n);
-theta  = zeros(1,n);
-r = zeros(1,n);
-F_rl = zeros(1,n);
-F_rh = zeros(1,n);
-F_ll = zeros(1,n);
-F_lh = zeros(1,n);
-F_right = zeros(1,n);
-F_left  = zeros(1,n);
 
-for k = t
-    % Compute the smoothness, r(j), from the data, u(j).
-    for j = 2:n-1
-        % smooth measurement factor 'r'
-        if u(j) == u(j+1)
-            r(j) = 1;
-        elseif a > 0
-            r(j) = (u(j) - u(j-1)) / (u(j+1) - u(j));
-        elseif a < 0
-            r(j) = (u(j+2) - u(j+1)) / (u(j+1) - u(j));
-        end
-        r(1) = 1; r(n) = 1;
-    end
+for kk = t
+    % Compute WENO Fluxes:
+    [F_l,F_r] = WENOflux1d(u,a);
     
-    % Compute the Flux Limiter
-    phi = fluxlimiter1d(r,limiter);
+    % Compute new Step:
+    u_next = u - dtdx*(F_r - F_l); 
     
-    for j = 2:n-1    
-        % Compute fluxes for TVD
-        F_rl(j) = a_p*u(j) + a_m*u(j+1);
-        F_rh(j) = (1/2)*a*(u(j)+u(j+1)) - (1/2)*(a^2)*dtdx*(u(j+1)-u(j));
-        F_right(j) = F_rl(j) + phi(j)*( F_rh(j) - F_rl(j) );
-        
-        F_ll(j) = a_p*u(j-1) + a_m*u(j);
-        F_lh(j) = (1/2)*a*(u(j-1)+u(j)) - (1/2)*(a^2)*dtdx*(u(j)-u(j-1));
-        F_left(j)  = F_ll(j) + phi(j-1)*( F_lh(j) - F_ll(j) );
-        
-        % Compute next time step
-        u_next(j) = u(j) - dtdx*(F_right(j) - F_left(j));
-    end
+    % Update BCs: All Neumann BC's
+   	u_next(1)  = u_next(4); 
+    u_next(2)  = u_next(4);
+    u_next(3)  = u_next(4);
     
-    % BC
-    u_next(1) = u_next(2);
-    u_next(n) = u_next(n-1);
+    u_next(n  ) = u_next(n-3);
+    u_next(n-1) = u_next(n-3);
+    u_next(n-2) = u_next(n-3);
+    
     % UPDATE info
-    u = u_next(1:n);
+    u = u_next;
 end
 
 %% 2. Double-Sided Upwind
@@ -142,5 +110,5 @@ plot(x,u_LW,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-sta
 hold off
 subplot(313);
 hold on
-plot(x,u,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([0.5,2.5]); title 'TVD';
+plot(x,u,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([0.5,2.5]); title 'WENO3';
 hold off

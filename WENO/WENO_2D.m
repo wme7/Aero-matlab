@@ -1,32 +1,25 @@
-%% 2D Total Variation Diminishing (TVD) 2D subroutine
+%% Weighted Essentially non-Oscilaroty (WENO) Routine
 % to solve the scalar advection equation:
 %
 % $$du/dt + dF(u)/dx + dG(u)/dy = 0$$
 %
 % where $dF/du = a$ and $dG/du = b$
 %
-% Using flux limiter functions: 
-% Cases: {1} Van Leer
-%        {2} Superbee
-%        {3} Minmod
-%        {4} Koren
-%
 % by Manuel Diaz, manuel.ade'at'gmail.com 
-% Institute of Applied Mechanics, 2012.08.25
-
+% Institute of Applied Mechanics, 2012.08.21
+%
 clear; clc; close all;
-
 %% Main Parameters
       a = 0.40; % Scalar velocity in x direction
       b =-0.60; % Scalar velocity in y direction
     cfl = 0.40; % CFL condition
-  t_end = 2.50; % end time
-limiter = 1;    % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
+  t_end = 2.50; % Final time
+      k = 3;    % WENO Order: 1st, 2nd and 3rd Orders available.  
 
 %% Domain 
     d = 2; % 2D domain is used
 % 2D domain where dx = dy, nx > 1 and ny > 4!!
-   nx = 40;   ny = 40;
+   nx = 16;   ny = 32;
 [x,dx,y,dy] = grid2d(0,7,nx,0,15,ny);
 
 % time discretization
@@ -69,33 +62,29 @@ u = u_0;
 % Initialize Matrix Arrays
 u_next = zeros(ny,nx);
 
-rx = zeros(ny,nx);
-ry = zeros(ny,nx);
-
-F_r = zeros(ny,nx);
-F_l = zeros(ny,nx);
-
-G_r = zeros(ny,nx);
-G_l = zeros(ny,nx);
-
-for k = t
-    % Compute Theta (smoothness coeficient)
-    [rx,ry] = theta2d(u,a,b);
-    
-    % Compute flux Limiter 
-    [phix,phiy] = fluxlimiter2d(rx,ry,limiter);
-        
-    % Compute TVD Fluxes:
-    [F_l,F_r,G_l,G_r] = TVDflux2d(u,a,b,dtdx,dtdy,phix,phiy);
+for kk = t
+    % Compute WENO Fluxes:
+    [F_l,F_r,G_l,G_r] = WENOflux2d(u,a,b);
     
     % Compute new Step:
     u_next = u - dtdx*(F_r - F_l) - dtdy*(G_r - G_l);
     
     % Update BCs: All Neumann BC's
-   	u_next(:,1)  = u_next(:,2); 
-    u_next(:,nx) = u_next(:,nx-1);
-    u_next(1,:)  = u_next(2,:); 
-    u_next(ny,:) = u_next(ny-1,:);
+   	u_next(:,1)  = u_next(:,4); 
+    u_next(:,2)  = u_next(:,4);
+    u_next(:,3)  = u_next(:,4);
+    
+    u_next(:,nx  ) = u_next(:,nx-3);
+    u_next(:,nx-1) = u_next(:,nx-3);
+    u_next(:,nx-2) = u_next(:,nx-3);
+    
+    u_next(1,:)  = u_next(4,:);
+    u_next(2,:)  = u_next(4,:);
+    u_next(3,:)  = u_next(4,:);
+    
+    u_next(ny  ,:) = u_next(ny-3,:);
+    u_next(ny-1,:) = u_next(ny-3,:);
+    u_next(ny-2,:) = u_next(ny-3,:);
     
     % Update Information
     u = u_next;

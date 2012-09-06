@@ -1,4 +1,4 @@
-function [f_s,f_r,g_s,g_r] = flux2d(u,a,b,dtdx,dtdy,phi_x,phi_y)
+function [f_s,f_r,g_s,g_r] = TVDflux2d(u,a,b,dtdx,dtdy,phi_x,phi_y)
 %% Grid Size
 [ny,nx] = size(u);
 x = 2:nx-1;
