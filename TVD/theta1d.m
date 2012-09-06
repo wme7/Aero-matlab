@@ -10,6 +10,7 @@ nx  = length(u);
 r_x = zeros(1,nx);
 
 % Main loop
+
 x = 2:nx-1;
 for j = x
     % smooth measurement factor 'r_x'
@@ -18,6 +19,7 @@ for j = x
     elseif a > 0 
         r_x(j) = (u(j) - u(j-1)) / (u(j+1) - u(j));
     elseif a < 0
+        u(nx+1) = u(nx); % we will need an extra column value
         r_x(j) = (u(j+2) - u(j+1)) / (u(j+1) - u(j));
     end
 end
