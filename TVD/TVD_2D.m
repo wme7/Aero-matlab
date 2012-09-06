@@ -69,17 +69,8 @@ u = u_0;
 % Initialize Matrix Arrays
 u_next = zeros(ny,nx);
 
-rx = zeros(ny,nx);
-ry = zeros(ny,nx);
-
-F_r = zeros(ny,nx);
-F_l = zeros(ny,nx);
-
-G_r = zeros(ny,nx);
-G_l = zeros(ny,nx);
-
 for k = t
-    % Compute Theta (smoothness coeficient)
+    % Compute Theta (smoothness coeficients)
     [rx,ry] = theta2d(u,a,b);
     
     % Compute flux Limiter 

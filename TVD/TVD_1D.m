@@ -20,7 +20,7 @@ clear all; close all; clc;
       a = -0.5;     % Scalar velocity in x direction
     a_p = max(0,a); % a^{+}
     a_m = min(0,a); % a^{-}
-     dx = 0.025;    % Spatial step size
+     dx = 0.01;    % Spatial step size
     cfl = 0.8;      % Courant Number
      dt = cfl*dx/abs(a); % time step size
    dtdx = dt/dx;    % precomputed to save some flops
@@ -44,49 +44,24 @@ u = u_0;
 
 % Initialize vector variables 
 u_next = zeros(1,n);
-theta  = zeros(1,n);
-r = zeros(1,n);
-F_rl = zeros(1,n);
-F_rh = zeros(1,n);
-F_ll = zeros(1,n);
-F_lh = zeros(1,n);
-F_right = zeros(1,n);
-F_left  = zeros(1,n);
 
 for k = t
-    % Compute the smoothness, r(j), from the data, u(j).
-    for j = 2:n-1
-        % smooth measurement factor 'r'
-        if u(j) == u(j+1)
-            r(j) = 1;
-        elseif a > 0
-            r(j) = (u(j) - u(j-1)) / (u(j+1) - u(j));
-        elseif a < 0
-            r(j) = (u(j+2) - u(j+1)) / (u(j+1) - u(j));
-        end
-        r(1) = 1; r(n) = 1;
-    end
+    % Compute the smoothness factors, r(j), from data, u(j).
+    [r] = theta1d(u,a);
     
     % Compute the Flux Limiter
-    phi = fluxlimiter1d(r,limiter);
+    [phi] = fluxlimiter1d(r,limiter);
     
-    for j = 2:n-1    
-        % Compute fluxes for TVD
-        F_rl(j) = a_p*u(j) + a_m*u(j+1);
-        F_rh(j) = (1/2)*a*(u(j)+u(j+1)) - (1/2)*(a^2)*dtdx*(u(j+1)-u(j));
-        F_right(j) = F_rl(j) + phi(j)*( F_rh(j) - F_rl(j) );
+    % Compute TVD Fluxes
+    [F_left,F_right] = TVDflux1d(u,a,dtdx,phi);
         
-        F_ll(j) = a_p*u(j-1) + a_m*u(j);
-        F_lh(j) = (1/2)*a*(u(j-1)+u(j)) - (1/2)*(a^2)*dtdx*(u(j)-u(j-1));
-        F_left(j)  = F_ll(j) + phi(j-1)*( F_lh(j) - F_ll(j) );
+    % Compute next time step
+    u_next = u - dtdx*(F_right - F_left);
         
-        % Compute next time step
-        u_next(j) = u(j) - dtdx*(F_right(j) - F_left(j));
-    end
-    
     % BC
     u_next(1) = u_next(2);
     u_next(n) = u_next(n-1);
+    
     % UPDATE info
     u = u_next(1:n);
 end

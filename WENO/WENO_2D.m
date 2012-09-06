@@ -19,7 +19,7 @@ clear; clc; close all;
 %% Domain 
     d = 2; % 2D domain is used
 % 2D domain where dx = dy, nx > 1 and ny > 4!!
-   nx = 16;   ny = 32;
+   nx = 40;   ny = 40;
 [x,dx,y,dy] = grid2d(0,7,nx,0,15,ny);
 
 % time discretization
@@ -144,4 +144,4 @@ hold off
 movie(M,2,10); % movie(M,n,fps)
 
 % %% Export to Gif
-imwrite(im,map,'TVD_2D.gif','DelayTime',0,'LoopCount',5)
+imwrite(im,map,'WENO3_2D.gif','DelayTime',0,'LoopCount',5)
