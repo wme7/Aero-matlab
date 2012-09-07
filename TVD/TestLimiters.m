@@ -53,8 +53,8 @@ for k = t
     u_next = u_vl - dtdx*(F_right - F_left);
         
     % BC
-    u_next(1) = u_next(2);
-    u_next(n) = u_next(n-1);
+    u_next(1) = u_next(2);      %Neumann BC
+    u_next(n) = u_next(n-1);  	%Neumann BC
     
     % UPDATE info
     u_vl = u_next(1:n);
@@ -79,8 +79,8 @@ for k = t
     u_next = u_sp - dtdx*(F_right - F_left);
         
     % BC
-    u_next(1) = u_next(2);
-    u_next(n) = u_next(n-1);
+    u_next(1) = u_next(2);      %Neumann BC
+    u_next(n) = u_next(n-1);    %Neumann BC
     
     % UPDATE info
     u_sp = u_next(1:n);
@@ -106,8 +106,8 @@ for k = t
     u_next = u_mm - dtdx*(F_right - F_left);
         
     % BC
-    u_next(1) = u_next(2);
-    u_next(n) = u_next(n-1);
+    u_next(1) = u_next(2);      %Neumann BC
+    u_next(n) = u_next(n-1);    %Neumann BC
     
     % UPDATE info
     u_mm = u_next(1:n);
