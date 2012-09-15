@@ -87,9 +87,9 @@ f = zeros(lv,lx);  feq = zeros(lv,lx); fnext = zeros(lv,lx);
 % subroutine to compute the advection of the information in the grid:
 switch advec
     
-    case{1} %TVD
+    case{1} %TVD 0(h^2)
         
-    case{2} %WENO5 
+    case{2} %WENO k = 3 i.e. O(h^5) 
         
     otherwise
         error('Order must be between 1 and 2');
@@ -97,8 +97,8 @@ end
 
 %% Recover Macroscopic Properties:
 % Using Quadrature rules to integrate for:
-    n   = k*sum(w .* feq)    % Number density
-    u_n = k*sum(v .* w .* feq)   % Macrospic velocity in x
-    E   = k*sum(1/2*( v.^2 ).* w .* feq) % Energy
+    n   = k*sum(w .* feq);    % Number density
+    u_n = k*sum(v .* w .* feq);   % Macrospic velocity in x
+    E   = k*sum(1/2*( v.^2 ).* w .* feq); % Energy
 % Plot Macroscopic Properties of feq:
      plot(x,n,x,u,x,E) 

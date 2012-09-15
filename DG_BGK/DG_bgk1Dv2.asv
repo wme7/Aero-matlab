@@ -105,6 +105,7 @@ for i=1:nx
     end
 end
 
+%%
 for i=1:nx
     Mtemp=zeros(NV,pp);
     for K=1:NV
@@ -160,6 +161,7 @@ end
 %     set(wave_handlev,'EraseMode','Xor'); drawnow
 % end
 
+%%
 pause(1)
 
 A=zeros(pp,pp);
@@ -266,7 +268,7 @@ while ISTOP ==0
             F_tmp(NVh+K,nx,:)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FB) +V(NVh+K)* sum(FC'.*c) * c'-FN)' .* b);
             
         end % loop for NV
-        
+       
         if l<rk
             %                 phi=phi+ alpha(l+1)*(phi_alt+dt*phi_t);
             %                 phi_alt=phi_alt+dt*phi_t;
@@ -415,8 +417,8 @@ while ISTOP ==0
             %                 phi=phi+ alpha(rk)*dt*phi_t;
             %                 psi=psi+ alpha(rk)*dt*psi_t;
         end
-    end % RK
-    
+    end  % RK
+%%    
     F=F_new;
     
     for i=1:nx
@@ -548,7 +550,7 @@ while ISTOP ==0
             end
             
     end %if IT
-    
+ %%   
     %     for i=1:nx
     %         fp_plot((i-1)*pp+1:i*pp)=Floc(Kplot,i,1:pp);
     %         fm_plot((i-1)*pp+1:i*pp)=Floc(NV-Kplot+1,i,1:pp);

@@ -1,0 +1,10 @@
+%% Write data from matlab to Tecplot 360
+% Generate data
+
+x = 1:0.1:2;
+y = 0:0.2:1;
+
+[X,Y] = meshgrid(x,y);
+
+z = sin(y'*x);
+

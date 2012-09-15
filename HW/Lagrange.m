@@ -39,8 +39,7 @@ for j=1:1:l
         end
     end
 end
-lj;
-yi=dot(lj,y)
+yi=dot(lj,y);
 
 %% Ploting Lagrange Result
 % I wish to use 100 points for ploting the Lagrange polinomial.
