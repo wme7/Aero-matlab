@@ -9,16 +9,15 @@ Dhat = legendreDiff(p);
 M    = legendreMass(p);
 
 for m=1:8
- F = x.^m; 
- 
- Fcoeff     = V\F;
- 
- diffFcoeff = (Dhat*Fcoeff);
- 
- diffF      = V*diffFcoeff;
- 
- error(m)   = max(abs((m)*x.^(m-1) - diffF));
- 
+    F = x.^m; % function to be differenciated
+    
+    Fcoeff     = V\F; % or inv(V)*F
+    
+    diffFcoeff = (Dhat*Fcoeff);
+    
+    diffF      = V*diffFcoeff;
+    
+    error(m)   = max(abs((m)*x.^(m-1) - diffF));
 end
 
 plot(error, 'r*'); hold on; plot(error, 'k-'); hold off;

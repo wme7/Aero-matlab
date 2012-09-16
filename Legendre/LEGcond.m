@@ -1,7 +1,7 @@
 for p=0:140
     x = sin(0.5*pi*linspace(-1,1,p+1))'; % Compute Chebishev nodes
     
-    V = legendreVDM(x,p);
+    V = legendreVDM(x,p); % compute Legendre's Vandermonde matrix.
     
     cgraph(p+1) = cond(V); % condition matlab test using L2-norm.
     
