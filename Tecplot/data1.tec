@@ -1,7 +1,7 @@
 TITLE = "Z = sin(YX)"
 VARIABLES = "X" "Y" "Z"
 ZONE T = "Frame1"
-I = 11, J = 6, K = 1, F = POINT
+I I = 11, J = 6, K =  F = POINT
 
 1.000000	0.000000	0.000000
 1.100000	0.000000	0.000000
