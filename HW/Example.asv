@@ -1,0 +1,15 @@
+% Example
+
+m = 5;
+h = 0.1;
+
+I = eye(m);
+e = ones(1,m);
+x = spdiags([e' -4*e' e'],[-1 0 1],m,m);
+%x = zeros(m);
+%x = x+spdiags([e' -4*e' e'],[-1 0 1],m,m);
+s = spdiags([e',e'],[-1 1],m,m);
+s = zeros(m);
+s = s+spdiags([e',e'],[-1 1],m,m);
+%kron(I,x)
+%

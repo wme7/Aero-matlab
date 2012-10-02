@@ -1,0 +1,1 @@
+function c=colfunc(u);%%	This determines which physical quantity that is plotted.%[p,v]=Riemann_to_Phys(u);c=p.*log(p)+v.^2;

@@ -1,0 +1,1 @@
+% clear;N=128;tid=0.5;dt=0.125/2;delta=0.025;NT=ceil(tid/dt);x=linspace(-0.5,3.5,N);y=0.5*(x(1:N-1)+x(2:N));u0=(abs(y-0.4)<0.25);plotFTresult(u0,y);drawnow;tic;u=LongGod(u0,x,'fflux',delta,dt,NT);toc;plotFTresult(u,y);

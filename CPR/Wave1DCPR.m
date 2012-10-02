@@ -15,7 +15,7 @@ close all ;
 % k: degree of solution polynomial; k+1 is the numer of solution points
 k = 5
 % nc: number of elements
-nc = 4
+nc = 5
 % cfl: cfl number
 cfl = 0.001
 % time: the time to stop the simulation

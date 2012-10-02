@@ -1,39 +1,40 @@
-%% Discontinuous Galerkin (with Legendre polynomials)
+%% Discontinuous Galerkin using Legendre polynomials
 % for the advection equation q_t + a*q_x = 0
-% by Manuel Diaz, 2012.09.16
+% using u(x,0)=sin(x) and periodic boundary conditions
+% advancing in time using TVD-RK4 method. 
+% Modify by Manuel Diaz, 2012.09.16
 
 clear all; close all;
 
-%% DESCRIBE THE ORDER OF THE SCHEME
+%% ORDER OF THE SCHEME
 % Order of polynomials used for interpolation:
 p = 4;
 
 % Chebychev nodes on the interval [-1,1]
 xcheby = sin(0.5*pi*linspace(-1,1,p+1)');
 
-%% DIVIDE THE PIPE INTO CELLS
+%% DIVIDE THE DOMAIN INTO CELLS
 % number of cells to divide interval into
-Ncells = 100;
+Ncells = 50;
 
-% Physical limits of the pipe
-xmin = -4;
-xmax =  4;
+% Physical limits of our Domain
+xmin = -pi(); xmax =  pi();
 
-% set Number of nodes along pipe
+% Set number of nodes along the domain
 Nnodes = Ncells+1;
 nodex  = linspace(xmin,xmax,Nnodes);
 
-% for each cell of the pipe fill with p+1 Chebychev nodes
+% for each cell of the domain fill with p+1 Chebychev nodes
 x = zeros(p+1, Ncells);
 for i=1:Ncells
     x(:,i) = ((nodex(i+1)-nodex(i))/2)*xcheby + (nodex(i)+nodex(i+1))/2;
 end
 
 %% CREATE THE MATRICES NEEDED FOR THE DG SCHEME
-% Create the Vandermonde matrix for the Chebychev nodes
+% Vandermonde matrix for the Chebychev nodes
 V = legendreVDM(xcheby,p);
 
-%Differentiation matrix
+% Differentiation matrix
 %(acts on the vector of coefficients of q
 % and gives coefficients of q_x)
 Dhat = legendreDiff(p);
@@ -44,7 +45,7 @@ M = legendreMass(p);
 % Stiffness matrix
 D = M*Dhat;
 
-% Modify D
+% Modify D (given the in LHS of our equation)
 % i.e. D <- D(n,m)+ 2*(-1)^(n+m); 0<=m,n<=p
 
 Dmod = zeros(p+1);
@@ -54,18 +55,18 @@ for i = 1:p+1
     end
 end
 
-% surface term matrix
+% Surface term matrix (boundaries of our elements)
 S = (-1).^[0:p]'* ones(1,p+1);
 
 %% INITIAL CONDITIONS
-% Initial condition q in each cell and its interpol. coefficients ro
+% IC q in each cell and its interpol. coefficients ro
 % (cells indexed by i, each cell has p+1 nodes)
 q   = zeros(p+1, Ncells);
-
-q(:)   = exp(-x(:).^2);
+%q(:) = exp(-x(:).^2);
+q(:) = sin(x);
 rho = V\q;
 
-% PARAMETERS FOR THE SCHEME
+% PARAMETERS FOR THE ADVECTION EQUATION
 a = 1.;
 
 % width of each cell
@@ -75,10 +76,10 @@ dx = nodex(2:Nnodes)-nodex(1:Nnodes-1);
 dt = min(min(dx))/((p+1)^2);
 
 % final time to integrate advection equation to
-T = 4;
+T_end= 4;
 
 % number of time steps
-Ntsteps = floor(T/dt);
+Ntsteps = floor(T_end/dt);
 
 % coefficients
 coeff   = (2*(0:p)+1)'*(a./(dx));
@@ -87,33 +88,35 @@ coeff   = (2*(0:p)+1)'*(a./(dx));
 
 for tstep = 1:Ntsteps
     
-    sigma = rho;
+    sigma = rho; % load IC
     
-    for rkstage = 3:-1:1
+    for rkstage = 4:-1:1 % RK 4
         % stage 1
-        volterms = -Dmod*sigma;
+        vol_terms = -Dmod*sigma;
         
         % flux coming in from left neighbors
         surfterm =  S*sigma;
         
-        idthis = 2:Ncells;
-        idneig = 1:Ncells-1;
+        idthis = 2:Ncells;      % element's initial index
+        idneig = 1:Ncells-1;    % element's last index
         
-        volterms(:, idthis) = ...
-            (dt/rkstage)*coeff(:,idthis).*(volterms(:,idthis)+surfterm(:,idneig));
+        vol_terms(:, idthis) = ...
+            (dt/rkstage)*coeff(:,idthis).*(vol_terms(:,idthis)+surfterm(:,idneig));
         
-        volterms(:, 1) = (dt/rkstage)*coeff(:,1).*volterms(:,1);
+        vol_terms(:, 1) = (dt/rkstage)*coeff(:,1).*vol_terms(:,1);
         
-        sigma    = rho + volterms;
+        sigma    = rho + vol_terms;
     end
+    % Periodic BC
+    sigma(:,1)= sigma(:,Ncells);
     
-    rho = sigma;
+    % Update info
+    rho = sigma; 
     
-    if ( ~mod(tstep, 100)  )
+    if ( ~mod(tstep, 100)  ) % compute solution when mod() == 0
         q = V*rho;
-        
         % plot(x(:),abs(q(:)-exp(-(x(:)-dt*tstep).^2)));
-        plot(x(:),q(:));
+        plot(x,q);
         pause(0.1);
     end
 end

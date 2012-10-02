@@ -1,0 +1,1 @@
+function ci=clindex(u,pmax,pmin,NMAP,colfunc)% A function assigning an index defined by "colfunc" to each value of ucf=feval(colfunc,u);pc=NMAP*(cf-pmin)/(pmax-pmin);ci=max(1,min(round(pc),NMAP));

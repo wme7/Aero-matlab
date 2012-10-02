@@ -1,0 +1,1 @@
+function x=clfunc(y);% Returns a number between 0 and 1 for y between 0 and 1% To be used in clindex% x=tanh(y/2);x=1./(1+4*abs(y));x=min(1,max(x,0));
