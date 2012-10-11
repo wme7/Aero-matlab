@@ -5,6 +5,7 @@ function [x,dx] = grid1d(a,b,nx)
 % [a,b]: x range, nx: the desided number of nodes.
 
 % OUTPUTS
+% uniformly distributed mesh grid for computation.
 % x: vector x's coordinates, dx: cell size.
 
 %% Compute cell size

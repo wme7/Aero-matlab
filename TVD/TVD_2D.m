@@ -24,7 +24,6 @@ clear; clc; close all;
 limiter = 1;    % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 
 %% Domain 
-    d = 2; % 2D domain is used
 % 2D domain where dx = dy, nx > 1 and ny > 4!!
    nx = 40;   ny = 40;
 [x,dx,y,dy] = grid2d(0,7,nx,0,15,ny);
@@ -87,13 +86,9 @@ for k = t
     % Visualization
     if mod(s,sPlot) == 0 % I want 1 frame per iteration
         counter = counter + 1;
-        if d == 1
-            plot(u)
-        else
-            contourf(u)
-            colormap Autumn
-            colorbar('location','southoutside')
-        end
+        contourf(u)
+        colormap Autumn
+        colorbar('location','southoutside')
         M(counter) = getframe;
     end
     
