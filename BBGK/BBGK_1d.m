@@ -12,7 +12,7 @@ clc;  clear all;  close all;
 %% Simulation Parameters
 CFL    = 0.6;    % CFL condition
 r_time = 0.01;   % Relaxation time
-tEnd   = 0.1;    % End time
+tEnd   = 0.2;    % End time
 theta  = 0;      % for FD = -1, MB = 0, BE = +1
 quad   = 1;      % for NC = 1 , GH = 2
 method = 1;      % for TVD = 1, WENO3 = 2, WENO5 = 3
@@ -23,7 +23,11 @@ nx  = 40;                       % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
-%% Microscopic Velocity Discretization (using discrete ordinate method)
+%% Microscopic Velocity Discretization (using Discrete Ordinate Method)
+% that is to make coincide discrete values of microscopic velocities with
+% values as the value points for using a quadrature method, so that we can
+% integrate the velocity probability distribution to recover our
+% macroscopics properties.
 switch quad
 
     case{1} % Newton Cotes Quadrature:
@@ -80,7 +84,7 @@ time = 0:dt:tEnd;
 
 % By negleting any force field acting over our domian, the classic
 % transport Boltzmann equation will resemble to a pure advection equation.
-% Thus we use WENO, TVD, DG or CPR can be used to compute evolution of the
+% Thus WENO, TVD, DG or CPR can be used easyly to compute evolution of the
 % information inside the domain: 
 
 switch method
@@ -98,7 +102,8 @@ switch method
         
         for tsteps = time
             % for visualization
-            h = plot(x,r(1,:));
+            figure(1)
+            h = plot(x,r(1,:)); axis([0,1,0,0.5])
         
             % compute equilibrium distribution for the current t_step
             f_eq = f_equilibrium_1d(r,u,v,t,theta);
