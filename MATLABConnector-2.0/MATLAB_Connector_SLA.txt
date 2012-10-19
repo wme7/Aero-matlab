@@ -1,0 +1,139 @@
+
+The MathWorks, Inc.
+Software Utility License Agreement
+
+For MATLAB Mobile Connector, Copyright 2012, The MathWorks, Inc.
+
+IMPORTANT NOTICE
+THIS LICENSE GOVERNS YOUR USE OF THE SOFTWARE LICENSED 
+HEREUNDER AND ITS ASSOCIATED DOCUMENTATION (COLLECTIVELY, THE "UTILITY"). 
+IN ORDER TO ACCESS AND USE THE UTILITY, THE INDIVIDUAL GRANTED LICENSE 
+RIGHTS HEREUNDER ("YOU") MUST BE ASSOCIATED EITHER TO A VALID MATLAB 
+LICENSE THAT IS CURRENT ON SOFTWARE MAINTENANCE SERVICE OR TO A VALID 
+LICENSE FOR MATLAB & SIMULINK STUDENT VERSION. THE UTILITY IS THE 
+PROPERTY OF THE MATHWORKS, INC. ("MATHWORKS"), AND YOUR RIGHTS ARE 
+LIMITED TO THOSE EXPRESSLY SET FORTH IN THIS AGREEMENT.
+
+BY INSTALLING THE UTILITY, YOU ACCEPT THE TERMS OF THIS AGREEMENT.  IF 
+YOU ARE NOT WILLING TO DO SO, SELECT "I DO NOT ACCEPT THE AGREEMENT" AND 
+THE INSTALLATION WILL BE ABORTED.
+
+1. LICENSE GRANT. Subject to any restrictions below, The MathWorks, Inc.
+("MathWorks") hereby grants You a license to install and use the Utility, 
+but only for the purpose of enabling the validly licensed instance of 
+MATLAB to which Your license is associated to serve, by means of 
+a MathWorks-licensed Mobile application, a device running the iOS or 
+Android operating system. This license is personal, nonexclusive, 
+nontransferable, and revocable. Your use of the Utility will require 
+a MathWorks account log-in. MathWorks may periodically perform technical 
+verification of your license to ensure compliance with these terms.
+
+2. LICENSE RESTRICTIONS. The license in Section 1 does not extend to use 
+of the Utility to serve either a version of MATLAB not current on 
+Software Maintenance Service or an invalidly licensed MATLAB & Simulink 
+Student Version. You shall not modify or adapt the Utility for any reason. 
+You shall not allow any third party to use the Utility to access MATLAB 
+software. Except as permitted in Section 1, You shall not serve any other 
+hardware or software via the Utility; and You shall not use the Utility to 
+enable any other software to act as a server. You also shall not 
+disassemble, decompile, or reverse engineer the Utility. You shall only 
+reproduce the Utility for archival purposes or as may be required in order 
+to allow the Utility to execute. You shall not alter or remove any 
+proprietary or other legal notices on or in copies of the Utility. You 
+shall not rent, lease, or loan the Utility, use the Utility for supporting 
+any other party’s use of the Utility, time share the Utility, or provide 
+service bureau use. You shall not sublicense, sell, or otherwise transfer 
+Your rights in the Utility to any third party; and You shall not disclose, 
+publish, reproduce, or transmit the Utility. You shall not republish the 
+documentation provided in connection with the Utility. You may not compile 
+the Utility into an executable using any compiler, including the MATLAB 
+Compiler. You may not run the Utility directly within a MATLAB Distributed 
+Computing Server worker. All other rights not granted in Section 1, 
+including without limitation rights to reproduce, sublicense, rent, sell, 
+distribute, serve other software by means of, decompile, reverse engineer, 
+and disassemble the Utility, are expressly reserved. You also warrant that 
+your use of the Application is compliant with any network or security 
+restrictions or policies applicable to You.
+
+3. LICENSES FOR THIRD PARTY SOFTWARE AND PRODUCTS. MathWorks has 
+incorporated certain software written by third parties into the Utility. 
+This software is licensed under separate license agreements which may 
+require MathWorks to distribute the software to You subject to additional 
+terms and conditions. Third party licenses binding on You may be viewed 
+at mathworks.com/connectorthirdpartylicense. You may also contact 
+MathWorks to obtain a copy of these licenses. By accepting this Agreement, 
+You confirm Your acceptance of such third party software licenses.
+
+4. TERM AND TERMINATION. Either party may terminate this Agreement at any 
+time, for any reason. This Agreement shall also automatically terminate 
+upon Your failure or inability to comply with any license restrictions set 
+forth in Paragraph 2. 
+
+5. EXPORT CONTROL. The Utility may be subject to U.S. and non-U.S. 
+export control laws and other applicable governmental export and import 
+laws and regulations. In exercising Your rights under this Agreement, 
+You shall not violate any such laws and regulations. 
+
+6. U.S. GOVERNMENT: By accepting delivery of the Utility, the government 
+agrees that it qualifies as commercial computer software or documentation 
+as defined in the FAR and/or DFARS; that the terms and conditions of this 
+Software Utility License Agreement shall govern the government’s use, 
+reproduction, performance, display, and disclosure of the Utility, 
+superseding any inconsistent government provisions.  
+
+7. ASSIGNMENT. You may not assign or otherwise transfer this Agreement 
+and its rights and obligations hereunder, in whole or in part, without 
+the written consent of MathWorks.  In the case of any permitted 
+assignment or transfer of or under this Agreement, this Agreement or the 
+relevant provisions shall be binding upon, and inure to the benefit of, 
+the successors, executors, heirs, representatives, administrators and 
+assigns of the parties hereto.  
+
+8. LIMITATION OF LIABILITY. Any liability of MathWorks and its third 
+party licensors (whether in relation to breach of contract, negligence or 
+otherwise) shall not in total exceed ten dollars ($10.00); and MathWorks 
+and its third party licensors shall have no liability for any indirect or 
+consequential loss (whether foreseeable or otherwise and including loss 
+of profits, loss of business, loss of opportunity, and loss of use of any 
+computer hardware or software).  Some states do not allow the exclusion 
+or limitation of incidental or consequential damages, so the above 
+exclusion or limitation may not apply to You. MathWorks' and its 
+Licensors' liability for death or personal injury resulting from 
+negligence or for any other matter in relation to which liability by law 
+cannot be excluded or limited shall not be excluded or limited. 
+
+9. DISCLAIMER OF WARRANTIES. The Utility is delivered "as is" and 
+MathWorks makes and You receive no additional express or implied 
+warranties.  MathWorks and its third party software providers hereby 
+expressly disclaim any and all other conditions, warranties, or other 
+terms of any kind or nature concerning the Utility (including, without 
+limitation, any with regard to infringement, merchantability, quality, 
+accuracy, or fitness for a particular purpose or Your purpose).  
+MathWorks also expressly disclaims any warranties that may be implied 
+from usage of trade, course of dealing, or course of performance.  The 
+Utility is provided with all faults, without any obligation of technical 
+support by MathWorks, and the entire risk of satisfactory quality, 
+performance, accuracy, and effort is with You.  MathWorks does not 
+warrant that the Utility will operate without interruption or be error 
+free. You accept responsibility for Your use of the Utility and the 
+results obtained therefrom. 
+
+10. GOVERNING LAW; JURISDICTION. This Agreement shall be governed by the 
+laws of the Commonwealth of Massachusetts, United States of America, 
+without regard to its conflicts of law provisions. Neither the U.N. 
+Convention on Contracts for the International Sale of Goods nor the 
+Uniform Computer Information Transactions Act, or any version thereof, 
+("UCITA") shall apply to this Agreement. To the extent that UCITA is 
+applicable, the parties agree to opt out of the applicability of UCITA. 
+
+11. ENTIRE AGREEMENT. This Agreement contains the entire understanding 
+of the parties and may not be modified or amended except by written 
+instrument, executed by MathWorks' and You.  
+
+
+10/12
+
+
+
+
+
