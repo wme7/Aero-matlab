@@ -66,7 +66,9 @@ v = repmat(v,1,nx);   w = repmat(w,1,nx);
     f0 = f_equilibrium_1d(r,u,v,t,theta);
 
 % Plot initial Equilibrium function:
-    %surface(f_eq)
+    surface(f0); grid on;
+    xlabel('x - Spatial Domain'); ylabel('v - Velocity Space');
+    zlabel('f - Probability');
 
 % Compute Initial Macroscopic Momemts:
     %[n,j_x,E] = macromoments1d(k,w,f,v);
