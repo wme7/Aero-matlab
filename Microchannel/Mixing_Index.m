@@ -4,7 +4,7 @@
 
 %% INPUT IMAGES & CORRECTION VALUES
 Im_number = [1808 1813 1824 1828 1834 1838 1855 1860 1843 1847]; 
-Pix_value = [0.28 0.28 0.295 0.295 0.285 0.285 0.30 0.30 0.30 0.30]; 
+Pix_value = [0.15 0.10 0.10 0.16 0.12 0.11 0.23 0.255 0.16 0.14]; 
 % The Pix_value was choosen by observing the result of the filter process
 % until we find an optimun condition to visualize the intesity of the
 % mixing region. 
@@ -19,13 +19,13 @@ end
 %% MAIN LOOP
 for ii = 1:N_Pv
     %% Load Image
-    name = strcat(num2str(Im_number(ii)),'.bmp');
+    name = strcat(num2str(Im_number(ii)),'_croped.bmp');
     image = imread(name);
     
     %% Apply filter and convert to Gray Intensity scale.
     h = fspecial('unsharp');    % load 'x' filter
     image2 = imfilter(image,h); % apply 'x' filter
-    image4 = rgb2gray(image2); % conver Filtered to gray scales
+    image4 = rgb2gray(image); % conver Filtered to gray scales
     
     %% Create Negative version of the Gray-Filtered image.
     image6 = double(image4);
@@ -55,9 +55,10 @@ for ii = 1:N_Pv
     
     %% Compute Mixing Index
     I = neg_image6;      % Use values in neg_image6 for the difusion analysis.
+    %x = find(I);         % find indices of non-zero values.
     I_mean = mean(I(:)); % Find the average of the image intensity values.
-    x = find(I);         % find indices of non-zero values.
-    N = length(x);       % Total number of non-zero values.
+    [m,n] = size(I); N = n*m;
+    %N = length(x);       % Total number of non-zero values.
     
     Mix_index(ii) = 1-(1/I_mean)*sqrt(sum(sum((I - I_mean).^2))/N);
     

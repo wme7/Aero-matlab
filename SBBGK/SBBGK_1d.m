@@ -57,7 +57,7 @@ v = repmat(v,1,nx);   w = repmat(w,1,nx);
 % Load Macroscopic Velocity, Temperature and Fugacity
     [r0,u0,t0] = reimann_IC1d(x,input);
     
-% Using Discrete ordinate method:
+% Using Discrete Ordinate Method:
     r = repmat(r0,nv,1); u = repmat(u0,nv,1); t = repmat(t0,nv,1);
 
 % Compute distribution IC of our mesoscopic method by assuming the equilibrium 
@@ -77,8 +77,7 @@ v = repmat(v,1,nx);   w = repmat(w,1,nx);
 % First we need to define how big is our time step. Due to the discrete
 % ordinate method the problem is similar to evonve the same problem for
 % every mesoscopic velocity.
-maxv = max(max(v));
-dt = dx*CFL/maxv; 
+dt = dx*CFL/max(v(:,1)); 
 dtdx = dt/dx;  % precomputed to save someflops
 
 % time domain discretization
@@ -110,7 +109,7 @@ switch method
             % compute equilibrium distribution for the current t_step
             f_eq = f_equilibrium_1d(r,u,v,t,theta);
                   
-            % (this part can and should be done in parallel!)
+            % (this part can, and should be done in parallel!)
             for i = 1:nv
                 % Compute the smoothness factors, r(j), from data, u(j).
                 [r] = theta1d(f(i,:),a(i));
@@ -139,6 +138,8 @@ switch method
             % UPDATE macroscopic properties 
             % (here lies a paralellizing computing chalenge)
             [r,u,t,p] = macroproperties1d(n,j_x,E,nx,nv,theta);
+            
+            %fprintf('%2.4f\n',tsteps)
             drawnow
         end
         
@@ -148,5 +149,5 @@ switch method
         error('Order must be between 1 and 2');
 end
 
-% Plot results
+%% Plot results
 %plot(x,u);

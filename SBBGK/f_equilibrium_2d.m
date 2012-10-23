@@ -1,4 +1,4 @@
-function f = f_equilibrium_2d(r,u,x,v,y,t,theta) 
+function f = f_equilibrium_2d(r,u1,u2,v1,v2,t,theta) 
 % Compute equilibrum in 1d cases for:
 %
 % MB:  Maxwell-Boltzmann, theta =  0
@@ -13,5 +13,5 @@ function f = f_equilibrium_2d(r,u,x,v,y,t,theta)
 % t: temperature
 % r: fugacity
 %
+f = 1./(exp( ((v1-u1).^2 + (v2-u2).^2 ) ./t) ./r + theta);
 
-f = 1./(exp( ((x-u).^2 + (y-v).^2)./t)./r + theta);
