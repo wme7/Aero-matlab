@@ -27,8 +27,8 @@ nx = 40; ny = 40;
 switch quad
 
     case{1} % Newton Cotes Quadrature:
-    V  = [-5,5];  % range: a to b
-    lv = 20;        % nodes desired (may not the actual value)
+    V  = [-20,20];  % range: a to b
+    lv = 25;        % nodes desired (may not the actual value)
     [v,w,k] = cotes_xw(V(1),V(2),lv,5); % cotes Degree 5
 
     case{2} % Gauss Hermite Quadrature:

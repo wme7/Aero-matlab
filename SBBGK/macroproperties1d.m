@@ -16,7 +16,7 @@ switch theta
         - n(i)*(u(i)^2);
         r_p = bisection(psi,r_a,r_b,tol);
         r(i) = r_p;
-        t(i) = n(i)/(pi*BE(r_p,1));
+        t(i) = n(i)^2/(pi*(BE(r_p,0.5))^2);
         p(i) = E(i) - 1/2*n(i)*(u(i)^2);
         end
         
@@ -29,15 +29,15 @@ switch theta
         - n(i)*(u(i)^2);
         r_p = bisection(psi,r_a,r_b,tol);
         r(i) = r_p;
-        t(i) = n(i)/(pi*FD(r_p,1));
+        t(i) = n(i)^2/(pi*(FD(r_p,0.5))^2);
         p(i) = E(i) - 1/2*n(i)*(u(i)^2);
         end        
     
     case{0} % MB
     % IF MB: the task is much simple.
-        t = 2*E./n - u.^2;
-        r = n./(pi.*t);
-        p = (1/2).*n.*t;
+        t = 4*E./n - 2*u.^2;
+        r = n./sqrt(pi.*t);
+        p = E-(1/2).*n.*t;
     otherwise 
         error('theta can only be: -1, 0, +1 ');
 end
