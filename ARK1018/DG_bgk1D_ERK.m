@@ -1,40 +1,38 @@
-clear all
-close all
-
+function [x,r_plot,u_plot]=DG_bgk1D_ERK(OUTTIME,TAU,bb)
+%% DG1D SBBGK-ERK
+%clc; clear all; close all; 
 tic
-GHNC        = 0;
-%CFL         = 0.9;
-OUTTIME     = 0.1;
-TAU			= 0.0001% !RELAXATION TIME
 
-nx = 32; % number of elements
-p  = 7;			%polinomial degree
-pp =p+1;
-stage=6;
-rk =stage;			%RK stage
+%% START
+GHNC        = 0;
+%OUTTIME    = 0.1;
+%TAU	    = 0.0001;% !RELAXATION TIME
+fprintf('tau = %0.6f\n',TAU);
+
+nx = 32;    % Number of elements
+p  = 7;		% Polinomial degree
+pp = p+1;
+stage = 6;
+rk = stage; % RK stage
 
 BC_type = 0; % 0 No-flux; -1: reflecting
-CFL=1/(2*p+1);
-ratio=0.2;
+CFL = 1/(2*p+1);
+ratio = 0.2;
 
-bb=1;
+%bb=1; % for ploting variables
 
 coeffi_RK
 gamma=const_a_I(2,1);
 
-% filter_order=4;
-% CutOff=0.75;
-%
-% filter_sigma=filter_profile(p,filter_order, CutOff)
-
 IT       = 0;
 NV = 20;
 NVh=20/2;
+
 GH =[-5.38748089001,-4.60368244955,-3.94476404012,-3.34785456738, ...
     -2.78880605843,-2.25497400209,-1.73853771212,-1.2340762154,...
     -0.737473728545,-0.245340708301,0.245340708301,0.737473728545,...
-    1.2340762154,1.73853771212,2.25497400209,2.78880605843,3.34785456738,...
-    3.94476404012,4.60368244955,5.38748089001];
+    1.2340762154,1.73853771212,2.25497400209,2.78880605843,...
+    3.34785456738,3.94476404012,4.60368244955,5.38748089001];
 wp  =[0.898591961453,0.704332961176,0.62227869619,0.575262442852,...
     0.544851742366,0.524080350949,0.509679027117,0.499920871336,...
     0.493843385272,0.490921500667,0.490921500667,0.493843385272,...
@@ -43,7 +41,8 @@ wp  =[0.898591961453,0.704332961176,0.62227869619,0.575262442852,...
 
 V=-GH;
 dx=1/nx;		%Stepwidth in space
-amax=abs(V(1))
+amax=abs(V(1));
+fprintf('a_max = %0.6f\n',amax);
 
 % Initial State
 
@@ -55,9 +54,7 @@ PL=1.0;
 ET=PL+0.5*RL*UL^2;
 TL=4*ET/RL-2*UL^2;
 ZL=RL/sqrt(pi*TL);
-%                         T(i,m)    = 4*ET(i,m)/R(i,m) - 2*U(i,m)^2;
-%                         Z(i,m)    = R(i,m) / sqrt(pi* T(i,m));
-%                         P(i,m) = ET(i,m) - 0.5 * R(i,m) * U(i,m)^2;
+
 RR=0.125;
 UR=0;
 PR=0.1;
@@ -65,18 +62,6 @@ PR=0.1;
 ET=PR+0.5*RR*UR^2;
 TR=4*ET/RR-2*UR^2;
 ZR=RR/sqrt(pi*TR);
-
-% Case 2
-% UL  = 0.;
-% TL  = 4.38385;
-% ZL  = 0.2253353;
-% UR  = 0.;
-% TR  = 8.972544;
-% ZR  = 0.1204582;
-
-% UR  = UL;
-% TR  = TL;
-% ZR  = ZL;
 
 
 %nt=round(OUTTIME/dt);
@@ -108,8 +93,8 @@ alpha=zeros(1,rk);
 
 FR=zeros(pp,1);
 FU=zeros(pp,1);
-FC=zeros(pp,1);
-FN=zeros(pp,1);
+%FC=zeros(pp,1);
+%FN=zeros(pp,1);
 
 F_s=zeros(NV,nx,pp,stage);
 F_ns=zeros(NV,nx,pp,stage);
@@ -163,39 +148,32 @@ for i=1:nx
     end
 end
 
-dt=CFL*dx*ratio/amax
-
-
+dt=CFL*dx*ratio/amax;
+fprintf('dt = %0.6f\n',dt);
 
 r_plot=reshape(R',nx*pp,1);
 u_plot=reshape(U',nx*pp,1);
-scrsz = get(0,'ScreenSize');
+et_plot=reshape(ET',nx*pp,1);
+av_plot=reshape(AV',nx*pp,1);
+t_plot=reshape(T',nx*pp,1);
+z_plot=reshape(Z',nx*pp,1);
+%scrsz = get(0,'ScreenSize');
 if bb==1
     
-    figure
-    %figure('Position',[1 scrsz(4)/8 scrsz(3)/2 scrsz(4)*3/4])
-    subplot(1,2,1)
-    wave_handleu=plot(x,u_plot,'-');
-    %     figure(1)
-    %     hold on
-    %     for i=1:nx
-    %         plot(x_p(i,:),U(i,:),'-');
-    %     end
-    %     hold off
-    axis([-0.2, 1.2, -0.5, 1.5]);
-    xlabel('x'); ylabel('u(x,t)')
-    
+    figure(1)
     %figure('Position',[scrsz(3)/4 scrsz(4)/8 scrsz(3)/2 scrsz(4)*3/4])
-    subplot(1,2,2)
-    wave_handler=plot(x,r_plot,'-');
-    %     figure(2)
-    %     hold on
-    %     for i=1:nx
-    %         plot(x_p(i,:),R(i,:),'-');
-    %     end
-    %     hold off
-    axis([-0.2, 1.2, 0., 1.2]);
-    xlabel('x'); ylabel('R(x,t)')
+    subplot(2,3,1); wave_handleu = plot(x,u_plot,'.'); axis([0,1,-0.5,1.5]);
+    xlabel('x'); ylabel('u(x,t)'); title('Velocity');
+    subplot(2,3,2); wave_handler = plot(x,r_plot,'.'); axis([0,1,0,1.2]);
+    xlabel('x'); ylabel('R(x,t)'); title('Density');
+    subplot(2,3,3); wave_handleet = plot(x,et_plot,'.'); axis([0,1,0,2]);
+    xlabel('x'); ylabel('ET(x,t)'); title('Energy');
+    subplot(2,3,4); wave_handleav = plot(x,av_plot,'.'); axis([0,1,0,1.5]);
+    xlabel('x'); ylabel('AV(x,t)');title('Viscority');
+    subplot(2,3,5); wave_handlet = plot(x,t_plot,'.'); axis([0,1,3,4]);
+    xlabel('x'); ylabel('T(x,t)'); title('temperature');
+    subplot(2,3,6); wave_handlez = plot(x,z_plot,'.'); axis([0,1,0,1]);
+    xlabel('x'); ylabel('Z(x,t)');title('Fugacity');
     
     drawnow
 end
@@ -378,20 +356,7 @@ while ISTOP ==0
                 end
             end % loop for NV
         end
-        % u_alt => F
-        % u =>F_new
-        %           if l<stage
-        %             %u_num = u_num + dt*const_b(i)*(F_s(:,i)); %+F_ns(:,i));
-        %             u = u + dt*const_b(l)*(F_s(:,:,l)+F_ns(:,:,l));
-        %             u_alt = uold;
-        %             for j=1:l %u_alt=Un+Xi
-        %                 u_alt = u_alt + dt*(const_a_I(l+1,j)*F_s(:,:,j) + const_a_E(l+1,j)*F_ns(:,:,j));
-        %             end
-        %         else
-        %             u = u + dt*const_b(l)*(F_s(:,:,l)+F_ns(:,:,l));
-        %         end
-        
-        
+            
         if l<stage
             F_new=F_new+ dt*const_b(l)*(F_s(:,:,:,l)+F_ns(:,:,:,l));
             F=Fold;
@@ -576,30 +541,12 @@ while ISTOP ==0
     if bb==1
         set(wave_handleu,'YData',u_plot);
         set(wave_handler,'YData',r_plot);
-        %         figure(1)
-        %         plot(x_p(1,:),U(1,:),'-');
-        %         hold on
-        %         for i=2:nx
-        %             plot(x_p(i,:),U(i,:),'-');
-        %         end
-        %         hold off
-        %         figure(2)
-        %         plot(x_p(1,:),R(1,:),'-');
-        %         hold on
-        %         for i=2:nx
-        %             plot(x_p(i,:),R(i,:),'-');
-        %         end
-        %         hold off
+        set(wave_handleet,'YData',et_plot);
+        set(wave_handleav,'YData',av_plot);
+        set(wave_handlet,'YData',t_plot);
+        set(wave_handlez,'YData',z_plot);
         drawnow
-        %         set(wave_handlev,'YData',u_plot); drawnow
     end
-    
-    %fprintf('1X ELAPSED TIME: %f7.4,4 DENSITY AT X=4.0,Y=5.: %f7.4\n', TIME, R(NXP1/2))
-    
-    ITER = ITER + 1;
-    
+    ITER = ITER + 1;    
 end
-
 toc
-
-

@@ -1,7 +1,9 @@
-clear all
-close all
+%% DG1D SBBGK-RK
+clc; clear all; close all;
 
 tic
+
+%% Start
 GHNC        = 0;
 %CFL         = 0.9;
 OUTTIME     = 0.1;
@@ -9,9 +11,9 @@ TAU			= 0.01;% !RELAXATION TIME
 
 nx = 32; % number of elements
 p  = 4;			%polinomial degree
-pp =p+1;
-stage=pp;
-rk =pp;			%RK stage
+pp = p+1;
+stage = pp;
+rk = pp;	%RK stage
 
 BC_type = 0; % 0 No-flux; -1: reflecting
 CFL=1/(2*p+1);
@@ -27,44 +29,26 @@ gamma=const_a_I(2,1);
 %
 % filter_sigma=filter_profile(p,filter_order, CutOff)
 
-IT       = 0;
-NV = 20;
-NVh=20/2;
+IT  = 0;
+NV  = 20;
+NVh = 20/2;
+
 GH =[-5.38748089001,-4.60368244955,-3.94476404012,-3.34785456738, ...
     -2.78880605843,-2.25497400209,-1.73853771212,-1.2340762154,...
     -0.737473728545,-0.245340708301,0.245340708301,0.737473728545,...
-    1.2340762154,1.73853771212,2.25497400209,2.78880605843,3.34785456738,...
-    3.94476404012,4.60368244955,5.38748089001];
-wp  =[0.898591961453,0.704332961176,0.62227869619,0.575262442852,...
+    1.2340762154,1.73853771212,2.25497400209,2.78880605843,...
+    3.34785456738,3.94476404012,4.60368244955,5.38748089001];
+wp =[0.898591961453,0.704332961176,0.62227869619,0.575262442852,...
     0.544851742366,0.524080350949,0.509679027117,0.499920871336,...
     0.493843385272,0.490921500667,0.490921500667,0.493843385272,...
     0.499920871336,0.509679027117,0.524080350949,0.544851742366,...
     0.575262442852,0.62227869619,0.704332961176,0.898591961453];
 
-V=-GH;
-dx=1/nx;		%Stepwidth in space
-amax=abs(V(1))
+V = -GH;
+dx = 1/nx;		%Stepwidth in space
+amax = abs(V(1))
 
 % Initial State
-
-% Case 1
-% RL=1.0;
-% UL=0.75;
-% PL=1.0;
-%
-% ET=PL+0.5*RL*UL^2;
-% TL=4*ET/RL-2*UL^2;
-% ZL=RL/sqrt(pi*TL);
-% %                         T(i,m)    = 4*ET(i,m)/R(i,m) - 2*U(i,m)^2;
-% %                         Z(i,m)    = R(i,m) / sqrt(pi* T(i,m));
-% %                         P(i,m) = ET(i,m) - 0.5 * R(i,m) * U(i,m)^2;
-% RR=0.125;
-% UR=0;
-% PR=0.1;
-%
-% ET=PR+0.5*RR*UR^2;
-% TR=4*ET/RR-2*UR^2;
-% ZR=RR/sqrt(pi*TR);
 
 % Case 2
 UL  = 0.;
@@ -74,14 +58,10 @@ UR  = 0.;
 TR  = 8.972544;
 ZR  = 0.1204582;
 
-% UR  = UL;
-% TR  = TL;
-% ZR  = ZL;
-
-
 %nt=round(OUTTIME/dt);
 [xl,w]=gauleg(pp);
 [Pleg]=legtable(xl,p);
+
 MF=zeros(NV,NV);
 F=zeros(NV,nx,pp);
 FEQ=zeros(NV,nx,pp);
@@ -361,18 +341,6 @@ while ISTOP ==0
             end % loop for NV
         end
         
-        %           if l<stage
-        %             %u_num = u_num + dt*const_b(i)*(F_s(:,i)); %+F_ns(:,i));
-        %             u = u + dt*const_b(l)*(F_s(:,:,l)+F_ns(:,:,l));
-        %             u_alt = uold;
-        %             for j=1:l %u_alt=Un+Xi
-        %                 u_alt = u_alt + dt*(const_a_I(l+1,j)*F_s(:,:,j) + const_a_E(l+1,j)*F_ns(:,:,j));
-        %             end
-        %         else
-        %             u = u + dt*const_b(l)*(F_s(:,:,l)+F_ns(:,:,l));
-        %         end
-        
-        
         if l<stage
             F_new=F_new+ dt*alpha(l+1)*(F+dt*F_tmp);
             F=F+dt*F_tmp;
@@ -463,8 +431,7 @@ while ISTOP ==0
             
         else
             F_new=F_new+ alpha(rk)*dt*F_tmp;
-            %                 phi=phi+ alpha(rk)*dt*phi_t;
-            %                 psi=psi+ alpha(rk)*dt*psi_t;
+
         end
     end % RK
     F=F_new;
@@ -558,13 +525,8 @@ while ISTOP ==0
         drawnow
         %         set(wave_handlev,'YData',u_plot); drawnow
     end
-    
-    %fprintf('1X ELAPSED TIME: %f7.4,4 DENSITY AT X=4.0,Y=5.: %f7.4\n', TIME, R(NXP1/2))
-    
     ITER = ITER + 1;
-    
 end
-
 toc
 
 

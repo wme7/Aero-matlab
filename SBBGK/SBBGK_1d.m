@@ -10,13 +10,14 @@
 clc;  clear all;  close all;
 
 %% Simulation Parameters
-CFL    = 0.1;    % CFL condition
+CFL    = 0.30;   % CFL condition
 r_time = 0.0001;   % Relaxation time
 tEnd   = 0.05;    % End time
 theta  = 0;      % for FD = +1, MB = 0, BE = -1
 quad   = 1;      % for NC = 1 , GH = 2
 method = 1;      % for TVD = 1, WENO3 = 2, WENO5 = 3
-input  = 2;      % Reimann IC case
+input  = 1;      % Reimann IC case
+plot_result = 1; % 0: no!, 1: yes please!
 
 %% Space Discretization
 nx  = 100;                      % Desided number of points in our domain
@@ -69,12 +70,13 @@ nv = length(v);
     f0 = f_equilibrium_1d(r,ux,v,t,theta);
 
 % Plot IC of Distribution function, f, in Phase-Space:
+if plot_result == 1
    figure(1)
-   surface(f0); grid on;
+   surf(f0); grid on;
    xlabel('x - Spatial Domain'); 
    ylabel('v - Velocity Space');
    zlabel('f - Probability');
-
+end
 % Compute Initial Macroscopic Momemts:
     [n,j_x,E] = macromoments1d(k,w,f0,v);
     
@@ -108,14 +110,15 @@ switch method
         
         for tsteps = time
             % Plot and redraw figures every time step for visualization
+            if plot_result == 1
             figure(2)
-            subplot(2,3,1); h1 = plot(x,n(1,:),'.'); axis([0,1,0.5,1]); title('Density')
-            subplot(2,3,2); h2 = plot(x,p(1,:),'.'); axis([0,1,-2,0]); title('Pressure')
-            subplot(2,3,3); h3 = plot(x,t(1,:),'.'); axis([0,1,4,9]); title('Temperature')
-            subplot(2,3,4); h4 = plot(x,r(1,:),'.'); axis([0,1,0,0.5]); title('Fugacity')
-            subplot(2,3,5); h5 = plot(x,ux(1,:),'.'); axis([0,1,-1,0]); title('velocity in x')
-            subplot(2,3,6); h6 = plot(x,j_x(1,:),'.'); axis([0,1,-1,0]); title('momentum in x')
-            
+            subplot(2,3,1); h1 = plot(x,n(1,:),'.'); axis([0,1,0,1.2]); title('Density')
+            subplot(2,3,2); h2 = plot(x,p(1,:),'.'); axis([0,1,-15,0]); title('Pressure')
+            subplot(2,3,3); h3 = plot(x,t(1,:),'.'); axis([0,1,3,4]); title('Temperature')
+            subplot(2,3,4); h4 = plot(x,r(1,:),'.'); axis([0,1,0,20]); title('Fugacity')
+            subplot(2,3,5); h5 = plot(x,ux(1,:),'.'); axis([0,1,-0.5,1.5]); title('velocity in x')
+            subplot(2,3,6); h6 = plot(x,j_x(1,:),'.'); axis([0,1,-2,12]); title('momentum in x')
+            end
             % compute equilibrium distribution for the current t_step
             f_eq = f_equilibrium_1d(r,ux,v,t,theta);
             

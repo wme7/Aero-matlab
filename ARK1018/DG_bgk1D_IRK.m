@@ -52,7 +52,7 @@ amax=abs(V(1))
 tol=[1.d-6,1.d-6]*dx;
 parms = [40,40,-.1,1];
 
-% Initial State
+%% Initial State
 
 % Case 1
 RL=1.0;
@@ -73,7 +73,7 @@ ET=PR+0.5*RR*UR^2;
 TR=4*ET/RR-2*UR^2;
 ZR=RR/sqrt(pi*TR);
 
-% Case 2
+%% Case 2
 % UL  = 0.;
 % TL  = 4.38385;
 % ZL  = 0.2253353;

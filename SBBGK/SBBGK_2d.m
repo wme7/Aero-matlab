@@ -14,7 +14,7 @@ CFL    = 0.20;   % CFL condition
 r_time = 0.01;   % Relaxation time
 tEnd   = 0.2;    % Out time
 theta  = 0;      % for FD = +1, MB = 0, BE = -1
-quad   = 1;      % for NC = 1 , GH = 2
+quad   = 2;      % for NC = 1 , GH = 2
 method = 1;      % for TVD = 1, WENO3 = 2, WENO5 = 3
 input  = 5;      % Reimann IC case
 
