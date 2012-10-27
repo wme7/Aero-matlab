@@ -1,0 +1,110 @@
+body {
+    margin-top: 0px;
+    background-color: #eaeaff;
+} 
+
+H4 { color: rgb(153,0,0);
+    background-color: #f2f2ff;
+    font-family: Arial,Helvetica,sans-serif;
+    font-weight: bold;
+    font-size: smallnormal;
+}
+
+H3 {
+    color: rgb(153,0,0);
+    background-color: #f2f2ff;
+    font-family: Arial,Helvetica,sans-serif;
+    font-weight: bold;
+    font-size: large;
+}
+
+H2 {
+    color: rgb(153,0,0);
+    background-color: #e7e7ff;
+    font-weight: bold;
+    font-size: x-large;
+    font-family: Arial,Helvetica,sans-serif;
+}
+
+H1 { 
+    color: rgb(10,0,0);
+    background-color: #d7d7ff;
+    font-weight: bold;
+    font-size: xx-large;
+    font-family: Arial,Helvetica,sans-serif;
+}
+
+P {
+    font-weight: normal;
+    font-style: normal;
+    color: rgb(0, 0, 32);
+    font-family: Arial,Helvetica,sans-serif;
+    text-decoration: none;
+}  
+
+LI {
+    font-weight: normal;
+    font-style: normal;
+    color: rgb(0, 0, 32);
+    font-family: Arial,Helvetica,sans-serif;
+    text-decoration: none;
+}  
+
+A { 
+    font-weight: normal;
+    font-style: normal;
+    color: rgb(0,0,180);
+    font-family: Arial,Helvetica,sans-serif;
+    text-decoration: none;
+}
+A:hover {
+    text-decoration: underline; 
+    color: rgb(0,0,255);
+}
+
+CODE {
+    font-family: Courier New,Courier,monospace;
+    color: #000044;
+    font-size: -1;
+}
+
+TABLE.MAINLAYOUT {
+    width: 800px;
+    border-width: 0;
+    border-style: no-border;
+    padding: 0;
+    background-color: #ffffff;
+    background-image: url('background.png');
+    background-repeat: repeat-y;
+}
+
+TABLE.SUMMARYTABLE {
+    border-width: 1;
+    border-style: inset;
+    border-color: #777777;
+    padding: 0;
+    border-collapse: collapse;
+}
+TH.SUMMARYTABLE {
+    font-weight: bold;
+    color: #000000;
+    border-width: 1;
+    border-style: inset;
+    background-color: #b2b2b2;
+    padding: 0;
+}
+TD.SUMMARYTABLE {
+    font-weight: normal;
+    color: #000000;
+    border-width: 1;
+    border-style: inset;
+    background-color: #f2f2f2;
+    padding: 2;
+}
+
+PRE { 
+    font-family: Courier New,Courier,monospace;
+    color: #000044;
+    font-size: -1;
+}
+
