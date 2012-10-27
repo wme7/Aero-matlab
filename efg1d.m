@@ -3,6 +3,7 @@
 x = [0.0:.1:1.0];
 nnodes = length(x);         
 ncells = nnodes-1;
+nosDeDirichlet = 1;
 
 % SET PARAMETERS FOR WEIGHT FUNCTION, MATERIAL PROPERITES
 dmax = 2.0;
@@ -20,14 +21,14 @@ gg = -.05:.1:0.95; gg(1) = 0.0;
 % INITIALIZE MATRICES
 k = zeros(nnodes);
 f = zeros(nnodes,1);
-GG = zeros(nnodes,1);
+GG = zeros(nnodes,nosDeDirichlet);
 
 % LOOP OVER GAUSS POINTS
 for j = 1:length(gg)
    xg = gg(j);
 
 % DETERMINE DISTANCE BETWEEN NODES AND GAUSS POINT
-dif = xg*ones(1,nnodes)-x;;
+dif = xg*ones(1,nnodes)-x;
  
 % SET UP WEIGHTS W AND DW FOR EACH NODE
 clear w dw
@@ -60,26 +61,40 @@ for i=1:nnodes
 end
 Ainv = inv(A);
 pg = [1 xg];
-phi = pg*Ainv*B;
+phi(j,:) = pg*Ainv*B;
 db = p.*[dw;dw];
 da = -Ainv*(dA*Ainv);
-dphi = [0 1]*Ainv*B+pg*(da*B+Ainv*db);
+dphi(j,:) = [0 1]*Ainv*B+pg*(da*B+Ainv*db);
 
 %ASSEMBLE DISCRETE EQUATIONS
 if j == 1
    GG(1:3,1) = -phi(1:3)';
-else if j>1
-   k = k+(weight*E*area*jac)*(dphi'*dphi);
-   fbody = area*xg;
-   f = f+(weight*fbody*jac)*phi';
 end
-end
+%else
+    k = k+(weight*E*area*jac)*(dphi(j,:)'*dphi(j,:));
+    fbody = area*xg;
+    f = f+(weight*fbody*jac)*phi(j,:)';
+%end
 end
 
 % ENFORCE BOUNDARY CONDITIONS USING LAGRANGE MULTIPLIERS
 q = [0];
 m = [k GG;GG' zeros(1)];
+
 % SOLVE FOR NODAL PARAMETERS
 d = m\[f' q]';
 u = d(1:nnodes);
 
+result = phi*u;
+for i=1:length(x)
+    exact(i) =  0.5*(x(i)) - x(i)^3/6.0;
+end
+%%
+plot(x,u);
+title('valores u');
+figure();
+plot(x,result);
+title('valores u*phi');
+figure();
+plot(x,exact);
+title('valores exatos');

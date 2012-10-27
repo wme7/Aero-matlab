@@ -1,0 +1,15 @@
+<p>
+    These results show the performance of the GPU calculating elements of
+    the <a href="http://www.mathworks.com/products/parallel-computing/demos.html?file=/products/demos/shipping/distcomp/paralleldemo_gpu_mandelbrot.html">Mandelbrot Set</a>.
+    The elements form a square grid with <code>(-2 &lt;= x &lt;= 0.5)</code> and 
+    <code>(-1.25 &lt;= y &lt;= 1.25)</code>. Every iteration of a single element
+    is assumed to take twelve floating point operations.
+</p>
+<p>
+    Elements that are inside the set will iterate until the maximum number
+    of iterations is reached and are usually limited by the GPU computation
+    speed. Elements that quickly escape from the 2-circle take very little 
+    computation and are more dependent on how fast data can be read and 
+    written from/to memory. This is therefore a reasonably balanced test of
+    memory bandwidth and computational power.
+</p>
