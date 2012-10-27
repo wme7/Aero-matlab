@@ -9,6 +9,6 @@ function BE = BoseEinstein(z,nu)
 % As we can notice this function is of the order $\nu$ 
 
 l   = 1:50; % up to l = 50 to ensure a fair accuaracy
-fd  = (z.^l) ./ (l.^nu);
-FD  = sum(fd);
+be  = (z.^l) ./ (l.^nu);
+BE  = sum(be);
 return
