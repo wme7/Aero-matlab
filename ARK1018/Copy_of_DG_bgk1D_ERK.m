@@ -1,31 +1,30 @@
-function [x,r_plot,u_plot,et_plot,p_plot,t_plot,z_plot] = ...
-    DG_bgk1D_ERK(OUTTIME,TAU,nx,p,pp,stage,CFL,IT,bb)
+%function [x,r_plot,u_plot]=DG_bgk1D_ERK(OUTTIME,TAU,nx,p,pp,stage,CFL,IT,bb)
 %% DG1D SBBGK-ERK
-%clc; clear all; close all; 
+clc; clear all; close all; 
 tic
 
 %% START
 %GHNC        = 0;
-%OUTTIME    = 0.1;
-%TAU	    = 0.0001;% !RELAXATION TIME
+OUTTIME    = 0.1;
+TAU	    = 0.0001;% !RELAXATION TIME
 fprintf('tau = %0.6f\n',TAU);
 
-%nx = 32;    % Number of elements
-%p  = 7;		% Polinomial degree
-%pp = p+1;
-%stage = 6;
+nx = 32;    % Number of elements
+p  = 6;		% Polinomial degree
+pp = p+1;
+stage = 6;
 rk = stage; % RK stage
 
 BC_type = 0; % 0 No-flux; -1: reflecting
-%CFL = 1/(2*p+1);
+CFL = 1/(2*p+1);
 ratio = 0.2;
 
-%bb=1; % for ploting variables
+bb=1; % for ploting variables
 
 coeffi_RK % Load Rk coeficients from another matlab program.
 %gamma=const_a_I(2,1);
 
-%IT       = 0;
+IT       = 0;
 NV = 20;
 NVh=20/2;
 
@@ -172,7 +171,7 @@ if bb==1
     subplot(2,3,4); wave_handleav = plot(x,p_plot,'.'); axis([0,1,0,1.5]);
     xlabel('x'); ylabel('AV(x,t)');title('Pressure');
     subplot(2,3,5); wave_handlet = plot(x,t_plot,'.'); axis([0,1,3,4]);
-    xlabel('x'); ylabel('T(x,t)'); title('temperature');
+    xlabel('x'); ylabel('T(x,t)'); title('Temperature');
     subplot(2,3,6); wave_handlez = plot(x,z_plot,'.'); axis([0,1,0,1]);
     xlabel('x'); ylabel('Z(x,t)');title('Fugacity');
     
