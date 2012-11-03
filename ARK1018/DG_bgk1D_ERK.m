@@ -101,9 +101,10 @@ F_s=zeros(NV,nx,pp,stage);
 F_ns=zeros(NV,nx,pp,stage);
 
 x_p=zeros(nx,pp);
-%%%%%%%%%%%%%%  Transforming the initial condition to coefficients of Legendre Polinomials  %%%%%%%%%%%%%%%%%%%%
+
+%%%% Transforming the initial condition to coefficients of Legendre Polinomials %%%%
 for i=1:nx
-    xi=(2*i-1)*dx/2;      %evaluating the function `func' at the quadrature points
+    xi=(2*i-1)*dx/2; %evaluating the function `func' at the quadrature points
     x((i-1)*pp+1:i*pp)=xi+xl*dx/2;
     x_p(i,:)=xi+xl*dx/2;
     if(xi+xl(2)*dx/2 <= 0.5)
@@ -117,7 +118,7 @@ for i=1:nx
     end
     
     for K = 1: NV
-        for m=1:pp  %evaluating the function `func' at the quadrature points
+        for m=1:pp   %evaluating the function `func' at the quadrature points
             ffunc(m)  = 1/((exp((V(K)-U(i,m))^2/T(i,m))/Z(i,m)) + IT);
         end
         for j=0:p

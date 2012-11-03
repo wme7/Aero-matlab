@@ -1,3 +1,5 @@
+function SBBGK_1d_func(name,CFL,r_time,tEnd,theta,quad,method,IC_case, ...
+        plot_figs,write_ans,P_deg,Pp,RK_stages,nx)
 %% 1D Boltzmann Equation
 % Finite Difference solution of the Semi-classical Boltzmann equation to
 % recover Euler macroscopic continuum solution. By Manuel Diaz 2012.10.06
@@ -7,27 +9,27 @@
 % $$\frac{\partial f}{\partial t}+\vec F\cdot \nabla_p f + \vec v
 % \cdot\nabla_{\vec x} f =\widehat{\Omega } (f)$$
 %
-clc;  clear all;  close all;
+%clc;  clear all;  close all;
 
 %% Simulation Parameters
-name        ='SBBGK1d'; % Simulation Name
-CFL         = 0.30;     % CFL condition
-r_time      = 0.0001;   % Relaxation time
-tEnd        = 0.2;      % End time
-theta       = 1;        % {-1} BE, {0} MB, {1} FD.
-quad        = 1;        % for NC = 1 , GH = 2
-method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
-IC_case     = 7;        % Reimann IC cases available :{1,2,3,4,5,6,7}
-plot_figs   = 0;        % 0: no, 1: yes please!
-write_ans   = 1;        % 0: no, 1: yes please!
-% Using DG
-P_deg       = 0;        % Polinomial Degree
-Pp          = P_deg+1;  % Polinomials Points
-% Using RK integration time step
-RK_stages   = 4;        % Number of RK stages
+% name        ='SBBGK1d'; % Simulation Name
+% CFL         = 0.30;     % CFL condition
+% r_time      = 0.0001;   % Relaxation time
+% tEnd        = 0.2;      % End time
+% theta       = 1;        % {-1} BE, {0} MB, {1} FD.
+% quad        = 1;        % for NC = 1 , GH = 2
+% method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
+% IC_case     = 7;        % Reimann IC cases available :{1,2,3,4,5,6,7}
+% plot_figs   = 0;        % 0: no, 1: yes please!
+% write_ans   = 1;        % 0: no, 1: yes please!
+% % Using DG
+% P_deg       = 0;        % Polinomial Degree
+% Pp          = P_deg+1;  % Polinomials Points
+% % Using RK integration time step
+% RK_stages   = 4;        % Number of RK stages
 
 %% Space Discretization
-nx  = 100;                      % Desided number of points in our domain
+% nx  = 100;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
@@ -128,12 +130,12 @@ switch method
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1
             figure(2)
-            subplot(2,3,1); h1 = plot(x,n(1,:),'.'); axis([0,1,0,1.2]); title('Density')
-            subplot(2,3,2); h2 = plot(x,p(1,:),'.'); axis([0,1,-1,1]); title('Pressure')
-            subplot(2,3,3); h3 = plot(x,t(1,:),'.'); axis([0,1,3,5]); title('Temperature')
-            subplot(2,3,4); h4 = plot(x,r(1,:),'.'); axis([0,1,0,1]); title('Fugacity')
-            subplot(2,3,5); h5 = plot(x,ux(1,:),'.'); axis([0,1,-0.5,1.5]); title('velocity in x')
-            subplot(2,3,6); h6 = plot(x,E(1,:),'.'); axis([0,1,-1.5,1.5]); title('Energy')
+            subplot(2,3,1); plot(x,n(1,:),'.'); axis([0,1,0,1.2]); title('Density')
+            subplot(2,3,2); plot(x,p(1,:),'.'); axis([0,1,-1,1]); title('Pressure')
+            subplot(2,3,3); plot(x,t(1,:),'.'); axis([0,1,3,5]); title('Temperature')
+            subplot(2,3,4); plot(x,r(1,:),'.'); axis([0,1,0,1]); title('Fugacity')
+            subplot(2,3,5); plot(x,ux(1,:),'.'); axis([0,1,-0.5,1.5]); title('velocity in x')
+            subplot(2,3,6); plot(x,E(1,:),'.'); axis([0,1,-1.5,1.5]); title('Energy')
             end
             % Write Results
             if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
@@ -148,7 +150,7 @@ switch method
             f_eq = f_equilibrium_1d(r,ux,v,t,theta);
             
             % initialize variables
-            u_next = zeros(1,nx);
+            %u_next = zeros(1,nx);
             u_eq = zeros(1,nx);
             u = zeros(1,nx);
                               
