@@ -130,12 +130,12 @@ switch method
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1
             figure(2)
-            subplot(2,3,1); plot(x,n(1,:),'.'); axis([0,1,0,1.2]); title('Density')
-            subplot(2,3,2); plot(x,p(1,:),'.'); axis([0,1,-1,1]); title('Pressure')
-            subplot(2,3,3); plot(x,t(1,:),'.'); axis([0,1,3,5]); title('Temperature')
-            subplot(2,3,4); plot(x,r(1,:),'.'); axis([0,1,0,1]); title('Fugacity')
-            subplot(2,3,5); plot(x,ux(1,:),'.'); axis([0,1,-0.5,1.5]); title('velocity in x')
-            subplot(2,3,6); plot(x,E(1,:),'.'); axis([0,1,-1.5,1.5]); title('Energy')
+            subplot(2,3,1); plot(x,n(1,:),'.'); axis tight; title('Density')
+            subplot(2,3,2); plot(x,p(1,:),'.'); axis tight; title('Pressure')
+            subplot(2,3,3); plot(x,t(1,:),'.'); axis tight; title('Temperature')
+            subplot(2,3,4); plot(x,r(1,:),'.'); axis tight; title('Fugacity')
+            subplot(2,3,5); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+            subplot(2,3,6); plot(x,E(1,:),'.'); axis tight; title('Energy')
             end
             % Write Results
             if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
