@@ -2,8 +2,8 @@
  % declare local arguments
 %    integer :: i,j
 %    real(kind=8) :: machine_zero, tmp
-filter_sigma(1:PolyDeg+1)=0;
-    machine_zero=1.0E-14;
+filter_sigma=zeros(1,1,PolyDeg+1);
+    machine_zero=1.0E-10;
     filter_alpha=-log(machine_zero);
     
     DegCutOff=round(CutOff*PolyDeg)

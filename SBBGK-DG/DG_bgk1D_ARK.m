@@ -8,9 +8,9 @@ global A b c Pleg w wp NV nx p dx dt IT BC_type V VIS F gamma
 GHNC        = 0;
 %CFL         = 0.9;
 OUTTIME     = 0.1;
-TAU			= 0.0001;% !RELAXATION TIME
+TAU			= 0.001% !RELAXATION TIME
 
-nx = 32; % number of elements
+nx = 16; % number of elements
 p  = 7;			%polinomial degree
 pp =p+1;
 stage=6;
@@ -18,7 +18,7 @@ rk =stage;			%RK stage
 
 BC_type = 0; % 0 No-flux; -1: reflecting
 CFL=1/(2*p+1);
-ratio=0.5;
+ratio=0.2;
 
 bb=1;
 
@@ -48,11 +48,14 @@ wp  =[0.898591961453,0.704332961176,0.62227869619,0.575262442852,...
 V=-GH;
 dx=1/nx;		%Stepwidth in space
 amax=abs(V(1))
+dt=CFL*dx*ratio/amax
+dt=min(dt,TAU)
 
 tol=[1.d-6,1.d-6]*dx;
 parms = [40,40,-.1,1];
 
-%% Initial State
+
+% Initial State
 
 % Case 1
 RL=1.0;
@@ -73,7 +76,7 @@ ET=PR+0.5*RR*UR^2;
 TR=4*ET/RR-2*UR^2;
 ZR=RR/sqrt(pi*TR);
 
-%% Case 2
+% Case 2
 % UL  = 0.;
 % TL  = 4.38385;
 % ZL  = 0.2253353;
@@ -143,6 +146,18 @@ for i=1:nx
         end
     end
 end
+
+No=6;
+[LG_grids_o,ValuesOFPolyNatGrids] = ZELEGL (No) ;
+[LG_weights_o] = WELEGL (N_pl,LG_grids_o,ValuesOFPolyNatGrids) ;
+for i=1:nx
+    xi=(2*i-1)*dx/2;      %evaluating the function `func' at the quadrature points
+    x((i-1)*pp+1:i*pp)=xi+xl*dx/2;
+for j=1:No
+ xo1(j)= x1(0,1,DDK)+(x1(PND1,1,DDK)-x1(0,1,DDK))*(LG_grids_o(ii)-LG_grids_o(0))/2d0
+end
+end
+
 Tmin=min(TR,TL);
 Tmax=max(TR,TL);
 
@@ -167,8 +182,8 @@ for i=1:nx
     end
 end
 
-dt=CFL*dx*ratio/amax;
-%dt=min(dt,TAU*ratio)
+
+
 
 
 r_plot=reshape(R',nx*pp,1);
@@ -185,6 +200,19 @@ if bb==1
     
     axis([-0.2, 1.2, 0., 1.2]);
     xlabel('x'); ylabel('R(x,t)')
+    %     figure(1)
+    %     hold on
+    %     for i=1:nx
+    %         plot(x_p(i,:),U(i,:),'-');
+    %     end
+    %     hold off
+    
+    %     figure(2)
+    %     hold on
+    %     for i=1:nx
+    %         plot(x_p(i,:),R(i,:),'-');
+    %     end
+    %     hold off
     
     drawnow
 end
@@ -268,47 +296,52 @@ while ISTOP ==0
                     FC(:)=F(K,1,:);
                     FU=FC;
                     FR(:)=FS(K,1,:);
-                    F_s(K,1,:,1)=( (V(K)*A'*FC -V(K)* sum(FC)+ V(K)* sum(FU'.* c) * c'-FR)' .* b);
+                    F_s(K,1,:,1)=( (-FR)' .* b);
+                    F_ns(K,1,:,1)=( (V(K)*A'*FC -V(K)* sum(FC)+ V(K)* sum(FU'.* c) * c')' .* b);
                 elseif BC_type == -1            %BC reflecting
                     FC(:)=F(K,1,:);
                     FU(:)=F(NV-K+1,1,:);
                     FR(:)=FS(K,1,:);
-                    F_s(K,1,:,1)=( (V(K)*A'*FC -V(K)* sum(FC)+ V(K)* sum(FU'.* c) * c'-FR)' .* b);
+                    F_s(K,1,:,1)=( (-FR)' .* b);
+                    F_ns(K,1,:,1)=( (V(K)*A'*FC -V(K)* sum(FC)+ V(K)* sum(FU'.* c) * c')' .* b);
                 else
                 end
                 for i=2:nx
                     FU(:)=F(K,i-1,:);
                     FC(:)=F(K,i,:);
                     FR(:)=FS(K,i,:);
-                    F_s(K,i,:,1)=( (V(K)*A'*FC -V(K)* sum(FC) +V(K)* sum(FU) * c'-FR)' .* b);
+                    F_s(K,i,:,1)=( (-FR)' .* b);
+                    F_ns(K,i,:,1)=( (V(K)*A'*FC -V(K)* sum(FC) +V(K)* sum(FU) * c')' .* b);
                 end
                 
                 for i=1:nx-1
                     FU(:)=F(NVh+K,i+1,:);
                     FC(:)=F(NVh+K,i,:);
                     FR(:)=FS(NVh+K,i,:);
-                    F_s(NVh+K,i,:,1)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU'.* c) + V(NVh+K)*sum(FC'.* c) * c'-FR)' .* b);
+                    F_s(NVh+K,i,:,1)=( (-FR)' .* b);
+                    F_ns(NVh+K,i,:,1)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU'.* c) + V(NVh+K)*sum(FC'.* c) * c')' .* b);
                 end
                 if BC_type == 0
                     %BC no-flux
                     FC(:)=F(NVh+K,nx,:);
                     FU=FC;
                     FR(:)=FS(NVh+K,nx,:);
-                    F_s(NVh+K,nx,:,1)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU) +V(NVh+K)* sum(FC'.*c) * c'-FR)' .* b);
+                    F_s(NVh+K,nx,:,1)=( (-FR)' .* b);
+                    F_ns(NVh+K,nx,:,1)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU) +V(NVh+K)* sum(FC'.*c) * c')' .* b);
                 elseif BC_type == -1
                     %BC reflexting
                     FC(:)=F(NVh+K,nx,:);
                     FU(:)=F(NVh-K+1,nx,:);
                     FR(:)=FS(NVh+K,nx,:);
-                    F_s(NVh+K,nx,:,1)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU) +V(NVh+K)* sum(FC'.*c) * c'-FR)' .* b);
+                    F_s(NVh+K,nx,:,1)=( (-FR)' .* b);
+                    F_ns(NVh+K,nx,:,1)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU) +V(NVh+K)* sum(FC'.*c) * c')' .* b);
                 end
             end % loop for NV
         else
-            
             Fi=reshape(F_new,NV*nx*pp,1);
-            [Fn, it_histg, ierr] = nsoli(Fi,'BGKimL',tol,parms);
+            [Fn, it_histg, ierr] = nsoli(Fi,'BGKimexL',tol,parms);
+            %             [Fn, it_histg, ierr] = brsola(Fi,'BGKimexL',tol,parms);
             F=reshape(Fn,NV,nx,pp);
-            
             for i=1:nx
                 Mtemp=zeros(NV,pp);
                 for K=1:NV
@@ -334,11 +367,18 @@ while ISTOP ==0
                         T(i,m)    = 4*ET(i,m)/R(i,m) - 2*U(i,m)^2;
                         Z(i,m)    = R(i,m) / sqrt(pi* T(i,m));
                         P(i,m) = ET(i,m) - 0.5 * R(i,m) * U(i,m)^2;
+                        if T(i,m) <0
+                            error('T is Negative')
+                        end
+                        if P(i,m) <0
+                            error('P is Negative')
+                        end
                     end
                 end
             else
                 for i=1:nx
                     for m=1:pp
+                        
                         ZA = 0.0001;
                         ZB = 0.99;
                         while (abs(ZA-ZB) > 0.00001)
@@ -387,6 +427,7 @@ while ISTOP ==0
                         Z(i,m) = ZC;
                         T(i,m) = R(i,m)^2 / (pi*GC12^2 );
                         P(i,m) = ET(i,m) - 0.5 * R(i,m) * U(i,m)^2;
+                        
                     end
                 end
             end %if IT
@@ -419,13 +460,15 @@ while ISTOP ==0
                     FU=FC;
                     FR(:)=FS(K,1,:);
                     %F_ns(K,1,:,l)=( (V(K)*A'*FC -V(K)* sum(FC)+ V(K)* sum(FU'.* c) * c'-FR)' .* b);
-                    F_s(K,1,:,l)=( (V(K)*A'*FC -V(K)* sum(FC)+ V(K)* sum(FU'.* c) * c'-FR)' .* b);
+                    F_s(K,1,:,l)=( (-FR)' .* b);
+                    F_ns(K,1,:,l)=( (V(K)*A'*FC -V(K)* sum(FC)+ V(K)* sum(FU'.* c) * c')' .* b);
                 elseif BC_type == -1            %BC reflecting
                     FC(:)=F(K,1,:);
                     FU(:)=F(NV-K+1,1,:);
                     FR(:)=FS(K,1,:);
                     %F_ns(K,1,:,l)=( (V(K)*A'*FC -V(K)* sum(FC)+ V(K)* sum(FU'.* c) * c'-FR)' .* b);
-                    F_s(K,1,:,l)=( (V(K)*A'*FC -V(K)* sum(FC)+ V(K)* sum(FU'.* c) * c'-FR)' .* b);
+                    F_s(K,1,:,l)=( (-FR)' .* b);
+                    F_ns(K,1,:,l)=( (V(K)*A'*FC -V(K)* sum(FC)+ V(K)* sum(FU'.* c) * c')' .* b);
                 else
                 end
                 for i=2:nx
@@ -433,7 +476,8 @@ while ISTOP ==0
                     FC(:)=F(K,i,:);
                     FR(:)=FS(K,i,:);
                     %F_ns(K,i,:,l)=( (V(K)*A'*FC -V(K)* sum(FC) +V(K)* sum(FU) * c'-FR)' .* b);
-                    F_s(K,i,:,l)=( (V(K)*A'*FC -V(K)* sum(FC) +V(K)* sum(FU) * c'-FR)' .* b);
+                    F_s(K,i,:,l)=( (-FR)' .* b);
+                    F_ns(K,i,:,l)=( (V(K)*A'*FC -V(K)* sum(FC) +V(K)* sum(FU) * c')' .* b);
                 end
                 
                 for i=1:nx-1
@@ -441,7 +485,8 @@ while ISTOP ==0
                     FC(:)=F(NVh+K,i,:);
                     FR(:)=FS(NVh+K,i,:);
                     %F_ns(NVh+K,i,:,l)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU'.* c) + V(NVh+K)*sum(FC'.* c) * c'-FR)' .* b);
-                    F_s(NVh+K,i,:,l)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU'.* c) + V(NVh+K)*sum(FC'.* c) * c'-FR)' .* b);
+                    F_s(NVh+K,i,:,l)=( (-FR)' .* b);
+                    F_ns(NVh+K,i,:,l)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU'.* c) + V(NVh+K)*sum(FC'.* c) * c')' .* b);
                 end
                 if BC_type == 0
                     %BC no-flux
@@ -449,30 +494,19 @@ while ISTOP ==0
                     FU=FC;
                     FR(:)=FS(NVh+K,nx,:);
                     %F_ns(NVh+K,nx,:,l)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU) +V(NVh+K)* sum(FC'.*c) * c'-FR)' .* b);
-                    F_s(NVh+K,nx,:,l)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU) +V(NVh+K)* sum(FC'.*c) * c'-FR)' .* b);
+                    F_s(NVh+K,nx,:,l)=( (-FR)' .* b);
+                    F_ns(NVh+K,nx,:,l)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU) +V(NVh+K)* sum(FC'.*c) * c')' .* b);
                 elseif BC_type == -1
                     %BC reflexting
                     FC(:)=F(NVh+K,nx,:);
                     FU(:)=F(NVh-K+1,nx,:);
                     FR(:)=FS(NVh+K,nx,:);
                     %F_ns(NVh+K,nx,:,l)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU) +V(NVh+K)* sum(FC'.*c) * c'-FR)' .* b);
-                    F_s(NVh+K,nx,:,l)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU) +V(NVh+K)* sum(FC'.*c) * c'-FR)' .* b);
+                    F_s(NVh+K,nx,:,l)=( (-FR)' .* b);
+                    F_ns(NVh+K,nx,:,l)=( (-V(NVh+K)*A'*(-FC) -V(NVh+K)* sum(FU) +V(NVh+K)* sum(FC'.*c) * c')' .* b);
                 end
             end % loop for NV
         end
-        % u_alt => F
-        % u =>F_new
-        %           if l<stage
-        %             %u_num = u_num + dt*const_b(i)*(F_s(:,i)); %+F_ns(:,i));
-        %             u = u + dt*const_b(l)*(F_s(:,:,l)+F_ns(:,:,l));
-        %             u_alt = uold;
-        %             for j=1:l %u_alt=Un+Xi
-        %                 u_alt = u_alt + dt*(const_a_I(l+1,j)*F_s(:,:,j) + const_a_E(l+1,j)*F_ns(:,:,j));
-        %             end
-        %         else
-        %             u = u + dt*const_b(l)*(F_s(:,:,l)+F_ns(:,:,l));
-        %         end
-        
         
         if l<stage
             F_new=F_new+ dt*const_b(l)*(F_s(:,:,:,l)+F_ns(:,:,:,l));
@@ -506,9 +540,14 @@ while ISTOP ==0
                         T(i,m)    = 4*ET(i,m)/R(i,m) - 2*U(i,m)^2;
                         Z(i,m)    = R(i,m) / sqrt(pi* T(i,m));
                         P(i,m) = ET(i,m) - 0.5 * R(i,m) * U(i,m)^2;
+                        if T(i,m) <0
+                            error('T is Negative')
+                        end
+                        if P(i,m) <0
+                            error('P is Negative')
+                        end
                     end
                 end
-                
             else
                 for i=1:nx
                     for m=1:pp
@@ -597,6 +636,12 @@ while ISTOP ==0
                 T(i,m)    = 4*ET(i,m)/R(i,m) - 2*U(i,m)^2;
                 Z(i,m)    = R(i,m) / sqrt(pi* T(i,m));
                 P(i,m) = ET(i,m) - 0.5 * R(i,m) * U(i,m)^2;
+                if T(i,m) <0
+                    error('T is Negative')
+                end
+                if P(i,m) <0
+                            error('P is Negative')
+                        end
             end
         end
     else
@@ -659,6 +704,20 @@ while ISTOP ==0
     if bb==1
         set(wave_handleu,'YData',u_plot);
         set(wave_handler,'YData',r_plot);
+        %         figure(1)
+        %         plot(x_p(1,:),U(1,:),'-');
+        %         hold on
+        %         for i=2:nx
+        %             plot(x_p(i,:),U(i,:),'-');
+        %         end
+        %         hold off
+        %         figure(2)
+        %         plot(x_p(1,:),R(1,:),'-');
+        %         hold on
+        %         for i=2:nx
+        %             plot(x_p(i,:),R(i,:),'-');
+        %         end
+        %         hold off
         drawnow
         %         set(wave_handlev,'YData',u_plot); drawnow
     end
@@ -666,7 +725,7 @@ while ISTOP ==0
     %fprintf('1X ELAPSED TIME: %f7.4,4 DENSITY AT X=4.0,Y=5.: %f7.4\n', TIME, R(NXP1/2))
     
     ITER = ITER + 1;
-    
+   % pause()
 end
 
 toc
