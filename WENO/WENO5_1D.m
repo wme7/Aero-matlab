@@ -2,16 +2,17 @@ function [uun,uup] = WENO5_1D(uu)
 % pjk  (j,k = 0,1,2,3,4) : the coefficients of the k-th degree term of the
 % polynomial pj by weno5, e.g.,p12 represents the 2nd-degree term (x^2) of
 % the polynomial p1(x) by weno5 
+%
 % dpjk (j,k = 0,1,2,3,4) : the coefficient of the k-th degree term of the
 % derivative of the polynomial pj by weno5
 %
 % bj  (j = 0,1,2,3,4) : the smoothness indicator for the polynomial pj
 %
-% rnk (k = 0,1,2,3,4) : the optimal coefficients for the polynomials obtained via left stecils 
-% rpk (k = 0,1,2,3,4) : the optimal coefficients for the polynomials obtained via right stecils
+% rnk (k = 0,1,2,3,4) : the optimal coefficients for the polynomials obtained via left stencils 
+% rpk (k = 0,1,2,3,4) : the optimal coefficients for the polynomials obtained via right stencils
 %
-% wnk (k = 0,1,2,3,4) : the weights for the polynomials obtained via left stecils
-% wpk (k = 0,1,2,3,4) : the weights for the polynomials obtained via right stecils
+% wnk (k = 0,1,2,3,4) : the weights for the polynomials obtained via left stencils
+% wpk (k = 0,1,2,3,4) : the weights for the polynomials obtained via right stencils
 %
 eps  = 1.0D-15;
 %
