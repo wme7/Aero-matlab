@@ -113,7 +113,7 @@ time = 0:dt:tEnd;
 % transport Boltzmann equation will resemble to a pure advection equation.
 % Thus WENO, TVD, DG or CPR can be used easyly to compute evolution of the
 % information inside the domain: 
-
+tic
 switch method
     
     case{1} % TVD 0(h^2)
@@ -197,7 +197,7 @@ switch method
     otherwise
         error('Order must be between 1 and 2');
 end
-
+toc
 %% Close file with Results
 fclose(file);
 fprintf('Simulation has been completed succesfully!\n')

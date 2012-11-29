@@ -1,4 +1,11 @@
-function [uun,uup] = WENO5_1D(uu)
+function [uun,uup] = WENO5_1D_flux(uu)
+% 1D WENO3 reconstruction for 
+% u_t + f_x = 0 where f(u) = a*u(x) 
+% we assume "a" is or is not constant along x
+
+%% NOTATION
+% uu(1:9) nine points Flux values
+%
 % pjk  (j,k = 0,1,2,3,4) : the coefficients of the k-th degree term of the
 % polynomial pj by weno5, e.g.,p12 represents the 2nd-degree term (x^2) of
 % the polynomial p1(x) by weno5 
@@ -13,49 +20,44 @@ function [uun,uup] = WENO5_1D(uu)
 %
 % wnk (k = 0,1,2,3,4) : the weights for the polynomials obtained via left stencils
 % wpk (k = 0,1,2,3,4) : the weights for the polynomials obtained via right stencils
+
+% Constants
+dn0  = 1./126.; dn1  = 10./63.; dn2  = 10./21.; dn3  = 20./63.; dn4  = 5./126.;
+dp0  = 5./126.; dp1  = 20./63.; dp2  = 10./21.; dp3  = 10./63.; dp4  = 1./126.;
+epsilon  = 1E-6;
+
+% Center value:
+i = 5;
+
+p00 = (- 71.*uu(i-4)+ 364.*uu(i-3)- 746.*uu(i-2)+ 684.*uu(i-1)+1689.*uu(i))/1920.;
+p01 = (   9.*uu(i-4)-  50.*uu(i-3)+ 120.*uu(i-2)- 174.*uu(i-1)+  95.*uu(i))/48.;
+p02 = (   7.*uu(i-4)-  36.*uu(i-3)+  74.*uu(i-2)-  68.*uu(i-1)+  23.*uu(i))/16.;
+p03 = (   3.*uu(i-4)-  14.*uu(i-3)+  24.*uu(i-2)-  18.*uu(i-1)+   5.*uu(i))/12.;
+p04 = (      uu(i-4)-   4.*uu(i-3)+   6.*uu(i-2)-   4.*uu(i-1)+      uu(i))/24.;
 %
-eps  = 1.0D-15;
+p10 = (   9.*uu(i-3)-  36.*uu(i-2)-  26.*uu(i-1)+2044.*uu(i)-  71.*uu(i+1))/1920.;
+p11 = (-  5.*uu(i-3)+  30.*uu(i-2)-  84.*uu(i-1)+  50.*uu(i)+   9.*uu(i+1))/48.;
+p12 = (-     uu(i-3)+   4.*uu(i-2)+   2.*uu(i-1)-  12.*uu(i)+   7.*uu(i+1))/16.;
+p13 = (      uu(i-3)-   6.*uu(i-2)+  12.*uu(i-1)-  10.*uu(i)+   3.*uu(i+1))/12.;
+p14 = (      uu(i-3)-   4.*uu(i-2)+   6.*uu(i-1)-   4.*uu(i)+      uu(i+1))/24.;
 %
-rn0  = 1./126.;
-rn1  = 10./63.;
-rn2  = 10./21.;
-rn3  = 20./63.;
-rn4  = 5./126.;
-rp0  = 5./126.;
-rp1  = 20./63.;
-rp2  = 10./21.;
-rp3  = 10./63.;
-rp4  = 1./126.;
+p20 = (   9.*uu(i-2)- 116.*uu(i-1)+2134.*uu(i)- 116.*uu(i+1)+   9.*uu(i+2))/1920.;
+p21 = (   5.*uu(i-2)-  34.*uu(i-1)            +  34.*uu(i+1)-   5.*uu(i+2))/48.;
+p22 = (-     uu(i-2)+  12.*uu(i-1)-  22.*uu(i)+  12.*uu(i+1)-      uu(i+2))/16.;
+p23 = (-     uu(i-2)+   2.*uu(i-1)            -   2.*uu(i+1)+      uu(i+2))/12.;
+p24 = (      uu(i-2)-   4.*uu(i-1)+   6.*uu(i)-   4.*uu(i+1)+      uu(i+2))/24.;
 %
-p00 = (- 71.*uu(-4)+ 364.*uu(-3)- 746.*uu(-2)+ 684.*uu(-1)+1689.*uu(0))/1920.;
-p01 = (   9.*uu(-4)-  50.*uu(-3)+ 120.*uu(-2)- 174.*uu(-1)+  95.*uu(0))/48.;
-p02 = (   7.*uu(-4)-  36.*uu(-3)+  74.*uu(-2)-  68.*uu(-1)+  23.*uu(0))/16.;
-p03 = (   3.*uu(-4)-  14.*uu(-3)+  24.*uu(-2)-  18.*uu(-1)+   5.*uu(0))/12.;
-p04 = (      uu(-4)-   4.*uu(-3)+   6.*uu(-2)-   4.*uu(-1)+      uu(0))/24.;
+p30 = (- 71.*uu(i-1)+2044.*uu(i)-  26.*uu(i+1)-  36.*uu(i+2)+   9.*uu(i+3))/1920.;
+p31 = (-  9.*uu(i-1)-  50.*uu(i)+  84.*uu(i+1)-  30.*uu(i+2)+   5.*uu(i+3))/48.;
+p32 = (   7.*uu(i-1)-  12.*uu(i)+   2.*uu(i+1)+   4.*uu(i+2)-      uu(i+3))/16.;
+p33 = (-  3.*uu(i-1)+  10.*uu(i)-  12.*uu(i+1)+   6.*uu(i+2)-      uu(i+3))/12.;
+p34 = (      uu(i-1)-   4.*uu(i)+   6.*uu(i+1)-   4.*uu(i+2)+      uu(i+3))/24.;
 %
-p10 = (   9.*uu(-3)-  36.*uu(-2)-  26.*uu(-1)+2044.*uu( 0)-  71.*uu(1))/1920.;
-p11 = (-  5.*uu(-3)+  30.*uu(-2)-  84.*uu(-1)+  50.*uu( 0)+   9.*uu(1))/48.;
-p12 = (-     uu(-3)+   4.*uu(-2)+   2.*uu(-1)-  12.*uu( 0)+   7.*uu(1))/16.;
-p13 = (      uu(-3)-   6.*uu(-2)+  12.*uu(-1)-  10.*uu( 0)+   3.*uu(1))/12.;
-p14 = (      uu(-3)-   4.*uu(-2)+   6.*uu(-1)-   4.*uu( 0)+      uu(1))/24.;
-%
-p20 = (   9.*uu(-2)- 116.*uu(-1)+2134.*uu( 0)- 116.*uu( 1)+   9.*uu(2))/1920.;
-p21 = (   5.*uu(-2)-  34.*uu(-1)             +  34.*uu( 1)-   5.*uu(2))/48.;
-p22 = (-     uu(-2)+  12.*uu(-1)-  22.*uu( 0)+  12.*uu( 1)-      uu(2))/16.;
-p23 = (-     uu(-2)+   2.*uu(-1)             -   2.*uu( 1)+      uu(2))/12.;
-p24 = (      uu(-2)-   4.*uu(-1)+   6.*uu( 0)-   4.*uu( 1)+      uu(2))/24.;
-%
-p30 = (- 71.*uu(-1)+2044.*uu( 0)-  26.*uu( 1)-  36.*uu( 2)+   9.*uu(3))/1920.;
-p31 = (-  9.*uu(-1)-  50.*uu( 0)+  84.*uu( 1)-  30.*uu( 2)+   5.*uu(3))/48.;
-p32 = (   7.*uu(-1)-  12.*uu( 0)+   2.*uu( 1)+   4.*uu( 2)-      uu(3))/16.;
-p33 = (-  3.*uu(-1)+  10.*uu( 0)-  12.*uu( 1)+   6.*uu( 2)-      uu(3))/12.;
-p34 = (      uu(-1)-   4.*uu( 0)+   6.*uu( 1)-   4.*uu( 2)+      uu(3))/24.;
-%
-p40 = (1689.*uu( 0)+ 684.*uu( 1)- 746.*uu( 2)+ 364.*uu( 3)-  71.*uu(4))/1920.;
-p41 = (- 95.*uu( 0)+ 174.*uu( 1)- 120.*uu( 2)+  50.*uu( 3)-   9.*uu(4))/48.;
-p42 = (  23.*uu( 0)-  68.*uu( 1)+  74.*uu( 2)-  36.*uu( 3)+   7.*uu(4))/16.;
-p43 = (-  5.*uu( 0)+  18.*uu( 1)-  24.*uu( 2)+  14.*uu( 3)-   3.*uu(4))/12.;
-p44 = (      uu( 0)-   4.*uu( 1)+   6.*uu( 2)-   4.*uu( 3)+      uu(4))/24.;
+p40 = (1689.*uu(i)+ 684.*uu(i+1)- 746.*uu(i+2)+ 364.*uu(i+3)-  71.*uu(i+4))/1920.;
+p41 = (- 95.*uu(i)+ 174.*uu(i+1)- 120.*uu(i+2)+  50.*uu(i+3)-   9.*uu(i+4))/48.;
+p42 = (  23.*uu(i)-  68.*uu(i+1)+  74.*uu(i+2)-  36.*uu(i+3)+   7.*uu(i+4))/16.;
+p43 = (-  5.*uu(i)+  18.*uu(i+1)-  24.*uu(i+2)+  14.*uu(i+3)-   3.*uu(i+4))/12.;
+p44 = (      uu(i)-   4.*uu(i+1)+   6.*uu(i+2)-   4.*uu(i+3)+      uu(i+4))/24.;
 %
 dp01  = ( 4.*p04)^2/448. + (3.*p03)^2/80. + (2.*p02)^2/12. + p01^2 +  p04*p02/5. + p03*p01/2.;
 dp02  = (12.*p04)^2/80.  + (6.*p03)^2/12. + (2.*p02)^2              +  p04*p02*4.;
@@ -88,40 +90,41 @@ b2   = dp21 + dp22 + dp23 + dp24;
 b3   = dp31 + dp32 + dp33 + dp34;
 b4   = dp41 + dp42 + dp43 + dp44;
 %
-wn0  = rn0 / (b0 + eps)^3;
-wn1  = rn1 / (b1 + eps)^3;
-wn2  = rn2 / (b2 + eps)^3;
-wn3  = rn3 / (b3 + eps)^3;
-wn4  = rn4 / (b4 + eps)^3;
-wsum = wn0 + wn1 + wn2 + wn3 + wn4 + eps;
+wn0  = dn0 / (b0 + epsilon)^3;
+wn1  = dn1 / (b1 + epsilon)^3;
+wn2  = dn2 / (b2 + epsilon)^3;
+wn3  = dn3 / (b3 + epsilon)^3;
+wn4  = dn4 / (b4 + epsilon)^3;
+wsum = wn0 + wn1 + wn2 + wn3 + wn4; %+ epsilon;
 wn0  = wn0 / wsum;
 wn1  = wn1 / wsum;
 wn2  = wn2 / wsum;
 wn3  = wn3 / wsum;
 wn4  = wn4 / wsum;
 
-wp0  = rp0 / (b0 + eps)^3;
-wp1  = rp1 / (b1 + eps)^3;
-wp2  = rp2 / (b2 + eps)^3;
-wp3  = rp3 / (b3 + eps)^3;
-wp4  = rp4 / (b4 + eps)^3;
-wsum = wp0 + wp1 + wp2 + wp3 + wp4 + eps;
+wp0  = dp0 / (b0 + epsilon)^3;
+wp1  = dp1 / (b1 + epsilon)^3;
+wp2  = dp2 / (b2 + epsilon)^3;
+wp3  = dp3 / (b3 + epsilon)^3;
+wp4  = dp4 / (b4 + epsilon)^3;
+wsum = wp0 + wp1 + wp2 + wp3 + wp4; %+ epsilon;
 wp0  = wp0 / wsum;
 wp1  = wp1 / wsum;
 wp2  = wp2 / wsum;
 wp3  = wp3 / wsum;
 wp4  = wp4 / wsum;
-%
+% Positive Flux u_i+1/2 (+)
 dx   =-0.5;
 uup  = wp0 * (p00 + p01*dx + p02*dx^2 + p03*dx^3 + p04*dx^4) ...
     + wp1 * (p10 + p11*dx + p12*dx^2 + p13*dx^3 + p14*dx^4) ...
     + wp2 * (p20 + p21*dx + p22*dx^2 + p23*dx^3 + p24*dx^4) ...
     + wp3 * (p30 + p31*dx + p32*dx^2 + p33*dx^3 + p34*dx^4) ...
     + wp4 * (p40 + p41*dx + p42*dx^2 + p43*dx^3 + p44*dx^4);
-%
+% Negative Flux u_i+1/2 (-)
 dx   = 0.5;
 uun  = wn0 * (p00 + p01*dx + p02*dx^2 + p03*dx^3 + p04*dx^4) ...
     + wn1 * (p10 + p11*dx + p12*dx^2 + p13*dx^3 + p14*dx^4) ...
     + wn2 * (p20 + p21*dx + p22*dx^2 + p23*dx^3 + p24*dx^4) ...
     + wn3 * (p30 + p31*dx + p32*dx^2 + p33*dx^3 + p34*dx^4) ...
     + wn4 * (p40 + p41*dx + p42*dx^2 + p43*dx^3 + p44*dx^4);
+end

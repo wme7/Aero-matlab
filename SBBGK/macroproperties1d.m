@@ -37,7 +37,7 @@ switch theta
     % IF MB: the task is much simple.
         t = 4*E./n - 2*u.^2;
         r = n./sqrt(pi.*t);
-        p = E-(1/2).*n.*t;
+        p = E-(1/2).*n.*u.^2;
     otherwise 
         error('theta can only be: -1, 0, +1 ');
 end

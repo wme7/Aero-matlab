@@ -10,7 +10,7 @@ nx=160;			%discretization in space
 p=3;			%polinomial degree
 pp=p+1;
 stage=6;
-rk=stage;			%RK order
+rk=stage;		%RK order
 T=0.25;			%Time
 cfl=1/(2*p+1);
 
@@ -149,7 +149,3 @@ end
 
 error=sqrt( sum(((1./(1./func0(x-T)-T)-z).^2).*w_collapse)*dx/2 )    % Error in L2 Norm
 error2=max(abs((1./(1./func0(x-T)-T)-z)))				   % Error in max Norm
-
-
-% error=sqrt( sum(((func0(x-T).*exp(T)-z).^2).*w_collapse)*dx/2 )    % Error in L2 Norm
-% error2=max(abs((func0(x-T).*exp(T)-z)))				   % Error in max Norm

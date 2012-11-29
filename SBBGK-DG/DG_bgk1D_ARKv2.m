@@ -6,7 +6,7 @@ tic
 global A b c Pleg w wp NV nx p dx dt IT BC_type V VIS F gamma
 
 GHNC        = 0;
-%CFL         = 0.9;
+%CFL        = 0.9;
 OUTTIME     = 0.1;
 TAU			= 0.0001% !RELAXATION TIME
 IT       = 0;
@@ -32,7 +32,7 @@ bb=2;
 coeffi_RK
 gamma=const_a_I(2,1);
 
-NV = 20;
+NV = 40;
 NVh=NV/2;
 % GH =[-5.38748089001,-4.60368244955,-3.94476404012,-3.34785456738, ...
 %     -2.78880605843,-2.25497400209,-1.73853771212,-1.2340762154,...
@@ -44,6 +44,7 @@ NVh=NV/2;
 %     0.493843385272,0.490921500667,0.490921500667,0.493843385272,...
 %     0.499920871336,0.509679027117,0.524080350949,0.544851742366,...
 %     0.575262442852,0.62227869619,0.704332961176,0.898591961453];
+
 [GH,wp] = GaussHermite(NV); % for integrating range: -inf to inf
 wp=wp';
 V=-GH';
@@ -96,9 +97,9 @@ RL=1.0;
 UL=0.75;
 PL=1.0;
 
-ET=PL+0.5*RL*UL^2;
-TL=4*ET/RL-2*UL^2;
-ZL=RL/sqrt(pi*TL);
+ET = PL+0.5*RL*UL^2;
+TL = 4*ET/RL-2*UL^2;
+ZL = RL/sqrt(pi*TL);
 %                         T(i,m)    = 4*ET(i,m)/R(i,m) - 2*U(i,m)^2;
 %                         Z(i,m)    = R(i,m) / sqrt(pi* T(i,m));
 %                         P(i,m) = ET(i,m) - 0.5 * R(i,m) * U(i,m)^2;
@@ -106,9 +107,9 @@ RR=0.125;
 UR=0;
 PR=0.1;
 
-ET=PR+0.5*RR*UR^2;
-TR=4*ET/RR-2*UR^2;
-ZR=RR/sqrt(pi*TR);
+ET = PR+0.5*RR*UR^2;
+TR = 4*ET/RR-2*UR^2;
+ZR = RR/sqrt(pi*TR);
 
 % Case 2
 

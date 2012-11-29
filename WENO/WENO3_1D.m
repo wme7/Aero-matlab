@@ -14,7 +14,7 @@ clear all; close all; clc;
       a = -0.5;     % Scalar velocity in x direction
     a_p = max(0,a); % a^{+}
     a_m = min(0,a); % a^{-}
-     dx = 0.01;     % Spatial step size
+     dx = 0.02;     % Spatial step size
     cfl = 0.8;      % Courant Number
      dt = cfl*dx/abs(a); % time step size
    dtdx = dt/dx;    % precomputed to save some flops
@@ -41,7 +41,7 @@ u_next = zeros(1,n);
 
 for kk = t
     % Compute WENO Fluxes:
-    [F_l,F_r] = WENOflux1d(u,a);
+    [F_l,F_r] = WENO3_1D_flux(u,a);
     
     % Compute new Step:
     u_next = u - dtdx*(F_r - F_l); 
@@ -99,13 +99,13 @@ u_exact(x_1:x_2) = 2;
 %% Plot Results
 subplot(311);
 hold on
-plot(x,u_upwind,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([0.5,2.5]); title 'Double-Sided Upwind'; 
+plot(x,u_upwind,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); ylim([0.5,2.5]); title 'Double-Sided Upwind'; 
 hold off
 subplot(312);
 hold on
-plot(x,u_LW,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([0.5,2.5]); title 'Lax-wendroff';
+plot(x,u_LW,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); ylim([0.5,2.5]); title 'Lax-wendroff';
 hold off
 subplot(313);
 hold on
-plot(x,u,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([0.5,2.5]); title 'WENO3';
+plot(x,u,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); ylim([0.5,2.5]); title 'WENO3';
 hold off

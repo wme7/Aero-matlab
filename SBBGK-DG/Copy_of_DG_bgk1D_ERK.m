@@ -4,15 +4,15 @@ clc; clear all; close all;
 tic
 
 %% START
-%GHNC        = 0;
-OUTTIME    = 0.1;
-TAU	    = 0.0001;% !RELAXATION TIME
+%GHNC   = 0;
+OUTTIME = 0.1;
+TAU	    = 0.01;% !RELAXATION TIME
 fprintf('tau = %0.6f\n',TAU);
 
 nx = 32;    % Number of elements
-p  = 6;		% Polinomial degree
+p  = 3;		% Polinomial degree
 pp = p+1;
-stage = 6;
+stage = 3;
 rk = stage; % RK stage
 
 BC_type = 0; % 0 No-flux; -1: reflecting
@@ -24,22 +24,26 @@ bb=1; % for ploting variables
 coeffi_RK % Load Rk coeficients from another matlab program.
 %gamma=const_a_I(2,1);
 
-IT       = 0;
-NV = 20;
-NVh=20/2;
+IT  = 0;
+NV  = 40;
+NVh = 20/2;
 
-GH =[-5.38748089001,-4.60368244955,-3.94476404012,-3.34785456738, ...
-    -2.78880605843,-2.25497400209,-1.73853771212,-1.2340762154,...
-    -0.737473728545,-0.245340708301,0.245340708301,0.737473728545,...
-    1.2340762154,1.73853771212,2.25497400209,2.78880605843,...
-    3.34785456738,3.94476404012,4.60368244955,5.38748089001];
-wp  =[0.898591961453,0.704332961176,0.62227869619,0.575262442852,...
-    0.544851742366,0.524080350949,0.509679027117,0.499920871336,...
-    0.493843385272,0.490921500667,0.490921500667,0.493843385272,...
-    0.499920871336,0.509679027117,0.524080350949,0.544851742366,...
-    0.575262442852,0.62227869619,0.704332961176,0.898591961453];
+% GH =[-5.38748089001,-4.60368244955,-3.94476404012,-3.34785456738, ...
+%     -2.78880605843,-2.25497400209,-1.73853771212,-1.2340762154,...
+%     -0.737473728545,-0.245340708301,0.245340708301,0.737473728545,...
+%     1.2340762154,1.73853771212,2.25497400209,2.78880605843,...
+%     3.34785456738,3.94476404012,4.60368244955,5.38748089001];
+% wp  =[0.898591961453,0.704332961176,0.62227869619,0.575262442852,...
+%     0.544851742366,0.524080350949,0.509679027117,0.499920871336,...
+%     0.493843385272,0.490921500667,0.490921500667,0.493843385272,...
+%     0.499920871336,0.509679027117,0.524080350949,0.544851742366,...
+%     0.575262442852,0.62227869619,0.704332961176,0.898591961453];
 
-V=-GH;
+[GH,wp] = GaussHermite(NV); % for integrating range: -inf to inf
+wp=wp';
+V=-GH';
+wp=wp.*exp(V.^2);
+
 dx=1/nx;		%Stepwidth in space
 amax=abs(V(1));
 fprintf('a_max = %0.6f\n',amax);
@@ -159,23 +163,21 @@ t_plot=reshape(T',nx*pp,1);
 z_plot=reshape(Z',nx*pp,1);
 %scrsz = get(0,'ScreenSize');
 if bb==1
-    
     figure(1)
     %figure('Position',[scrsz(3)/4 scrsz(4)/8 scrsz(3)/2 scrsz(4)*3/4])
-    subplot(2,3,1); wave_handleu = plot(x,u_plot,'.'); axis([0,1,-0.5,1.5]);
+    subplot(2,3,1); wave_handleu = plot(x,u_plot,'.'); axis tight;
     xlabel('x'); ylabel('u(x,t)'); title('Velocity');
-    subplot(2,3,2); wave_handler = plot(x,r_plot,'.'); axis([0,1,0,1.2]);
+    subplot(2,3,2); wave_handler = plot(x,r_plot,'.'); axis tight;
     xlabel('x'); ylabel('R(x,t)'); title('Density');
-    subplot(2,3,3); wave_handleet = plot(x,et_plot,'.'); axis([0,1,0,2]);
+    subplot(2,3,3); wave_handleet = plot(x,et_plot,'.'); axis tight;
     xlabel('x'); ylabel('ET(x,t)'); title('Energy');
-    subplot(2,3,4); wave_handleav = plot(x,p_plot,'.'); axis([0,1,0,1.5]);
+    subplot(2,3,4); wave_handleav = plot(x,p_plot,'.'); axis tight;
     xlabel('x'); ylabel('AV(x,t)');title('Pressure');
-    subplot(2,3,5); wave_handlet = plot(x,t_plot,'.'); axis([0,1,3,4]);
+    subplot(2,3,5); wave_handlet = plot(x,t_plot,'.'); axis tight;
     xlabel('x'); ylabel('T(x,t)'); title('Temperature');
-    subplot(2,3,6); wave_handlez = plot(x,z_plot,'.'); axis([0,1,0,1]);
+    subplot(2,3,6); wave_handlez = plot(x,z_plot,'.'); axis tight;
     xlabel('x'); ylabel('Z(x,t)');title('Fugacity');
-    
-    drawnow
+   
 end
 
 pause(0.2)
