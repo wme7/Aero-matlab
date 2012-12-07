@@ -6,10 +6,10 @@ clear all
 coeffi_RK % Calculation of the coefficients alpha for ARK
 gamma=const_a_I(2,1);
 
-nx=160;			%discretization in space
+nx=80;			%discretization in space
 p=3;			%polinomial degree
 pp=p+1;
-stage=6;
+stage=3;
 rk=stage;		%RK order
 T=0.25;			%Time
 cfl=1/(2*p+1);
@@ -40,6 +40,10 @@ for i=1:nx
     end
 end
 
+%% Just for testing the degrees of freedom computation
+y = u*P
+xi = reshape(x,4,80)
+plot(xi,y')
 %%%%%%%%%%%%%%  Calculation the Matrix A=int(phi_j + phi_i') , b and c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 A=zeros(pp,pp);
 for i=1:pp
@@ -134,18 +138,21 @@ while  ISTOP ==0
     end
     uold=u;
     y=u*P;
-    z=[];
-    w_collapse=[];
-    for i=1:size(y,1)
-        z=[z,y(i,:)];
-        w_collapse=[w_collapse,w];
-    end
-    plot(x,z);
+    xi = reshape(x,4,80)
+    y = y'
+    plot(xi,y)
+%     z=[];
+%     w_collapse=[];
+%     for i=1:size(y,1)
+%         z=[z,y(i,:)];
+%         w_collapse=[w_collapse,w];
+%     end
+%    plot(x,z);
     drawnow
 end
 
 
 %%%%%%%%%%%%%  plotting  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-error=sqrt( sum(((1./(1./func0(x-T)-T)-z).^2).*w_collapse)*dx/2 )    % Error in L2 Norm
-error2=max(abs((1./(1./func0(x-T)-T)-z)))				   % Error in max Norm
+%error=sqrt( sum(((1./(1./func0(x-T)-T)-z).^2).*w_collapse)*dx/2 )    % Error in L2 Norm
+%error2=max(abs((1./(1./func0(x-T)-T)-z)))				   % Error in max Norm

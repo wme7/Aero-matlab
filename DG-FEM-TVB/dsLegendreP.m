@@ -1,5 +1,5 @@
-function dP = dLegendreP(k,x)
-%% Evaluate the Derivative of our scaled Legendre Polynomials of order k, at a point x.
+function dP = dsLegendreP(k,x)
+% Evaluate the Derivative of our scaled Legendre Polynomials of order k, at a point x.
 
 switch k
     case{0}

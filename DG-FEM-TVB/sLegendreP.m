@@ -1,5 +1,5 @@
-function P = LegendreP(k,x)
-%% Evaluate Legendre Polynomials of degree k, at a point x.
+function P = sLegendreP(k,x)
+% Evaluate Legendre Polynomials of degree k, at a point x.
 
 switch k
     case{0}

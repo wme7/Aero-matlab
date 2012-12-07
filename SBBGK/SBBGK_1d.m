@@ -11,9 +11,9 @@ clc;  clear all;  close all;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
-CFL         = 0.30;     % CFL condition
+CFL         = 0.15;     % CFL condition
 r_time      = 0.0001;   % Relaxation time
-tEnd        = 0.2;      % End time
+tEnd        = 0.1;      % End time
 theta       = 1;        % {-1} BE, {0} MB, {1} FD.
 quad        = 1;        % for NC = 1 , GH = 2
 method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
@@ -56,7 +56,7 @@ switch quad
     [v,w,k] = cotes_xw(V(1),V(2),nv,5); % cotes Degree 5
         
     case{2} % Gauss Hermite Quadrature:
-    nv = 20;        % nodes desired (the actual value)
+    nv = 80;        % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
      k = 1;         % quadrature constant.
     
