@@ -2,14 +2,19 @@
 %**************************************************************************
 % Solve and compare two simple IVP's:
 %
-%  du/dt = -2u + t + 4, with IC: u(0) = 1
-%  du/dt = sin(pi*t),   with IC: u(0) = 1
+%  {1} du/dt = -2u + t + 4, with IC: u(0) = 1
+%  {2} du/dt = sin(pi*t),   with IC: u(0) = 1
+%  {3} du/dt = EXP(t),      with IC: u(0) = 1
 %
-% Based on 
+% Based on:
 %
 % Gottlieb and Shu (1998) 
 % Mathematics of Computation
 % Vol. 67, No. 221. PP. 73-85
+%
+% Parviz Moin 
+% Numerical Method for Engineering and Science
+% McGraw-Hill 2nd Ed. (2008)
 %
 % Coded by: Manuel Diaz 2012.12.07
 %
@@ -20,32 +25,49 @@ clear all; close all; clc;
 %% Define t, dt and tEnd
 t0 = 0; tEnd = 1.0; dt = 0.2;
 tsteps = t0:dt:tEnd;
+t_iter = t0:dt:tEnd-dt;
+
+%% Define number of stages to use
+No_stages = 4; % only stages 1,2 and 3 are available.
+
+%% Choose IVP to study
+IVPn = 3;
+
+% Define residual
+% Tor this IVP problem the residual is defined as: 
+switch IVPn
+    case{1}
+        residual = @(v,x) -2*v + x + 4;
+    case{2}
+        residual = @(v,x) sin(2*pi*x);
+    case{3}
+        residual = @(v,x) exp(x);
+end
+
+% Compute exact solution
+switch IVPn
+    case{1}
+        u_exact = 1/4*(2*tsteps - 3*exp(-2*tsteps) + 7);
+    case{2}
+        u_exact = (2*pi+1-cos(2*pi*tsteps))/(2*pi);
+    case{3}
+        u_exact = exp(tsteps);
+end
+
+% Plot exact solution
+figure
+range = [t0,tEnd,1,3]; % plot range 
+subplot(1,4,1); plot(tsteps,u_exact); title('Exact'); axis(range);
 
 %% Load IC
 u = 1;
 
-%% Define residual
-% Tor this IVP problem the residual is defined as: 
-%residual = @(v,x) -2*v + x + 4;
-residual = @(v,x) sin(2*pi*x);
-
-%% Define number of stages to use
-No_stages = 3; % only stages 1,2 and 3 are available.
-
-%% Exact solution
-%u_exact = 1/4*(2*tsteps - 3*exp(-2*tsteps) + 7);
-u_exact = (2*pi+1-cos(2*pi*tsteps))/(2*pi);
-
-%% Plot exact solution
-figure
-range = [t0,tEnd,0.6,2.4];
-subplot(1,4,1); plot (tsteps,u_exact); title('Exact'); axis(range);
-
 %% Run RK Classical integration schemes
-i = 0;
-for t = tsteps
+i = 1;
+u_RK(i) = u; % first known value in time
+for t = t_iter
     switch No_stages
-        case{1} % 1st Order (no time integration used)
+        case{1} % 1st Order Euler time Stepping
             u_next = u + dt*residual(u,t);
             
         case{2} % RK 2nd Order
@@ -69,20 +91,21 @@ for t = tsteps
             error('Not a case available')
     end
     i=i+1;
-    u_RK(i) = u_next; % Capture info per tstep
+    u_RK(i) = u_next; % Capture info per iteration
     u = u_next;     % update info
 end
 %% Plot TVD-RK solution
-subplot(1,4,2); plot (tsteps,u_RK); title('Classic RK'); axis(range);
+subplot(1,4,2); plot(tsteps,u_RK); title('Classic RK'); axis(range);
 
 %% Interlude
 clear u; u = 1;
 
 %% Run TVD-RK integration
-i = 0;
-for t = tsteps
+i = 1;
+u_TVD(i) = u; %first known value in time
+for t = t_iter
     switch No_stages
-        case{1} % 1st Order (no time integration used)
+        case{1} % 1st Order Euler time Stepping
             u_next = u + dt*residual(u,t);
             
         case{2} % TVD-RK 2nd Order
@@ -103,41 +126,41 @@ for t = tsteps
             error('Not a case available')
     end
     i=i+1;
-    u_TVD(i) = u_next; % Capture info per tstep
+    u_TVD(i) = u_next; % Capture info per iteration
     u = u_next;     % update info
 end
 
 %% Plot TVD-RK solution
-subplot(1,4,3); plot (tsteps,u_TVD); title('TVD-RK'); axis(range);
+subplot(1,4,3); plot(tsteps,u_TVD); title('TVD-RK'); axis(range);
 
 %% Interlude
 clear u; u = 1;
 
 %% Run JST-RK 
 % general time integrator by Jameson, Schmidt and Turkel:
-i = 0;
-for t = tsteps
+i = 1;
+u_JST(i) = u; %first known value in time
+for t = t_iter
     %***************************************
     % Stage 0
-    u_i = u;
+    sgima = u;
     % Stages 1 to n
     for stage = No_stages:-1:1
-       u_i = u + (dt/stage)*residual(u_i,t);
+       sgima = u + (dt/stage)*residual(sgima,t);
     end
-    u_next = u_i;
+    u_next = sgima;
     %***************************************
     i=i+1;
-    u_JST(i) = u_next; % Capture info per tstep
+    u_JST(i) = u_next; % Capture info per iteration
     u = u_next;     % update info
 end
 
 %% Plot TVD-RK solution
-subplot(1,4,4); plot (tsteps,u_JST); title('RK by JST'); axis(range);
+subplot(1,4,4); plot(tsteps,u_JST); title('RK by JST'); axis(range);
 
-%% Print
-u_exact
-u_RK
-u_TVD
-u_JST
+%% Print Comparisons
+error_RK  = abs(u_exact - u_RK); fprintf('Classic RK error\n'); fprintf('%e\t',error_RK); fprintf('\n\n');
+error_TVD = abs(u_exact - u_TVD); fprintf('RK-TVD error\n'); fprintf('%e\t',error_TVD); fprintf('\n\n');
+error_JST = abs(u_exact - u_JST); fprintf('JST-TVD error\n'); fprintf('%e\t',error_JST); fprintf('\n\n');
 
-% Conclusion
+
