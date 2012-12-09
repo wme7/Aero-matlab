@@ -28,8 +28,9 @@ gamma=const_a_I(2,1);
 % filter_sigma=filter_profile(p,filter_order, CutOff)
 
 IT       = 0;
-NV = 20;
-NVh=20/2;
+NV = 40;
+NVh= NV/2;
+
 % GH =[-5.38748089001,-4.60368244955,-3.94476404012,-3.34785456738, ...
 %     -2.78880605843,-2.25497400209,-1.73853771212,-1.2340762154,...
 %     -0.737473728545,-0.245340708301,0.245340708301,0.737473728545,...
@@ -167,37 +168,32 @@ for i=1:nx
     end
 end
 
-dt=CFL*dx*ratio/amax
-
-
+dt=CFL*dx*ratio/amax;
+fprintf('dt = %0.6f\n',dt);
 
 r_plot=reshape(R',nx*pp,1);
 u_plot=reshape(U',nx*pp,1);
-scrsz = get(0,'ScreenSize');
+et_plot=reshape(ET',nx*pp,1);
+p_plot=reshape(P',nx*pp,1);
+t_plot=reshape(T',nx*pp,1);
+z_plot=reshape(Z',nx*pp,1);
+%scrsz = get(0,'ScreenSize');
 if bb==1
     
-    
-    figure('Position',[1 scrsz(4)/8 scrsz(3)/2 scrsz(4)*3/4])
-    wave_handleu=plot(x,u_plot,'-');
-    %     figure(1)
-    %     hold on
-    %     for i=1:nx
-    %         plot(x_p(i,:),U(i,:),'-');
-    %     end
-    %     hold off
-    axis([-0.2, 1.2, -0.5, 1.5]);
-    
-    figure('Position',[scrsz(3)/4 scrsz(4)/8 scrsz(3)/2 scrsz(4)*3/4])
-    wave_handler=plot(x,r_plot,'-');
-    
-    %     figure(2)
-    %     hold on
-    %     for i=1:nx
-    %         plot(x_p(i,:),R(i,:),'-');
-    %     end
-    %     hold off
-    axis([-0.2, 1.2, 0., 1.2]);
-    xlabel('x'); ylabel('R(x,t)')
+    figure(1)
+    %figure('Position',[scrsz(3)/4 scrsz(4)/8 scrsz(3)/2 scrsz(4)*3/4])
+    subplot(2,3,1); wave_handleu = plot(x,u_plot,'.'); axis([0,1,-0.5,1.5]);
+    xlabel('x'); ylabel('u(x,t)'); title('Velocity');
+    subplot(2,3,2); wave_handler = plot(x,r_plot,'.'); axis([0,1,0,1.2]);
+    xlabel('x'); ylabel('R(x,t)'); title('Density');
+    subplot(2,3,3); wave_handleet = plot(x,et_plot,'.'); axis([0,1,0,2]);
+    xlabel('x'); ylabel('ET(x,t)'); title('Energy');
+    subplot(2,3,4); wave_handleav = plot(x,p_plot,'.'); axis([0,1,0,1.5]);
+    xlabel('x'); ylabel('AV(x,t)');title('Pressure');
+    subplot(2,3,5); wave_handlet = plot(x,t_plot,'.'); axis([0,1,3,4]);
+    xlabel('x'); ylabel('T(x,t)'); title('temperature');
+    subplot(2,3,6); wave_handlez = plot(x,z_plot,'.'); axis([0,1,0,1]);
+    xlabel('x'); ylabel('Z(x,t)');title('Fugacity');
     
     drawnow
 end
@@ -575,29 +571,19 @@ while ISTOP ==0
     
     r_plot=reshape(R',nx*pp,1);
     u_plot=reshape(U',nx*pp,1);
+    et_plot=reshape(ET',nx*pp,1);
+    p_plot=reshape(P',nx*pp,1);
+    t_plot=reshape(T',nx*pp,1);
+    z_plot=reshape(Z',nx*pp,1);
     if bb==1
         set(wave_handleu,'YData',u_plot);
         set(wave_handler,'YData',r_plot);
-        %         figure(1)
-        %         plot(x_p(1,:),U(1,:),'-');
-        %         hold on
-        %         for i=2:nx
-        %             plot(x_p(i,:),U(i,:),'-');
-        %         end
-        %         hold off
-        %         figure(2)
-        %         plot(x_p(1,:),R(1,:),'-');
-        %         hold on
-        %         for i=2:nx
-        %             plot(x_p(i,:),R(i,:),'-');
-        %         end
-        %         hold off
+        set(wave_handleet,'YData',et_plot);
+        set(wave_handleav,'YData',p_plot);
+        set(wave_handlet,'YData',t_plot);
+        set(wave_handlez,'YData',z_plot);
         drawnow
-        %         set(wave_handlev,'YData',u_plot); drawnow
     end
-    
-    %fprintf('1X ELAPSED TIME: %f7.4,4 DENSITY AT X=4.0,Y=5.: %f7.4\n', TIME, R(NXP1/2))
-    
     ITER = ITER + 1;
     
 end
