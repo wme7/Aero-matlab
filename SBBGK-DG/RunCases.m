@@ -9,7 +9,7 @@ end
 cases = 1:4;                    % Number of Cases to evaluate
 
 %% Common Parameters
-Nx          = 8;               % Number of elements
+Nx          = 32;               % Number of elements
 t_end       = 0.12;             % Final Time 
 P_deg       = 4;                % Polinomial Degree
 Pp          = P_deg+1;          % Polinomials Points
@@ -17,14 +17,16 @@ CFL         = 1/(2*P_deg+1);    % Courant Number
 RK_stages   = 4;                % Number of RK stages
 plot_fig    = 0;                % {1}: plot while computing, {0}: no plot
 theta       = 0;                % {-1} BE, {0} MB, {1} FD.
+iV          = 80;               % Space Velocity Points
 
 %% particular Paramerters
 tau = [0.1 0.01 0.001 0.0001];  % Relaxation time per case
 
 %% Excecute SBBGK in Parallel using 4 processors
+
 parfor i = cases
     [x(i,:),R(i,:),U(i,:),E(i,:),P(i,:),T(i,:),Z(i,:)] = ...
-        DG_bgk1D_ERK(t_end,tau(i),Nx,P_deg,Pp,RK_stages,CFL,theta,plot_fig);
+        DG_bgk1D_ERK_func(t_end,tau(i),Nx,P_deg,Pp,RK_stages,CFL,theta,plot_fig,iV);
 end
 matlabpool close
 
@@ -54,6 +56,8 @@ for j = cases
     % Relaxation time
     w = 1/tau(j);
     w = num2str(w);
+    % Number of velocity points
+    
     % Tecplot format
     f = '.plt';
     % ID
