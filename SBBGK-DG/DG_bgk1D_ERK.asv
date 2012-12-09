@@ -5,7 +5,7 @@ tic
 GHNC        = 0;
 %CFL        = 0.9;
 OUTTIME     = 0.1;
-TAU			= 0.01; % !RELAXATION TIME
+TAU			= 0.0001% !RELAXATION TIME
 
 nx = 32; % number of elements
 p  = 7;	 %polinomial degree

@@ -11,11 +11,11 @@ clc;  clear all;  close all;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
-CFL         = 0.15;     % CFL condition
-r_time      = 0.0001;   % Relaxation time
+CFL         = 0.05;      % CFL condition
+r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.1;      % End time
-theta       = 1;        % {-1} BE, {0} MB, {1} FD.
-quad        = 1;        % for NC = 1 , GH = 2
+theta       = 0;        % {-1} BE, {0} MB, {1} FD.
+quad        = 2;        % for NC = 1 , GH = 2
 method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
 IC_case     = 7;        % Reimann IC cases available :{1,2,3,4,5,6,7}
 plot_figs   = 1;        % 0: no, 1: yes please!
@@ -53,12 +53,13 @@ switch quad
     case{1} % Newton Cotes Quadrature:
     V  = [-20,20];  % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
-    [v,w,k] = cotes_xw(V(1),V(2),nv,5); % cotes Degree 5
+    [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
         
     case{2} % Gauss Hermite Quadrature:
-    nv = 80;        % nodes desired (the actual value)
+    nv = 60;          % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
-     k = 1;         % quadrature constant.
+    k = 1;            % quadrature constant.
+    w = w.*exp(v.^2); % weighting fucntion of the Gauss-Hermite quadrature
     
     otherwise
         error('Order must be between 1 and 2');

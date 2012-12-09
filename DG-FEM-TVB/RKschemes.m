@@ -31,7 +31,7 @@ t_iter = t0:dt:tEnd-dt;
 No_stages = 4; % only stages 1,2 and 3 are available.
 
 %% Choose IVP to study
-IVPn = 3;
+IVPn = 1;
 
 % Define residual
 % Tor this IVP problem the residual is defined as: 

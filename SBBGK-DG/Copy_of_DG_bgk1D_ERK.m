@@ -25,7 +25,7 @@ coeffi_RK % Load Rk coeficients from another matlab program.
 %gamma=const_a_I(2,1);
 
 IT  = 0;
-NV  = 40;
+NV  = 80;
 NVh = 20/2;
 
 % GH =[-5.38748089001,-4.60368244955,-3.94476404012,-3.34785456738, ...
