@@ -1,7 +1,7 @@
 #!MC 1200
 # Created by Tecplot 360 build 12.2.0.9077
-$!VarSet |LFDSFN1| = '"DG1DMBX16 P4RK3w1000iv80.plt"'
-$!VarSet |LFDSVL1| = '"x" "Density" "Velocity in x" "Energy" "Pressure" "Temperature" "Fugacity"'
+$!VarSet |LFDSFN1| = '"SBBGK1dMBX100 P0RK4w10000IC1.plt"'
+$!VarSet |LFDSVL1| = '"x" "density" "velocity" "energy" "pressure" "temperature" "fugacity"'
 $!SETSTYLEBASE FACTORY
 $!GLOBALLINKING 
   LINKCOLORMAPS = YES
@@ -886,7 +886,6 @@ $!READDATASET  '|LFDSFN1|'
   INITIALPLOTTYPE = XYLINE
   INCLUDETEXT = NO
   INCLUDEGEOM = NO
-  RESETSTYLE = NO
   ASSIGNSTRANDIDS = YES
   VARLOADMODE = BYNAME
   VARNAMELIST = '|LFDSVL1|'
@@ -925,7 +924,7 @@ $!LINEMAP  [1]
   NAME = '&DV&'
   ASSIGN
     {
-    ZONE = 1
+    ZONE = 215
     XAXISVAR = 1
     YAXISVAR = 2
     }
@@ -1003,7 +1002,7 @@ $!LINEMAP  [4]
   NAME = '&DV&'
   ASSIGN
     {
-    ZONE = 1
+    ZONE = 215
     XAXISVAR = 1
     YAXISVAR = 5
     }

@@ -14,10 +14,10 @@ name        ='SBBGK1d'; % Simulation Name
 CFL         = 0.05;      % CFL condition
 r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.1;      % End time
-theta       = 0;        % {-1} BE, {0} MB, {1} FD.
+theta       = 1;        % {-1} BE, {0} MB, {1} FD.
 quad        = 2;        % for NC = 1 , GH = 2
 method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
-IC_case     = 7;        % Reimann IC cases available :{1,2,3,4,5,6,7}
+IC_case     = 1;        % Reimann IC cases available :{1,2,3,4,5,6,7}
 plot_figs   = 1;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG

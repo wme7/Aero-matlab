@@ -67,6 +67,11 @@ switch input
         
 end
 % Compute Semiclassical ICs
+
+% ET=PL+0.5*RL*UL^2;
+% TL=4*ET/RL-2*UL^2;
+% ZL=RL/sqrt(pi*TL);
+
 E = p+(0.5).*rho.*u.^2; % Energy
 t = 4*E./rho-2*u.^2;    % Temperature
 r = rho./sqrt(pi*t);    % Fugacity

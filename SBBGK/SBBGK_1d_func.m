@@ -13,8 +13,8 @@ function SBBGK_1d_func(name,CFL,r_time,tEnd,theta,quad,method,IC_case, ...
 
 %% Simulation Parameters
 % name        ='SBBGK1d'; % Simulation Name
-% CFL         = 0.30;     % CFL condition
-% r_time      = 0.0001;   % Relaxation time
+% CFL         = 0.05;     % CFL condition
+% r_time      = 1/10000;  % Relaxation time
 % tEnd        = 0.2;      % End time
 % theta       = 1;        % {-1} BE, {0} MB, {1} FD.
 % quad        = 1;        % for NC = 1 , GH = 2
@@ -55,12 +55,13 @@ switch quad
     case{1} % Newton Cotes Quadrature:
     V  = [-20,20];  % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
-    [v,w,k] = cotes_xw(V(1),V(2),nv,5); % cotes Degree 5
+    [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
         
     case{2} % Gauss Hermite Quadrature:
-    nv = 20;        % nodes desired (the actual value)
+    nv = 80;          % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
-     k = 1;         % quadrature constant.
+    k = 1;            % quadrature constant.
+    w = w.*exp(v.^2); % weighting fucntion of the Gauss-Hermite quadrature
     
     otherwise
         error('Order must be between 1 and 2');
@@ -115,7 +116,7 @@ time = 0:dt:tEnd;
 % transport Boltzmann equation will resemble to a pure advection equation.
 % Thus WENO, TVD, DG or CPR can be used easyly to compute evolution of the
 % information inside the domain: 
-
+tic
 switch method
     
     case{1} % TVD 0(h^2)
@@ -150,7 +151,7 @@ switch method
             f_eq = f_equilibrium_1d(r,ux,v,t,theta);
             
             % initialize variables
-            %u_next = zeros(1,nx);
+            u_next = zeros(1,nx);
             u_eq = zeros(1,nx);
             u = zeros(1,nx);
                               
@@ -199,7 +200,7 @@ switch method
     otherwise
         error('Order must be between 1 and 2');
 end
-
+toc
 %% Close file with Results
 fclose(file);
 fprintf('Simulation has been completed succesfully!\n')
