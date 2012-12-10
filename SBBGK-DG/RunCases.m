@@ -11,16 +11,16 @@ cases = 1:4;                    % Number of Cases to evaluate
 %% Common Parameters
 Nx          = 32;               % Number of elements
 t_end       = 0.10;             % Final Time 
-P_deg       = 5;                % Polinomial Degree
+P_deg       = 4;                % Polinomial Degree
 Pp          = P_deg+1;          % Polinomials Points
 CFL         = 1/(2*P_deg+1);    % Courant Number 
-RK_stages   = 5;                % Number of RK stages
+RK_stages   = 3;                % Number of RK stages
 plot_fig    = 0;                % {1}: plot while computing, {0}: no plot
 theta       = 0;                % {-1} BE, {0} MB, {1} FD.
-iV          = 80;               % Space Velocity Points
+iV          = 20;               % Space Velocity Points
 
 %% particular Paramerters
-tau = [0.1 0.01 0.001 0.0001];  % Relaxation time per case
+tau = [1/10 1/1000 1/5000 1/10000];  % Relaxation time per case
 
 %% Excecute SBBGK in Parallel using 4 processors
 
