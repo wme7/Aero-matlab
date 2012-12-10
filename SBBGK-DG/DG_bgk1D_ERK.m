@@ -7,8 +7,8 @@ GHNC        = 0;
 OUTTIME     = 0.1;
 TAU			= 0.001; % !RELAXATION TIME
 
-nx = 32; % number of elements
-p  = 7;	 %polinomial degree
+nx = 16; % number of elements
+p  = 4;	 %polinomial degree
 pp =p+1;
 stage=6;
 rk =stage;			%RK stage
@@ -28,7 +28,7 @@ gamma=const_a_I(2,1);
 % filter_sigma=filter_profile(p,filter_order, CutOff)
 
 IT       = 0;
-NV = 40;
+NV = 60;
 NVh= NV/2;
 
 % GH =[-5.38748089001,-4.60368244955,-3.94476404012,-3.34785456738, ...
@@ -175,17 +175,17 @@ if bb==1
     
     figure(1)
     %figure('Position',[scrsz(3)/4 scrsz(4)/8 scrsz(3)/2 scrsz(4)*3/4])
-    subplot(2,3,1); wave_handleu = plot(x,u_plot,'.'); axis([0,1,-0.5,1.5]);
+    subplot(2,3,1); wave_handleu = plot(x,u_plot,'.'); axis('tight');
     xlabel('x'); ylabel('u(x,t)'); title('Velocity');
-    subplot(2,3,2); wave_handler = plot(x,r_plot,'.'); axis([0,1,0,1.2]);
+    subplot(2,3,2); wave_handler = plot(x,r_plot,'.'); axis('tight');
     xlabel('x'); ylabel('R(x,t)'); title('Density');
-    subplot(2,3,3); wave_handleet = plot(x,et_plot,'.'); axis([0,1,0,2]);
+    subplot(2,3,3); wave_handleet = plot(x,et_plot,'.'); axis('tight');
     xlabel('x'); ylabel('ET(x,t)'); title('Energy');
-    subplot(2,3,4); wave_handleav = plot(x,p_plot,'.'); axis([0,1,0,1.5]);
+    subplot(2,3,4); wave_handleav = plot(x,p_plot,'.'); axis('tight');
     xlabel('x'); ylabel('AV(x,t)');title('Pressure');
-    subplot(2,3,5); wave_handlet = plot(x,t_plot,'.'); axis([0,1,3,4]);
+    subplot(2,3,5); wave_handlet = plot(x,t_plot,'.'); axis('tight');
     xlabel('x'); ylabel('T(x,t)'); title('temperature');
-    subplot(2,3,6); wave_handlez = plot(x,z_plot,'.'); axis([0,1,0,1]);
+    subplot(2,3,6); wave_handlez = plot(x,z_plot,'.'); axis('tight');
     xlabel('x'); ylabel('Z(x,t)');title('Fugacity');
     
     drawnow

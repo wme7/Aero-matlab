@@ -9,9 +9,9 @@ end
 cases = 1:4;                    % Number of Cases to evaluate
 
 %% Common Parameters
-Nx          = 32;               % Number of elements
+Nx          = 16;               % Number of elements
 t_end       = 0.12;             % Final Time 
-P_deg       = 4;                % Polinomial Degree
+P_deg       = 3;                % Polinomial Degree
 Pp          = P_deg+1;          % Polinomials Points
 CFL         = 1/(2*P_deg+1);    % Courant Number 
 RK_stages   = 4;                % Number of RK stages
@@ -57,13 +57,13 @@ for j = cases
     w = 1/tau(j);
     w = num2str(w);
     % Number of velocity points
-    
+    iv = num2str(iV);
     % Tecplot format
     f = '.plt';
     % ID
-    IDn = [name,statistic,'X',elements,' ','P',P_degree,'RK',RKs,'w',w,f];
+    IDn = [name,statistic,'X',elements,' ','P',P_degree,'RK',RKs,'w',w,'iv',iv,f];
     IDn4 = IDn3; IDn3 = IDn2; IDn2 = IDn1; IDn1 = IDn;
-    ID = [name,statistic,'X',elements,'-','P',P_degree,'RK',RKs,'w',w];
+    ID = [name,statistic,'X',elements,'-','P',P_degree,'RK',RKs,'w',w,'iv',iv];
     ID4 = ID3; ID3 = ID2; ID2 = ID1; ID1 = ID; 
 end
 IDn = {IDn4,IDn3,IDn2,IDn1};
