@@ -924,7 +924,7 @@ $!LINEMAP  [1]
   NAME = '&DV&'
   ASSIGN
     {
-    ZONE = 215
+    ZONE = 468
     XAXISVAR = 1
     YAXISVAR = 2
     }
@@ -1002,7 +1002,7 @@ $!LINEMAP  [4]
   NAME = '&DV&'
   ASSIGN
     {
-    ZONE = 215
+    ZONE = 468
     XAXISVAR = 1
     YAXISVAR = 5
     }
