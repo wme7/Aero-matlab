@@ -1,6 +1,6 @@
 #!MC 1200
 # Created by Tecplot 360 build 12.2.0.9077
-$!VarSet |LFDSFN1| = '"DG1DMBX16 P4RK3w5000iv80.plt"'
+$!VarSet |LFDSFN1| = '"DG1DMBX32 P4RK4w10000iv20.plt"'
 $!VarSet |LFDSVL1| = '"x" "Density" "Velocity in x" "Energy" "Pressure" "Temperature" "Fugacity"'
 $!SETSTYLEBASE FACTORY
 $!GLOBALLINKING 
