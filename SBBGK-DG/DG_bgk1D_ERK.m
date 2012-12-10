@@ -4,7 +4,7 @@ close all
 tic
 GHNC        = 0;
 %CFL        = 0.9;
-OUTTIME     = 0.1;
+OUTTIME     = 0.08;
 TAU			= 0.001; % !RELAXATION TIME
 
 nx = 16; % number of elements
@@ -28,7 +28,7 @@ gamma=const_a_I(2,1);
 % filter_sigma=filter_profile(p,filter_order, CutOff)
 
 IT       = 0;
-NV = 60;
+NV = 80;
 NVh= NV/2;
 
 % GH =[-5.38748089001,-4.60368244955,-3.94476404012,-3.34785456738, ...
@@ -52,30 +52,30 @@ amax=abs(V(1));
 
 % Initial State
 
-% Case 1
-% RL=1.0;
-% UL=0.75;
-% PL=1.0;
-% 
-% ET=PL+0.5*RL*UL^2;
-% TL=4*ET/RL-2*UL^2;
-% ZL=RL/sqrt(pi*TL);
-% 
-% RR=0.125;
-% UR=0;
-% PR=0.1;
-% 
-% ET=PR+0.5*RR*UR^2;
-% TR=4*ET/RR-2*UR^2;
-% ZR=RR/sqrt(pi*TR);
+%Case 1
+RL=1.0;
+UL=0.75;
+PL=1.0;
+
+ET=PL+0.5*RL*UL^2;
+TL=4*ET/RL-2*UL^2;
+ZL=RL/sqrt(pi*TL);
+
+RR=0.125;
+UR=0;
+PR=0.1;
+
+ET=PR+0.5*RR*UR^2;
+TR=4*ET/RR-2*UR^2;
+ZR=RR/sqrt(pi*TR);
 
 % Case 2
-UL  = 0.;
-TL  = 4.38385;
-ZL  = 0.2253353;
-UR  = 0.;
-TR  = 8.972544;
-ZR  = 0.1204582;
+% UL  = 0.;
+% TL  = 4.38385;
+% ZL  = 0.2253353;
+% UR  = 0.;
+% TR  = 8.972544;
+% ZR  = 0.1204582;
 
 %nt=round(OUTTIME/dt);
 [xl,w]=gauleg(pp);

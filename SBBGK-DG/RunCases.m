@@ -9,12 +9,12 @@ end
 cases = 1:4;                    % Number of Cases to evaluate
 
 %% Common Parameters
-Nx          = 16;               % Number of elements
-t_end       = 0.12;             % Final Time 
-P_deg       = 3;                % Polinomial Degree
+Nx          = 32;               % Number of elements
+t_end       = 0.10;             % Final Time 
+P_deg       = 5;                % Polinomial Degree
 Pp          = P_deg+1;          % Polinomials Points
 CFL         = 1/(2*P_deg+1);    % Courant Number 
-RK_stages   = 4;                % Number of RK stages
+RK_stages   = 5;                % Number of RK stages
 plot_fig    = 0;                % {1}: plot while computing, {0}: no plot
 theta       = 0;                % {-1} BE, {0} MB, {1} FD.
 iV          = 80;               % Space Velocity Points
