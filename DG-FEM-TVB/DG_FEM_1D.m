@@ -60,8 +60,6 @@ for l = 0:k             % for all degress of freedom
     end
 end
 
-
-
 %% transform degress of freedom u(t)_{l,i} back to space-time values u(x,t)
 u = (ut'*P')';
 figure
