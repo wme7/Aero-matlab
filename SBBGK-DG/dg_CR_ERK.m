@@ -11,7 +11,7 @@ p=3;			%polinomial degree
 pp=p+1;
 stage=3;
 rk=stage;		%RK order
-T=0.25;			%Time
+T=0.5;			%Time
 cfl=1/(2*p+1);
 
 %dt=T/nt;		%stepwidth in time
@@ -138,8 +138,8 @@ while  ISTOP ==0
     end
     uold=u;
     y=u*P;
-    xi = reshape(x,4,80)
-    y = y'
+    xi = reshape(x,4,80);
+    y = y';
     plot(xi,y)
 %     z=[];
 %     w_collapse=[];

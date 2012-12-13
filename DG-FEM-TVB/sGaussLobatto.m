@@ -1,4 +1,4 @@
-function [x,w] = GaussLobatto(n)
+function [x,w] = sGaussLobatto(n)
 %% Compute abscissas and weights Gauss-Lobatto Quadrature with n points
 x = zeros(n,1); w = zeros(n,1); 
 switch n 

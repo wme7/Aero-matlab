@@ -6,6 +6,11 @@
 %
 % u_t + f(u)_x = s(u)
 %
+% where f(u) = a*u  and  s(u) = u^2 
+% Function residual will be defined as:
+%
+% u_t = Residue(u)
+%
 % Based on ideas of the following papers:
 %
 % 1. TVB Runge-Kutta Local Projection Discontinuous Galerkin Finite Element
@@ -23,6 +28,7 @@ np        = k+1;    % Number of points per Cell/Element
 quadn     = 1;      % Element Integration quadrature to use: n={1,2,3,4}
 rks       = 3;      % Time order of the Sheme/RK stages
 flux_type = 3;      % {1}Roe, {2}Global LF, {3}LLF
+a         = 0.5;    % scalar advection speed
 cfl       = 0.3;    % Courant Number
 tEnd      = pi/15;  % Final Time for computation
 nx        = 80;     % Number of Cells/Elements
@@ -69,30 +75,96 @@ switch quadn
         error('quadrature not available')
 end
 
+%% flux function
+flux = @(c,u) c*u;
+
+%% source term fucntion
+Sterm = @(u) u.^2;
+
 %% Load Initial Condition, u(x,0) = u0
 u0 = u_zero(x,IC_case);
+f0 = flux(a,u0);
+s0 = Sterm(u0);
 
 % Plot u0
 %if plot_figs == 1; plot(x,u0); axis([0,2,0,1.2]); end;
-if plot_figs == 1; plot(x,u0); axis tight; end;
+if plot_figs == 1; 
+    subplot(1,3,1); plot(x,u0); title('u0'); axis tight;
+    subplot(1,3,2); plot(x,f0); title('f0'); axis tight;
+    subplot(1,3,3); plot(x,s0); title('s0'); axis tight; 
+end;
 
 % Define coeficients matrix
-a = diag([1 12 180 2800 44100 698544 11099088 176679360]);
+al = diag([1 12 180 2800 44100 698544 11099088 176679360]);
 
-% transform u(x,t) to degress of freedom u(t)_{l,i} for each i-Cell/Element
+% Transform u(x,t) to degress of freedom u(t)_{l,i} for each i-Cell/Element
 ut = zeros(np,nx+1);
 for l = 0:k             % for all degress of freedom
     for j = 1:nx
     i = l+1;            % Dummy index
     P = LegMat(k,xi);   % Legendre Matrix
-    ut(i,j) = a(i,i).*sum(w(:,j).*u0(:,j).*P(:,i));
+    ut(i,j) = al(i,i).*sum(w(:,j).*u0(:,j).*P(:,i));
     end
 end
 
-%% 
+% Transform f(u) to degress of freedom f(t)_{l,i} for each i-Cell/Element
+ft = zeros(np,nx+1);
+for l = 0:k             % for all degress of freedom
+    for j = 1:nx
+    i = l+1;            % Dummy index
+    P = LegMat(k,xi);   % Legendre Matrix
+    ft(i,j) = al(i,i).*sum(w(:,j).*f0(:,j).*P(:,i));
+    end
+end
+
+% Transform s(u) to degress of freedom s(t)_{l,i} for each i-Cell/Element
+st = zeros(np,nx+1);
+for l = 0:k             % for all degress of freedom
+    for j = 1:nx
+    i = l+1;            % Dummy index
+    P = LegMat(k,xi);   % Legendre Matrix
+    st(i,j) = al(i,i).*sum(w(:,j).*s0(:,j).*P(:,i));
+    end
+end
+
+%% Elements boundary values
+%fp = f( 1,:); % flux to the left  (f( 1,i)^{+})
+%fn = f(np,:); % flux to the right (f(np,1)^{-})
+
+%% Compute Residue
+% STEP 1
+%-------
+% Cell Integral volume by Gauss-Lobatto quadrature.
+% NOTE:
+%  1. This is the long way: element by element.
+%  2. This is very slow because of the two 'for' loops.
+v_residue = zeros(np,nx+1);
+for l = 0:k
+    i = l+1;    % Dummy index
+    for j = 1:nx
+        v_residue(i,j) = al(i,i)*sum(w(:,j).*flux(a,u(i,j)).*dsLegendreP(l,xi));
+    end
+end
+
+% Cell Integral volume by Prof. Tim Warburton method.
+% NOTE:
+% 1. this is a faster and very mechanic way to compute this term.
+
+% STEP 2
+%-------
+% Cell boundary contribution
+b_residue = zeros(np,nx+1);
+up = u( 1,:); % state at left boundary (u^{+} = u( 1,i))
+un = u(np,:); % state at right boundary (u^{-} = u(np,i))
 
 
 %% Transform degress of freedom u(t)_{l,i} back to space-time values u(x,t)
 u = (ut'*P')';
+f = a*u;
+s = u.^2;
 figure
-plot(x,u); axis('tight');
+if plot_figs == 1; 
+    subplot(1,3,1); plot(x,u0); title('u'); axis tight;
+    subplot(1,3,2); plot(x,f0); title('f'); axis tight;
+    subplot(1,3,3); plot(x,s0); title('s'); axis tight; 
+end;

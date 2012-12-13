@@ -3,10 +3,10 @@ function dP = dsLegendreP(k,x)
 
 switch k
     case{0}
-        dP = 0;
+        dP = zeros(length(x),1);
     
     case{1}
-        dP = 1;
+        dP = ones(length(x),1);
         
     case{2}
         dP = 2*x;

@@ -38,3 +38,5 @@ CM  = diag(a,1) + diag(a,-1);
 [x ind] = sort(diag(L));
 V       = V(:,ind)';
 w       = 2 * V(:,1).^2;
+
+% Compute Legendre Vandermonde
