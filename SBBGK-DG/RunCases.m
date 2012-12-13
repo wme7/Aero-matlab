@@ -11,7 +11,7 @@ cases = 1:4;                    % Number of Cases to evaluate
 %% Common Parameters
 Nx          = 64;               % Number of elements
 t_end       = 0.10;             % Final Time 
-P_deg       = 4;                % Polinomial Degree
+P_deg       = 3;                % Polinomial Degree
 Pp          = P_deg+1;          % Polinomials Points
 CFL         = 1/(2*P_deg+1);    % Courant Number 
 RK_stages   = 4;                % Number of RK stages
