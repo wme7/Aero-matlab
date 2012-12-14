@@ -16,7 +16,7 @@ Pp          = P_deg+1;          % Polinomials Points
 CFL         = 1/(2*P_deg+1);    % Courant Number 
 RK_stages   = 4;                % Number of RK stages
 plot_fig    = 0;                % {1}: plot while computing, {0}: no plot
-theta       = 1;                % {-1} BE, {0} MB, {1} FD.
+theta       = 0;                % {-1} BE, {0} MB, {1} FD.
 iV          = 80;               % Space Velocity Points
 
 %% particular Paramerters
