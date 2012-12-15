@@ -135,12 +135,14 @@ for l = 0:k             % for all degress of freedom
     end
 end
 
-% Flux Term f(u)
+% Volume Term contribution
 volume = D'*Ft;
+
+% Fluxes contribution
+
 
 % We use simple Upwinding Scheme
 ut_next = ut;
-
 
 % Transfrom back from degress of freedom
 u = (ut'*P')';

@@ -1,7 +1,9 @@
 #!MC 1200
 # Created by Tecplot 360 build 12.2.0.9077
-$!VarSet |LFDSFN1| = '"DG1DMBX32 P4RK4w10000iv20.plt"'
-$!VarSet |LFDSVL1| = '"x" "Density" "Velocity in x" "Energy" "Pressure" "Temperature" "Fugacity"'
+$!VarSet |LFDSFN1| = '"..\SBBGK\SBBGK1dBEX100 P0RK4w10000IC1.plt"'
+$!VarSet |LFDSVL1| = '"x" "density" "velocity" "energy" "pressure" "temperature" "fugacity"'
+$!VarSet |LFDSFN2| = '"DG1DBEX32 P5RK4w1000iv80.plt"'
+$!VarSet |LFDSVL2| = '"x" "density" "velocity" "energy" "pressure" "temperature" "fugacity" "Velocity in x"'
 $!SETSTYLEBASE FACTORY
 $!GLOBALLINKING 
   LINKCOLORMAPS = YES
@@ -886,12 +888,22 @@ $!READDATASET  '|LFDSFN1|'
   INITIALPLOTTYPE = XYLINE
   INCLUDETEXT = NO
   INCLUDEGEOM = NO
-  RESETSTYLE = NO
   ASSIGNSTRANDIDS = YES
   VARLOADMODE = BYNAME
   VARNAMELIST = '|LFDSVL1|'
 $!REMOVEVAR |LFDSVL1|
 $!REMOVEVAR |LFDSFN1|
+$!READDATASET  '|LFDSFN2|'
+  INITIALPLOTTYPE = XYLINE
+  INCLUDETEXT = NO
+  INCLUDEGEOM = NO
+  READDATAOPTION = APPEND
+  RESETSTYLE = NO
+  ASSIGNSTRANDIDS = YES
+  VARLOADMODE = BYNAME
+  VARNAMELIST = '|LFDSVL2|'
+$!REMOVEVAR |LFDSVL2|
+$!REMOVEVAR |LFDSFN2|
 $!FRAMELAYOUT 
   SHOWHEADER = NO
   HEADERCOLOR = RED
@@ -908,7 +920,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = XYLINE
 $!FRAMENAME  = 'Frame 001'
 $!DELETELINEMAPS 
-$!ACTIVELINEMAPS  =  [1,4]
+$!ACTIVELINEMAPS  =  [1,7]
 $!GLOBALLINEPLOT 
   DATALABELS
     {
@@ -916,27 +928,38 @@ $!GLOBALLINEPLOT
     }
   LEGEND
     {
+    SHOW = YES
+    BOX
+      {
+      BOXTYPE = NONE
+      }
     XYPOS
       {
-      X = 95
+      X = 98.165
+      Y = 94.837
       }
     }
 $!LINEMAP  [1]
-  NAME = '&DV&'
+  NAME = '&DV& BE Direct Solver'
   ASSIGN
     {
-    ZONE = 1
+    ZONE = 390
     XAXISVAR = 1
     YAXISVAR = 2
     }
   LINES
     {
-    COLOR = RED
+    COLOR = BLACK
     }
   SYMBOLS
     {
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = DEL
+      }
     COLOR = RED
     FILLCOLOR = RED
+    SIZE = 1.5
     }
   BARCHARTS
     {
@@ -1009,7 +1032,7 @@ $!LINEMAP  [4]
     }
   LINES
     {
-    COLOR = CUSTOM3
+    COLOR = CYAN
     }
   SYMBOLS
     {
@@ -1077,6 +1100,37 @@ $!LINEMAP  [6]
     {
     COLOR = PURPLE
     }
+$!LINEMAP  [7]
+  NAME = '&DV& BE DG1D'
+  ASSIGN
+    {
+    ZONE = 391
+    XAXISVAR = 1
+    YAXISVAR = 2
+    }
+  LINES
+    {
+    COLOR = BLACK
+    }
+  SYMBOLS
+    {
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = CIRCLE
+      }
+    COLOR = CUSTOM3
+    FILLCOLOR = RED
+    SIZE = 1.5
+    }
+  BARCHARTS
+    {
+    COLOR = RED
+    FILLCOLOR = RED
+    }
+  ERRORBARS
+    {
+    COLOR = RED
+    }
 $!XYLINEAXIS 
   DEPXTOYRATIO = 1
 $!XYLINEAXIS 
@@ -1090,9 +1144,11 @@ $!XYLINEAXIS
   YDETAIL 1
     {
     RANGEMIN = 0
-    RANGEMAX = 1.1000000000000001
+    RANGEMAX = 1.3
     GRSPACING = 0.2
     }
+$!LINEPLOTLAYERS 
+  SHOWSYMBOLS = YES
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 1
 $!SETSTYLEBASE CONFIG

@@ -115,12 +115,12 @@ while (age <= t_stop)
   % compute upwind fluxes at cell boundaries
 
   for i=1:npt-1            
-    vp = 0.5 * ( v(i,n) + v(i+1,n) );
-    if (vp > 0.0) 
+    vp = 0.5 * ( v(i,n) + v(i+1,n) ); % average value
+    if (vp > 0.0) % average value positive
       if (v(i,n) >= 0.0) 
         flp(i) = 0.5 * v(i,n)^2;
       end
-    elseif (vp <= 0.0) 
+    elseif (vp <= 0.0) % average value negative
       if (v(i+1,n) <= 0.0) 
         flp(i) = 0.5 * v(i+1,n)^2;
       end
