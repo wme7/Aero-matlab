@@ -1,0 +1,9 @@
+libemlrt.lib
+libut.lib
+libmwblascompat32.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:emlrtMexFcnProperties
+/export:bisection2
+/export:bisection2_initialize
+/export:bisection2_terminate
