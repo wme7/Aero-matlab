@@ -6,7 +6,7 @@ clear all
 coeffi_RK % Calculation of the coefficients alpha for ARK
 gamma=const_a_I(2,1);
 
-nx=80;			%discretization in space
+nx=9;			%discretization in space
 p=3;			%polinomial degree
 pp=p+1;
 stage=3;
@@ -42,7 +42,7 @@ end
 
 %% Just for testing the degrees of freedom computation
 y = u*P
-xi = reshape(x,4,80)
+xi = reshape(x,4,nx)
 plot(xi,y')
 %%%%%%%%%%%%%%  Calculation the Matrix A=int(phi_j + phi_i') , b and c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 A=zeros(pp,pp);
@@ -87,11 +87,10 @@ while  ISTOP ==0
         ISTOP = 0;
     end
     TIME = TIME + dt;
+%%%%%%%%%%%%  Calculating the d(eta)/d(t) for every timestep i %%%%%%%%%%%%
     u_alt=u;    
-    for l=1:rk        
-        %%%%%%%%%%%%  Calculating the d(eta)/d(t) for every timestep i %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    for l=1:rk       
         if l==1% Stage 1
-            
             % Compute the source term u^2
             for i=1:nx
                 FC(:)=u_alt(i,:);
@@ -102,11 +101,10 @@ while  ISTOP ==0
             end
             F_ns(1,:,l)=( (A'*u_alt(1,:)' - sum(u_alt(1,1:pp)) + sum(u_alt(nx,1:pp)) * c'+FS(1,1:pp)')' .* b);
             for i=2:nx
-                F_ns(i,:,l)=( ( A'*u_alt(i,:)' - sum(u_alt(i,1:pp)) + sum(u_alt(i-1,1:pp)) * c'+FS(i,1:pp)')' .* b);
+            F_ns(i,:,l)=( (A'*u_alt(i,:)' - sum(u_alt(i,1:pp)) + sum(u_alt(i-1,1:pp)) * c'+FS(i,1:pp)')' .* b);
             end
         else
-             % Stages 2-6          
-            
+            % Stages 2-6          
             for i=1:nx
                 % Compute the source term u^2
                 FC(:)=u_alt(i,:);
@@ -116,12 +114,11 @@ while  ISTOP ==0
                 end
             end
             % Right-going wave u_t+u_x=u^2
-            
             F_ns(1,:,l)=( (A'*u_alt(1,:)' - sum(u_alt(1,1:pp)) + sum(u_alt(nx,1:pp)) * c'+FS(1,1:pp)')' .* b);
             %  terms related to sum(u_alt) are related the numerical flux
             %  (upwinding flux)
             for i=2:nx
-                F_ns(i,:,l)=( ( A'*u_alt(i,:)' - sum(u_alt(i,1:pp)) + sum(u_alt(i-1,1:pp)) * c'+FS(i,1:pp)')' .* b);
+            F_ns(i,:,l)=( ( A'*u_alt(i,:)' - sum(u_alt(i,1:pp)) + sum(u_alt(i-1,1:pp)) * c'+FS(i,1:pp)')' .* b);
             end
         end      
         
@@ -129,7 +126,7 @@ while  ISTOP ==0
             u = u + dt*const_b(l)*(F_s(:,:,l)+F_ns(:,:,l));
             u_alt = uold;
             for j=1:l %u_alt=Un+Xi
-                u_alt = u_alt + dt*(const_a_I(l+1,j)*F_s(:,:,j) + const_a_E(l+1,j)*F_ns(:,:,j));
+            u_alt = u_alt + dt*(const_a_I(l+1,j)*F_s(:,:,j) + const_a_E(l+1,j)*F_ns(:,:,j));
             end
         else
             % Final Stage and update the new U, Eq. 42
@@ -138,7 +135,7 @@ while  ISTOP ==0
     end
     uold=u;
     y=u*P;
-    xi = reshape(x,4,80);
+    xi = reshape(x,4,nx);
     y = y';
     plot(xi,y)
 %     z=[];

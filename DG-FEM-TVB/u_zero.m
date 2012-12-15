@@ -37,7 +37,8 @@ switch case_no
         end
     case{3} % Sinusoidal IC
         
-        u = 1/2+sin(pi*x);
+        %u = 1/2+sin(pi*x);
+        u = sin(2*pi*x);
         
     case{4} % Riemann IC
         for j = 1:n

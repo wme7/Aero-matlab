@@ -44,7 +44,7 @@ x_left = 0; x_right = 2; dx = (x_right-x_left)/nx;
 x_temp    = x_left: dx :x_right;
 x         = repmat(x_temp,np,1); % Cells
 
-%% Build Cells/Elements (Local) Points and it's corresponding Vandermonde Matrix
+%% Build Cells/Elements (Local) Points
 switch quadn
     case{1} % Scaled Guass-Lobatto quadrature weights and abscissas 
         [xi,w]   = sGaussLobatto(np); % scaled to [-1/2, 1/2]
@@ -53,7 +53,7 @@ switch quadn
         x        = x + xj; % Create poinst in every cells
         
     case{2} % Guass-Lobatto quadrature weights and abscissas 
-        [xi,w,P] = GaussLobatto(np); % for the interval [-1,1]
+        [xi,w,V] = GaussLobatto(np); % for the interval [-1,1]
         xj       = repmat( xi*dx ,1,nx+1);
         w        = repmat(   w   ,1,nx+1);
         x        = x + xj; % Create poinst in every cells
@@ -63,10 +63,9 @@ switch quadn
         xj       = repmat( xi*dx ,1,nx+1);
         w        = repmat(   w   ,1,nx+1);
         x        = x + xj; % Create poinst in every cells
-        P        = 2 ;
-        
+                
     case{4} % Guass-Legendre quadrature weights and abscissas 
-        [xi,w,P] = GaussRadau(np); % for the interval [-1,1]
+        [xi,w,V] = GaussRadau(np); % for the interval [-1,1]
         xj       = repmat( xi*dx ,1,nx+1);
         w        = repmat(   w   ,1,nx+1);
         x        = x + xj; % Create poinst in every cells
@@ -74,6 +73,10 @@ switch quadn
     otherwise
         error('quadrature not available')
 end
+%% Computing Legendre Polynomials 
+% We use them as basis for expanding our solution into degress of freedom
+
+
 
 %% flux function
 flux = @(c,u) c*u;
@@ -98,32 +101,31 @@ end;
 al = diag([1 12 180 2800 44100 698544 11099088 176679360]);
 
 % Transform u(x,t) to degress of freedom u(t)_{l,i} for each i-Cell/Element
+P = sLegMat(k,xi);   % Legendre Matrix
+
 ut = zeros(np,nx+1);
 for l = 0:k             % for all degress of freedom
-    for j = 1:nx
     i = l+1;            % Dummy index
-    P = LegMat(k,xi);   % Legendre Matrix
-    ut(i,j) = al(i,i).*sum(w(:,j).*u0(:,j).*P(:,i));
+    for j = 1:nx+1
+        ut(i,j) = al(i,i).*sum(w(:,j).*u0(:,j).*P(:,i));
     end
 end
 
 % Transform f(u) to degress of freedom f(t)_{l,i} for each i-Cell/Element
 ft = zeros(np,nx+1);
 for l = 0:k             % for all degress of freedom
-    for j = 1:nx
     i = l+1;            % Dummy index
-    P = LegMat(k,xi);   % Legendre Matrix
-    ft(i,j) = al(i,i).*sum(w(:,j).*f0(:,j).*P(:,i));
+    for j = 1:nx+1
+        ft(i,j) = al(i,i).*sum(w(:,j).*f0(:,j).*P(:,i));
     end
 end
 
 % Transform s(u) to degress of freedom s(t)_{l,i} for each i-Cell/Element
 st = zeros(np,nx+1);
 for l = 0:k             % for all degress of freedom
-    for j = 1:nx
     i = l+1;            % Dummy index
-    P = LegMat(k,xi);   % Legendre Matrix
-    st(i,j) = al(i,i).*sum(w(:,j).*s0(:,j).*P(:,i));
+    for j = 1:nx+1
+        st(i,j) = al(i,i).*sum(w(:,j).*s0(:,j).*P(:,i));
     end
 end
 
@@ -142,7 +144,7 @@ v_residue = zeros(np,nx+1);
 for l = 0:k
     i = l+1;    % Dummy index
     for j = 1:nx
-        v_residue(i,j) = al(i,i)*sum(w(:,j).*flux(a,u(i,j)).*dsLegendreP(l,xi));
+        v_residue(i,j) = al(i,i)*sum(w(:,j).*flux(a,u0(i,j)).*dsLegendreP(l,xi));
     end
 end
 
@@ -150,12 +152,13 @@ end
 % NOTE:
 % 1. this is a faster and very mechanic way to compute this term.
 
+
 % STEP 2
 %-------
 % Cell boundary contribution
 b_residue = zeros(np,nx+1);
-up = u( 1,:); % state at left boundary (u^{+} = u( 1,i))
-un = u(np,:); % state at right boundary (u^{-} = u(np,i))
+up = u0( 1,:); % state at left boundary (u^{+} = u( 1,i))
+un = u0(np,:); % state at right boundary (u^{-} = u(np,i))
 
 
 %% Transform degress of freedom u(t)_{l,i} back to space-time values u(x,t)
