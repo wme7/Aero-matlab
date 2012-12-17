@@ -117,13 +117,13 @@ while (age <= t_stop)
   for i=1:npt-1 % cells boundaries = x_i's middle points           
     vp = 0.5 * ( v(i,n) + v(i+1,n) ); % average value
     if (vp > 0.0) % average value positive
-      if (v(i,n) >= 0.0) 
+      %if (v(i,n) >= 0.0) 
         flp(i) = 0.5 * v(i,n)^2;
-      end
+      %end
     elseif (vp <= 0.0) % average value negative
-      if (v(i+1,n) <= 0.0) 
+      %if (v(i+1,n) <= 0.0) 
         flp(i) = 0.5 * v(i+1,n)^2;
-      end
+      %end
     else
       flp(i) = 0.0;
     end
