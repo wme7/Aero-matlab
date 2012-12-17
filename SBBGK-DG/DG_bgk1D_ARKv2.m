@@ -5,15 +5,15 @@ tic
 
 global A b c Pleg w wp NV nx p dx dt IT BC_type V VIS F gamma
 
-GHNC        = 0;
+%GHNC        = 0;
 %CFL        = 0.9;
 OUTTIME     = 0.1;
-TAU			= 0.0001% !RELAXATION TIME
-IT       = 0;
+TAU			= 0.001% !RELAXATION TIME
+IT          = 0;
 %!maxwellian = 0., fermion = 1., boson = -1
 
 nx = 16; % number of elements
-p  = 7;			%polinomial degree
+p  = 4;			%polinomial degree
 pp =p+1;
 stage=6;
 rk =stage;			%RK stage
@@ -27,24 +27,13 @@ filter_order=4;
 CutOff=1;
 
 % bb=0: No plot; 1 assume continuous; 2 interval-by-interval
-bb=2;
+bb=0;
 
 coeffi_RK
 gamma=const_a_I(2,1);
 
-NV = 40;
+NV = 80;
 NVh=NV/2;
-% GH =[-5.38748089001,-4.60368244955,-3.94476404012,-3.34785456738, ...
-%     -2.78880605843,-2.25497400209,-1.73853771212,-1.2340762154,...
-%     -0.737473728545,-0.245340708301,0.245340708301,0.737473728545,...
-%     1.2340762154,1.73853771212,2.25497400209,2.78880605843,3.34785456738,...
-%     3.94476404012,4.60368244955,5.38748089001];
-% wp  =[0.898591961453,0.704332961176,0.62227869619,0.575262442852,...
-%     0.544851742366,0.524080350949,0.509679027117,0.499920871336,...
-%     0.493843385272,0.490921500667,0.490921500667,0.493843385272,...
-%     0.499920871336,0.509679027117,0.524080350949,0.544851742366,...
-%     0.575262442852,0.62227869619,0.704332961176,0.898591961453];
-
 [GH,wp] = GaussHermite(NV); % for integrating range: -inf to inf
 wp=wp';
 V=-GH';
@@ -97,9 +86,9 @@ RL=1.0;
 UL=0.75;
 PL=1.0;
 
-ET = PL+0.5*RL*UL^2;
-TL = 4*ET/RL-2*UL^2;
-ZL = RL/sqrt(pi*TL);
+ET=PL+0.5*RL*UL^2;
+TL=4*ET/RL-2*UL^2;
+ZL=RL/sqrt(pi*TL);
 %                         T(i,m)    = 4*ET(i,m)/R(i,m) - 2*U(i,m)^2;
 %                         Z(i,m)    = R(i,m) / sqrt(pi* T(i,m));
 %                         P(i,m) = ET(i,m) - 0.5 * R(i,m) * U(i,m)^2;
@@ -107,9 +96,9 @@ RR=0.125;
 UR=0;
 PR=0.1;
 
-ET = PR+0.5*RR*UR^2;
-TR = 4*ET/RR-2*UR^2;
-ZR = RR/sqrt(pi*TR);
+ET=PR+0.5*RR*UR^2;
+TR=4*ET/RR-2*UR^2;
+ZR=RR/sqrt(pi*TR);
 
 % Case 2
 
@@ -169,6 +158,14 @@ for i=1:nx
         Z(i,m)    = R(i,m) / sqrt(pi* T(i,m));
     end
 end
+
+%Macrocopic Initial Condition
+r_plot=reshape(R',nx*pp,1);
+u_plot=reshape(U',nx*pp,1);
+et_plot=reshape(ET',nx*pp,1);
+p_plot=reshape(P',nx*pp,1);
+t_plot=reshape(T',nx*pp,1);
+z_plot=reshape(Z',nx*pp,1);
 
 if bb==1
     r_plot=reshape(R',nx*pp,1);
@@ -526,6 +523,7 @@ while ISTOP ==0
             
         end
     end % RK
+     
     % Filter
     %F=F_new.*filter_sigma;    
     % Un-comment the line above and comment the line below to impose the
@@ -638,6 +636,13 @@ while ISTOP ==0
         end
     end
     %fprintf('1X ELAPSED TIME: %f7.4,4 DENSITY AT X=4.0,Y=5.: %f7.4\n', TIME, R(NXP1/2))
+        
+    r_plot=reshape(R',nx*pp,1);
+    u_plot=reshape(U',nx*pp,1);
+    et_plot=reshape(ET',nx*pp,1);
+    p_plot=reshape(P',nx*pp,1);
+    t_plot=reshape(T',nx*pp,1);
+    z_plot=reshape(Z',nx*pp,1);
     
     ITER = ITER + 1;
 end
@@ -681,6 +686,13 @@ if bb ~= 1
         [Zo,To,Po]=ZTP_fun_B(nx,No,ETo,Ro,Uo);
     end %if IT
     
+    r_plot=reshape(Ro',nx*pp,1);
+    u_plot=reshape(Uo',nx*pp,1);
+    et_plot=reshape(ETo',nx*pp,1);
+    p_plot=reshape(Po',nx*pp,1);
+    t_plot=reshape(To',nx*pp,1);
+    z_plot=reshape(Zo',nx*pp,1);    
+    
     figure(1)
     plot(xo(1,:),Uo(1,:),'-');
     hold on
@@ -699,5 +711,3 @@ if bb ~= 1
     hold off
 end
 toc
-
-

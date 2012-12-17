@@ -8,14 +8,14 @@ clear all; close all;
 
 %% ORDER OF THE SCHEME
 % Order of polynomials used for interpolation:
-p = 4;
+p = 3;
 
 % Chebychev nodes on the interval [-1,1]
 xcheby = sin(0.5*pi*linspace(-1,1,p+1)');
 
 %% DIVIDE THE DOMAIN INTO CELLS
 % number of cells to divide interval into
-Ncells = 50;
+Ncells = 10;
 
 % Physical limits of our Domain
 xmin = -pi(); xmax =  pi();

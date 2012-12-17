@@ -6,12 +6,12 @@ clear all
 coeffi_RK % Calculation of the coefficients alpha for ARK
 gamma=const_a_I(2,1);
 
-nx=9;			%discretization in space
+nx=10;			%discretization in space
 p=3;			%polinomial degree
 pp=p+1;
 stage=3;
 rk=stage;		%RK order
-T=0.5;			%Time
+T=2;			%Time
 cfl=1/(2*p+1);
 
 %dt=T/nt;		%stepwidth in time
@@ -57,7 +57,7 @@ for i=1:pp
 end
 
 
-%%%%%%%%%%%%%%  Calculation of the coefficients alpha for SSP-RK  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%  Calculation of the coefficients alpha for SSP-RK  %%%%%%%%%
 % 
 % alpha(1)=1;
 % 
@@ -70,7 +70,7 @@ end
 % end
 
 
-%%%%%%%%%%%%%%  RK Method for ODE   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%  RK Method for ODE   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 FS=zeros(nx,pp);
 FC=zeros(pp,1);
 TIME=0;

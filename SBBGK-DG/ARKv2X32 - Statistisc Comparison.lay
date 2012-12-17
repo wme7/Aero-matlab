@@ -1,9 +1,7 @@
 #!MC 1200
 # Created by Tecplot 360 build 12.2.0.9077
-$!VarSet |LFDSFN1| = '"..\SBBGK\SBBGK1dBEX100 P0RK4w10000IC1.plt"'
-$!VarSet |LFDSVL1| = '"x" "density" "velocity" "energy" "pressure" "temperature" "fugacity"'
-$!VarSet |LFDSFN2| = '"DG1DBEX32 P5RK4w1000iv80.plt"'
-$!VarSet |LFDSVL2| = '"x" "density" "velocity" "energy" "pressure" "temperature" "fugacity" "Velocity in x"'
+$!VarSet |LFDSFN1| = '"case.plt"'
+$!VarSet |LFDSVL1| = '"x" "Density" "Velocity in x" "Energy" "Pressure" "Temperature" "Fugacity"'
 $!SETSTYLEBASE FACTORY
 $!GLOBALLINKING 
   LINKCOLORMAPS = YES
@@ -893,17 +891,6 @@ $!READDATASET  '|LFDSFN1|'
   VARNAMELIST = '|LFDSVL1|'
 $!REMOVEVAR |LFDSVL1|
 $!REMOVEVAR |LFDSFN1|
-$!READDATASET  '|LFDSFN2|'
-  INITIALPLOTTYPE = XYLINE
-  INCLUDETEXT = NO
-  INCLUDEGEOM = NO
-  READDATAOPTION = APPEND
-  RESETSTYLE = NO
-  ASSIGNSTRANDIDS = YES
-  VARLOADMODE = BYNAME
-  VARNAMELIST = '|LFDSVL2|'
-$!REMOVEVAR |LFDSVL2|
-$!REMOVEVAR |LFDSFN2|
 $!FRAMELAYOUT 
   SHOWHEADER = NO
   HEADERCOLOR = RED
@@ -920,7 +907,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = XYLINE
 $!FRAMENAME  = 'Frame 001'
 $!DELETELINEMAPS 
-$!ACTIVELINEMAPS  =  [1,7]
+$!ACTIVELINEMAPS  =  [1]
 $!GLOBALLINEPLOT 
   DATALABELS
     {
@@ -935,15 +922,15 @@ $!GLOBALLINEPLOT
       }
     XYPOS
       {
-      X = 93.302
-      Y = 89.518
+      X = 45.808
+      Y = 40.682
       }
     }
 $!LINEMAP  [1]
-  NAME = 'BE - Direct Solver'
+  NAME = 'MB'
   ASSIGN
     {
-    ZONE = 390
+    ZONE = 1
     XAXISVAR = 1
     YAXISVAR = 2
     }
@@ -953,10 +940,6 @@ $!LINEMAP  [1]
     }
   SYMBOLS
     {
-    SYMBOLSHAPE
-      {
-      GEOMSHAPE = DEL
-      }
     COLOR = RED
     FILLCOLOR = RED
     SIZE = 1.5
@@ -971,7 +954,7 @@ $!LINEMAP  [1]
     COLOR = RED
     }
 $!LINEMAP  [2]
-  NAME = 'BE - Direct Solver'
+  NAME = 'MB'
   ASSIGN
     {
     ZONE = 1
@@ -980,12 +963,13 @@ $!LINEMAP  [2]
     }
   LINES
     {
-    COLOR = GREEN
+    COLOR = BLACK
     }
   SYMBOLS
     {
     COLOR = GREEN
     FILLCOLOR = GREEN
+    SIZE = 1.5
     }
   BARCHARTS
     {
@@ -997,7 +981,7 @@ $!LINEMAP  [2]
     COLOR = GREEN
     }
 $!LINEMAP  [3]
-  NAME = 'BE - Direct Solver'
+  NAME = 'MB'
   ASSIGN
     {
     ZONE = 1
@@ -1006,12 +990,13 @@ $!LINEMAP  [3]
     }
   LINES
     {
-    COLOR = BLUE
+    COLOR = BLACK
     }
   SYMBOLS
     {
     COLOR = BLUE
     FILLCOLOR = BLUE
+    SIZE = 1.5
     }
   BARCHARTS
     {
@@ -1023,7 +1008,7 @@ $!LINEMAP  [3]
     COLOR = BLUE
     }
 $!LINEMAP  [4]
-  NAME = 'BE - Direct Solver'
+  NAME = 'MB'
   ASSIGN
     {
     ZONE = 1
@@ -1032,12 +1017,13 @@ $!LINEMAP  [4]
     }
   LINES
     {
-    COLOR = CYAN
+    COLOR = BLACK
     }
   SYMBOLS
     {
     COLOR = CYAN
     FILLCOLOR = CYAN
+    SIZE = 1.5
     }
   BARCHARTS
     {
@@ -1049,7 +1035,7 @@ $!LINEMAP  [4]
     COLOR = CYAN
     }
 $!LINEMAP  [5]
-  NAME = 'BE - Direct Solver'
+  NAME = 'MB'
   ASSIGN
     {
     ZONE = 1
@@ -1058,12 +1044,13 @@ $!LINEMAP  [5]
     }
   LINES
     {
-    COLOR = YELLOW
+    COLOR = BLACK
     }
   SYMBOLS
     {
     COLOR = YELLOW
     FILLCOLOR = YELLOW
+    SIZE = 1.5
     }
   BARCHARTS
     {
@@ -1075,7 +1062,7 @@ $!LINEMAP  [5]
     COLOR = YELLOW
     }
 $!LINEMAP  [6]
-  NAME = 'BE - Direct Solver'
+  NAME = 'MB'
   ASSIGN
     {
     ZONE = 1
@@ -1084,52 +1071,22 @@ $!LINEMAP  [6]
     }
   LINES
     {
-    COLOR = PURPLE
-    }
-  SYMBOLS
-    {
-    COLOR = PURPLE
-    FILLCOLOR = PURPLE
-    }
-  BARCHARTS
-    {
-    COLOR = PURPLE
-    FILLCOLOR = PURPLE
-    }
-  ERRORBARS
-    {
-    COLOR = PURPLE
-    }
-$!LINEMAP  [7]
-  NAME = 'BE - DG1D ARK'
-  ASSIGN
-    {
-    ZONE = 391
-    XAXISVAR = 1
-    YAXISVAR = 2
-    }
-  LINES
-    {
     COLOR = BLACK
     }
   SYMBOLS
     {
-    SYMBOLSHAPE
-      {
-      GEOMSHAPE = CIRCLE
-      }
-    COLOR = CUSTOM3
-    FILLCOLOR = RED
+    COLOR = PURPLE
+    FILLCOLOR = PURPLE
     SIZE = 1.5
     }
   BARCHARTS
     {
-    COLOR = RED
-    FILLCOLOR = RED
+    COLOR = PURPLE
+    FILLCOLOR = PURPLE
     }
   ERRORBARS
     {
-    COLOR = RED
+    COLOR = PURPLE
     }
 $!XYLINEAXIS 
   DEPXTOYRATIO = 1

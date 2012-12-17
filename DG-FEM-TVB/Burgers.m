@@ -31,9 +31,9 @@ x_mid   = (x_min+x_max)/2.0;    % mid-point of spatial range
 
 % parameters for initial data
 
-%i_dat = 1;      % Gaussian
+i_dat = 1;      % Gaussian
 %i_dat = 2;      % slope
-i_dat = 3;      % triangle
+%i_dat = 3;      % triangle
 
 v_min = +0.20;  % maxium velocity
 v_max = +0.70;  % minimum velocity
@@ -114,7 +114,7 @@ while (age <= t_stop)
 
   % compute upwind fluxes at cell boundaries
 
-  for i=1:npt-1            
+  for i=1:npt-1 % cells boundaries = x_i's middle points           
     vp = 0.5 * ( v(i,n) + v(i+1,n) ); % average value
     if (vp > 0.0) % average value positive
       if (v(i,n) >= 0.0) 

@@ -25,7 +25,7 @@ rks       = 3;      % Time order of the Sheme/RK stages
 flux_type = 1;      % {1}Roe, {2}Global LF, {3}LLF
 cfl       = 0.3;    % Courant Number
 tEnd      = pi/15;  % Final Time for computation
-nx        = 9;     % Number of Cells/Elements
+nx        = 10;     % Number of Cells/Elements
 MM        = 0.01;   % TVB constant M
 IC_case   = 3;      % 4 cases are available
 plot_figs = 1;      % {1}Plot figures, {0}Do NOT plot figures
@@ -82,15 +82,15 @@ for l = 0:k             % For all degress of freedom
             D(i,j)=2;   % D or diffentiated Matrix
         end
     end
-    M(i,i) = (2*l+1)/2; % Inverser of Mass Matrix
+    M(i,i) = (2*l+1)/dx; % Inverser of Mass Matrix
     C(1,i) = (-1)^l;    % Legendre polynomials of deg 'l' evaluated at x=1
 end
 
 %% Plot u0
-if plot_figs == 1; plot(x,u0); axis tight; end;
+if plot_figs == 1; plot(x,u0); axis auto; grid on; end;
 
 % Pre-allocate math objects
-P = LegMat(k,xi);       % Legendre Matrix
+P = LegMat(k,xi);     % Legendre Vandermonde Matrix
 ut = zeros(np,nx);    % u degress of freedom
 St = zeros(np,nx);    % source degress of freedom
 Ft = zeros(np,nx);    % flux degress of freedom
@@ -111,7 +111,7 @@ n    = 0; % counter
 for l = 0:k             % for all degress of freedom
     i = l+1;            % Dummy index
     for j = 1:nx
-        ut(i,j) = M(i,i).*sum(w(:,j).*u(:,j).*P(:,i));
+        ut(i,j) = (2*l+1)/2*sum(w(:,j).*u(:,j).*P(:,i));
     end
 end
     
@@ -121,7 +121,7 @@ S  = u.^2;
 for l = 0:k             % for all degress of freedom
     i = l+1;            % Dummy index
     for j = 1:nx
-        St(i,j) = M(i,i).*sum(w(:,j).*S(:,j).*P(:,i));
+        St(i,j) = (2*l+1)/2.*sum(w(:,j).*S(:,j).*P(:,i));
     end
 end
 
@@ -131,7 +131,7 @@ Ft = zeros(np,nx);
 for l = 0:k             % for all degress of freedom
     i = l+1;            % Dummy index
     for j = 1:nx
-        Ft(i,j) = M(i,i).*sum(w(:,j).*F(:,j).*P(:,i));
+        Ft(i,j) = (2*l+1)/2.*sum(w(:,j).*F(:,j).*P(:,i));
     end
 end
 
@@ -151,4 +151,4 @@ u = (ut'*P')';
 %% Transform degress of freedom u(t)_{l,i} back to space-time values u(x,t)
 %u = (ut'*P')';
 figure
-plot(x,u); axis('tight');
+if plot_figs == 1; plot(x,u); axis tight; grid on; end;

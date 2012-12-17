@@ -2,19 +2,19 @@
 clc; clear all; close all; 
 
 if matlabpool('size') == 0 % checking to see if my pool is already open
-    matlabpool open 4
+    matlabpool open 2
 end
 
 %% Number of cases
 cases = 1:4;                    % Number of Cases to evaluate
 
 %% Common Parameters
-Nx          = 64;               % Number of elements
+Nx          = 32;               % Number of elements
 t_end       = 0.10;             % Final Time 
-P_deg       = 3;                % Polinomial Degree
+P_deg       = 4;                % Polinomial Degree
 Pp          = P_deg+1;          % Polinomials Points
 CFL         = 1/(2*P_deg+1);    % Courant Number 
-RK_stages   = 4;                % Number of RK stages
+RK_stages   = 6;                % Number of RK stages
 plot_fig    = 0;                % {1}: plot while computing, {0}: no plot
 theta       = 0;                % {-1} BE, {0} MB, {1} FD.
 iV          = 80;               % Space Velocity Points

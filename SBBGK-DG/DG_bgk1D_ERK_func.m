@@ -180,7 +180,7 @@ if bb==1
     drawnow
 end
 
-pause(0.2)
+%pause(0.2)
 
 A=zeros(pp,pp);
 b=zeros(1,pp);
