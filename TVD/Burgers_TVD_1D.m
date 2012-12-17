@@ -1,5 +1,5 @@
-%% 1D Conservation Laws Solver using TVD
-% Solving Invicid Burgers Equation
+%% 1D Conservation Laws Solver using Upwind
+% To solve Invicid Burgers Equation
 %
 % u_t + f(u) = 0
 %
@@ -11,30 +11,33 @@
 clear all; close all; clc;
 
 %% Parameters
-     dx = 0.01;     % Spatial step size
-    cfl = 0.8;      % Courant Number
- tStart = 0;        % Start time
-   tEnd = 1;      % End time
-IC_case = 3;        % {1} Gaussian, {2} Slope, {3} Triangle
-limiter = 1;        % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
+     dx = 0.01;  % Spatial step size
+    cfl = 0.80;  % Courant Number
+ tStart = 0.00;  % Start time
+   tEnd = 1.20;  % End time
+IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
+limiter = 1;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
+flxtype = 2;     % {1} Godunov, {2} Roe, {3} LF, {4} LLF, {5} Upwind
 
 %% Define our Flux function
-    f = @(w) w.^2/2;
+     f = @(w) w.^2/2;
+% and the Derivate of the flux function
+    df = @(w) w;
 
 %% Discretization of Domain
-      x = 1:dx:2;     % x grid
-      nx = length(x);  % number of points
+      x = 0:dx:2;     % x grid
+      nx = length(x); % number of points
 
 %% Initial Condition
 % NOTE: In IC function, we can control the initial max and min value of u. 
-     u0 = IC_iBurgers(x,3); 
+     u0 = IC_iBurgers(x,IC_case); 
 
 % Load initial time
     time = tStart;
      
 % Load Initial Condition
     u = u0;
-
+    
 %% Main Loop
 % Beause the max slope, f'(u) = u, is changing as the time steps progress
 % we cannot fix the size of the time steps. Therefore we need to recompute
@@ -44,46 +47,41 @@ limiter = 1;        % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 % Initialize vector variables 
 it_count = 0;           % Iteration counter
 u_next = zeros(1,nx);   % u in next time step
-Fr = zeros(1,nx);       % Right flux    
-Fl = zeros(1,nx);       % Left flux
-%u_mp = zeros(1:nx-1)   % u values at the cell boundaries
+h = zeros(1,nx);        % Flux values at the cell boundaries
 
 while time < tEnd
- 
-% Update time step
-    dt = cfl*dx/abs(max(u));    % time step size
-  dtdx = dt/dx;                 % precomputed to save some flops
-  time = time + dt;             % iteration actual time.
+    % Plot Evolution
+    plot(x,u); axis([x(1) x(end) min(u0)-0.1 max(u0)+0.1])
+    
+    % Update time step
+    dt   = cfl*dx/abs(max(u));  % time step size
+    dtdx = dt/dx;               % precomputed to save some flops
+    time = time + dt;           % iteration actual time.
 
     % Compute fluxes at cell boundaries (middle points x_i+1/2)
-    % Computing Flux to the Right: f(u_{i+1/2}) = 1/2(f(u_i)-f(u_i+1))
-        
-        u_mp = 1/2*(u(2:nx) - u(1:nx-1)); 
-    % Compute left and right flux for every i-cell
-    for i = 2:nx-1 % cells with two boundaries
-        if u(i) >= 0;
-            Fr(i) = f(u_mp(i));
-        else
-            Fr(i) = 0;
-        end
-        if u(i) < 0;
-            Fl(i) = f(u_mp(i-1));
-        else
-            Fl(i) = 0;
-        end
-    end
+    h = flux1d(f,df,u,flxtype);
     
     % Compute solution of next time step using Upwind
-    u_next = u - dtdx * (Fr - Fl);
+    for i = 2:nx-1
+    u_next(i) = u(i) - dtdx * (h(i) - h(i-1));
+    end
 
     % Periodic BC
-    u_next(1)  = u(1);   % left boundary condition (fixed value)
-    u_next(nx) = u(nx);  % right boundary condition (fixed value)
+    u_next(1)  = u(nx);   % left boundary condition (periodic)
+    u_next(2)  = u(1);    % left boundary condition (periodic)
+    u_next(nx) = u(nx-1); % right boundary condition (fixed value)
+    
+    % Dirichlet BC
+    %u_next(1)  = u(1);    % left boundary condition (fixed value)
+    %u_next(nx) = u(nx);   % right boundary condition (fixed value)
     
     % Update information
     u = u_next;
     
 % Counter
-it_count = it_count + 1;        % Update counter
-  
+it_count = it_count + 1; % Update counter
+
+% draw iteration
+drawnow
+
 end
