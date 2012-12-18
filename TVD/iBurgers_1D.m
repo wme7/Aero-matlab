@@ -1,9 +1,9 @@
 %% 1D Conservation Laws Solver using Upwind
 % To solve Invicid Burgers Equation
 %
-% u_t + f(u) = 0
+%   u_t + f(u) = 0
 %
-% Where: f(u) = u^2/2
+% where: f(u) = u^2/2
 % 
 % by Manuel Diaz, manuel.ade'at'gmail.com 
 % Institute of Applied Mechanics, 2012.12.17
@@ -17,7 +17,7 @@ clear all; close all; clc;
    tEnd = 1.20;  % End time
 IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
 limiter = 1;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
-flxtype = 2;     % {1} Godunov, {2} Roe, {3} LF, {4} LLF, {5} Upwind
+flxtype = 4;     % {1} Godunov, {2} Roe, {3} LF, {4} LLF, {5} Upwind
 
 %% Define our Flux function
      f = @(w) w.^2/2;
