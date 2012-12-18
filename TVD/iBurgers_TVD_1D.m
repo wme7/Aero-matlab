@@ -8,16 +8,16 @@
 % by Manuel Diaz, manuel.ade'at'gmail.com 
 % Institute of Applied Mechanics, 2012.12.17
 
-clear all; clc; close all;
+clear all; close all; clc;
 
 %% Parameters
      dx = 0.01;  % Spatial step size
     cfl = 0.80;  % Courant Number
  tStart = 0.00;  % Start time
-   tEnd = 1.20;  % End time
+   tEnd = 2.20;  % End time
 IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
 limiter = 1;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
-flxtype = 5;     % {1} Godunov, {2} Roe, {3} LF, {4} LLF, {5} Upwind
+flxtype = 4;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind
 
 %% Define our Flux function
      f = @(w) w.^2/2;
@@ -51,13 +51,19 @@ h = zeros(1,nx);        % Flux values at the cell boundaries
 
 while time < tEnd
     % Plot Evolution
-    plot(x,u); axis([x(1) x(end) min(u0)-0.1 max(u0)+0.1])
+    plot(x,u,'.'); axis([x(1) x(end) min(u0)-0.1 max(u0)+0.1])
     
     % Update time step
     dt   = cfl*dx/abs(max(u));  % time step size
     dtdx = dt/dx;               % precomputed to save some flops
     time = time + dt;           % iteration actual time.
 
+    % Compute the smoothness factors, r(j), from data, u(j).
+    [r] = theta1d(u,df(u));
+    
+    % Compute the Flux Limiter
+    [phi] = fluxlimiter1d(r,limiter);
+    
     % Compute fluxes at cell boundaries (middle points x_i+1/2)
     h = flux1d(f,df,u,flxtype);
     
@@ -72,10 +78,10 @@ while time < tEnd
     u_next(nx) = u(nx-1); % right boundary condition (fixed value)
     
     % Dirichlet BC
-    %u_next(1)  = u(1);    % left boundary condition (fixed value)
-    %u_next(nx) = u(nx);   % right boundary condition (fixed value)
+%     u_next(1)  = u(1);    % left boundary condition (fixed value)
+%     u_next(nx) = u(nx);   % right boundary condition (fixed value)
     
-    % Update information
+    % UPDATE Info
     u = u_next;
     
 % Counter

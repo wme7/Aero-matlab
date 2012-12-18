@@ -59,8 +59,8 @@ for k = t
     u_next = u - dtdx*(F_right - F_left);
         
     % BC
-    u_next(1) = u_next(2);
-    u_next(n) = u_next(n-1);
+    u_next(1) = u_next(2);   % left boundary condition (fixed flow value)
+    u_next(n) = u_next(n-1); % right boundary condition (fixed flow value)
     
     % UPDATE info
     u = u_next(1:n);
@@ -106,13 +106,13 @@ u_exact(x_1:x_2) = 2;
 %% Plot Results
 subplot(311);
 hold on
-plot(x,u_upwind,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([0.5,2.5]); title 'Double-Sided Upwind'; 
+plot(x,u_upwind,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); ylim([0.5,2.5]); title 'Double-Sided Upwind'; 
 hold off
 subplot(312);
 hold on
-plot(x,u_LW,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([0.5,2.5]); title 'Lax-wendroff';
+plot(x,u_LW,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); ylim([0.5,2.5]); title 'Lax-wendroff';
 hold off
 subplot(313);
 hold on
-plot(x,u,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([0.5,2.5]); title 'TVD';
+plot(x,u,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); ylim([0.5,2.5]); title 'TVD';
 hold off

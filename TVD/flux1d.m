@@ -20,7 +20,7 @@ switch strategy
             % if a >= b choose max f(u) of (a>u>b)
             if u(i) <= u(i+1)
                 h(i) = min(flux(i),flux(i+1));
-            elseif u(i+1) <= u(i)
+            else % u(i+1) <= u(i)
                 h(i) = max(flux(i),flux(i+1));
             end
         end
@@ -62,12 +62,16 @@ switch strategy
         
     case {5} % Simple Upwind
         
+    % For dflux is constant along the domain!
     % if dflux > 0, flux to the left, then h(a,b) = h(a)
     % if dflux > 0, flux to the left, then h(a,b) = h(b)
+    % We evaluate professor yang's strategy:
+    % % a = (a - |a|)/2
+    a = max(dflux - abs(dflux))/2; 
     for i = 1:nx-1 % for all middle points
-        if dflux(i) >= 0
+        if a == 0 % a > 0 
             h(i) = flux(i); % Flux to the left
-        elseif dflux(i) < 0
+        else % a < 0 
             h(i) = flux(i+1); % Flux to the right
         end
     end

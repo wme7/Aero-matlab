@@ -1,12 +1,8 @@
 clear all
 close all
-
 tic
-
 global A b c Pleg w wp NV nx p dx dt IT BC_type V VIS F gamma
 
-%GHNC        = 0;
-%CFL        = 0.9;
 OUTTIME     = 0.1;
 TAU			= 0.001% !RELAXATION TIME
 IT          = 0;
@@ -17,18 +13,14 @@ p  = 4;			%polinomial degree
 pp =p+1;
 stage=6;
 rk =stage;			%RK stage
-
 BC_type = 0; % 0 No-flux; -1: reflecting
 CFL=1/(2*p+1);
 ratio=0.2;
-
 % Filter Parameters
 filter_order=4;
 CutOff=1;
-
 % bb=0: No plot; 1 assume continuous; 2 interval-by-interval
 bb=0;
-
 coeffi_RK
 gamma=const_a_I(2,1);
 
@@ -693,21 +685,21 @@ if bb ~= 1
     t_plot=reshape(To',nx*pp,1);
     z_plot=reshape(Zo',nx*pp,1);    
     
-    figure(1)
-    plot(xo(1,:),Uo(1,:),'-');
-    hold on
-    for i=2:nx
-        plot(xo(i,:),Uo(i,:),'-');
-    end
-    axis([-0.2, 1.2, -0.5, .5]);
-    hold off
-    figure(2)
-    plot(xo(1,:),Ro(1,:),'-');
-    hold on
-    for i=2:nx
-        plot(xo(i,:),Ro(i,:),'-');
-    end
-    axis([-0.2, 1.2, 0.2, 1.2]);
-    hold off
+%     figure(1)
+%     plot(xo(1,:),Uo(1,:),'-');
+%     hold on
+%     for i=2:nx
+%         plot(xo(i,:),Uo(i,:),'-');
+%     end
+%     axis([-0.2, 1.2, -0.5, .5]);
+%     hold off
+%     figure(2)
+%     plot(xo(1,:),Ro(1,:),'-');
+%     hold on
+%     for i=2:nx
+%         plot(xo(i,:),Ro(i,:),'-');
+%     end
+%     axis([-0.2, 1.2, 0.2, 1.2]);
+%     hold off
 end
 toc

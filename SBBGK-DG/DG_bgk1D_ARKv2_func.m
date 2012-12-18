@@ -5,13 +5,14 @@ close all
 tic
 global A b c Pleg w wp NV nx p dx dt IT BC_type V VIS F gamma
 
+name = 'ARKMBX64 P4RKs6w1000iv80.plt';
 %GHNC       = 0;
 %CFL        = 0.9;
 OUTTIME     = 0.1;
 TAU			= 0.001 %!RELAXATION TIME
-IT          = -1;
+IT          = 0;
 %!maxwellian = 0., fermion = 1., boson = -1
-nx = 32; % number of elements
+nx = 64; % number of elements
 p  = 4;			%polinomial degree
 pp =p+1;
 stage=6;
@@ -76,8 +77,8 @@ for i=1:nx
     xo(i,:)=xi+LG_grids_o*dx/2;
 end
 
-
 % Initial State
+
 % Case 1
 RL=1.0;
 UL=0.75;
@@ -86,9 +87,7 @@ PL=1.0;
 ET=PL+0.5*RL*UL^2;
 TL=4*ET/RL-2*UL^2;
 ZL=RL/sqrt(pi*TL);
-%                         T(i,m)    = 4*ET(i,m)/R(i,m) - 2*U(i,m)^2;
-%                         Z(i,m)    = R(i,m) / sqrt(pi* T(i,m));
-%                         P(i,m) = ET(i,m) - 0.5 * R(i,m) * U(i,m)^2;
+
 RR=0.125;
 UR=0;
 PR=0.1;
@@ -98,18 +97,12 @@ TR=4*ET/RR-2*UR^2;
 ZR=RR/sqrt(pi*TR);
 
 % Case 2
-
 % UL  = 0.;
 % TL  = 4.38385;
 % ZL  = 0.2253353;
 % UR  = 0.;
 % TR  = 8.972544;
 % ZR  = 0.1204582;
-
-% Constant State
-% UR  = UL;
-% TR  = TL;
-% ZR  = ZL;
 
 %%%%%%%%%%%%%%  Transforming the initial condition to coefficients of Legendre Polinomials  %%%%%%%%%%%%%%%%%%%%
 for i=1:nx
@@ -690,22 +683,22 @@ if bb ~= 1
 %     t_plot=reshape(To',nx*pp,1);
 %     z_plot=reshape(Zo',nx*pp,1);    
     
-    figure(1)
-    plot(xo(1,:),Uo(1,:),'-');
-    hold on
-    for i=2:nx
-        plot(xo(i,:),Uo(i,:),'-');
-    end
-    axis([-0.2, 1.2, -0.5, .5]);
-    hold off
-    figure(2)
-    plot(xo(1,:),Ro(1,:),'-');
-    hold on
-    for i=2:nx
-        plot(xo(i,:),Ro(i,:),'-');
-    end
-    axis([-0.2, 1.2, 0.2, 1.2]);
-    hold off
+%     figure(1)
+%     plot(xo(1,:),Uo(1,:),'-');
+%     hold on
+%     for i=2:nx
+%         plot(xo(i,:),Uo(i,:),'-');
+%     end
+%     axis([-0.2, 1.2, -0.5, .5]);
+%     hold off
+%     figure(2)
+%     plot(xo(1,:),Ro(1,:),'-');
+%     hold on
+%     for i=2:nx
+%         plot(xo(i,:),Ro(i,:),'-');
+%     end
+%     axis([-0.2, 1.2, 0.2, 1.2]);
+%     hold off
 end
 toc
 
@@ -713,7 +706,7 @@ toc
 
     nx = length(x);
     % Open file
-    file = fopen('case.plt','w');
+    file = fopen(name,'w');
     % 'file' gets the handel for the file "case.plt".
     % 'w' specifies that it will be written.
     % similarly 'r' is for reading and 'a' for appending.
