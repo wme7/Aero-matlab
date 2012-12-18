@@ -17,7 +17,7 @@ clear all; close all; clc;
    tEnd = 2.20;  % End time
 IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
 limiter = 1;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
-flxtype = 4;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind
+flxtype = 3;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind <-non-conservative!
 
 %% Define our Flux function
      f = @(w) w.^2/2;
@@ -65,9 +65,9 @@ while time < tEnd
     [phi] = fluxlimiter1d(r,limiter);
     
     % Compute fluxes at cell boundaries (middle points x_i+1/2)
-    h = flux1d(f,df,u,flxtype);
+    h = GeneralTVDflux1d(f,df,u,dtdx,phi,flxtype);
     
-    % Compute solution of next time step using Upwind
+    % Compute solution of next time step using TVD Upwind
     for i = 2:nx-1
     u_next(i) = u(i) - dtdx * (h(i) - h(i-1));
     end

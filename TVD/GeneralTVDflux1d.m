@@ -30,8 +30,8 @@ switch strategy
     case{4} % Upwind Flux
 
         % For dflux is constant along the domain!
-        a_p = max(dflx - abs(dflx))/2 == []; % boolen operator for a>0
-        a_n = max(dflx + abs(dflx))/2 == []; % boolen operator for a<0
+        a_p = max(dflx - abs(dflx))/2 == [0]; % boolen operator for a>0
+        a_n = max(dflx + abs(dflx))/2 == [0]; % boolen operator for a<0
         h = a_p*flx(1:nx-1) + a_n*flx(2:nx);
 
     otherwise 
