@@ -1,4 +1,4 @@
-function h = generalflux(f,df,u,strategy)
+function h = Generalflux(f,df,u,strategy)
 % General flux subroutine 
 % We use 1 of 4 flux strategies/algorithms optimized for matlab.
 
@@ -30,8 +30,8 @@ switch strategy
     case{4} % Upwind Flux
 
         % For dflux is constant along the domain!
-        a_p = max(dflx - abs(dflx))/2 == []; % boolen operator for a>0
-        a_n = max(dflx + abs(dflx))/2 == []; % boolen operator for a<0
+        a_p = max(dflx - abs(dflx))/2 == [0]; %#ok<NBRAK> % boolen operator for a>0
+        a_n = max(dflx + abs(dflx))/2 == [0]; %#ok<NBRAK> % boolen operator for a<0
         h = a_p*flx(1:nx-1) + a_n*flx(2:nx);
 
     otherwise 

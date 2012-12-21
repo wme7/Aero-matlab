@@ -1,6 +1,3 @@
-%% Load Initial Condition, u(x,0) = u0
-u0 = u_zero(x,IC_case);
-
 % Plot u0
 %if plot_figs == 1; plot(x,u0); axis([0,2,0,1.2]); end;
 if plot_figs == 1; plot(x,u0); axis('tight'); end;

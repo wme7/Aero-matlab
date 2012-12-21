@@ -28,7 +28,7 @@ switch case_no
     case{2} % Square Jump IC
         for j = 1:n
             for i = 1:m
-                if (x(j,i)>0.4) && (x(j,i)<0.6)
+                if (x(j,i)>0.4) && (x(j,i)<=0.6)
                     u(j,i)=1;
                 else
                     u(j,i)=0;

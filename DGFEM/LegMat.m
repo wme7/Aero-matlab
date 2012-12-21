@@ -11,8 +11,8 @@ n = length(x); P = zeros(n,n);
 
 %% Evaluate sLegendre fucntion
 for l = 0:k         % all Polynomial Degrees up to k
+    j = l + 1;      % Dummy index
     for i = 1:n     % all Element Points in x
-        j = l + 1;  % Dummy index
         P(j,i) = legendreP(x(i),l);
     end
 end

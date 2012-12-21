@@ -8,14 +8,14 @@
 % by Manuel Diaz, manuel.ade'at'gmail.com 
 % Institute of Applied Mechanics, 2012.12.17
 
-clear all; close all; clc;
+clear all; clc; %close all;
 
 %% Parameters
      dx = 0.01;  % Spatial step size
     cfl = 0.80;  % Courant Number
  tStart = 0.00;  % Start time
-   tEnd = 2.20;  % End time
-IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
+   tEnd = 4.00;  % End time
+IC_case = 1;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
 limiter = 1;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 flxtype = 3;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind <-non-conservative!
 
