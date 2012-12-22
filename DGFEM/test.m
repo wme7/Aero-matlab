@@ -1,5 +1,5 @@
 % Simulate the eq: u_t+a u_x=u^2
-clear all
+clear all; close all; %clc;
 nx=10;			%discretization in space
 p=3;			%polinomial degree
 pp=p+1;
@@ -33,7 +33,7 @@ for i=1:nx
 end
 
 %% Just for testing the degrees of freedom computation
-y0 = (u*P)'
+y0 = (u*P)';
 xi = reshape(x,4,nx);
 plot(xi,y0);
 
@@ -41,7 +41,7 @@ plot(xi,y0);
 A=zeros(pp,pp);
 for i=1:pp
     for j=1:pp
-        if j>i& rem(j-i,2)==1
+        if j>i && rem(j-i,2)==1
             A(i,j)=2;
         end
     end
@@ -73,6 +73,7 @@ end
 
 u = F_ns(:,:,1);
 figure
-y1 = (u*P)'
+y1 = (u*P)';
 xi = reshape(x,4,nx);
-plot(xi,y1)
+subplot(2,1,1); plot(xi,y1,'o-'); title('y1')
+subplot(2,1,2); plot(xi,F_ns','o-'); title('F_{ns}')

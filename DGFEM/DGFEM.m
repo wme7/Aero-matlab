@@ -171,7 +171,7 @@ u = u0; %f = f0; s = s0;
 t = 0; % time
 n = 0; % counter
 residue = zeros(np,nx);
-while t < tEnd
+%while t < tEnd
     % Time step 'dt'
     u_reshaped = reshape(u,1,nx*np); 
     dt  = dx*cfl/max(abs(u_reshaped));
@@ -179,7 +179,7 @@ while t < tEnd
     n  = n + 1;    % update counter
     
     % Plot solution every time step
-    if plot_figs == 1; plot(x,u,'o-'); axis([0,1,-1.5,1.5]); end;
+    if plot_figs == 1; plot(x,u,'-'); axis([0,1,-1.5,1.5]); end;
     
     % Evaluate/update u, f and s terms on domain
     ut = V\u;
@@ -215,13 +215,12 @@ while t < tEnd
     % Transform degress u(t)_{l,i} into values u(x,t)
     u = (ut'*V')'; 
     
-end % time loop 
+%end % time loop 
 
 %% Examine Output
 if plot_figs == 1; 
 u = (ut'*V')'; % f = F(u); % s = S(u);
 figure
-    subplot(3,1,1); plot(x,u,'o-'); title('u'); axis tight;
-    subplot(3,1,2); plot(x,f,'o-'); title('f'); axis tight;
-    subplot(3,1,3); plot(x,s,'o-'); title('s'); axis tight;
+    subplot(2,1,1); plot(x,u,'o-'); title('u-final'); axis tight;
+    subplot(2,1,2); plot(x,residue,'o-'); title('residue'); axis tight;
 end;
