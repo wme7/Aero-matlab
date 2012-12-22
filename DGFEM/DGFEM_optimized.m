@@ -37,7 +37,7 @@ tEnd      = pi/15;  % Final Time for computation
 nx        = 10;     % Number of Cells/Elements
 MM        = 0.01;   % TVB constant M
 IC_case   = 3;      % 4 cases are available
-plot_figs = 0;      % {1}Plot figures, {0}Do NOT plot figures
+plot_figs = 1;      % {1}Plot figures, {0}Do NOT plot figures
 
 %% Define Grid Cell's (Global) nodes
 % Building nodes for cells/elements: 
@@ -147,35 +147,31 @@ ut_next = zeros(np,nx);
 % Contribution of fluxes at cell boundary See Ref. [4]
 un = (ut'*Ln)'; % u_{i+1/2}^(-) -> Right u
 up = (ut'*Lp)'; % u_{i-1/2}^(+) -> Left u
-ub = [up;un]; 
+ub = [up(2:nx);un(1:nx-1)]; 
 h = DGflux1d(F,dF,ub,flux_type); % Evaluate fluxes
 
-% u = (ut'*V')';
-u_reshaped = reshape(u,1,nx*np);
-% h_reshaped = Generalflux(F,dF,u_reshaped,flux_type);
-% h_reshaped = [h_reshaped,0]; % append '0' at the End
-% h = reshape(h_reshaped,np,nx);
-
 % time step
+u_reshaped = reshape(u,1,nx*np);
 dt  = dx*cfl/max(abs(u_reshaped));
 
+% Compute next time step
+for i = 2:nx-1
+ut_next(:,i) = ut(:,i) + dt*( D'*ft(:,i) - ... % Volume term
+                     h(i)*Ln + h(i-1)*Lp + ... % flux terms
+                       st(:,i) ).*diag(invM);  % Source term
+end
 
-
-
-
-% for i = 2:nx
-% ut_next(i,:) = ut + dt*( D'*ft(:,i) - ... % Volume term
-%                     h(:,i).*Ln + h(:,i-1).*Lp + ... % flux terms
-%                                   st(:,i) ).*diag(invM);  % Source term
-% end
-% 
-% % BC: Periodic
-% ut_next(1,:) = ut + dt*( D'*ft(:,1) - ... % Volume term
-%                     h(:,1).*Ln + h(:,nx).*Lp + ... % flux terms
-%                                   st(:,1) ).*diag(invM);  % Source term
+% BC: Periodic
+% ut_next(:,nx) = ut(:,i) + dt*( D'*ft(:,1) - ... % Volume term
+%                     h(nx-1).*Ln + h(nx).*Lp + ... % flux terms
+%                        st(:,1) ).*diag(invM);  % Source term
+%                    
+% ut_next(:,1) = ut(:,i) + dt*( D'*ft(:,1) - ... % Volume term
+%                     h(1).*Ln + h(nx).*Lp + ... % flux terms
+%                        st(:,1) ).*diag(invM);  % Source term
 
 % UPDATE info
-    ut = ut + ut_next;
+ut = ut + ut_next;
 
 %end % time loop
 
