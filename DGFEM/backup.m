@@ -19,3 +19,14 @@ end
 u = (ut'*P')';
 figure
 plot(x,u); axis('tight');
+
+Examine Output
+figure
+u = (ut'*V')';
+f = F(u);
+s = S(u);
+if plot_figs == 1;
+    subplot(1,3,1); plot(x,u); title('u'); axis tight;
+    subplot(1,3,2); plot(x,f); title('f'); axis tight;
+    subplot(1,3,3); plot(x,s); title('s'); axis tight;
+end;

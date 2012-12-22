@@ -32,7 +32,7 @@ quadn     = 3;      % element grid: {1}sLeg, {2}Lobatto, {3}Leg, {4}Radau
 rks       = 3;      % Time order of the Sheme/RK stages
 flux_type = 4;      % {1}Roe, {2}Global LF, {3}LLF, {4}Upwind (non-conservative)
 a         = 1.0;    % scalar advection speed
-cfl       = 0.3;    % Courant Number
+cfl       = 1/(2*k+1);    % Courant Number
 tEnd      = pi/15;  % Final Time for computation
 nx        = 10;     % Number of Cells/Elements
 MM        = 0.01;   % TVB constant M
@@ -45,14 +45,14 @@ x_left = 0; x_right = 1; dx = (x_right-x_left)/nx;
 x_nodes = x_left : dx : x_right; % cells nodes
 
 %% flux function
-%F = @(w) a * w;     % for Linear advection
-F = @(w) w.^2/2;    % for Invicid burger's eq.
+F = @(w) a * w;     % for Linear advection
+%F = @(w) w.^2/2;    % for Invicid burger's eq.
 % and derivate of the flux function
-%dF = @(w) a*(w./w);  % for Linear advection
-dF = @(w) w;        % for Invicid burger's eq.
+dF = @(w) a;        % for Linear advection
+%dF = @(w) w;        % for Invicid burger's eq.
 
 %% Source term fucntion
-S = @(u) u.^2;        % for Source Term
+S = @(w) w.^2;        % for Source Term
 
 %% SETUP
 % 1. Build Cells/Elements (Local) inner points (quadrature points).
@@ -116,13 +116,6 @@ u0 = u_zero(x,IC_case);
 f0 = F(u0);
 s0 = S(u0);
 
-% Plot IC
-if plot_figs == 1; 
-    subplot(1,3,1); plot(x,u0); title('u0'); axis tight;
-    subplot(1,3,2); plot(x,f0); title('f0'); axis tight;
-    subplot(1,3,3); plot(x,s0); title('s0'); axis tight; 
-end;
-
 %% Computing the evolution of the residue 'L(u)', du/dt = L(u) 
 % Load Initial conditions
 u = u0; f = f0; s = s0;
@@ -133,56 +126,30 @@ ft = V\f;
 st = V\s;
 
 % Set Initial time step
-time = 0; % time
-n    = 0; % counter
-ut_next = zeros(np,nx);
-%while time < tEnd
+t = 0; % time
+n = 0; % counter
+while t < tEnd
     dt = cfl*dx/max(max(abs(u)));   % dt, time step
-    time = time + dt;               % iteration time / increment time
-    n    = n + 1;                   % update counter
+    t  = t + dt;                    % iteration time / increment time
+    n  = n + 1;                     % update counter
 
-% Contribution of Volume Term. See Ref. [4]
-% v_term = D'*ft;
+    % Time step 'dt'
+    u = (ut'*V')'; % Transform degress u(t)_{l,i} into values u(x,t)
+    u_reshaped = reshape(u,1,nx*np);
+    dt  = dx*cfl/max(abs(u_reshaped));
+    
+    % Plot solution every time step
+    if plot_figs == 1; plot(x,u,'o-'); axis([0,1,-1.5,1.5]); end;
+    
+    % Compute next time step using TVD-RK3
+    ut_1 = ut + dt*AdvecResidual(ut,F,dF,S,Ln,Lp,V,D,M,flux_type);
+    ut_2 = 3/4*ut + 1/4*ut_1 + 1/4*dt*AdvecResidual(ut_1,F,dF,S,Ln,Lp,V,D,M,flux_type);
+    ut_next = 1/3*ut + 2/3*ut_2 + 2/3*dt*AdvecResidual(ut_2,F,dF,S,Ln,Lp,V,D,M,flux_type);
 
-% Contribution of fluxes at cell boundary See Ref. [4]
-un = (ut'*Ln)'; % u_{i+1/2}^(-) -> Right u
-up = (ut'*Lp)'; % u_{i-1/2}^(+) -> Left u
-ub = [up(2:nx);un(1:nx-1)]; 
-h = DGflux1d(F,dF,ub,flux_type); % Evaluate fluxes
+    % UPDATE info
+    ut = ut_next;
+    
+    % Update figure
+    drawnow
 
-% time step
-u_reshaped = reshape(u,1,nx*np);
-dt  = dx*cfl/max(abs(u_reshaped));
-
-% Compute next time step
-for i = 2:nx-1
-ut_next(:,i) = ut(:,i) + dt*( D'*ft(:,i) - ... % Volume term
-                     h(i)*Ln + h(i-1)*Lp + ... % flux terms
-                       st(:,i) ).*diag(invM);  % Source term
-end
-
-% BC: Periodic
-% ut_next(:,nx) = ut(:,i) + dt*( D'*ft(:,1) - ... % Volume term
-%                     h(nx-1).*Ln + h(nx).*Lp + ... % flux terms
-%                        st(:,1) ).*diag(invM);  % Source term
-%                    
-% ut_next(:,1) = ut(:,i) + dt*( D'*ft(:,1) - ... % Volume term
-%                     h(1).*Ln + h(nx).*Lp + ... % flux terms
-%                        st(:,1) ).*diag(invM);  % Source term
-
-% UPDATE info
-ut = ut + ut_next;
-
-%end % time loop
-
-%% Transform degress of freedom u(t)_{l,i} back to space-time values u(x,t)
-u = (ut'*V')';
-f = F(u);
-s = S(u);
-
-if plot_figs == 1; 
-figure
-    subplot(1,3,1); plot(x,u); title('u'); axis tight;
-    subplot(1,3,2); plot(x,f); title('f'); axis tight;
-    subplot(1,3,3); plot(x,s); title('s'); axis tight; 
-end;
+end % time loop

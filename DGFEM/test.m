@@ -3,7 +3,7 @@ clear all
 nx=10;			%discretization in space
 p=3;			%polinomial degree
 pp=p+1;
-stage=3;
+stage=1;
 rk=stage;		%RK order
 T=2;			%Time
 cfl=1/(2*p+1);
