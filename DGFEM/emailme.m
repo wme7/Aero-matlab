@@ -1,4 +1,4 @@
-function [] = finished(x)
+function [] = emailme(x)
 %% Send email message when simulation finish to my Gmail account
 % Based on:
 % http://obasic.net/how-to-send-e-mail-from-matlab
