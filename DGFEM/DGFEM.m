@@ -23,21 +23,26 @@
 % Coded by Manuel Diaz 2012.12.05
 
 %% Clear Work Space 
-clear all; close all; %clc;
-
+clear all; close all; clc;
+load volume.mat
+load source
+load mass
+load residual
+load fluxes
 %% Simulation Parameters
 k         = 3;      % Space order / Number of degress of freedom: 0 to k
 np        = k+1;    % Number of points per Cell/Element
 quadn     = 3;      % element grid: {1}sLeg, {2}Lobatto, {3}Leg, {4}Radau
 rks       = 3;      % Time order of the Sheme/RK stages
-flux_type = 4;      % {1}Roe, {2}Global LF, {3}LLF, {4}Upwind (non-conservative)
+flux_type = 3;      % {1}Roe, {2}Global LF, {3}LLF, {4}Upwind (non-conservative)
 a         = 1.0;    % scalar advection speed
 cfl       = 1/(2*k+1);    % Courant Number
-tEnd      = pi/15;  % Final Time for computation
-nx        = 10;     % Number of Cells/Elements
+tEnd      = 0.18;   % Final Time for computation
+nx        = 16;     % Number of Cells/Elements
 MM        = 0.01;   % TVB constant M
 IC_case   = 3;      % 4 cases are available
 plot_figs = 1;      % {1}Plot figures, {0}Do NOT plot figures
+w_output  = 0;      % Write output: {1} YES please!, {2} NO
 
 %% Define Grid Cell's (Global) nodes
 % Building nodes for cells/elements: 
@@ -45,14 +50,15 @@ x_left = 0; x_right = 1; dx = (x_right-x_left)/nx;
 x_nodes = x_left : dx : x_right; % cells nodes
 
 %% flux function
-F = @(w) a * w;     % for Linear advection
-%F = @(w) w.^2/2;    % for Invicid burger's eq.
+%F = @(w) a * w;             % for Linear advection
+F = @(w) w.^2/2;            % for Invicid burger's eq.
 % and derivate of the flux function
-dF = @(w) a;        % for Linear advection
-%dF = @(w) w;        % for Invicid burger's eq.
+%dF = @(w) a*ones(size(w));  % for Linear advection
+dF = @(w) w;                % for Invicid burger's eq.
 
 %% Source term fucntion
-S = @(w) w.^2;       % for Source Term
+%S = @(w) w.^2;              % for Source Term
+S = @(w) zeros(size(w));    % for Source Term
 
 %% SETUP
 % 1. Build Cells/Elements (Local) inner points (quadrature points).
@@ -125,7 +131,9 @@ u0 = u_zero(x,IC_case);
 
 %% Computing the Evolution of the residue 'L', du/dt = L(u) 
 % Load Initial conditions
-u = u0; %f = f0; s = s0;
+u = u0; ut = V\u;
+%f = f0; 
+%s = s0;
 
 % transform u(x,t) to degress of freedom u(t)_{l,i} for each i-Cell/Element
 % ut = zeros(np,nx);
@@ -171,7 +179,7 @@ u = u0; %f = f0; s = s0;
 t = 0; % time
 n = 0; % counter
 residue = zeros(np,nx);
-%while t < tEnd
+while t < tEnd
     % Time step 'dt'
     u_reshaped = reshape(u,1,nx*np); 
     dt  = dx*cfl/max(abs(u_reshaped));
@@ -179,30 +187,49 @@ residue = zeros(np,nx);
     n  = n + 1;    % update counter
     
     % Plot solution every time step
-    if plot_figs == 1; plot(x,u,'-'); axis([0,1,-1.5,1.5]); end;
+    if plot_figs == 1; plot(x,u,'o-'); axis([0,1,-1.5,1.5]); end;
     
-    % Evaluate/update u, f and s terms on domain
-    ut = V\u;
+    % Evaluate/update f and s terms on domain
     f = F(u); ft = V\f;
-    s = S(u); st = V\s;
+    s = S(u); %st = V\s;
     
-    % Compute fluxes
-    un = (ut'*Ln)'; % u_{i+1/2}^(-) -> Right u
+    % transform s(x,t) to degress of freedom s(t)_{l,i} for each i-Cell/Element
+    st = zeros(np,nx);
+    for l = 0:k             % for all degress of freedom
+        i = l+1;            % Dummy index
+        for j = 1:nx
+            %st(i,j) = (2*l+1)/2.*sum(w(:,j).*s(:,j).*V(:,i));
+            st(i,j) = dx/2*sum(w(:,j).*s(:,j).*V(:,i));
+        end
+    end
+    
+    % Compute fluxes - Inner cells boundaries
     up = (ut'*Lp)'; % u_{i-1/2}^(+) -> Left u
-    ub = [up(2:nx);un(1:nx-1)];
-    h  = DGflux1d(F,dF,ub,flux_type); % Evaluate fluxes
-     
-    % BCs Periodic BC assuming element 1 and nx are ghost cells.
-    ut(:,1)  = ut(:,nx-1);
-    ut(:,nx) = ut(:,2);
+    un = (ut'*Ln)'; % u_{i+1/2}^(-) -> Right u
+    uc = [un(1:nx-1);up(2:nx)];
+    h  = DGflux1d(F,dF,uc,flux_type); % Evaluate fluxes
+    
+    % Compute fluxes for periodic BC - boundary cells
+    ub = [un(nx);up(1)];
+    hb = DGflux1d(F,dF,ub,flux_type);
+    
+    % Periodic BC - cell#1
+         residue(:,1) = ( D'*ft(:,1) - ...          % Volume term
+                        h(1)*Ln + hb*Lp + ...       % flux terms
+                        st(:,1) ).*diag(invM);      % Source term
     
     % Compute residue function:
     for i = 2:nx-1
-        residue(:,i) = ( D'*ft(:,i) - ...          % Volume term
-                        h(i)*Ln + h(i-1)*Lp + ...  % flux terms
-                        st(:,i) ).*diag(M);        % Source term
+        residue(:,i) = ( D'*ft(:,i) - ...           % Volume term
+                        h(i)*Ln + h(i-1)*Lp + ...   % flux terms
+                        st(:,i) ).*diag(invM);      % Source term
     end
-     
+    
+    % Periodic BC - cell#nx
+        residue(:,nx) = ( D'*ft(:,nx) - ...         % Volume term
+                        hb*Ln + h(nx-1)*Lp + ...    % flux terms
+                        st(:,nx) ).*diag(invM);     % Source term
+    
     % Compute next time step
     ut_next = ut + dt*residue;
 
@@ -215,10 +242,10 @@ residue = zeros(np,nx);
     % Transform degress u(t)_{l,i} into values u(x,t)
     u = (ut'*V')'; 
     
-%end % time loop 
+end % time loop 
 
 %% Examine Output
-if plot_figs == 1; 
+if w_output == 1; 
 u = (ut'*V')'; % f = F(u); % s = S(u);
 figure
     subplot(2,1,1); plot(x,u,'o-'); title('u-final'); axis tight;
