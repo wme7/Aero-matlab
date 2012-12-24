@@ -1,4 +1,4 @@
-function residue = AdvecResidual(ut,F,dF,S,Ln,Lp,V,D,invM,flux_type)
+function residue = AdvecResidue(ut,F,dF,S,Ln,Lp,V,D,invM,flux_type)
 % Parameters
 [np,nx] = size(ut);
 
