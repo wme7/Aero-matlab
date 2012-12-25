@@ -176,8 +176,9 @@ while t < tEnd
             ut_next = 1/3*ut + 2/3*ut_2 + 2/3*dt*AdvecResidue(ut_2 ...
                 ,F,dF,S,Ln,Lp,V,D,invM,flux_type);
             
-        case{4} % 6 stages ARK4 
+        case{4} % 4th-Order, 6-Stages ARK 
             % coming soon ...
+            
             
         otherwise
             error ('scheme not defined')
