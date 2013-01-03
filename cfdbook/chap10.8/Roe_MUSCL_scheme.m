@@ -22,7 +22,7 @@ global  PRL  CRL MACHLEFT  gamma  pleft  pright  rholeft  rhoright  uleft...
 
 		% .....................Input............................
 gamma = 1.4; 	% Ratio of specific heats
-J = 48;		% Number of grid cells
+J = 100; %48;		% Number of grid cells
 invariants = 0;	% Enter 0 for extrapolation of primitive variables or
 		%   something else for extrapolation of Riemann invariants 
 limtype = 2;	% Enter 1 for minmod or 2 for van Albada or something else

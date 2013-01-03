@@ -34,14 +34,14 @@ n = floor(tend/dt);	% Number of time-steps
 % grid   |---o---|---o---|---o---  ...  --|---o---|
 %            1   1   2   2   3           J-1  J  
 
-xcenter = h*[1:J] - h/2;		% Location of cell centers
+xcenter = h*(1:J) - h/2;		% Location of cell centers
 
 press = zeros(size(xcenter));		% Preallocation of pressure,  
 rhoold = press; uold = press;		%      density and velocity
 
 for j = 1:length(xcenter)		% Initial conditions
   if xcenter(j) < 0.5, press(j) = pleft; rhoold(j) = rholeft;  uold(j) = uleft; 
-  else,		      press(j) = pright; rhoold(j) = rhoright; uold(j) = uright;
+  else		      press(j) = pright; rhoold(j) = rhoright; uold(j) = uright;
   end 
 end
 
