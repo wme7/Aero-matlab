@@ -1,0 +1,9 @@
+This directory contains Matlab software for:
+
+Dissipation and dispersion plot for Lax-wendroff scheme:
+Lax_Wendroff_dispersion.m
+
+Dissipation and dispersion plot for kappa scheme:
+kappa_scheme_dispersion.m
+
+Documentation is in the programs.

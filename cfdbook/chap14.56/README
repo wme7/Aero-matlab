@@ -1,0 +1,6 @@
+This directory contains Matlab software for solving the one-dimensional
+Euler equations with two staggered schemes.
+The main programs are:
+staggered_compressible_scheme.m
+staggered_unified_scheme.m
+Documentation is in the programs

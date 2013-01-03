@@ -1,0 +1,4 @@
+This directory contains Matlab software for the numerical solution of a 2-D 
+singular perturbation problem for the stationary convection-diffusion equation.
+The main program is:scheme.m
+Documentation is in the program

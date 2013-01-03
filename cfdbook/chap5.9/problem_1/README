@@ -1,0 +1,7 @@
+This directory contains Matlab software for the numerical solution of the
+one-dimensional nonstationary convection-diffusion equations with various 
+boundary conditions.
+
+The main programs are: smoothscheme.m, periodic.m
+
+Documentation is in the programs.

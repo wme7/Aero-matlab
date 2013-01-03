@@ -23,14 +23,14 @@ clear all; close all; clc
 
 %% Parameters
 cfl      = 0.1;     % courant number
-nx       = 10;      % number of cells
+nx       = 80;      % number of cells
 n        = nx-1;    % number of nodes at boundary
 tEnd     = 0.2;    % final time to compute
 plot_fig = 1;       % {1} plot figures, {2} do NOT plot figures
 
 %% Physical Constanst
 gamma = 1.4; 
-Cv = 1.01;
+Cv = 0.714;
 Cp = gamma*Cv;
 R_gas = 8.314;
 
@@ -59,7 +59,7 @@ for i = 1:nx %for all cells
         p(i) = p0(2);
     end
 end
-% Specific internal energy of the initial condition
+% energy of the initial condition
 e = p./((gamma-1).*r);
 
 % Exact speed of sound
@@ -70,7 +70,7 @@ lambda(1,:) = u - a;
 lambda(2,:) = u;
 lambda(3,:) = u + a;
 
-% Use the exact eigenvalues to compute initial time step 'dt'.
+% Use exact eigenvalues to compute initial time step 'dt'.
 lambda_bar = lambda;
 
 t = 0;  % time 
@@ -91,11 +91,16 @@ while t < tEnd
         subplot(2,2,4); plot(x,e,'.'); axis tight; title('Internal Energy');
     end
         
-    % Energy
-    e = p./((gamma-1).*r);
-    % Total specific Energy
+    % Internal Energy
+    e = p./((gamma-1)*r);
+    % Total energy 
     E = e.*r + (u.^2).*r/2;
-       
+          
+%     % Specific Enthalpy
+%     h = e + p./r;
+%     % Total Entalpy per unit volume
+%     H = h + (u.^2)/2;
+    
     % Specific Entalpy
     h = e - u.^2/2;
     % Total Entalpy
@@ -103,13 +108,13 @@ while t < tEnd
     
     % Build vector U and dU, and F
     % Define:
-    L = 1:nx-1; R = 2:nx; % inner nodes / middle points
-    % U = [U1 U2 U3]' % defined at every cell
+    L = 1:nx-1; R = 2:nx; % inner nodes
+    % U = [u1 u2 u3]' % defined at every cell
     U = [r; r.*u; r.*E];
     % dU = U(R)-U(L) at the cell boundaries ( x_{i+1/2} )
     dU = U(:,R)-U(:,L);
-    % F = [F1 F2 F3]' % defined at every cell
-    F = [r.*u; r.*u.^2+p; u.*(E+p)]; 
+    % F = [u1 u2 u3]' % defined at every cell
+    F = [r.*u; r.*u.^2+p; u.*(E+p)];
     
     % Compute Roe Averged values:
     % Velovity 'u'
@@ -121,7 +126,7 @@ while t < tEnd
     % Sound Speed 'a'
     a_bar = sqrt((gamma-1)*(H_bar-1/2*u_bar.^2));
     
-    % Eigenvalues of A_bar are (same as the original A mat)
+    % Eigenvalues of A_bar are (same as the orginal A mat)
     lambda_bar(1,:) = u_bar - a_bar;
     lambda_bar(2,:) = u_bar;
     lambda_bar(3,:) = u_bar + a_bar;
@@ -149,7 +154,7 @@ while t < tEnd
     lambda3_bar = repmat(lambda_bar(3,:),3,1);
     
     % compute flux in cells boundaries
-    Flux = 1/2*(FL+FR)-1/2*(alpha1_bar.*abs(lambda1_bar).*k1_bar + ...
+    Flux = (1/2)*(FL+FR) - (1/2)*(alpha1_bar.*abs(lambda1_bar).*k1_bar + ...
                             alpha2_bar.*abs(lambda2_bar).*k2_bar + ...
                             alpha3_bar.*abs(lambda3_bar).*k3_bar );
     
@@ -159,15 +164,15 @@ while t < tEnd
     end
     
     % BCs
-    U_next(:,1) = U(:,2); % Neumann condition to the left
-    U_next(:,nx) = U(:,nx-1); % Neumann condition to the right
+    U_next(:,1) = U(:,2); % Neumann condition at the left
+    U_next(:,nx) = U(:,nx-1); % Neumann condition at the right
      
     % Compute Variables of new time step
     r_next = U_next(1,:);               % Density
     u_next = U_next(2,:)./U_next(1,:);  % Velocity
     E_next = U_next(3,:);%./U_next(1,:);  % Total Energy
-    e_next = E_next./r - u_next.^2/2;   % Specific internal energy
-    p_next = (gamma-1).*e_next.*r_next; % pressure
+    e_next = E_next./r - u_next.^2/2;    % specific internal energy
+    p_next = (gamma-1).*e_next.*r_next;      % pressure
     
     % Update info
     r = r_next;
@@ -177,5 +182,8 @@ while t < tEnd
     
     % plot
     drawnow
+    
+    % no necesary
+%      pause(1) % pause for 1 sec
 
 end

@@ -1,0 +1,7 @@
+This directory contains Matlab software for solving the one-dimensional
+Euler equations with three schemes.
+The main programs are:
+Liou_Steffen_MUSCL_scheme.m
+Osher_MUSCL_scheme.m
+Roe_MUSCL_scheme.m
+Documentation is in the programs

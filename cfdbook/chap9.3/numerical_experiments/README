@@ -1,0 +1,8 @@
+This directory contains Matlab software for the numerical solution of the
+one-dimensional convection equation with two schemes.
+
+Main programs:
+Lax_Wendroff_scheme.m
+kappa_scheme.m
+
+Documentation is in the programs.

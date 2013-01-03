@@ -1,0 +1,6 @@
+This directory contains Matlab software for computing the stability domain
+of the SHK Runge-Kutta scheme.
+
+The main program is stability_domain.m
+
+Documentation is in the program.

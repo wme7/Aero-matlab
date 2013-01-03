@@ -29,12 +29,12 @@ clear all; close all; clc;
 k         = 4;      % Space order / Number of degress of freedom: 0 to k
 np        = k+1;    % Number of points per Cell/Element
 quadn     = 3;      % element grid: {1}sLeg, {2}Lobatto, {3}Leg, {4}Radau
-flux_type = 1;      % {1}Roe, {2}Global LF, {3}LLF, {4}Upwind (non-conservative)
-equation  = 2;      % {1} scalar advection, {2} burgers equation
+flux_type = 4;      % {1}Roe, {2}Global LF, {3}LLF, {4}Upwind (non-conservative)
+equation  = 1;      % {1} scalar advection, {2} burgers equation
 include_s = 1;      % {1} include source term, {0} do NOT include source term 
-a         = -1.0;   % for scalar advection speed
+a         = 1.00;   % for scalar advection speed
 cfl       = 1/(2*k+1);    % Courant Number
-tEnd      = 0.18;   % Final Time for computation
+tEnd      = 1.60;   % Final Time for computation
 nx        = 10;     % Number of Cells/Elements
 MM        = 0.01;   % TVB constant M
 IC_case   = 3;      % {1} Gaussian , {2} Square, {3} sine, {4} Riemann.
@@ -48,11 +48,11 @@ x_nodes = x_left : dx : x_right; % cells nodes
 
 %% flux function
 switch equation
-    case{1} % Scalar advection Eq.
+    case{1} % Scalar advection Eq. flux:
         F  = @(w) a * w;
         % and derivate of the flux function
         dF = @(w) a*ones(size(w));
-    case{2} % Invicied Burgers Eq.
+    case{2} % Invicied Burgers Eq. flux:
         F  = @(w) w.^2/2;
         % and derivate of the flux function
         dF = @(w) w;

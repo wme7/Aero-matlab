@@ -1,0 +1,4 @@
+This directory contains an incompressible Navier-Stokes solver using a staggered
+scheme on a nonuniform Cartesian grid, in Matlab.
+The main program is ns1.m
+Documentation is provided in the program files. 

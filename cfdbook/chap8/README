@@ -1,0 +1,6 @@
+This directory contains Matlab software for the numerical solution of the
+one-dimensional shallow water equations.
+
+The main program is: exercise_823.m
+
+Documentation is in the program.

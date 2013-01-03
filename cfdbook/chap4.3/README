@@ -1,0 +1,5 @@
+This directory contains Matlab software for solving the one-dimensional
+convection-diffusion equation. 
+The main program is:
+convection_diffusion.m
+Documentation is in the program

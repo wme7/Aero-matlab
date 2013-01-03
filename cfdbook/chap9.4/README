@@ -1,0 +1,11 @@
+This directory contains Matlab software for:
+
+The numerical solution of the Burgers equation: Burgers_equation.m
+
+Illustration of application of Oleinik's entropy condition: Oleinik.m
+
+Solution of Riemann problem for Buckley-Leverett equation: Riemann.m
+ 
+Making graph of Buckley-Leverett flux function: fluxgraph.m
+
+Documentation is in the programs.

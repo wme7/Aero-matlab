@@ -1,0 +1,6 @@
+This directory contains Matlab software for solving the one-dimensional
+Euler equations with a number of schemes.
+The main programs are:
+AUSM_scheme.m     Osher_H_scheme.m   Riemann_Osher.m  Haenel_scheme.m   
+Osher_O_scheme.m*  Roe_scheme.m     van_Leer_scheme.m Jameson_scheme.m
+Documentation is in the programs

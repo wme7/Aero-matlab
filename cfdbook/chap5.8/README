@@ -1,0 +1,8 @@
+This directory contains Matlab software for computing the stability domain
+for a number of time-stepping schemes.
+The main programs are:
+Adams_Bashforth_2.m               Adams_Bashforth_Euler.m  
+Adams_Bashforth_3.m               BDF2.m                   
+Adams_Bashforth_Crank_Nicolson.m  Extrapolated_BDF.m       
+
+Documentation is in the programs.
