@@ -1,5 +1,3 @@
-(* ::Package:: *)
-
 %**************************************************************************
 %* Roe's Approximate 1D Riemann Solver
 %**************************************************************************
@@ -25,9 +23,11 @@ clear all; clc; % close all;
 
 %% Parameters
 cfl      = 0.9;     % courant number
-nx       = 50;      % number of cells
-tEnd     = 0.17;    % final time to compute
-dtdx     = 0.35;    % dt/dx (fixed for testing)
+nx       = 40;      % number of cells
+mx       = nx+1;    % number of nodes
+ICx      = 1;       % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
+tEnd     = 0.15;    % final time to compute
+dtdx     = 0.02;    % dt/dx (fixed for testing)
 etpfix   = 0.5;		% {#} Harten's sonic entropy fix value, {0} no entropy fix
 plot_fig = 1;       % {1} plot figures, {0} do NOT plot figures
 wrt_sol  = 0;       % {1} write solution, {0} do NOT write solution file
@@ -36,34 +36,17 @@ wrt_sol  = 0;       % {1} write solution, {0} do NOT write solution file
 gamma = 1.4;        % Ratio of specific heats
 
 %% Domain
-dx = (1-0)/nx;      % Cell size
-x = dx/2:dx:1-dx/2; % Cell centers
+xn = linspace(0,1,mx);          % cells nodes
+dx = max(xn(2:mx)-xn(1:mx-1));  % Cell size
+x  = xn(1:mx-1)+dx/2;        	% Cell centers
 
 %% Time 
 dt = dtdx*dx;       % time step
-t = 0:dt:tEnd;
+t  = 0:dt:tEnd;
 
 %% IC for Euler Riemann solver
-% Sod's Problem
-% x = [xL , xR  ];
-r0 = [1.00 , 0.125]; 
-u0 = [0.75 , 0    ];
-p0 = [1.00 , 0.100];
+[r,u,p]=Euler_IC1d(x,ICx);
 
-% Pre-Allocate variables
-r = zeros(1,nx); u = zeros(1,nx); p = zeros(1,nx);
-
-for i = 1:nx % for all cells 
-    if x(i) < 0.5
-        r(i) = r0(1); 
-        u(i) = u0(1);
-        p(i) = p0(1);
-    else
-        r(i) = r0(2);
-        u(i) = u0(2);
-        p(i) = p0(2);
-    end
-end
 % Specific internal energy of the IC
 e_s = p./((gamma-1).*r);
 % Internal energy of the IC : e = e_s*rho
@@ -73,7 +56,7 @@ E = e + 1/2*r.*u.^2;
 % Total Enthalpy: H = g/(g-1)p/rho + 1/2 u^2
 H = gamma/(gamma-1)*p./r + u.^2/2;
 
-% Left and right conditions for Dirichlet BC's
+%% Left and right conditions for Dirichlet BC's
     r_left  = r(1);  % r_left
     r_right = r(nx); % r_right
     u_left  = u(1);  % u_left
@@ -168,7 +151,7 @@ for time = t;
     E_next = U_next(3,:);               % Total Energy
     p_next = (gamma-1).*(E_next-r_next.*u_next.^2/2);  % Pressure
     e_next = 1/(gamma-1)*(p_next./r_next);      % Internal Energy
-    a_bar _next = sqrt(gamma*p_next./r_next);    % sound speed
+    a_bar_next = sqrt(gamma*p_next./r_next);    % sound speed
     m_next = u_next./a_bar_next;        % Mach 
     s_next = log(p_next./r_next.^gamma);% Entropy
     H_next = (E_next + p_next)./r_next; % Enthalpy
@@ -200,10 +183,10 @@ end
 
 %% Write Results
 if wrt_sol == 1;
-    subplot(2,3,1); plot(x,r,'o'); title('Density');
-    subplot(2,3,2); plot(x,u,'o'); title('Velocity');
+    subplot(2,3,1); plot(x,r,'o'); title('Velocity');
     subplot(2,3,3); plot(x,p,'o'); title('Pressure');
     subplot(2,3,4); plot(x,m,'o'); title('Mach number');
     subplot(2,3,5); plot(x,s,'o'); title('Entropy');
-    subplot(2,3,6); plot(x,e,'o'); title('Internal Energy');
+    subplot(2,3,6); plot(x,e,'o'); title('IntDensity');
+    subplot(2,3,2); plot(x,u,'o'); title('ernal Energy');
 end
