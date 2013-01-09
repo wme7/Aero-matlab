@@ -11,13 +11,13 @@ clc;  clear all;  close all;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
-CFL         = 0.05;      % CFL condition
+CFL         = 0.05;     % CFL condition
 r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.1;      % End time
 theta       = 1;        % {-1} BE, {0} MB, {1} FD.
 quad        = 2;        % for NC = 1 , GH = 2
 method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
-IC_case     = 1;        % Reimann IC cases available :{1,2,3,4,5,6,7}
+IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
 plot_figs   = 0;        % 0: no, 1: yes please!
 write_ans   = 1;        % 0: no, 1: yes please!
 % Using DG
@@ -35,14 +35,14 @@ dx  = max(x(2:end)-x(1:end-1)); % delta x
 [ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,r_time,IC_case);
 
 %% Open a Files to store the Results
-file = fopen(IDn,'w');
-% 'file' gets the handel for the file "case.plt".
-% 'w' specifies that it will be written.
-% similarly 'r' is for reading and 'a' for appending.
-
-fprintf(file, 'TITLE = "%s"\n',ID);
-fprintf(file, 'VARIABLES = "x" "density" "velocity" "energy" "pressure" "temperature" "fugacity"\n');
-
+if write_ans == 1
+    file = fopen(IDn,'w');
+    % 'file' gets the handel for the file "case.plt".
+    % 'w' specifies that it will be written.
+    % similarly 'r' is for reading and 'a' for appending.
+    fprintf(file, 'TITLE = "%s"\n',ID);
+    fprintf(file, 'VARIABLES = "x" "density" "velocity" "energy" "pressure" "temperature" "fugacity"\n');
+end
 %% Microscopic Velocity Discretization (using Discrete Ordinate Method)
 % that is to make coincide discrete values of microscopic velocities with
 % values as the value points for using a quadrature method, so that we can
@@ -59,7 +59,7 @@ switch quad
     nv = 60;          % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;            % quadrature constant.
-    w = w.*exp(v.^2); % weighting fucntion of the Gauss-Hermite quadrature
+    w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature
     
     otherwise
         error('Order must be between 1 and 2');
@@ -79,7 +79,7 @@ nv = length(v);
 
 %% Initial Conditions
 % Load Macroscopic Velocity, Temperature and Fugacity
-    [r0,u0,t0] = reimann_IC1d(x,IC_case);
+    [r0,u0,t0] = SSBGK_IC1d(x,IC_case);
     
 % Using Discrete Ordinate Method:
     r = repmat(r0,nv,1); ux = repmat(u0,nv,1); t = repmat(t0,nv,1);

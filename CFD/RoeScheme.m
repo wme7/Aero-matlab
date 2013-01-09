@@ -22,18 +22,18 @@
 clear all; clc; % close all;
 
 %% Parameters
-cfl      = 0.9;     % courant number
+cfl      = 0.3;     % courant number
 nx       = 40;      % number of cells
 mx       = nx+1;    % number of nodes
 ICx      = 1;       % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-tEnd     = 0.15;    % final time to compute
-dtdx     = 0.02;    % dt/dx (fixed for testing)
-etpfix   = 0.5;		% {#} Harten's sonic entropy fix value, {0} no entropy fix
+tEnd     = 0.10;    % final time to compute
+dtdx     = 0.30;    % dt/dx (fixed for testing)
+etpfix   = 0.90;	% {#} Harten's sonic entropy fix value, {0} no entropy fix
 plot_fig = 1;       % {1} plot figures, {0} do NOT plot figures
-wrt_sol  = 0;       % {1} write solution, {0} do NOT write solution file
+wrt_sol  = 1;       % {1} write solution, {0} do NOT write solution file
 
 %% Physical Constanst
-gamma = 1.4;        % Ratio of specific heats
+gamma = 2.5; %1.4;        % Ratio of specific heats
 
 %% Domain
 xn = linspace(0,1,mx);          % cells nodes
@@ -55,6 +55,10 @@ e = p./(gamma-1);
 E = e + 1/2*r.*u.^2;
 % Total Enthalpy: H = g/(g-1)p/rho + 1/2 u^2
 H = gamma/(gamma-1)*p./r + u.^2/2;
+
+%% Exact Riemann Solution
+[xx,rhoexact,uexact,pexact,machexact,entroexact,energexact] = ...
+    Exact_Riemann(r(1),u(1),p(1),r(nx),u(nx),p(nx),tEnd);
 
 %% Left and right conditions for Dirichlet BC's
     r_left  = r(1);  % r_left
@@ -171,22 +175,29 @@ for time = t;
     
     % Plot figure
     if plot_fig == 1;
-        subplot(2,3,1); plot(x,r,'o'); title('Density');
-        subplot(2,3,2); plot(x,u,'o'); title('Velocity');
+        subplot(2,3,1); plot(x,r,'o'); title('Velocity');
+        subplot(2,3,2); plot(x,u,'o'); title('ernal Energy');
         subplot(2,3,3); plot(x,p,'o'); title('Pressure');
         subplot(2,3,4); plot(x,m,'o'); title('Mach number');
         subplot(2,3,5); plot(x,s,'o'); title('Entropy');
-        subplot(2,3,6); plot(x,e,'o'); title('Internal Energy');
+        subplot(2,3,6); plot(x,e,'o'); title('IntDensity');
     end
     drawnow
 end
 
 %% Write Results
 if wrt_sol == 1;
-    subplot(2,3,1); plot(x,r,'o'); title('Velocity');
-    subplot(2,3,3); plot(x,p,'o'); title('Pressure');
-    subplot(2,3,4); plot(x,m,'o'); title('Mach number');
-    subplot(2,3,5); plot(x,s,'o'); title('Entropy');
-    subplot(2,3,6); plot(x,e,'o'); title('IntDensity');
-    subplot(2,3,2); plot(x,u,'o'); title('ernal Energy');
+    subplot(2,3,1); hold on; plot(x,r,'o'); title('Density');
+    subplot(2,3,2); hold on; plot(x,u,'o'); title('Velocity');
+    subplot(2,3,3); hold on; plot(x,p,'o'); title('Pressure');
+    subplot(2,3,4); hold on; plot(x,m,'o'); title('Mach number');
+    subplot(2,3,5); hold on; plot(x,s,'o'); title('Entropy');
+    subplot(2,3,6); hold on; plot(x,e,'o'); title('Internal Energy');
+    
+    subplot(2,3,1); plot(xx,rhoexact);   hold off;
+    subplot(2,3,2); plot(xx,uexact);     hold off;
+    subplot(2,3,3); plot(xx,pexact);     hold off;
+    subplot(2,3,4); plot(xx,machexact);  hold off;
+    subplot(2,3,5); plot(xx,entroexact); hold off;
+    subplot(2,3,6); plot(xx,energexact); hold off;
 end

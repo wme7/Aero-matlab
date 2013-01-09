@@ -181,7 +181,7 @@ u = u0; ut = V\u;
 t = 0; % time
 n = 0; % counter
 residue = zeros(np,nx);
-while t < tEnd
+while t <= tEnd
     % Time step 'dt'
     u_reshaped = reshape(u,1,nx*np); 
     dt  = dx*cfl/max(abs(u_reshaped));

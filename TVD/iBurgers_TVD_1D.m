@@ -14,9 +14,9 @@ clear all; clc; %close all;
      dx = 0.01;  % Spatial step size
     cfl = 0.80;  % Courant Number
  tStart = 0.00;  % Start time
-   tEnd = 4.00;  % End time
-IC_case = 1;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
-limiter = 1;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
+   tEnd = 0.15;  % End time
+IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
+limiter = 2;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 flxtype = 3;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind <-non-conservative!
 
 %% Define our Flux function
@@ -49,9 +49,11 @@ it_count = 0;           % Iteration counter
 u_next = zeros(1,nx);   % u in next time step
 h = zeros(1,nx);        % Flux values at the cell boundaries
 
-while time < tEnd
+while time <= tEnd
     % Plot Evolution
     plot(x,u,'.'); axis([x(1) x(end) min(u0)-0.1 max(u0)+0.1])
+    xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); 
+    title 'Invicid Burgers using TVD scheme';
     
     % Update time step
     dt   = cfl*dx/abs(max(u));  % time step size
@@ -84,10 +86,10 @@ while time < tEnd
     % UPDATE Info
     u = u_next;
     
-% Counter
-it_count = it_count + 1; % Update counter
-
-% draw iteration
-drawnow
+    % Counter
+    it_count = it_count + 1; % Update counter
+    
+    % draw iteration
+    drawnow
 
 end

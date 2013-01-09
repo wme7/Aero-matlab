@@ -17,7 +17,7 @@ clear all; clc; close all;
    tEnd = 1.20;  % End time
 IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
 limiter = 1;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
-flxtype = 5;     % {1} Godunov, {2} Roe, {3} LF, {4} LLF, {5} Upwind
+flxtype = 4;     % {1} Godunov, {2} Roe, {3} LF, {4} LLF, {5} Upwind {not conservative}
 
 %% Define our Flux function
      f = @(w) w.^2/2;
