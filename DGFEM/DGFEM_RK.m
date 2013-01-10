@@ -28,14 +28,14 @@ clear all; close all; clc;
 %% Simulation Parameters
 k         = 4;      % Space order / Number of degress of freedom: 0 to k
 np        = k+1;    % Number of points per Cell/Element
-quadn     = 2;      % element grid: {1}sLeg, {2}Lobatto, {3}Leg, {4}Radau
+quadn     = 3;      % element grid: {1}sLeg, {2}Lobatto, {3}Leg, {4}Radau
 RKs       = 3;      % Time Int. Sheme {1} no-RK {2}TVD RK2 {3}TVD RK3 {4} ARK4s6
 flux_type = 3;      % {1}Roe, {2}Global LF, {3}LLF, {4}Upwind (non-conservative)
-equation  = 1;      % {1} scalar advection, {2} burgers equation
+equation  = 2;      % {1} scalar advection, {2} burgers equation
 include_s = 0;      % {1} include source term, {0} do NOT include source term 
 a         = 1.0;    % for scalar advection speed
 cfl       = 1/(2*k+1);    % Courant Number
-tEnd      = 0.00;   % Final Time for computation
+tEnd      = 1.00;   % Final Time for computation
 nx        = 10;     % Number of Cells/Elements
 MM        = 0.01;   % TVB constant M
 IC_case   = 3;      % {1} Gaussian , {2} Square, {3} sine, {4} Riemann.

@@ -43,7 +43,7 @@ switch case_no
     case{4} % Riemann IC
         for j = 1:n
             for i = 1:m
-                if (x(j,i)<=1)
+                if (x(j,i)<=0.5)
                     u(j,i)=1;
                 else
                     u(j,i)=0;

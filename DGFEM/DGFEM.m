@@ -30,11 +30,11 @@ k         = 4;      % Space order / Number of degress of freedom: 0 to k
 np        = k+1;    % Number of points per Cell/Element
 quadn     = 3;      % element grid: {1}sLeg, {2}Lobatto, {3}Leg, {4}Radau
 flux_type = 4;      % {1}Roe, {2}Global LF, {3}LLF, {4}Upwind (non-conservative)
-equation  = 1;      % {1} scalar advection, {2} burgers equation
-include_s = 1;      % {1} include source term, {0} do NOT include source term 
+equation  = 2;      % {1} scalar advection, {2} burgers equation
+include_s = 0;      % {1} include source term, {0} do NOT include source term 
 a         = 1.00;   % for scalar advection speed
 cfl       = 1/(2*k+1);    % Courant Number
-tEnd      = 1.60;   % Final Time for computation
+tEnd      = 0.40;   % Final Time for computation
 nx        = 10;     % Number of Cells/Elements
 MM        = 0.01;   % TVB constant M
 IC_case   = 3;      % {1} Gaussian , {2} Square, {3} sine, {4} Riemann.
@@ -145,6 +145,7 @@ u = u0; ut = V\u;
 %         ut(i,j) = (2*l+1)/2*sum(w(:,j).*u(:,j).*V(:,i));
 %     end
 % end
+%
 %     
 % % transform f(x,t) to degress of freedom f(t)_{l,i} for each i-Cell/Element
 % ft = zeros(np,nx); 
@@ -189,7 +190,11 @@ while t <= tEnd
     n  = n + 1;    % update counter
     
     % Plot solution every time step
-    if plot_figs == 1; plot(x,u,'o-'); axis([0,1,-1.5,1.5]); end;
+    if plot_figs == 1; plot(x,u,'o-'); 
+        xlabel('x'); ylabel('u');
+        title('DG-FEM')
+        grid on; axis([0,1,-1.5,1.5]); 
+    end;
     
     % Evaluate/update f and s terms on domain
     f = F(u); ft = V\f;
@@ -242,7 +247,7 @@ while t <= tEnd
     drawnow
 
     % Transform degress u(t)_{l,i} into values u(x,t)
-    u = (ut'*V')'; 
+    u = V*ut;
     
 end % time loop 
 

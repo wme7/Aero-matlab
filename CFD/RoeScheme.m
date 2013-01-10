@@ -23,7 +23,7 @@ clear all; clc; % close all;
 
 %% Parameters
 cfl      = 0.3;     % courant number
-nx       = 40;      % number of cells
+nx       = 140;      % number of cells
 mx       = nx+1;    % number of nodes
 ICx      = 1;       % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
 tEnd     = 0.10;    % final time to compute
