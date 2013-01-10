@@ -22,3 +22,4 @@ FinalTime = 0.2;
 
 % Solve Problem
 [rho,rhou,Ener] = Euler1D(rho,rhou,Ener,FinalTime);
+snapnow;

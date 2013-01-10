@@ -1,6 +1,6 @@
 %% Runge Kutta Schemes
 %**************************************************************************
-% Solve and compare two simple IVP's:
+% Solve and compare using simple IVP's:
 %
 %  {1} du/dt = -2u + t + 4, with IC: u(0) = 1
 %  {2} du/dt = sin(pi*t),   with IC: u(0) = 1
@@ -16,6 +16,15 @@
 % Numerical Method for Engineering and Science
 % McGraw-Hill 2nd Ed. (2008)
 %
+% Jan S. Hesthaven & Tim Warburton
+% Nodal Discontinuous Galerkin Methods
+% Springer 1st Ed. (2008)
+%
+% Alex Kanevsky, et al.
+% Application of implicit-explicit High order
+% Runge-Kutta methods to discontinuous-garlekin methods.
+% JCP 225 (2007) 1753-1781
+%
 % Coded by: Manuel Diaz 2012.12.07
 %
 %**************************************************************************
@@ -23,7 +32,7 @@
 clear all; close all; clc;
 
 %% Define t, dt and tEnd
-t0 = 0; tEnd = 1.0; dt = 0.2;
+t0 = 0; tEnd = 2.0; dt = 0.2;
 tsteps = t0:dt:tEnd;
 t_iter = t0:dt:tEnd-dt;
 
@@ -31,7 +40,7 @@ t_iter = t0:dt:tEnd-dt;
 No_stages = 4; % only stages 1,2 and 3 are available.
 
 %% Choose IVP to study
-IVPn = 1;
+IVPn = 2;
 
 % Define residual
 % Tor this IVP problem the residual is defined as: 
@@ -57,14 +66,16 @@ end
 % Plot exact solution
 figure
 range = [t0,tEnd,1,3]; % plot range 
-subplot(1,4,1); plot(tsteps,u_exact); title('Exact'); axis(range);
+subplot(1,6,1); plot(tsteps,u_exact); title('Exact'); axis(range);
 
 %% Load IC
 u = 1;
 
-%% Run RK Classical integration schemes
+%% Run Standar explicit RK (ERK)
 i = 1;
-u_RK(i) = u; % first known value in time
+u_ERK(i) = u; % first known value in time
+fprintf('ERK\t\t\t');
+tic;
 for t = t_iter
     switch No_stages
         case{1} % 1st Order Euler time Stepping
@@ -91,18 +102,22 @@ for t = t_iter
             error('Not a case available')
     end
     i=i+1;
-    u_RK(i) = u_next; % Capture info per iteration
+    u_ERK(i) = u_next; % Capture info per iteration
     u = u_next;     % update info
 end
-%% Plot TVD-RK solution
-subplot(1,4,2); plot(tsteps,u_RK); title('Classic RK'); axis(range);
+toc;
+
+%% Plot ERK solution
+subplot(1,6,2); plot(tsteps,u_ERK); title('Standar ERK'); axis(range);
 
 %% Interlude
 clear u; u = 1;
 
 %% Run TVD-RK integration
 i = 1;
-u_TVD(i) = u; %first known value in time
+u_TVD(i) = u; % First known value in time
+fprintf('TVD-RK\t\t');
+tic;
 for t = t_iter
     switch No_stages
         case{1} % 1st Order Euler time Stepping
@@ -129,9 +144,10 @@ for t = t_iter
     u_TVD(i) = u_next; % Capture info per iteration
     u = u_next;     % update info
 end
+toc;
 
 %% Plot TVD-RK solution
-subplot(1,4,3); plot(tsteps,u_TVD); title('TVD-RK'); axis(range);
+subplot(1,6,3); plot(tsteps,u_TVD); title('TVD-RK'); axis(range);
 
 %% Interlude
 clear u; u = 1;
@@ -140,6 +156,8 @@ clear u; u = 1;
 % general time integrator by Jameson, Schmidt and Turkel:
 i = 1;
 u_JST(i) = u; %first known value in time
+fprintf('JST-RK\t\t');
+tic;
 for t = t_iter
     %***************************************
     % Stage 0
@@ -154,13 +172,94 @@ for t = t_iter
     u_JST(i) = u_next; % Capture info per iteration
     u = u_next;     % update info
 end
+toc;
 
+%% Plot JST-RK solution
+subplot(1,6,4); plot(tsteps,u_JST); title('RK by JST'); axis(range);
+
+%% Interlude
+clear u; u = 1;
+
+%% Run SSP-RK (Strong Stability-Preserving Runge-Kutta Methods) 
+
+i = 1;
+u_SSPRK(i) = u; %first known value in time
+fprintf('SSP-RK\t\t');
+tic;
+for t = t_iter
+    switch No_stages
+        case{1} % 1st Order Euler time Stepping
+            u_next = u + dt*residual(u,t);
+            
+        case{2} % SSP-RK 2nd Order
+            u_1 = u + dt*residual(u,t);
+            u_next = 1/2*(u + u_1 + dt*residual(u_1,t+dt));
+            
+        case{3} % SSP-RK 3rd Order
+            u_1 = u + dt*residual(u,t);
+            u_2 = 1/4*(3*u + u_1 + dt*residual(u_1,t+dt));
+            u_next = 1/3*(u + 2*u_2 + 2*dt*residual(u_2,t+0.5*dt));
+            
+        case{4} % 5-stages,4th-order SSP-RK
+            % It is not possible to construc a fourth-order, four-stage
+            % SSP-RK schemes shere all coefficients are positive.
+            % However, one can derive a fourth-order scheme by allowing a
+            % fifth stage. The optimal scheme is given as.
+            % Low storage Runge-Kutta coefficients
+            rk4a = [            0.0 ...
+                    -567301805773.0/1357537059087.0 ...
+                    -2404267990393.0/2016746695238.0 ...
+                    -3550918686646.0/2091501179385.0  ...
+                    -1275806237668.0/842570457699.0];
+            rk4b = [ 1432997174477.0/9575080441755.0 ...
+                     5161836677717.0/13612068292357.0 ...
+                     1720146321549.0/2090206949498.0  ...
+                     3134564353537.0/4481467310338.0  ...
+                     2277821191437.0/14882151754819.0];
+            rk4c = [             0.0  ...
+                     1432997174477.0/9575080441755.0 ...
+                     2526269341429.0/6820363962896.0 ...
+                     2006345519317.0/3224310063776.0 ...
+                     2802321613138.0/2924317926251.0];
+            resu = 0;
+            for s = 1:5
+                timelocal = t + rk4c(s)*dt;
+                [rhsu] = residual(u,timelocal);
+                resu = rk4a(s)*resu + dt*rhsu;
+                u = u + rk4b(s)*resu;
+            end
+            u_next = u;
+            
+        otherwise
+            error('Not a case available')
+    end
+    i=i+1;
+    u_SSPRK(i) = u_next; % Capture info per iteration
+    u = u_next;     % update info
+end
+toc;
+
+%% Plot SSP-RK solution
+subplot(1,6,5); plot(tsteps,u_SSPRK); title('SSP-RK'); axis(range);
+
+%% Interlude
+clear u; u = 1;
+
+%% Run ARK (additive Runge-Kutta)
+% general time integrator by Jameson, Schmidt and Turkel:
+i = 1;
+u_ARK(i) = u; %first known value in time
+fprintf('ARK\t\t\t');
+tic;
+
+toc;
 %% Plot TVD-RK solution
-subplot(1,4,4); plot(tsteps,u_JST); title('RK by JST'); axis(range);
+subplot(1,6,6); plot(tsteps,u_ARK); title('ARK'); axis(range);
 
 %% Print Comparisons
-error_RK  = abs(u_exact - u_RK); fprintf('Classic RK error\n'); fprintf('%e\t',error_RK); fprintf('\n\n');
+error_ERK  = abs(u_exact - u_ERK); fprintf('Standar ERK error\n'); fprintf('%e\t',error_ERK); fprintf('\n\n');
 error_TVD = abs(u_exact - u_TVD); fprintf('RK-TVD error\n'); fprintf('%e\t',error_TVD); fprintf('\n\n');
 error_JST = abs(u_exact - u_JST); fprintf('JST-TVD error\n'); fprintf('%e\t',error_JST); fprintf('\n\n');
-
+error_SSPRK = abs(u_exact - u_SSPRK); fprintf('JST-SSPRK error\n'); fprintf('%e\t',error_SSPRK); fprintf('\n\n');
+%error_ARK = abs(u_exact - u_ARK); fprintf('JST-ARK error\n'); fprintf('%e\t',error_ARK); fprintf('\n\n');
 
