@@ -4,7 +4,7 @@ function residue = AdvecResidue(ut,F,dF,S,Ln,Lp,V,D,invM,flux_type)
 
 %% Residue
 % Compute u in element nodes
-u = (ut'*V')';
+u = V*ut;
 
 % Compute flux legendre coeficients 'ft' over every element
 f = F(u); ft = V\f;

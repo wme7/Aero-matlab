@@ -29,7 +29,8 @@ clear all; close all; clc;
 k         = 4;      % Space order / Number of degress of freedom: 0 to k
 np        = k+1;    % Number of points per Cell/Element
 quadn     = 3;      % element grid: {1}sLeg, {2}Lobatto, {3}Leg, {4}Radau
-RKs       = 3;      % Time Int. Sheme {1} no-RK {2}TVD RK2 {3}TVD RK3 {4} ARK4s6
+RKs       = 3;      % Time Int. Scheme {1} no-RK,  {2}TVD-RK2, {3}TVD-RK3, 
+                    %                  {4}SSP-RK2, {5}SSP-RK3, {6}SSP-RK4S5
 flux_type = 3;      % {1}Roe, {2}Global LF, {3}LLF, {4}Upwind (non-conservative)
 equation  = 2;      % {1} scalar advection, {2} burgers equation
 include_s = 0;      % {1} include source term, {0} do NOT include source term 
@@ -180,12 +181,48 @@ while t <= tEnd
             ut_next = 1/3*ut + 2/3*ut_2 + 2/3*dt*AdvecResidue(ut_2 ...
                 ,F,dF,S,Ln,Lp,V,D,invM,flux_type);
             
-        case{4} % 4th-Order, 6-Stages ARK 
-            % coming soon ...
+        case{4} % 2nd Order SSP-RK 
+            u_1 = u + dt*residual(u,t);
+            u_next = 1/2*(u + u_1 + dt*residual(u_1,t+dt));
             
+        case{5} % 3rd Order SSP-RK 
+            u_1 = u + dt*residual(u,t);
+            u_2 = 1/4*(3*u + u_1 + dt*residual(u_1,t+dt));
+            u_next = 1/3*(u + 2*u_2 + 2*dt*residual(u_2,t+0.5*dt));
+            
+        case{6} % 5-stages, 4th-order SSP-RK
+            % "It is not possible to construc a fourth-order, four-stage
+            % SSP-RK schemes where all coefficients are positive." [3]
+            % However, one can derive a fourth-order scheme by allowing a
+            % fifth stage. The optimal scheme is given as:
+            %
+            % Low storage Runge-Kutta coefficients
+            rk4a = [            0.0 ...
+                    -567301805773.0/1357537059087.0 ...
+                    -2404267990393.0/2016746695238.0 ...
+                    -3550918686646.0/2091501179385.0  ...
+                    -1275806237668.0/842570457699.0];
+            rk4b = [ 1432997174477.0/9575080441755.0 ...
+                     5161836677717.0/13612068292357.0 ...
+                     1720146321549.0/2090206949498.0  ...
+                     3134564353537.0/4481467310338.0  ...
+                     2277821191437.0/14882151754819.0];
+            rk4c = [             0.0  ...
+                     1432997174477.0/9575080441755.0 ...
+                     2526269341429.0/6820363962896.0 ...
+                     2006345519317.0/3224310063776.0 ...
+                     2802321613138.0/2924317926251.0];
+            resu = 0;
+            for s = 1:5
+                timelocal = t + rk4c(s)*dt;
+                [rhsu] = residual(u,timelocal);
+                resu = rk4a(s)*resu + dt*rhsu;
+                u = u + rk4b(s)*resu;
+            end
+            u_next = u;
             
         otherwise
-            error ('scheme not defined')
+            error ('Scheme not defined')
     end
 
     % UPDATE info

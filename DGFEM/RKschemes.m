@@ -73,7 +73,7 @@ subplot(1,6,1); plot(tsteps,u_exact); title('Exact'); axis(range);
 %% Load IC
 u = 1;
 
-%% Run Standar explicit RK (ERK)
+%% Run Standard Explicit RK (ERK)
 i = 1;
 u_ERK(i) = u; % first known value in time
 fprintf('ERK\t\t\t');
@@ -110,7 +110,7 @@ end
 toc;
 
 %% Plot ERK solution
-subplot(1,6,2); plot(tsteps,u_ERK); title('Standar ERK'); axis(range);
+subplot(1,6,2); plot(tsteps,u_ERK); title('Standard ERK'); axis(range);
 
 %% Interlude
 clear u; u = 1;
