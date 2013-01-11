@@ -195,7 +195,7 @@ while t <= tEnd
     drawnow
 
     % Transform degress u(t)_{l,i} into values u(x,t)
-    u = (ut'*V')'; 
+    u = V*ut;
     
 end % time loop 
 toc;

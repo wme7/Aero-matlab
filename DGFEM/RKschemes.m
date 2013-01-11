@@ -8,19 +8,19 @@
 %
 % Based on:
 %
-% Gottlieb and Shu (1998) 
+% [1] Gottlieb and Shu (1998) 
 % Mathematics of Computation
 % Vol. 67, No. 221. PP. 73-85
 %
-% Parviz Moin 
+% [2] Parviz Moin 
 % Numerical Method for Engineering and Science
 % McGraw-Hill 2nd Ed. (2008)
 %
-% Jan S. Hesthaven & Tim Warburton
+% [3] Jan S. Hesthaven & Tim Warburton
 % Nodal Discontinuous Galerkin Methods
 % Springer 1st Ed. (2008)
 %
-% Alex Kanevsky, et al.
+% [4] Alex Kanevsky, et al.
 % Application of implicit-explicit High order
 % Runge-Kutta methods to discontinuous-garlekin methods.
 % JCP 225 (2007) 1753-1781
@@ -37,20 +37,23 @@ tsteps = t0:dt:tEnd;
 t_iter = t0:dt:tEnd-dt;
 
 %% Define number of stages to use
-No_stages = 4; % only stages 1,2 and 3 are available.
+No_stages = 4; % only stages 1, 2, 3 and 4 are available.
 
 %% Choose IVP to study
-IVPn = 2;
+IVPn = 3;
 
 % Define residual
 % Tor this IVP problem the residual is defined as: 
 switch IVPn
     case{1}
         residual = @(v,x) -2*v + x + 4;
+        range = [t0,tEnd,1,3]; % plot range
     case{2}
         residual = @(v,x) sin(2*pi*x);
+        range = [t0,tEnd,1,1.5]; % plot range
     case{3}
         residual = @(v,x) exp(x);
+        range = [t0,tEnd,1,9]; % plot range
 end
 
 % Compute exact solution
@@ -65,7 +68,6 @@ end
 
 % Plot exact solution
 figure
-range = [t0,tEnd,1,3]; % plot range 
 subplot(1,6,1); plot(tsteps,u_exact); title('Exact'); axis(range);
 
 %% Load IC
@@ -191,20 +193,21 @@ for t = t_iter
         case{1} % 1st Order Euler time Stepping
             u_next = u + dt*residual(u,t);
             
-        case{2} % SSP-RK 2nd Order
+        case{2} % 2nd Order SSP-RK 
             u_1 = u + dt*residual(u,t);
             u_next = 1/2*(u + u_1 + dt*residual(u_1,t+dt));
             
-        case{3} % SSP-RK 3rd Order
+        case{3} % 3rd Order SSP-RK 
             u_1 = u + dt*residual(u,t);
             u_2 = 1/4*(3*u + u_1 + dt*residual(u_1,t+dt));
             u_next = 1/3*(u + 2*u_2 + 2*dt*residual(u_2,t+0.5*dt));
             
-        case{4} % 5-stages,4th-order SSP-RK
-            % It is not possible to construc a fourth-order, four-stage
-            % SSP-RK schemes shere all coefficients are positive.
+        case{4} % 5-stages, 4th-order SSP-RK
+            % "It is not possible to construc a fourth-order, four-stage
+            % SSP-RK schemes where all coefficients are positive." [3]
             % However, one can derive a fourth-order scheme by allowing a
-            % fifth stage. The optimal scheme is given as.
+            % fifth stage. The optimal scheme is given as:
+            %
             % Low storage Runge-Kutta coefficients
             rk4a = [            0.0 ...
                     -567301805773.0/1357537059087.0 ...
@@ -245,16 +248,16 @@ subplot(1,6,5); plot(tsteps,u_SSPRK); title('SSP-RK'); axis(range);
 %% Interlude
 clear u; u = 1;
 
-%% Run ARK (additive Runge-Kutta)
+%% Run IMEXRK (Implicit-Explicit Runge-Kutta)
 % general time integrator by Jameson, Schmidt and Turkel:
 i = 1;
 u_ARK(i) = u; %first known value in time
 fprintf('ARK\t\t\t');
 tic;
-
+ % In progress
 toc;
 %% Plot TVD-RK solution
-subplot(1,6,6); plot(tsteps,u_ARK); title('ARK'); axis(range);
+%subplot(1,6,6); plot(tsteps,u_ARK); title('ARK'); axis(range);
 
 %% Print Comparisons
 error_ERK  = abs(u_exact - u_ERK); fprintf('Standar ERK error\n'); fprintf('%e\t',error_ERK); fprintf('\n\n');
