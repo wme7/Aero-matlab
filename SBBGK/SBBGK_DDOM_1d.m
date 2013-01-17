@@ -1,13 +1,13 @@
 %% 1D Boltzmann Equation
 % Finite Difference solution of the Semi-classical Boltzmann Equation to
-% recover Euler macroscopic continuum solution. By Manuel Diaz 2012.10.06
+% recover Euler macroscopic continuum solution. By Manuel Diaz 2013.1.16
 %
 % Boltzmann Trasnport Equation:
 %
 % $$\frac{\partial f}{\partial t}+\vec F\cdot \nabla_p f + \vec v
 % \cdot\nabla_{\vec x} f =\widehat{\Omega } (f)$$
 %
-clc;  clear all;  close all;
+clear all;  close all; %clc;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
@@ -15,11 +15,11 @@ CFL         = 0.05;     % CFL condition
 r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.1;      % End time
 theta       = 1;        % {-1} BE, {0} MB, {1} FD.
-quad        = 2;        % for NC = 1 , GH = 2
+quad        = 3;        % for NC-DOM = 1, GH-DOM = 2, GH-DDOM = 3
 method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
 IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-plot_figs   = 0;        % 0: no, 1: yes please!
-write_ans   = 1;        % 0: no, 1: yes please!
+plot_figs   = 1;        % 0: no, 1: yes please!
+write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG
 P_deg       = 0;        % Polinomial Degree
 Pp          = P_deg+1;  % Polinomials Points
@@ -43,6 +43,7 @@ if write_ans == 1
     fprintf(file, 'TITLE = "%s"\n',ID);
     fprintf(file, 'VARIABLES = "x" "density" "velocity" "energy" "pressure" "temperature" "fugacity"\n');
 end
+   
 %% Microscopic Velocity Discretization (using Discrete Ordinate Method)
 % that is to make coincide discrete values of microscopic velocities with
 % values as the value points for using a quadrature method, so that we can
@@ -50,47 +51,68 @@ end
 % macroscopics properties.
 switch quad
 
-    case{1} % Newton Cotes Quadrature:
+    case{1} % Newton Cotes Quadrature for D.O.M.
     V  = [-20,20];  % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
     [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
-        
-    case{2} % Gauss Hermite Quadrature:
+    
+    case{2} % Gauss Hermite Quadrature for D.O.M.
     nv = 60;          % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;            % quadrature constant.
     w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature
     
+    case{3} % Gauss Hermite Quadrature for Dynamic D.O.M.
+    nv = 3;          % nodes required = 3
+    [v_star,w] = GaussHermite(nv); % for integrating range: -inf to inf
+    k = 1;            % quadrature constant.
+    w = w.*exp(v_star.^2); % weighting function of the Gauss-Hermite quadrature
+    
     otherwise
-        error('Order must be between 1 and 2');
+        error('Order must be between 1, 2 and 3');
 end
-%% Velocity-Space Grid:
-% The actual nv value will be computed using 'lenght' vector function:
-nv = length(v); 
 
-% Using D.O.M.
-    v = repmat(v,1,nx);     w = repmat(w,1,nx);
-
-% Initialize Arrays
-%    ux = zeros(nv,nx);      t = zeros(nv,nx);       
-%    r = zeros(nv,nx);       n = zeros(nv,nx);
-% 	 p = zeros(nv,nx);   
-
-%% Initial Conditions
-% Load Macroscopic Velocity, Temperature and Fugacity
-    %[r0,u0,t0] = SSBGK_IC1d(x,IC_case);
-    [r0,u0,t0,n0,p0] = SSBGK_ES_IC1d(x,IC_case);
+%% Initial Conditions in physical Space
+% Load Macroscopic Fugacity [r], Velocity[u] and Temperature[t] 
+    [r0,u0,t0] = SSBGK_IC1d(x,IC_case);
     
 % Using Discrete Ordinate Method:
     r = repmat(r0,nv,1); ux = repmat(u0,nv,1); t = repmat(t0,nv,1);
-    n = repmat( n,nv,1); p  = repmat( p,nv,1); 
+    
+% Initialize Variables arrays
+%    ux = zeros(nv,nx);      t = zeros(nv,nx);       
+%    r = zeros(nv,nx);       n = zeros(nv,nx);
+	p = zeros(nv,nx);
 
+%% Prepare Velocity Points Space
+switch quad 
+    case{1,2} % DOM with NC or DOM with GH
+        % here v is fixed in every time step.
+        nv = length(v);     v = repmat(v,1,nx);     w = repmat(w,1,nx);
+    case{3} % DDOM with 3 GH points
+        % here v changes in every time step.
+        % v_star is fixed in every time step.
+        nv = length(v_star); % nv = 3, fixed number of velocity points
+        % v* is normalized as: v* = (v-u)/sqrt(t)
+        v_star = repmat(v_star,1,nx);               w = repmat(w,1,nx);
+        alpha = sqrt(t);    v = alpha.*v_star + ux;
+    otherwise 
+        error('Order must be between 1, 2 and 3');
+end
+    
+%% Initial Equilibrium Distribution
 % Compute distribution IC of our mesoscopic method by assuming the equilibrium 
 % state of the macroscopic IC. Using the semiclassical Equilibrium
 % distribuition function:
-    %f0 = f_equilibrium_1d(r,ux,v,t,theta);
-    f0 = f_SE_equilibrium_1d(r,p,n,ux,v,t,theta);
-    
+switch quad 
+    case{1,2} % DOM with NC or DOM with GH
+        f0 = f_equilibrium_1d(r,ux,v,t,theta);
+    case{3} % DDOM with 3 GH points
+        f0 = f_equilibrium_star_1d(r,v_star,theta);
+otherwise 
+        error('Order must be between 1, 2 and 3');
+end
+
 % Plot IC of Distribution function, f, in Phase-Space:
 if plot_figs == 1
    figure(1)
@@ -100,14 +122,22 @@ if plot_figs == 1
    zlabel('f - Probability');
 end
 % Compute Initial Macroscopic Momemts:
-    [n,j_x,E] = macromoments1d(k,w,f0,v);
+switch quad 
+    case{1,2} % DOM with NC or DOM with GH
+        [n,j_x,E] = macromoments1d(k,w,f0,v);
+    case{3} % DDOM with 3 GH points
+        [n,j_x,E] = macromoments_star_1d(alpha,k,w,f0,v_star);
+otherwise 
+        error('Order must be between 1, 2 and 3');
+end
+    
     
 %% Marching Scheme
 % First we need to define how big is our time step. Due to the discrete
 % ordinate method the problem is similar to evolve the same problem for
 % every mesoscopic velocity.
 dt = dx*CFL/max(v(:,1)); 
-dtdx = dt/dx;  % precomputed to save someflops
+dtdx = dt/dx;  % precomputed to save some flops
 
 % Time domain discretization
 time = 0:dt:tEnd;

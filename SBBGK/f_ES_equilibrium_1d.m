@@ -1,4 +1,4 @@
-function f = f_equilibrium_1d(r,u,x,t,theta) 
+function f = f_ES_equilibrium_1d(r,p,n,u,x,t,theta) 
 % Compute equilibrum in 1d cases for:
 %
 % MB:  Maxwell-Boltzmann, theta =  0
@@ -10,5 +10,8 @@ function f = f_equilibrium_1d(r,u,x,t,theta)
 % x: microscopic velocity
 % t: temperature
 % r: fugacity
+% p: pressure
+% n: density
 
-f = 1./(exp( (x-u).^2 ./ t)./r + theta);
+f = 1./((1./r).*exp((x-u).^2./t) + theta);
+b = p/n;

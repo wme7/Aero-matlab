@@ -37,7 +37,7 @@ cfl       = 1/(2*k+1);    % Courant Number
 tEnd      = 0.40;   % Final Time for computation
 nx        = 10;     % Number of Cells/Elements
 MM        = 0.01;   % TVB constant M
-IC_case   = 3;      % {1} Gaussian , {2} Square, {3} sine, {4} Riemann.
+IC_case   = 5;      % {1} Gaussian , {2} Square, {3} sine, {4} Riemann, {5}Soft Riemann
 plot_figs = 1;      % {1}Plot figures, {0}Do NOT plot figures
 w_output  = 0;      % Write output: {1} YES please!, {2} NO
 
@@ -128,14 +128,10 @@ end
 
 %% Load Initial Condition, u(x,0) = u0
 u0 = u_zero(x,IC_case);
-%f0 = F(u0);
-%s0 = S(u0);
 
 %% Computing the Evolution of the residue 'L', du/dt = L(u) 
 % Load Initial conditions
 u = u0; ut = V\u;
-%f = f0; 
-%s = s0;
 
 % transform u(x,t) to degress of freedom u(t)_{l,i} for each i-Cell/Element
 % ut = zeros(np,nx);

@@ -50,6 +50,11 @@ switch case_no
                 end
             end
         end
+        
+    case{5} % Riemann (soft version) IC
+        epsilon = 0.1;
+        u = -tanh((x+0.5)/(2*epsilon)) + 1.0;
+       
     otherwise 
         error('Case not available')
 end

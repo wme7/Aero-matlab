@@ -32,7 +32,7 @@ quadn     = 3;      % element grid: {1}sLeg, {2}Lobatto, {3}Leg, {4}Radau
 RKs       = 3;      % Time Int. Scheme {1} no-RK,  {2}TVD-RK2, {3}TVD-RK3, 
                     %                  {4}SSP-RK2, {5}SSP-RK3, {6}SSP-RK4S5
 flux_type = 3;      % {1}Roe, {2}Global LF, {3}LLF, {4}Upwind (non-conservative)
-equation  = 2;      % {1} scalar advection, {2} burgers equation
+equation  = 1;      % {1} scalar advection, {2} burgers equation
 include_s = 0;      % {1} include source term, {0} do NOT include source term 
 a         = 1.0;    % for scalar advection speed
 cfl       = 1/(2*k+1);    % Courant Number
@@ -136,13 +136,9 @@ s0 = S(u0);
 %% Computing the evolution of the residue 'L(u)', du/dt = L(u) 
 % Load Initial conditions
 u = u0; 
-%f = f0; 
-%s = s0;
 
 % Transform u(x,t) to degress of freedom u(t)_{l,i} for each i-Cell/Element
 ut = V\u;
-%ft = V\f;
-%st = V\s;
 
 % Set Initial time step
 t = 0; % time
