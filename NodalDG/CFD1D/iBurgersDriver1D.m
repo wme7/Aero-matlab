@@ -5,21 +5,19 @@ Globals1D;
 N = 6;
 
 % Generate simple mesh
-[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 250);
+[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 100);
 
 % Initialize solver and construct grid and metric
 StartUp1D;
-gamma = 1.4;
 
 % Set up initial conditions -- Sod's problem
 MassMatrix = inv(V')/V;
 cx = ones(Np,1)*sum(MassMatrix*x,1)/2; 
 
-rho = ones(Np,K).*( (cx<0.5) + 0.125*(cx>=0.5));
-rhou = zeros(Np,K);
-Ener = ones(Np,K).*((cx<0.5) + 0.1*(cx>=0.5))/(gamma-1.0);
-FinalTime = 0.2;
+%u = ones(Np,K).*( sin(2*pi*cx) );
+u = sin(2*pi*x);
+FinalTime = 5.0;
 
 % Solve Problem
-[rho,rhou,Ener] = Euler1D(rho,rhou,Ener,FinalTime);
+[u] = iBurgers1D(u,FinalTime);
 snapnow;

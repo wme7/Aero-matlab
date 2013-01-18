@@ -18,7 +18,7 @@ theta       = 1;        % {-1} BE, {0} MB, {1} FD.
 quad        = 3;        % for NC-DOM = 1, GH-DOM = 2, GH-DDOM = 3
 method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
 IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-plot_figs   = 1;        % 0: no, 1: yes please!
+plot_figs   = 0;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG
 P_deg       = 0;        % Polinomial Degree
@@ -160,6 +160,13 @@ switch method
         for tsteps = time
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1
+            % Plot f distribution
+            figure(1)
+            surf(f); grid on; set(gca,'xDir','reverse');
+            xlabel('x - Spatial Domain');
+            ylabel('v - Velocity Space');
+            zlabel('f - Probability');
+            % Plot Macroscopic variables
             figure(2)
             subplot(2,3,1); plot(x,n(1,:),'.'); axis tight; title('Density')
             subplot(2,3,2); plot(x,p(1,:),'.'); axis tight; title('Pressure')

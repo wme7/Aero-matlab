@@ -1,4 +1,4 @@
-function [rhsrho, rhsrhou, rhsEner] = EulerRHS1D(rho, rhou ,Ener)
+function [rhsu] = iBurgersRHS1D(u)
 
 % function [rhsrho, rhsrhou, rhsEner] = EulerRHS1D(rho, rhou ,Ener)
 % Purpose  : Evaluate RHS flux in 1D Euler
@@ -6,50 +6,32 @@ function [rhsrho, rhsrhou, rhsEner] = EulerRHS1D(rho, rhou ,Ener)
 Globals1D;
 
 % compute maximum velocity for LF flux
-gamma = 1.4;
-pres = (gamma-1.0)*(Ener - 0.5*(rhou).^2./rho);
-cvel = sqrt(gamma*pres./rho); lm = abs(rhou./rho)+cvel;
+lm = abs(u);
 
 % Compute fluxes
-rhof = rhou; rhouf=rhou.^2./rho+pres; Enerf=(Ener+pres).*rhou./rho;
+uf = u.^2/2; 
 
 % Compute jumps at internal faces
-drho  =zeros(Nfp*Nfaces,K);  drho(:)  =  rho(vmapM)-  rho(vmapP); 
-drhou =zeros(Nfp*Nfaces,K); drhou(:)  = rhou(vmapM)- rhou(vmapP);
-dEner =zeros(Nfp*Nfaces,K); dEner(:)  = Ener(vmapM)- Ener(vmapP);
-drhof =zeros(Nfp*Nfaces,K); drhof(:)  = rhof(vmapM)- rhof(vmapP);
-drhouf=zeros(Nfp*Nfaces,K); drhouf(:) =rhouf(vmapM)-rhouf(vmapP);
-dEnerf=zeros(Nfp*Nfaces,K); dEnerf(:) =Enerf(vmapM)-Enerf(vmapP);
-LFc   =zeros(Nfp*Nfaces,K); LFc(:)    =max(lm(vmapP),lm(vmapM));
+du  =zeros(Nfp*Nfaces,K);  du(:)  =  u(vmapM) -  u(vmapP); 
+duf =zeros(Nfp*Nfaces,K); duf(:)  = uf(vmapM) - uf(vmapP);
+LFc =zeros(Nfp*Nfaces,K); LFc(:)  = max(lm(vmapP),lm(vmapM));
 
 % Compute fluxes at interfaces
-drhof(:) = nx(:).*drhof(:)/2.0-LFc(:)/2.0.*drho(:); 
-drhouf(:)=nx(:).*drhouf(:)/2.0-LFc(:)/2.0.*drhou(:); 
-dEnerf(:)=nx(:).*dEnerf(:)/2.0-LFc(:)/2.0.*dEner(:); 
+duf(:) = nx(:).*duf(:)/2.0-LFc(:)/2.0.*du(:); 
 
 % Boundary conditions for Sod's problem
-rhoin    = 1.000;   rhouin   = 0.0;
-pin      = 1.000;   Enerin   = pin/(gamma-1.0);
-rhoout   = 0.125;   rhouout  = 0.0;
-pout     = 0.100;   Enerout  = pout/(gamma-1.0);
+uin    = 0.0;   
+uout   = 0.0;   
 
 % Set fluxes at inflow/outflow
-rhofin =rhouin; rhoufin=rhouin.^2./rhoin+pin; 
-Enerfin=(pin/(gamma-1.0)+0.5*rhouin^2/rhoin+pin).*rhouin./rhoin;
+ufin =uin.^2/2; 
 lmI=lm(vmapI)/2; nxI=nx(mapI);
-drhof (mapI)=nxI*(rhof (vmapI)-rhofin )/2.0-lmI*(rho(vmapI) -rhoin);  
-drhouf(mapI)=nxI*(rhouf(vmapI)-rhoufin)/2.0-lmI*(rhou(vmapI)-rhouin);
-dEnerf(mapI)=nxI*(Enerf(vmapI)-Enerfin)/2.0-lmI*(Ener(vmapI)-Enerin);
+duf (mapI)=nxI*(uf (vmapI)-ufin )/2.0-lmI*(u(vmapI) -uin);  
 
-rhofout=rhouout; rhoufout=rhouout.^2./rhoout+pout; 
-Enerfout=(pout/(gamma-1.0)+0.5*rhouout^2/rhoout+pout).*rhouout./rhoout;
+ufout=uout.^2/2; 
 lmO=lm(vmapO)/2; nxO=nx(mapO);
-drhof (mapO)=nxO*(rhof(vmapO) - rhofout)/2.0-lmO*(rho (vmapO)- rhoout);  
-drhouf(mapO)=nxO*(rhouf(vmapO)-rhoufout)/2.0-lmO*(rhou(vmapO)-rhouout);
-dEnerf(mapO)=nxO*(Enerf(vmapO)-Enerfout)/2.0-lmO*(Ener(vmapO)-Enerout);
+duf (mapO)=nxO*(uf(vmapO) - ufout)/2.0-lmO*(u(vmapO)- uout);  
 
 % compute right hand sides of the PDE's
-rhsrho  = -rx.*(Dr*rhof)  + LIFT*(Fscale.*drhof);
-rhsrhou = -rx.*(Dr*rhouf) + LIFT*(Fscale.*drhouf);
-rhsEner = -rx.*(Dr*Enerf) + LIFT*(Fscale.*dEnerf);
+rhsu  = -rx.*(Dr*uf)  + LIFT*(Fscale.*duf);
 return

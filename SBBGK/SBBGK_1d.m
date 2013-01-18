@@ -14,12 +14,12 @@ name        ='SBBGK1d'; % Simulation Name
 CFL         = 0.05;     % CFL condition
 r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.1;      % End time
-theta       = 1;        % {-1} BE, {0} MB, {1} FD.
+theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 quad        = 2;        % for NC = 1 , GH = 2
 method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
 IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-plot_figs   = 0;        % 0: no, 1: yes please!
-write_ans   = 1;        % 0: no, 1: yes please!
+plot_figs   = 1;        % 0: no, 1: yes please!
+write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG
 P_deg       = 0;        % Polinomial Degree
 Pp          = P_deg+1;  % Polinomials Points
@@ -74,27 +74,27 @@ nv = length(v);
 % Initialize Arrays
 %    ux = zeros(nv,nx);      t = zeros(nv,nx);       
 %    r = zeros(nv,nx);       n = zeros(nv,nx);
-% 	 p = zeros(nv,nx);   
+ 	 p = zeros(nv,nx);   
 
 %% Initial Conditions
 % Load Macroscopic Velocity, Temperature and Fugacity
-    %[r0,u0,t0] = SSBGK_IC1d(x,IC_case);
-    [r0,u0,t0,n0,p0] = SSBGK_ES_IC1d(x,IC_case);
+    [r0,u0,t0] = SSBGK_IC1d(x,IC_case);
+%    [r0,u0,t0,n0,p0] = SSBGK_ES_IC1d(x,IC_case);
     
 % Using Discrete Ordinate Method:
     r = repmat(r0,nv,1); ux = repmat(u0,nv,1); t = repmat(t0,nv,1);
-    n = repmat( n,nv,1); p  = repmat( p,nv,1); 
+%    n = repmat(n0,nv,1); p  = repmat(p0,nv,1); 
 
 % Compute distribution IC of our mesoscopic method by assuming the equilibrium 
 % state of the macroscopic IC. Using the semiclassical Equilibrium
 % distribuition function:
-    %f0 = f_equilibrium_1d(r,ux,v,t,theta);
-    f0 = f_SE_equilibrium_1d(r,p,n,ux,v,t,theta);
+    f0 = f_equilibrium_1d(r,ux,v,t,theta);
+%    f0 = f_SE_equilibrium_1d(r,p,n,ux,v,t,theta);
     
 % Plot IC of Distribution function, f, in Phase-Space:
 if plot_figs == 1
    figure(1)
-   surf(f0); grid on;
+   surf(f0); grid on; set(gca,'xDir','reverse');
    xlabel('x - Spatial Domain'); 
    ylabel('v - Velocity Space');
    zlabel('f - Probability');
@@ -130,6 +130,13 @@ switch method
         for tsteps = time
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1
+            % Plot f distribution
+            figure(1)
+            surf(f); grid on; set(gca,'xDir','reverse');
+            xlabel('x - Spatial Domain');
+            ylabel('v - Velocity Space');
+            zlabel('f - Probability');
+            % Plot Macroscopic variables
             figure(2)
             subplot(2,3,1); plot(x,n(1,:),'.'); axis tight; title('Density')
             subplot(2,3,2); plot(x,p(1,:),'.'); axis tight; title('Pressure')
@@ -192,6 +199,7 @@ switch method
             % (here lies a paralellizing computing chalenge)
             [r,ux,t,p] = macroproperties1d(n,j_x,E,nx,nv,theta);
             
+            % update figures
             drawnow
         end
         
