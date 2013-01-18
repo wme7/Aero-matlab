@@ -1,58 +1,65 @@
-function [uun,uup] = WENO3_1D_flux(u)
+function [un,up] = WENO3_1D_flux(u)
+% This function assumes that u = [u(1) u(2) u(3) u(4) u(5)]
+% And we return: up: u_i+1/2^(+) & un: u_i+1/2^(-)
+
 % Constants
-d0 = 1/10; d1 = 6/10; d2 = 3/10;
+dn0 = 1/10; dn1 = 6/10; dn2 = 3/10; dp0 = 3/10; dp1 = 6/10; dp2 = 1/10;
 epsilon = 1E-7;
 
 %% Compute WENO3 1d Fluxes:
-% Center value
-i = 3;
-un = u; up = u;
+% ENO polynomials
+pn0  = (-u(1) +  2*u(2) + 23*u(3)) / 24;
+pn1  = ( u(1) -  4*u(2) +  3*u(3)) / 2 ;
+pn2  = ( u(1) -  2*u(2) +    u(3)) / 2 ;
+
+pm0  = (-u(2) + 26*u(3) -    u(4)) / 24;
+pm1  = (-u(2)           +    u(4)) / 2 ;
+pm2  = ( u(2) -  2*u(3) +    u(4)) / 2 ;
+
+pp0  = (-u(3) +  2*u(4) + 23*u(5)) / 24;
+pp1  = (-u(3) +  4*u(4) -  3*u(5)) / 2 ;
+pp2  = ( u(3) -  2*u(4) +    u(5)) / 2 ;
+
+% Nonlinear Smoothness Indicators
+ISn = 13/3*pn2^2 + pn1^2;
+ISm = 13/3*pm2^2 + pm1^2;
+ISp = 13/3*pp2^2 + pp1^2;
 
 %% Positive Flux
-% Nonlinear Smoothness Indicators
-IS0p = 13/12*(up(i-2)-2*up(i-1)+up(i))^2 + 1/4*(up(i-2)-4*up(i-1)+3*up(i))^2;
-IS1p = 13/12*(up(i-1)-2*up(i)+up(i+1))^2 + 1/4*(up(i-1)-up(i+1))^2;
-IS2p = 13/12*(up(i)-2*up(i+1)+up(i+2))^2 + 1/4*(3*up(i)-4*up(i+1)+up(i+2))^2;
-
-% Negative Flux
-% Nonlinear Smoothness Indicators
-IS0n = 13/12*(un(i+1)-2*un(i+2)+un(i+3))^2 + 1/4*(3*un(i+1)-4*un(i+2)+un(i+3))^2;
-IS1n = 13/12*(un(i)-2*un(i+1)+un(i+2))^2 + 1/4*(un(i)-un(i+2))^2;
-IS2n = 13/12*(un(i-1)-2*un(i)+un(i+1))^2 + 1/4*(un(i-1)-4*un(i)+3*un(i+1))^2;
-%end
-
-%% Positive Flux
-% Non-normilized Stencil weights
-alpha0p = d0./(epsilon + IS0p).^2;
-alpha1p = d1./(epsilon + IS1p).^2;
-alpha2p = d2./(epsilon + IS2p).^2;
+% Non-normalized stencil weights
+alphapn = dp0 /(epsilon + ISn)^2;
+alphapm = dp1 /(epsilon + ISm)^2;
+alphapp = dp2 /(epsilon + ISp)^2;
+alphasump = alphapn + alphapm + alphapp;
 
 % Weigths
-w0p = alpha0p ./ (alpha0p + alpha1p + alpha2p);
-w1p = alpha1p ./ (alpha0p + alpha1p + alpha2p);
-w2p = alpha2p ./ (alpha0p + alpha1p + alpha2p);
+wpn = alphapn / alphasump;
+wpm = alphapm / alphasump;
+wpp = alphapp / alphasump;
 
 % Negative Flux
 % Non-normilized Stencil weights
-alpha0n = d0./(epsilon + IS0n).^2;
-alpha1n = d1./(epsilon + IS1n).^2;
-alpha2n = d2./(epsilon + IS2n).^2;
+alphann = dn0 /(epsilon + ISn)^2;
+alphanm = dn1 /(epsilon + ISm)^2;
+alphanp = dn2 /(epsilon + ISp)^2;
+alphasumn = alphann + alphanm + alphanp;
 
 % Weigths
-w0n = alpha0n ./ (alpha0n + alpha1n + alpha2n);
-w1n = alpha1n ./ (alpha0n + alpha1n + alpha2n);
-w2n = alpha2n ./ (alpha0n + alpha1n + alpha2n);
+wnn = alphann / alphasumn;
+wnm = alphanm / alphasumn;
+wnp = alphanp / alphasumn;
 
-%for i = 3:nx-3
-% Positive Flux
-% Numerical Flux: u_i+1/2 (+)
-uup(i) = w0p*(2/6*up(i-2)-7/6*up(i-1)+11/6*up(i))+...
-    w1p*(-1/6*up(i-1)+5/6*up(i)+2/6*up(i+1))+...
-    w2p*(2/6*up(i)+5/6*up(i+1)-1/6*up(i+2));
+%% WENO Fluxes
+% Positive Flux: u_i+1/2 (+)
+dx  =-0.5;
+up  = wpn * (pn0 + pn1*dx + pn2*dx^2) ...
+	+ wpm * (pm0 + pm1*dx + pm2*dx^2) ...
+	+ wpp * (pp0 + pp1*dx + pp2*dx^2);
 
-% Negative Flux
-% Numerical Flux: u_i+1/2 (-)
-uun(i) = w0n*(-1/6*un(i-1)+5/6*un(i)+2/6*un(i+1))+...
-    w1n*(2/6*un(i)+5/6*un(i+1)-1/6*un(i+2))+...
-    w2n*(11/6*un(i+1)-7/6*un(i+2)+2/6*un(i+3));
+% Negative Flux: u_i+1/2 (-)
+dx  = 0.5;
+un  = wnn * (pn0+ pn1*dx + pn2*dx^2) ...
+    + wnm * (pm0+ pm1*dx + pm2*dx^2) ...
+	+ wnp * (pp0+ pp1*dx + pp2*dx^2);
+
 end

@@ -5,12 +5,12 @@ clear all; close all; clc;
 origin = 0;
 switch origin
     case 0 % centered
-        z = 0.55; % normalization constant or fugacity
+        z = 0.30; disp = 0.0; % normalization constant or fugacity
         theta = -1; F0_BE = @(c) 1./((1./z).*exp(c.^2) + theta);
         theta =  0; F0_MB = @(c) 1./((1./z).*exp(c.^2) + theta);
         theta =  1; F0_FD = @(c) 1./((1./z).*exp(c.^2) + theta);
     case 1 % displaced
-        z = 0.70; disp = 2.0; 
+        z = 0.10; disp = 2.0; 
         theta = -1; F0_BE = @(c) 1./((1./z).*exp((c-disp).^2) + theta);
         theta =  0; F0_MB = @(c) 1./((1./z).*exp((c-disp).^2) + theta);
         theta =  1; F0_FD = @(c) 1./((1./z).*exp((c-disp).^2) + theta);
@@ -33,7 +33,7 @@ tic; rho_MB = quad(F0_MB,a,b,tol); toc; fprintf('rho_MB: %1.12f\n\n',rho_MB)
 tic; rho_FD = quad(F0_FD,a,b,tol); toc; fprintf('rho_FD: %1.12f\n\n',rho_FD)
 
 % Gauss Hermite Weights and Abscissas
-nv = 3; [v,w] = GaussHermite(nv); w = w.*exp(v.^2);
+nv = 7; [v,w] = GaussHermite(nv); w = w.*exp(v.^2);
 
 % Integrate for density values using Gauss Hermite Quadrature
 tic; rho2_BE = sum(F0_BE(v).*w); toc; fprintf('rho_BE: %1.12f\n\n',rho2_BE)
@@ -54,6 +54,10 @@ subplot(2,2,2); plot(c,f_MB); title('MB');
 subplot(2,2,3); plot(c,f_FD); title('FD'); 
     axis(range); xlabel('nv'); ylabel('f'); grid on;
 subplot(2,2,4),axis('off'), title('GH Quadrature Error','fontsize',12)
-  text(0,0.80,['Error in BE = ',num2str(err_BE)],'fontsize',12)
-  text(0,0.65,['Error in MB = ',num2str(err_MB)],'fontsize',12)
-  text(0,0.50,['Error in FD = ',num2str(err_FD)],'fontsize',12)
+    text(0.0,0.95,'Inputs for f^{eq}_{quantum}','fontsize',12)
+    text(0.1,0.80,['z = ',num2str(z)],'fontsize',12)
+    text(0.1,0.65,['a = ',num2str(disp)],'fontsize',12)
+    text(0.0,0.50,'Output: Numerical Integration error','fontsize',12)
+    text(0.1,0.35,['Error in BE = ',num2str(err_BE)],'fontsize',12)
+    text(0.1,0.20,['Error in MB = ',num2str(err_MB)],'fontsize',12)
+    text(0.1,0.05,['Error in FD = ',num2str(err_FD)],'fontsize',12)
