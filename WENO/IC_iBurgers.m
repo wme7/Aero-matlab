@@ -63,6 +63,10 @@ switch ICcase
         
         u0 = 1/2 + sin(2*pi*x);
         
+    case {5} % Riemann
+        
+        u0  = 1*(x <= x_mid) + 0*(x > x_mid);
+        
     otherwise
         error('case not in the list')
 end

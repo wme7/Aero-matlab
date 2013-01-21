@@ -24,7 +24,7 @@ clear all; close all; clc;
     cfl = 0.8;      % Courant Number
      dt = cfl*dx/abs(a); % time step size
    dtdx = dt/dx;    % precomputed to save some flops
-  t_end = 0.1;      % End time
+  t_end = 0.5;      % End time
 limiter = 1;        % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 
 %% Discretization of Domain

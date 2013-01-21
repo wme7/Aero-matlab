@@ -1,4 +1,4 @@
-function [r_0,u_0,t_0,n_0,p_0] = SSBGK_IC1d(x,input)
+function [r_0,u_0,t_0,n_0,p_0] = SSBGK_ES_IC1d(x,input)
 % Load the IC of a classical 2D Riemann Problem configuration. 
 % By Manuel Diaz 2012.10.24.
 % In the notation we take advantage of the matlab array notation as follows

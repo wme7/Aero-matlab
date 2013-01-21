@@ -16,7 +16,7 @@ cx = ones(Np,1)*sum(MassMatrix*x,1)/2;
 
 %u = ones(Np,K).*( sin(2*pi*cx) );
 u = sin(2*pi*x);
-FinalTime = 5.0;
+FinalTime = 0.10;
 
 % Solve Problem
 [u] = iBurgers1D(u,FinalTime);
