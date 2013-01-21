@@ -8,7 +8,7 @@ function [] = emailme(x)
 %% Set Parameters of my Gmail Account
 setpref('Internet', 'E_mail', 'manuel.ade@gmail.com');
 setpref('Internet', 'SMTP_Username', 'manuel.ade@gmail.com');
-setpref('Internet', 'SMTP_Password', 'Mymomwasborn1951');
+setpref('Internet', 'SMTP_Password', 'xxxxxx');
 setpref('Internet', 'SMTP_Server', 'smtp.gmail.com');
 props = java.lang.System.getProperties;
 props.setProperty('mail.smtp.auth','true');
