@@ -1,20 +1,20 @@
 %% 1D Conservation Laws Solver using Upwind
 % To solve Invicid Burgers Equation
 %
-%   u_t + f(u) = 0
+%   $u_t + f(u) = 0$
 %
-% where: f(u) = u^2/2
+% where: $f(u) = u^2/2$
 % 
 % by Manuel Diaz, manuel.ade'at'gmail.com 
 % Institute of Applied Mechanics, 2012.12.17
 
-clear all; clc; %close all;
+clear all; clc; close all;
 
 %% Parameters
      dx = 0.01;  % Spatial step size
     cfl = 0.80;  % Courant Number
  tStart = 0.00;  % Start time
-   tEnd = 0.15;  % End time
+   tEnd = 1.15;  % End time
 IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
 limiter = 2;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 flxtype = 3;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind <-non-conservative!

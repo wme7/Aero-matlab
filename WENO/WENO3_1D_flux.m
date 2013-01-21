@@ -7,7 +7,7 @@ dn0 = 1/10; dn1 = 6/10; dn2 = 3/10; dp0 = 3/10; dp1 = 6/10; dp2 = 1/10;
 epsilon = 1E-7;
 
 %% Compute WENO3 1d Fluxes:
-% ENO polynomials
+% base polynomials
 pn0  = (-u(1) +  2*u(2) + 23*u(3)) / 24;
 pn1  = ( u(1) -  4*u(2) +  3*u(3)) / 2 ;
 pn2  = ( u(1) -  2*u(2) +    u(3)) / 2 ;
@@ -50,14 +50,14 @@ wnm = alphanm / alphasumn;
 wnp = alphanp / alphasumn;
 
 %% WENO Fluxes
-% Positive Flux: u_i+1/2 (+)
-dx  =-0.5;
+% Positive Flux: f_i+1/2 (+)
+dx  =-0.01;
 up  = wpn * (pn0 + pn1*dx + pn2*dx^2) ...
 	+ wpm * (pm0 + pm1*dx + pm2*dx^2) ...
 	+ wpp * (pp0 + pp1*dx + pp2*dx^2);
 
-% Negative Flux: u_i+1/2 (-)
-dx  = 0.5;
+% Negative Flux: f_i+1/2 (-)
+dx  = 0.01;
 un  = wnn * (pn0+ pn1*dx + pn2*dx^2) ...
     + wnm * (pm0+ pm1*dx + pm2*dx^2) ...
 	+ wnp * (pp0+ pp1*dx + pp2*dx^2);
