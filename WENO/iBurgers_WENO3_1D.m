@@ -20,7 +20,7 @@ clear all; clc; close all;
     cfl = 0.80;  % Courant Number
  tStart = 0.00;  % Start time
    tEnd = 3.50;  % End time
-IC_case = 5;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine {5} Riemann
+IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine {5} Riemann
 bc_type = 1;     % {1} Dirichlet, {2} Neumann, {3} Periodic
 
 %% Define our Flux function

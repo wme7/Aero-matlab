@@ -1,4 +1,4 @@
-function [r_0,u_0,t_0] = SSBGK_IC1d(x,input)
+function [r_0,u_0,t_0,p_0,rho_0,E_0] = SSBGK_IC1d(x,input)
 % Load the IC of a classical 2D Riemann Problem configuration. 
 % By Manuel Diaz 2012.10.24.
 % In the notation we take advantage of the matlab array notation as follows
@@ -10,7 +10,7 @@ function [r_0,u_0,t_0] = SSBGK_IC1d(x,input)
 % p = Pressure
 % rho = Density
 % r = Fugacity
-% E = Enerty
+% E = Energy
 % t = temperature
 %
 % Based on:
@@ -89,7 +89,9 @@ end
 r_0 = zeros(1,nx); 
 u_0 = zeros(1,nx); 
 t_0 = zeros(1,nx); 
-
+p_0 = zeros(1,nx);
+rho_0 = zeros(1,nx);
+E_0 = zeros(1,nx);
 % Parameters of regions dimensions
 x_middle = ceil(nx/2);
 l_1 = 1:x_middle; l_2 = x_middle+1:nx;
@@ -104,3 +106,12 @@ u_0(l_2) = u(2); % region 2
 % temperature
 t_0(l_1) = t(1); % region 1
 t_0(l_2) = t(2); % region 2
+% pressure
+p_0(l_1) = p(1); % region 1
+p_0(l_2) = p(2); % region 2
+% density
+rho_0(l_1) = rho(1); % region 1
+rho_0(l_2) = rho(2); % region 2
+% Energy
+E_0(l_1) = E(1); % region 1
+E_0(l_2) = E(2); % region 2

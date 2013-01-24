@@ -210,6 +210,8 @@ switch method
 end
 toc
 %% Close file with Results
-fclose(file);
 fprintf('Simulation has been completed succesfully!\n')
-fprintf('All Results have been saved!\n')
+if write_ans == 1
+    fclose(file);
+    fprintf('All Results have been saved!\n')
+end
