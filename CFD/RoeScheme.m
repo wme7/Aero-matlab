@@ -26,14 +26,14 @@ cfl      = 0.3;     % courant number
 nx       = 140;      % number of cells
 mx       = nx+1;    % number of nodes
 ICx      = 1;       % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-tEnd     = 0.10;    % final time to compute
+tEnd     = 0.15;    % final time to compute
 dtdx     = 0.30;    % dt/dx (fixed for testing)
 etpfix   = 0.90;	% {#} Harten's sonic entropy fix value, {0} no entropy fix
 plot_fig = 1;       % {1} plot figures, {0} do NOT plot figures
 wrt_sol  = 1;       % {1} write solution, {0} do NOT write solution file
 
 %% Physical Constanst
-gamma = 2.5; %1.4;        % Ratio of specific heats
+gamma = 1.4;        % Ratio of specific heats
 
 %% Domain
 xn = linspace(0,1,mx);          % cells nodes
@@ -60,15 +60,15 @@ H = gamma/(gamma-1)*p./r + u.^2/2;
 [xx,rhoexact,uexact,pexact,machexact,entroexact,energexact] = ...
     Exact_Riemann(r(1),u(1),p(1),r(nx),u(nx),p(nx),tEnd);
 
-%% Left and right conditions for Dirichlet BC's
-    r_left  = r(1);  % r_left
-    r_right = r(nx); % r_right
-    u_left  = u(1);  % u_left
-    u_right = u(nx); % u_right
-    p_left  = p(1);  % p_left
-    p_right = p(nx); % p_right
-    E_left  = E(1);  % E_left
-    E_right = E(nx); % E_right
+% %% Left and right conditions for Dirichlet BC's
+%     r_left  = r(1);  % r_left
+%     r_right = r(nx); % r_right
+%     u_left  = u(1);  % u_left
+%     u_right = u(nx); % u_right
+%     p_left  = p(1);  % p_left
+%     p_right = p(nx); % p_right
+%     E_left  = E(1);  % E_left
+%     E_right = E(nx); % E_right
 
 %% Compute primitive Variables @ cell center variables
 % Build vector U and dU, and F

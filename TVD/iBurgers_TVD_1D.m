@@ -11,7 +11,7 @@
 clear all; clc; close all;
 
 %% Parameters
-     dx = 0.01;  % Spatial step size
+     dx = 0.10;  % Spatial step size
     cfl = 0.80;  % Courant Number
  tStart = 0.00;  % Start time
    tEnd = 1.15;  % End time
@@ -25,7 +25,7 @@ flxtype = 3;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind <-non-conservative!
     df = @(w) w;
 
 %% Discretization of Domain
-      x = 0:dx:2;     % x grid
+      x = 0:dx:1;     % x grid
       nx = length(x); % number of points
 
 %% Initial Condition

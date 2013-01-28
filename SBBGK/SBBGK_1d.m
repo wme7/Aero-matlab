@@ -13,7 +13,7 @@ clc;  clear all;  close all;
 name        ='SBBGK1d'; % Simulation Name
 CFL         = 0.05;     % CFL condition
 r_time      = 1/10000;  % Relaxation time
-tEnd        = 0.1;      % End time
+tEnd        = 0.15;      % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 quad        = 2;        % for NC = 1 , GH = 2
 method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
@@ -65,7 +65,7 @@ switch quad
         error('Order must be between 1 and 2');
 end
 %% Velocity-Space Grid:
-% The actual nv value will be computed using 'lenght' vector function:
+% The actual nv value will be computed using 'length' vector function:
 nv = length(v); 
 
 % Using D.O.M.
