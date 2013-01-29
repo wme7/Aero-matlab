@@ -1,8 +1,8 @@
-function [r,u,t,p] = macroproperties1d(n,j_x,E,nx,nv,theta)
+function [r,u,t,p] = macroproperties1d(n,nux,E,nx,nv,theta)
 %% Recover Macroscopic Properties
 % compute back, fugacity, macroscopic velocities, temperature and pressure.
     % Computing first velocites from the momentum:
-    u = j_x./n; 
+    u = nux./n; 
    
 % to compute fugacity, temperature and pressure, we need to rely on the
 % distribution fucntion that we where are using: MB, FD, BE.
@@ -43,6 +43,6 @@ switch theta
 end
 
 % Using Discrete Ordinate Method:
-    r = repmat(r,nv,1); u = repmat(u,nv,1); 
-    t = repmat(t,nv,1); %p = repmat(p,nv,1);
+%     r = repmat(r,nv,1); u = repmat(u,nv,1); 
+%     t = repmat(t,nv,1); 
     

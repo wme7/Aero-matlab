@@ -13,5 +13,5 @@ function f = f_equilibrium_2d(r,u1,u2,v1,v2,t,theta)
 % t: temperature
 % r: fugacity
 %
-f = 1./(exp( ((v1-u1).^2 + (v2-u2).^2 ) ./t) ./r + theta);
+f = 1./((1./r).*(exp( ((v1-u1).^2 + (v2-u2).^2 ) ./t) + theta));
 

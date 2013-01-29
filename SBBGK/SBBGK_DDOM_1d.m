@@ -11,14 +11,14 @@ clear all;  close all; %clc;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
-CFL         = 0.05;     % CFL condition
+CFL         = 0.01;     % CFL condition
 r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.1;      % End time
-theta       = 1;        % {-1} BE, {0} MB, {1} FD.
-quad        = 3;        % for NC-DOM = 1, GH-DOM = 2, GH-DDOM = 3
+theta       = 0;        % {-1} BE, {0} MB, {1} FD.
+quad        = 3;        % for DOM-NC = 1, DOM-GH = 2, DDOM-3pGH = 3
 method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
 IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-plot_figs   = 0;        % 0: no, 1: yes please!
+plot_figs   = 1;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG
 P_deg       = 0;        % Polinomial Degree
@@ -43,6 +43,10 @@ if write_ans == 1
     fprintf(file, 'TITLE = "%s"\n',ID);
     fprintf(file, 'VARIABLES = "x" "density" "velocity" "energy" "pressure" "temperature" "fugacity"\n');
 end
+
+%% Initial Conditions in physical Space
+% Load Macroscopic Fugacity [z], Velocity[u] and Temperature[t] 
+    [z0,u0,t0,p0,rho0,E0] = SSBGK_IC1d(x,IC_case);
    
 %% Microscopic Velocity Discretization (using Discrete Ordinate Method)
 % that is to make coincide discrete values of microscopic velocities with
@@ -55,82 +59,63 @@ switch quad
     V  = [-20,20];  % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
     [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
+    nv = length(v);     v = repmat(v,1,nx);     w = repmat(w,1,nx);
     
     case{2} % Gauss Hermite Quadrature for D.O.M.
-    nv = 60;          % nodes desired (the actual value)
+    nv = 80;        % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
-    k = 1;            % quadrature constant.
+    k = 1;          % quadrature constant.
     w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature
+    v = repmat(v,1,nx);     w = repmat(w,1,nx);
     
-    case{3} % Gauss Hermite Quadrature for Dynamic D.O.M.
-    nv = 3;          % nodes required = 3
-    [v_star,w] = GaussHermite(nv); % for integrating range: -inf to inf
-    k = 1;            % quadrature constant.
-    w = w.*exp(v_star.^2); % weighting function of the Gauss-Hermite quadrature
-    
+    case{3} % Gauss Hermite Quadrature for Dynamic-D.O.M.
+    nv = 3;         % nodes required = 3 (the actual value)
+    [c_star,w] = GaussHermite(nv); % for integrating range: -inf to inf
+    k = 1;          % quadrature constant.
+    w = w.*exp(c_star.^2); % weighting function of the Gauss-Hermite quadrature
+    J = sqrt(t0);   % Jacobian for every point in x domain, 'J(x)'.
+    v = c_star*J + ones(3,1)*u0;  % transformation: v = a*(C*) + ux
+    c_star = repmat(c_star,1,nx); w = repmat(w,1,nx); J = repmat(J,nv,1);
+        
     otherwise
         error('Order must be between 1, 2 and 3');
 end
-
-%% Initial Conditions in physical Space
-% Load Macroscopic Fugacity [r], Velocity[u] and Temperature[t] 
-    [r0,u0,t0] = SSBGK_IC1d(x,IC_case);
     
-% Using Discrete Ordinate Method:
-    r = repmat(r0,nv,1); ux = repmat(u0,nv,1); t = repmat(t0,nv,1);
-    
-% Initialize Variables arrays
-%    ux = zeros(nv,nx);      t = zeros(nv,nx);       
-%    r = zeros(nv,nx);       n = zeros(nv,nx);
-	p = zeros(nv,nx);
-
-%% Prepare Velocity Points Space
+%% Applying Discrete Ordinate Method on ICs:
+[z,ux,t] = apply_DOM(z0,u0,t0,nv);  % Semi-classical IC
+[p,~,~] = apply_DOM(p0,rho0,E0,nv); % Classical IC
+   
+%% Initial Equilibrium Distribution 'f0'
+% Compute distribution IC: 'f0' of our mesoscopic method by assuming the
+% equilibrium state of the macroscopic IC. We use then the semiclassical
+% Equilibrium distribuition function:
 switch quad 
-    case{1,2} % DOM with NC or DOM with GH
-        % here v is fixed in every time step.
-        nv = length(v);     v = repmat(v,1,nx);     w = repmat(w,1,nx);
-    case{3} % DDOM with 3 GH points
-        % here v changes in every time step.
-        % v_star is fixed in every time step.
-        nv = length(v_star); % nv = 3, fixed number of velocity points
-        % v* is normalized as: v* = (v-u)/sqrt(t)
-        v_star = repmat(v_star,1,nx);               w = repmat(w,1,nx);
-        alpha = sqrt(t);    v = alpha.*v_star + ux;
-    otherwise 
-        error('Order must be between 1, 2 and 3');
-end
-    
-%% Initial Equilibrium Distribution
-% Compute distribution IC of our mesoscopic method by assuming the equilibrium 
-% state of the macroscopic IC. Using the semiclassical Equilibrium
-% distribuition function:
-switch quad 
-    case{1,2} % DOM with NC or DOM with GH
-        f0 = f_equilibrium_1d(r,ux,v,t,theta);
-    case{3} % DDOM with 3 GH points
-        f0 = f_equilibrium_star_1d(r,v_star,theta);
+    case{1,2} % DOM-NC or DOM-GH
+        f0 = f_equilibrium_1d(z,ux,v,t,theta);
+    case{3}   % DDOM with 3 points GH
+        f0 = f_equilibrium_star_1d(z,c_star,theta);
 otherwise 
         error('Order must be between 1, 2 and 3');
 end
 
 % Plot IC of Distribution function, f, in Phase-Space:
-if plot_figs == 1
+if plot_figs == 1 && (quad == 1 || quad == 2)
    figure(1)
    surf(f0); grid on;
    xlabel('x - Spatial Domain'); 
    ylabel('v - Velocity Space');
    zlabel('f - Probability');
 end
+
 % Compute Initial Macroscopic Momemts:
 switch quad 
-    case{1,2} % DOM with NC or DOM with GH
-        [n,j_x,E] = macromoments1d(k,w,f0,v);
-    case{3} % DDOM with 3 GH points
-        [n,j_x,E] = macromoments_star_1d(alpha,k,w,f0,v_star);
+    case{1,2} % DOM-NC or DOM-GH
+        [rho,rhoux,E] = macromoments1d(k,w,f0,v);
+    case{3}   % DDOM with 3 GH points
+        [rho,rhoux,E] = macromoments_star_1d(J,k,w,f0,v);
 otherwise 
         error('Order must be between 1, 2 and 3');
 end
-    
     
 %% Marching Scheme
 % First we need to define how big is our time step. Due to the discrete
@@ -152,27 +137,29 @@ switch method
     case{1} % TVD 0(h^2)
         % Using discrete ordinate method (discrete and constant velocity
         % values in phase-space domain)
-        a = v(:,1);
+        a = v;
         
         % Load initial condition
         f = f0;
                         
         for tsteps = time
             % Plot and redraw figures every time step for visualization
-            if plot_figs == 1
+            if plot_figs == 1 && (quad == 1 || quad == 2)
             % Plot f distribution
             figure(1)
             surf(f); grid on; set(gca,'xDir','reverse');
             xlabel('x - Spatial Domain');
             ylabel('v - Velocity Space');
             zlabel('f - Probability');
+            end
+            if plot_figs == 1 
             % Plot Macroscopic variables
             figure(2)
-            subplot(2,3,1); plot(x,n(1,:),'.'); axis tight; title('Density')
-            subplot(2,3,2); plot(x,p(1,:),'.'); axis tight; title('Pressure')
-            subplot(2,3,3); plot(x,t(1,:),'.'); axis tight; title('Temperature')
-            subplot(2,3,4); plot(x,r(1,:),'.'); axis tight; title('Fugacity')
-            subplot(2,3,5); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+            subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
+            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+            subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
+            subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
+            subplot(2,3,5); plot(x,t(1,:),'.'); axis tight; title('Temperature')
             subplot(2,3,6); plot(x,E(1,:),'.'); axis tight; title('Energy')
             end
             % Write Results
@@ -181,11 +168,18 @@ switch method
                 fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
                 for i = 1:nx
                     fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
-                        x(1,i),n(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),r(1,i));
+                        x(1,i),n(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),z(1,i));
                 end
             end
             % compute equilibrium distribution for the current t_step
-            f_eq = f_equilibrium_1d(r,ux,v,t,theta);
+            switch quad
+                case{1,2} % DOM-NC or DOM-GH
+                    f_eq = f_equilibrium_1d(z,ux,v,t,theta);
+                case{3}   % DDOM with 3 points GH
+                    f_eq = f_equilibrium_star_1d(z,c_star,theta);
+                otherwise
+                    error('Order must be between 1, 2 and 3');
+            end
             
             % initialize variables
             u_next = zeros(1,nx);
@@ -194,18 +188,19 @@ switch method
                               
             % (this part can, and should be done in parallel!)
             for i = 1:nv
+                                
                 % load subcase
                 u_eq(:) = f_eq(i,:);
                 u(:) = f(i,:);
                 
                 % Compute the smoothness factors, r(j), from data, u(j).
-                [r] = theta1d(u,a(i));
+                [r] = theta1d(u,a(i,:));
 
                 % Compute the Flux Limiter
                 [phi] = fluxlimiter1d(r,1); % using limiter = 1
 
                 % Compute TVD Fluxes
-                [F_left,F_right] = TVDflux1d(u,a(i),dtdx,phi);
+                [F_left,F_right] = TVDflux1d(u,a(i,:),dtdx,phi);
 
                 % Compute next time step
                 u_next = u - dtdx*(F_right - F_left) ...
@@ -223,12 +218,29 @@ switch method
             end
             
             % Compute macroscopic moments
-            [n,j_x,E] = macromoments1d(k,w,f,v);
+            switch quad
+                case{1,2} % DOM-NC or DOM-GH
+                    [rho,rhoux,E] = macromoments1d(k,w,f,v);
+                case{3}   % DDOM with 3 GH points
+                    [rho,rhoux,E] = macromoments_star_1d(J,k,w,f,c_star);
+                otherwise
+                    error('Order must be between 1, 2 and 3');
+            end
             
             % UPDATE macroscopic properties 
             % (here lies a paralellizing computing chalenge)
-            [r,ux,t,p] = macroproperties1d(n,j_x,E,nx,nv,theta);
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,nv,theta);
             
+            % Apply DOM
+            [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
+            %[p,~,~] = apply_DOM(p,rho,E,nv); % Classical variables
+            
+            % compute new v and J values if DDOM is used
+            if quad == 3 % if DDOM
+                J = sqrt(t(1,:));   % Jacobian
+                v = ones(3,1)*J.*c_star + ux; % transformation: v = a*(C*) + ux
+            end
+            % update drawing
             drawnow
         end
         

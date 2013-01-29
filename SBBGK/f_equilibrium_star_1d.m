@@ -11,4 +11,4 @@ function f = f_equilibrium_star_1d(r,c,theta)
 % t: temperature
 % r: fugacity
 
-f = 1./(r.*exp(c.^2) + theta);
+f = 1./((1./r).*exp(c.^2) + theta);

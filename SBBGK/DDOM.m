@@ -10,7 +10,7 @@ switch origin
         theta =  0; F0_MB = @(c) 1./((1./z).*exp(c.^2) + theta);
         theta =  1; F0_FD = @(c) 1./((1./z).*exp(c.^2) + theta);
     case 1 % displaced
-        z = 0.10; disp = 2.0; 
+        z = 0.10; disp = 2.0; t = 3.2;
         theta = -1; F0_BE = @(c) 1./((1./z).*exp((c-disp).^2) + theta);
         theta =  0; F0_MB = @(c) 1./((1./z).*exp((c-disp).^2) + theta);
         theta =  1; F0_FD = @(c) 1./((1./z).*exp((c-disp).^2) + theta);
