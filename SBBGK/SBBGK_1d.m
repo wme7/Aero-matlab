@@ -155,9 +155,17 @@ switch method
                         x(1,i),n(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),r(1,i));
                 end
             end
-            % compute equilibrium distribution for the current t_step
-            f_eq = f_equilibrium_1d(z,ux,v,t,theta);
             
+            % Compute equilibrium distribution for the current t_step
+            switch fmodel
+                case{1} % U.U.
+                    f_eq = f_equilibrium_1d(z,ux,v,t,theta);
+                case{2} % E.S.
+                    f_eq = f_SE_equilibrium_1d(z,p,rho,ux,v,t,theta);
+                otherwise
+                    error('Order must be between 1 and 2');
+            end
+                        
             % initialize variables
             u_next = zeros(1,nx);
             u_eq = zeros(1,nx);
