@@ -11,7 +11,7 @@ clear all;  close all; %clc;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
-CFL         = 0.01;     % CFL condition
+CFL         = 1/20;     % CFL condition
 r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.1;      % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
@@ -62,19 +62,19 @@ switch quad
     nv = length(v);     v = repmat(v,1,nx);     w = repmat(w,1,nx);
     
     case{2} % Gauss Hermite Quadrature for D.O.M.
-    nv = 80;        % nodes desired (the actual value)
+    nv = 60;        % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;          % quadrature constant.
     w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature
     v = repmat(v,1,nx);     w = repmat(w,1,nx);
     
     case{3} % Gauss Hermite Quadrature for Dynamic-D.O.M.
-    nv = 3;         % nodes required = 3 (the actual value)
+    nv = 5;         % nodes required = 3 (the actual value)
     [c_star,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;          % quadrature constant.
     w = w.*exp(c_star.^2); % weighting function of the Gauss-Hermite quadrature
     J = sqrt(t0);   % Jacobian for every point in x domain, 'J(x)'.
-    v = c_star*J + ones(3,1)*u0;  % transformation: v = a*(C*) + ux
+    v = c_star*J + ones(nv,1)*u0;  % transformation: v = a*(C*) + ux
     c_star = repmat(c_star,1,nx); w = repmat(w,1,nx); J = repmat(J,nv,1);
         
     otherwise
@@ -99,7 +99,7 @@ otherwise
 end
 
 % Plot IC of Distribution function, f, in Phase-Space:
-if plot_figs == 1 && (quad == 1 || quad == 2)
+if plot_figs == 1 %&& (quad == 1 || quad == 2)
    figure(1)
    surf(f0); grid on;
    xlabel('x - Spatial Domain'); 
@@ -137,14 +137,14 @@ switch method
     case{1} % TVD 0(h^2)
         % Using discrete ordinate method (discrete and constant velocity
         % values in phase-space domain)
-        a = v;
-        
+        a = v; %c_star;
+                
         % Load initial condition
         f = f0;
                         
         for tsteps = time
             % Plot and redraw figures every time step for visualization
-            if plot_figs == 1 && (quad == 1 || quad == 2)
+            if plot_figs == 1 %&& (quad == 1 || quad == 2)
             % Plot f distribution
             figure(1)
             surf(f); grid on; set(gca,'xDir','reverse');
@@ -171,7 +171,7 @@ switch method
                         x(1,i),n(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),z(1,i));
                 end
             end
-            % compute equilibrium distribution for the current t_step
+            % Compute equilibrium distribution for the current t_step
             switch quad
                 case{1,2} % DOM-NC or DOM-GH
                     f_eq = f_equilibrium_1d(z,ux,v,t,theta);
@@ -222,25 +222,25 @@ switch method
                 case{1,2} % DOM-NC or DOM-GH
                     [rho,rhoux,E] = macromoments1d(k,w,f,v);
                 case{3}   % DDOM with 3 GH points
-                    [rho,rhoux,E] = macromoments_star_1d(J,k,w,f,c_star);
+                    [rho,rhoux,E] = macromoments_star_1d(J,k,w,f,v);
                 otherwise
                     error('Order must be between 1, 2 and 3');
             end
             
             % UPDATE macroscopic properties 
-            % (here lies a paralellizing computing chalenge)
+            % (here lies a paralellizing computing challenge)
             [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,nv,theta);
             
             % Apply DOM
             [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
-            %[p,~,~] = apply_DOM(p,rho,E,nv); % Classical variables
+            %[p,rho,E] = apply_DOM(p,rho,E,nv); % Classical variables
             
-            % compute new v and J values if DDOM is used
+            % Compute new v and J values if DDOM is used
             if quad == 3 % if DDOM
-                J = sqrt(t(1,:));   % Jacobian
-                v = ones(3,1)*J.*c_star + ux; % transformation: v = a*(C*) + ux
+                J = ones(nv,1)*sqrt(t(1,:));   % Jacobian
+                v = J.*c_star + ux; % transformation: v = a*(C*) + ux
             end
-            % update drawing
+            % Update figures
             drawnow
         end
         
@@ -251,6 +251,8 @@ switch method
 end
 toc
 %% Close file with Results
-fclose(file);
 fprintf('Simulation has been completed succesfully!\n')
-fprintf('All Results have been saved!\n')
+if write_ans == 1
+    fclose(file);
+    fprintf('All Results have been saved!\n')
+end

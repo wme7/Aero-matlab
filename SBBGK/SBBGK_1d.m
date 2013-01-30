@@ -15,6 +15,7 @@ CFL         = 0.05;     % CFL condition
 r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.15;      % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
+fmodel      = 1;        % {1} UU. model, {2} ES model.
 quad        = 2;        % for NC = 1 , GH = 2
 method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
 IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
@@ -43,6 +44,11 @@ if write_ans == 1
     fprintf(file, 'TITLE = "%s"\n',ID);
     fprintf(file, 'VARIABLES = "x" "density" "velocity" "energy" "pressure" "temperature" "fugacity"\n');
 end
+
+%% Initial Conditions in physical Space
+% Load Macroscopic Fugacity [z], Velocity[u] and Temperature[t] 
+    [z0,u0,t0,p0,rho0,E0] = SSBGK_IC1d(x,IC_case);
+
 %% Microscopic Velocity Discretization (using Discrete Ordinate Method)
 % that is to make coincide discrete values of microscopic velocities with
 % values as the value points for using a quadrature method, so that we can
@@ -66,30 +72,25 @@ switch quad
 end
 %% Velocity-Space Grid:
 % The actual nv value will be computed using 'length' vector function:
-nv = length(v); 
-
+    nv = length(v); 
 % Using D.O.M.
     v = repmat(v,1,nx);     w = repmat(w,1,nx);
 
-% Initialize Arrays
-%    ux = zeros(nv,nx);      t = zeros(nv,nx);       
-%    r = zeros(nv,nx);       n = zeros(nv,nx);
- 	 p = zeros(nv,nx);   
-
-%% Initial Conditions
-% Load Macroscopic Velocity, Temperature and Fugacity
-    [r0,u0,t0] = SSBGK_IC1d(x,IC_case);
-%    [r0,u0,t0,n0,p0] = SSBGK_ES_IC1d(x,IC_case);
-    
-% Using Discrete Ordinate Method:
-    r = repmat(r0,nv,1); ux = repmat(u0,nv,1); t = repmat(t0,nv,1);
-%    n = repmat(n0,nv,1); p  = repmat(p0,nv,1); 
+%% Applying Discrete Ordinate Method on ICs:
+[z,ux,t] = apply_DOM(z0,u0,t0,nv);  % Semi-classical IC
+[p,rho,E] = apply_DOM(p0,rho0,E0,nv); % Classical IC
 
 % Compute distribution IC of our mesoscopic method by assuming the equilibrium 
 % state of the macroscopic IC. Using the semiclassical Equilibrium
 % distribuition function:
-    f0 = f_equilibrium_1d(r,ux,v,t,theta);
-%    f0 = f_SE_equilibrium_1d(r,p,n,ux,v,t,theta);
+switch fmodel 
+    case{1} % U.U.
+        f0 = f_equilibrium_1d(z,ux,v,t,theta);
+    case{2} % E.S.
+        f0 = f_SE_equilibrium_1d(z,p,rho,ux,v,t,theta);
+otherwise 
+        error('Order must be between 1 and 2');
+end
     
 % Plot IC of Distribution function, f, in Phase-Space:
 if plot_figs == 1
@@ -100,7 +101,7 @@ if plot_figs == 1
    zlabel('f - Probability');
 end
 % Compute Initial Macroscopic Momemts:
-    [n,j_x,E] = macromoments1d(k,w,f0,v);
+%    [rho,rhou,E] = macromoments1d(k,w,f0,v); Just for testing
     
 %% Marching Scheme
 % First we need to define how big is our time step. Due to the discrete
@@ -138,11 +139,11 @@ switch method
             zlabel('f - Probability');
             % Plot Macroscopic variables
             figure(2)
-            subplot(2,3,1); plot(x,n(1,:),'.'); axis tight; title('Density')
-            subplot(2,3,2); plot(x,p(1,:),'.'); axis tight; title('Pressure')
-            subplot(2,3,3); plot(x,t(1,:),'.'); axis tight; title('Temperature')
-            subplot(2,3,4); plot(x,r(1,:),'.'); axis tight; title('Fugacity')
-            subplot(2,3,5); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+            subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
+            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+            subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
+            subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
+            subplot(2,3,5); plot(x,t(1,:),'.'); axis tight; title('Temperature')
             subplot(2,3,6); plot(x,E(1,:),'.'); axis tight; title('Energy')
             end
             % Write Results
@@ -155,7 +156,7 @@ switch method
                 end
             end
             % compute equilibrium distribution for the current t_step
-            f_eq = f_equilibrium_1d(r,ux,v,t,theta);
+            f_eq = f_equilibrium_1d(z,ux,v,t,theta);
             
             % initialize variables
             u_next = zeros(1,nx);
@@ -193,13 +194,17 @@ switch method
             end
             
             % Compute macroscopic moments
-            [n,j_x,E] = macromoments1d(k,w,f,v);
+            [rho,rhoux,E] = macromoments1d(k,w,f,v);
             
             % UPDATE macroscopic properties 
-            % (here lies a paralellizing computing chalenge)
-            [r,ux,t,p] = macroproperties1d(n,j_x,E,nx,nv,theta);
+            % (here lies a paralellizing computing challenge)
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,nv,theta);
             
-            % update figures
+            % Apply DOM
+            [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
+            %[p,rho,E] = apply_DOM(p,rho,E,nv); % Classical variables
+            
+            % Update figures
             drawnow
         end
         
