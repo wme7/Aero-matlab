@@ -11,12 +11,12 @@ clear all;  close all; %clc;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
-CFL         = 1/20;     % CFL condition
+CFL         = 4/100;    % CFL condition
 r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.1;      % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 quad        = 3;        % for DOM-NC = 1, DOM-GH = 2, DDOM-3pGH = 3
-method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
+method      = 1;        % for {1} Upwind, {2} TVD,
 IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
 plot_figs   = 1;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
@@ -133,11 +133,115 @@ time = 0:dt:tEnd;
 % information inside the domain: 
 tic
 switch method
-    
-    case{1} % TVD 0(h^2)
+            
+    case{1} % UPWIND O(h)
         % Using discrete ordinate method (discrete and constant velocity
         % values in phase-space domain)
-        a = v; %c_star;
+        a = v; % %c_star; %
+                
+        % Load initial condition
+        f = f0;
+                        
+        for tsteps = time
+            % Plot and redraw figures every time step for visualization
+            if plot_figs == 1 %&& (quad == 1 || quad == 2)
+            % Plot f distribution
+            figure(1)
+            surf(f); grid on; set(gca,'xDir','reverse');
+            xlabel('x - Spatial Domain');
+            ylabel('v - Velocity Space');
+            zlabel('f - Probability');
+            end
+            if plot_figs == 1 
+            % Plot Macroscopic variables
+            figure(2)
+            subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
+            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+            subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
+            subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
+            subplot(2,3,5); plot(x,t(1,:),'.'); axis tight; title('Temperature')
+            subplot(2,3,6); plot(x,E(1,:),'.'); axis tight; title('Energy')
+            end
+            % Write Results
+            if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
+                fprintf(file, 'ZONE T = "time %0.4f"\n', tsteps);
+                fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
+                for i = 1:nx
+                    fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
+                        x(1,i),n(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),z(1,i));
+                end
+            end
+            % Compute equilibrium distribution for the current t_step
+            switch quad
+                case{1,2} % DOM-NC or DOM-GH
+                    f_eq = f_equilibrium_1d(z,ux,v,t,theta);
+                case{3}   % DDOM with 3 points GH
+                    f_eq = f_equilibrium_star_1d(z,c_star,theta);
+                otherwise
+                    error('Order must be between 1, 2 and 3');
+            end
+            
+            % initialize variables
+            u_next = zeros(1,nx);
+            u_eq = zeros(1,nx);
+            u = zeros(1,nx);
+                              
+            % (this part can, and should be done in parallel!)
+            for i = 1:nv
+                                
+                % load subcase
+                u_eq(:) = f_eq(i,:);
+                u(:) = f(i,:);
+                
+                % Compute TVD Fluxes
+                [F_left,F_right] = Upwindflux1d(u,a(i,:));
+
+                % Compute next time step
+                u_next = u - dtdx*(F_right - F_left) ...
+                    + (dt/r_time)*J(1,:).*(u_eq-u);
+
+                % BC
+                u_next(1) = u_next(2);
+                u_next(nx) = u_next(nx-1);
+
+                % UPDATE info
+                u = u_next;
+                
+                % Going back to f
+                f(i,:) = u(:);
+            end
+            
+            % Compute macroscopic moments
+            switch quad
+                case{1,2} % DOM-NC or DOM-GH
+                    [rho,rhoux,E] = macromoments1d(k,w,f,v);
+                case{3}   % DDOM with 3 GH points
+                    [rho,rhoux,E] = macromoments_star_1d(J,k,w,f,v);
+                otherwise
+                    error('Order must be between 1, 2 and 3');
+            end
+            
+            % UPDATE macroscopic properties 
+            % (here lies a paralellizing computing challenge)
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,nv,theta);
+            
+            % Apply DOM
+            [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
+            %[p,rho,E] = apply_DOM(p,rho,E,nv); % Classical variables
+            
+            % Compute new v and J values if DDOM is used
+            if quad == 3 % if DDOM
+                J = ones(nv,1)*sqrt(t(1,:));   % Jacobian
+                v = J.*c_star + ux; % transformation: v = a*(C*) + ux
+            end
+            % Update figures
+            drawnow
+        end
+
+        case{2} % TVD 0(h^2)
+        % Using discrete ordinate method (discrete and constant velocity
+        % values in phase-space domain)
+        a = v; % %c_star; %
                 
         % Load initial condition
         f = f0;
@@ -244,8 +348,6 @@ switch method
             drawnow
         end
         
-    case{2} % WENO k = 3 i.e. O(h^5) 
-        
     otherwise
         error('Order must be between 1 and 2');
 end
@@ -255,4 +357,15 @@ fprintf('Simulation has been completed succesfully!\n')
 if write_ans == 1
     fclose(file);
     fprintf('All Results have been saved!\n')
+end
+
+if plot_figs ~= 1
+    % Plot Macroscopic variables
+    figure(2)
+    subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
+    subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+    subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
+    subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
+    subplot(2,3,5); plot(x,t(1,:),'.'); axis tight; title('Temperature')
+    subplot(2,3,6); plot(x,E(1,:),'.'); axis tight; title('Energy')
 end
