@@ -20,27 +20,31 @@
 %* coded by Manuel Diaz, 2012.12.25
 %**************************************************************************
 clear all; clc; % close all;
-global gamma
 
 %% Parameters
-cfl      = 0.3;     % courant number
-nx       = 140;     % number of cells
+cfl      = 0.1;     % courant number
+nx       = 100;      % number of cells
 mx       = nx+1;    % number of nodes
 ICx      = 1;       % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
 tEnd     = 0.10;    % final time to compute
-dtdx     = 0.20;    % dt/dx (fixed for testing)
+dtdx     = 0.30;    % dt/dx (fixed for testing)
 etpfix   = 0.90;	% {#} Harten's sonic entropy fix value, {0} no entropy fix
 plot_fig = 1;       % {1} plot figures, {0} do NOT plot figures
 wrt_sol  = 1;       % {1} write solution, {0} do NOT write solution file
+r_time      = 1/10000;  % Relaxation time
+theta       = -1;        % {-1} BE, {0} MB, {1} FD.
+quad        = 2;        % for NC = 1 , GH = 2
+method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
+
 
 %% Physical Constanst
-%gamma = 1.4;         % Ratio of specific heats
-gamma = 4.8;
+gamma = 2.5; %1.4;        % Ratio of specific heats
 
 %% Domain
 xn = linspace(0,1,mx);          % cells nodes
 dx = max(xn(2:mx)-xn(1:mx-1));  % Cell size
 x  = xn(1:mx-1)+dx/2;        	% Cell centers
+
 
 %% Time 
 dt = dtdx*dx;       % time step
@@ -62,15 +66,15 @@ H = gamma/(gamma-1)*p./r + u.^2/2;
 [xx,rhoexact,uexact,pexact,machexact,entroexact,energexact] = ...
     Exact_Riemann(r(1),u(1),p(1),r(nx),u(nx),p(nx),tEnd);
 
-% %% Left and right conditions for Dirichlet BC's
-%     r_left  = r(1);  % r_left
-%     r_right = r(nx); % r_right
-%     u_left  = u(1);  % u_left
-%     u_right = u(nx); % u_right
-%     p_left  = p(1);  % p_left
-%     p_right = p(nx); % p_right
-%     E_left  = E(1);  % E_left
-%     E_right = E(nx); % E_right
+%% Left and right conditions for Dirichlet BC's
+    r_left  = r(1);  % r_left
+    r_right = r(nx); % r_right
+    u_left  = u(1);  % u_left
+    u_right = u(nx); % u_right
+    p_left  = p(1);  % p_left
+    p_right = p(nx); % p_right
+    E_left  = E(1);  % E_left
+    E_right = E(nx); % E_right
 
 %% Compute primitive Variables @ cell center variables
 % Build vector U and dU, and F
@@ -79,10 +83,20 @@ H = gamma/(gamma-1)*p./r + u.^2/2;
     % U = [U1 U2 U3]' % defined at every cell center
     U = [r; r.*u; E];
         % U1 = Density, U2 = Momentum, U3 = Total Energy
-
+%% Cut Function
+for i = 2:nx-1
+if (x(1,i) < 0.335)
+     h(1,i)=1;
+   elseif( x(1,i) > 0.675)
+     h(1,i)=0;
+   else
+   h(1,i)= (x(1,i)-0.675)/(0.335-0.675);
+   end
+end
 %% Main Loop
 n = 1;  % counter
-U_next = zeros(3,nx);
+U_next   = zeros(3,nx);
+UL_next = zeros(3,nx);
 for time = t; 
     % Compute Roe Averages
     % Velovity 'u'
@@ -143,11 +157,21 @@ for time = t;
                             alpha3_bar.*lambda3_bar.*k3_bar );
                         
     % Compute next time step
-    for i = 2:nx-1
-        U_next(:,i) = U(:,i) - dtdx*(Flux(:,i) - Flux(:,i-1));
-    end
     
-    % BCs
+    for i = 2:nx-1
+% if (x(1,i) < 0.335)
+%      BGK-CODE;
+%    elseif( x(1,i) > 0.675)
+%        Roe-Euler
+     U_next(:,i) = U(:,i) - dtdx*(1-h(1,i))*(Flux(:,i) - Flux(:,i-1))
+%    else
+%    Roe-Euler &  BGK Coupling      
+%    h(1,i)= (x(1,i)-0.675)/(0.335-0.675);
+   end
+end
+    
+    
+   % BCs
     U_next(:,1)  = U(:,2); % Neumann condition to the left
     U_next(:,nx) = U(:,nx-1); % Neumann condition to the right
     
@@ -196,10 +220,10 @@ if wrt_sol == 1;
     subplot(2,3,5); hold on; plot(x,s,'o'); title('Entropy');
     subplot(2,3,6); hold on; plot(x,e,'o'); title('Internal Energy');
     
-    subplot(2,3,1); plot(xx,rhoexact);   hold off;
-    subplot(2,3,2); plot(xx,uexact);     hold off;
-    subplot(2,3,3); plot(xx,pexact);     hold off;
-    subplot(2,3,4); plot(xx,machexact);  hold off;
-    subplot(2,3,5); plot(xx,entroexact); hold off;
-    subplot(2,3,6); plot(xx,energexact); hold off;
+%      subplot(2,3,1); plot(xx,rhoexact);   hold off;
+%      subplot(2,3,2); plot(xx,uexact);     hold off;
+%      subplot(2,3,3); plot(xx,pexact);     hold off;
+%      subplot(2,3,4); plot(xx,machexact);  hold off;
+%      subplot(2,3,5); plot(xx,entroexact); hold off;
+%      subplot(2,3,6); plot(xx,energexact); hold off;
 end

@@ -15,10 +15,10 @@ CFL         = 4/100;    % CFL condition
 r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.1;      % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
-quad        = 3;        % for DOM-NC = 1, DOM-GH = 2, DDOM-3pGH = 3
+quad        = 2;        % for DOM-NC = 1, DOM-GH = 2, DDOM-3pGH = 3
 method      = 1;        % for {1} Upwind, {2} TVD,
 IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-plot_figs   = 1;        % 0: no, 1: yes please!
+plot_figs   = 0;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG
 P_deg       = 0;        % Polinomial Degree
@@ -84,7 +84,7 @@ end
 %% Applying Discrete Ordinate Method on ICs:
 [z,ux,t] = apply_DOM(z0,u0,t0,nv);  % Semi-classical IC
 [p,~,~] = apply_DOM(p0,rho0,E0,nv); % Classical IC
-   
+
 %% Initial Equilibrium Distribution 'f0'
 % Compute distribution IC: 'f0' of our mesoscopic method by assuming the
 % equilibrium state of the macroscopic IC. We use then the semiclassical
@@ -155,7 +155,7 @@ switch method
             if plot_figs == 1 
             % Plot Macroscopic variables
             figure(2)
-            subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
+            subplot(2,3,1); plot(x,rho(1,:),'.'); axis([0,1,0,1.4]); title('Density')
             subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
             subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
             subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
@@ -198,7 +198,7 @@ switch method
 
                 % Compute next time step
                 u_next = u - dtdx*(F_right - F_left) ...
-                    + (dt/r_time)*J(1,:).*(u_eq-u);
+                    + (dt/r_time)*(u_eq-u);
 
                 % BC
                 u_next(1) = u_next(2);

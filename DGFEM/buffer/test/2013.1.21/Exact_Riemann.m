@@ -20,8 +20,7 @@ function [xx,rhoexact,uexact,pexact,machexact,entroexact,energexact] = ...
 % u4, p4, rho4
 global PRL  CRL MACHLEFT  gamma
 
-%gamma = 1.4; 
-gammab = 1/(gamma - 1); gam1 = gamma-1;
+gamma = 2.5; gammab = 1/(gamma - 1); gam1 = gamma-1;
 
 % Assumed structure of exact solution
 %
