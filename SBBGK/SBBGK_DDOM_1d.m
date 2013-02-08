@@ -11,12 +11,12 @@ clear all;  close all; %clc;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
-CFL         = 4/100;    % CFL condition
+CFL         = 5/100;    % CFL condition
 r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.1;      % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
-quad        = 2;        % for DOM-NC = 1, DOM-GH = 2, DDOM-3pGH = 3
-method      = 1;        % for {1} Upwind, {2} TVD,
+quad        = 2;        % for DOM-NC = 1, DOM-GH = 2, DDOM-5pGH = 3
+method      = 2;        % for {1} Upwind, {2} TVD,
 IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
 plot_figs   = 0;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
@@ -69,7 +69,7 @@ switch quad
     v = repmat(v,1,nx);     w = repmat(w,1,nx);
     
     case{3} % Gauss Hermite Quadrature for Dynamic-D.O.M.
-    nv = 5;         % nodes required = 3 (the actual value)
+    nv = 5;         % nodes required = 5 (the actual value)
     [c_star,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;          % quadrature constant.
     w = w.*exp(c_star.^2); % weighting function of the Gauss-Hermite quadrature
@@ -137,7 +137,7 @@ switch method
     case{1} % UPWIND O(h)
         % Using discrete ordinate method (discrete and constant velocity
         % values in phase-space domain)
-        a = v; % %c_star; %
+        a = v;
                 
         % Load initial condition
         f = f0;
@@ -184,7 +184,10 @@ switch method
             % initialize variables
             u_next = zeros(1,nx);
             u_eq = zeros(1,nx);
-            u = zeros(1,nx);
+            u  = zeros(1,nx);
+                        
+            % Compute Distribution slope values @ c_star points
+            dudc = GaussSlope(c_star,f);
                               
             % (this part can, and should be done in parallel!)
             for i = 1:nv
@@ -192,23 +195,46 @@ switch method
                 % load subcase
                 u_eq(:) = f_eq(i,:);
                 u(:) = f(i,:);
+%                 vx = ux(i,:);
+                b = sqrt(t(i,:)); 
+                c = v(i,:);
+                
+%                 if tsteps == 0; b_old = sqrt(t); end
+%                 if tsteps == 0; vx_old = ux; end
+                if tsteps == 0; c_old = v; end
                 
                 % Compute TVD Fluxes
                 [F_left,F_right] = Upwindflux1d(u,a(i,:));
 
+                % Compute Material Derivates Correction values
+%                 DvxDt = MatDev(vx,vx_old(i,:),a(i,:),dtdx);
+%                 DbDt = MatDev(b,b_old(i,:),a(i,:),dtdx);
+                DcDt = MatDev(c,c_old(i,:),a(i,:),dtdx);
+                
                 % Compute next time step
-                u_next = u - dtdx*(F_right - F_left) ...
-                    + (dt/r_time)*(u_eq-u);
+%                 u_next = u - dtdx*(F_right - F_left) ...
+%                     - (dt/r_time)*(u-u_eq) ...
+%                     + (1./b).*dudc(i,:).*c_star(i,:).*DbDt ...
+%                     + (1./b).*dudc(i,:).*DvxDt ;
 
+                u_next = u - dtdx*(F_right - F_left) ...
+                    - (dt/r_time)*(u-u_eq) ...
+                    + (1./b).*dudc(i,:).*DcDt ;
+                
                 % BC
                 u_next(1) = u_next(2);
                 u_next(nx) = u_next(nx-1);
 
                 % UPDATE info
                 u = u_next;
-                
+                             
                 % Going back to f
                 f(i,:) = u(:);
+                
+                % Save Old info
+%                 vx_old(i,:) = vx;
+%                 b_old(i,:) = b;
+                c_old(i,:) = c;
             end
             
             % Compute macroscopic moments
@@ -231,7 +257,7 @@ switch method
             
             % Compute new v and J values if DDOM is used
             if quad == 3 % if DDOM
-                J = ones(nv,1)*sqrt(t(1,:));   % Jacobian
+                J = sqrt(t);   % Jacobian
                 v = J.*c_star + ux; % transformation: v = a*(C*) + ux
             end
             % Update figures
