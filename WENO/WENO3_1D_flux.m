@@ -52,13 +52,13 @@ wnp = alphanp / alphasumn;
 
 %% WENO Fluxes
 % Positive Flux: f_i+1/2 (-)
-dx  =-0.01;
+dx  =-0.5;
 up  = wpn * (pn0 + pn1*dx + pn2*dx^2) ...
 	+ wpm * (pm0 + pm1*dx + pm2*dx^2) ...
 	+ wpp * (pp0 + pp1*dx + pp2*dx^2);
 
 % Negative Flux: f_i-1/2 (+)
-dx  = 0.01;
+dx  = 0.5;
 un  = wnn * (pn0+ pn1*dx + pn2*dx^2) ...
     + wnm * (pm0+ pm1*dx + pm2*dx^2) ...
 	+ wnp * (pp0+ pp1*dx + pp2*dx^2);

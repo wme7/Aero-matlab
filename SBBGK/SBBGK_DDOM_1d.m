@@ -15,9 +15,9 @@ CFL         = 5/100;    % CFL condition
 r_time      = 1/10000;  % Relaxation time
 tEnd        = 0.1;      % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
-quad        = 2;        % for DOM-NC = 1, DOM-GH = 2, DDOM-5pGH = 3
+quad        = 1;        % for DOM-NC = 1, DOM-GH = 2, DDOM-5pGH = 3
 method      = 2;        % for {1} Upwind, {2} TVD,
-IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
+IC_case     = 3;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
 plot_figs   = 0;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG
@@ -27,7 +27,7 @@ Pp          = P_deg+1;  % Polinomials Points
 RK_stages   = 4;        % Number of RK stages
 
 %% Space Discretization
-nx  = 100;                      % Desided number of points in our domain
+nx  = 200;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
