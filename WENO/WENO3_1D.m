@@ -3,7 +3,7 @@
 %
 % du/dt + dF(u)/dx = 0
 %
-% where $dF/du = a$
+% where $F(u) = a*u$
 %
 % by Manuel Diaz, manuel.ade'at'gmail.com 
 % Institute of Applied Mechanics, 2012.08.20
