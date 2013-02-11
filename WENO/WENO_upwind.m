@@ -62,7 +62,7 @@ B2n = 13/12*(u( i )-2*u(i+1)+u(i+2))^2 + 1/4*(3*u( i )-4*u(i+1)+u(i+2))^2;
 
 % Constants
 d0n = 1/10; d1n = 6/10; d2n = 3/10; 
-epsilon = 1E-7;
+epsilon = 1E-8;
 
 % Alpha weights 
 alpha0n = d0n /(epsilon + B0n)^2;

@@ -16,12 +16,12 @@
 clear all; clc; close all;
 
 %% Parameters
+    cfl = 0.40;  % Courant Number
      dx = 0.02;  % Spatial step size
-    cfl = 0.80;  % Courant Number
  tStart = 0.00;  % Start time
-   tEnd = 3.50;  % End time
-IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine {5} Riemann
-bc_type = 1;     % {1} Dirichlet, {2} Neumann, {3} Periodic
+   tEnd = 3.15;  % End time
+IC_case = 3;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine {5} Riemann
+bc_type = 2;     % {1} Dirichlet, {2} Neumann, {3} Periodic
 
 %% Define our Flux function
      f = @(w) w.^2/2;
@@ -31,8 +31,8 @@ bc_type = 1;     % {1} Dirichlet, {2} Neumann, {3} Periodic
 %% Discretization of Domain
 % Depending on the size of the degree of the WENO stencil we are using then
 % 1 or more ghost cells have to be introduced
-    r = 3;              % for WENO r=3
-    gcells = r-1;       % gosht cells to add
+    k = 2;              % for WENO3 k=2
+    gcells = k;         % gosht cells to add
     a = 1 - gcells*dx;  % a
     b = 2 + gcells*dx;  % b
     x = a:dx:b;         % x grid
@@ -58,8 +58,8 @@ bc_type = 1;     % {1} Dirichlet, {2} Neumann, {3} Periodic
 it_count = 0;           % Iteration counter
 u_next = zeros(1,nx);   % u in next time step
 h = zeros(2,nx-1);      % Flux values at the cell boundaries
-fn = zeros(1,nx-1);     % Flux values at u_i+1/2 (-)
-fp = zeros(1,nx-1);     % Flux values at u_i-1/2 (+)
+hn = zeros(1,nx-1);     % Flux values at u_i+1/2 (-)
+hp = zeros(1,nx-1);     % Flux values at u_i-1/2 (+)
 
 while time <= tEnd
     % Plot Evolution
@@ -70,27 +70,43 @@ while time <= tEnd
     title 'Invicid Burgers using WENO scheme';
     
     % Update time step
-    dt   = cfl*dx/abs(max(u));  % time step size
+    dt   = cfl*dx/abs(max(u));  % size of time step
     dtdx = dt/dx;               % precomputed to save some flops
     time = time + dt;           % iteration actual time.
     
-    % Compute WENO Flux values at cells interfaces
-    for i = 3:nx-2
-        [fn(i),fp(i+1)] = WENO3_1D_flux(f(u(i-2:i+2)));
+    % Flux Spliting
+    fluxsplit = 3;
+    switch fluxsplit
+        case{1} % Godunov (non-conservative)
+            v = f(u);
+            vp = 0.5*(v + abs(v)); %flux^{+}
+            vn = 0.5*(v - abs(v)); %flux^{-}
+        case{2} % Local Lax-Friedrichs
+            v = f(u); alpha = abs(df(u));
+            vp = 0.5.*(v + alpha.*u); %flux^{+}
+            vn = 0.5.*(v - alpha.*u); %flux^{-}
+        case{3} % (Global) Lax-Friedrichs
+            v = f(u); alpha = max(abs(df(u)));
+            vp = 0.5.*(v + alpha.*u); %flux^{+}
+            vn = 0.5.*(v - alpha.*u); %flux^{-}
+        otherwise
+            error('only cases 1 and 2 are available')
     end
-    fluxes = [fn;fp];
     
-    % Numerical Global Lax Friedrichs Flux Spliting
-    du = (u(2:nx)-u(1:nx-1));  alpha = max(abs(df(u))); 
-    h = 0.5 * (fluxes(2,:) + fluxes(1,:) - alpha * du);
-        
-    % Compute solution of next time step using WENO Upwind
+    % Reconstruct Fluxes values at cells interfaces
+    for i = 3:nx-2
+        xr = i-2:i+2; % x-range of cells
+        [hn(i),hp(i-1)] = WENO3_1d_flux(vp(xr),vn(xr));
+    end
+    h = sum([hn;hp]);
+                
+    % Compute next time step
     for i = 4:nx-3
         u_next(i) = u(i) - dtdx * (h(i) - h(i-1));
     end
 
-    % WENO BC's
-    u_next = WENO3_1D_BCs(u_next,bc_type,nx);
+    % Apply BCs
+    u_next = WENO3_1d_BCs(u_next,bc_type,nx);
     
     % UPDATE Info
     u = u_next;

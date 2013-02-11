@@ -11,15 +11,12 @@
 clear all; close all; clc;
 
 %% Parameters
-%     r = 3;        % WENO 3rd Order
-      a = -0.50;     % Scalar velocity in x direction
-    a_p = max(0,a); % a^{+}
-    a_m = min(0,a); % a^{-}
+      a = -1.10;     % Scalar velocity in x direction
      dx = 0.01;     % Spatial step size
-    cfl = 0.80;     % Courant Number
+    cfl = 0.62;     % Courant Number
      dt = cfl*dx/abs(a); % time step size
    dtdx = dt/dx;    % precomputed to save some flops
-   tEnd = 0.25;      % End time
+   tEnd = 0.25;     % End time
 
 %% Define our Flux function
      f = @(w) a.*w;
@@ -34,15 +31,15 @@ clear all; close all; clc;
     xa = 1 - gcells*dx; % a
     xb = 2 + gcells*dx; % b
     x = xa:dx:xb;       % x grid
-    n = length(x);      % number of points
+    nx = length(x);      % number of points
     
 %% Time Discretization
 t = 0:dt:tEnd;
 
 %% Initial Condition
-u_0 = ones(1,n);
- x_1 = ceil(2*n/5);
- x_2 = ceil(3*n/5);
+u_0 = ones(1,nx);
+ x_1 = ceil(2*nx/5);
+ x_2 = ceil(3*nx/5);
 u_0(x_1:x_2) = 2;
 
 %% Main Loop
@@ -50,30 +47,38 @@ u_0(x_1:x_2) = 2;
 u = u_0; 
 
 % Initialize vector variables 
-u_next = zeros(1,n);
-h = zeros(2,n-1);      % Flux values at the cell boundaries
-fn = zeros(1,n-1);     % Flux values at u_i+1/2 (-)
-fp = zeros(1,n-1);     % Flux values at u_i-1/2 (+)
+u_next = zeros(1,nx);
+h = zeros(1,nx-1);      % Flux values at the cell boundaries
 
 tic
 for kk = t
-    % Compute WENO Flux values at cells interfaces
-    for i = 3:n-2
-        [fn(i),fp(i-1)] = WENO3_1D_flux(f(u(i-2:i+2)));
+    if a > 0;
+        % Upwinding WENO flux
+        for i = 3:nx-2
+            fu = f(u(i-2:i+2));
+            h(i) = WENO_upwind(fu);
+        end
+
+        % Compute solution of next time step using WENO Upwind
+        for i = 4:nx-3
+            u_next(i) = u(i) - dtdx * (h(i) - h(i-1));
+        end
+
+    else % a < 0;
+        % Downwinding WENO flux
+        for i = 3:nx-2
+            fu = f(u(i-2:i+2));
+            h(i) = WENO_downwind(fu);
+        end
+
+        % Compute solution of next time step using WENO Upwind
+        for i = 4:nx-3
+            u_next(i) = u(i) - dtdx * (h(i+1) - h(i));
+        end
     end
-    fluxes = [fn;fp];
-    
-    % Numerical Global Lax Friedrichs Flux Spliting
-    du = (u(2:n)-u(1:n-1));  alpha = max(abs(df(u))); 
-    h = 0.5 * (fluxes(2,:) + fluxes(1,:) - alpha * du);
-        
-    % Compute solution of next time step using WENO Upwind
-    for i = 4:n-3
-        u_next(i) = u(i) - dtdx * (h(i) - h(i-1));
-    end
-    
+
     % Update BCs: All Neumann BC's
-   	u_next = WENO3_1D_BCs(u_next,2,n); % 2: Neumann BC
+   	u_next = WENO3_1d_BCs(u_next,2,nx); % 2: Neumann BC
     
     % UPDATE info
     u = u_next;
@@ -84,9 +89,9 @@ toc
 % Displacement:
 x_add = floor(a*tEnd/dx);
 % Computing exact solution:
-u_exact = ones(1,n);
- x_1 = ceil(2*n/5) + x_add;
- x_2 = ceil(3*n/5) + x_add;
+u_exact = ones(1,nx);
+ x_1 = ceil(2*nx/5) + x_add;
+ x_2 = ceil(3*nx/5) + x_add;
 u_exact(x_1:x_2) = 2;
 
 %% Plot Results

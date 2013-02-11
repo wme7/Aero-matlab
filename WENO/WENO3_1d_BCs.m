@@ -1,4 +1,4 @@
-function u_next = WENO3_1D_BCs(u_next,bc_type,nx)
+function u_next = WENO3_1d_BCs(u_next,bc_type,nx)
 % Compute boundary conditions for WENO3 in 1D Domain
 
 switch bc_type
