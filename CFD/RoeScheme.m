@@ -23,28 +23,23 @@ clear all; clc; % close all;
 global gamma
 
 %% Parameters
-cfl      = 0.3;     % courant number
-nx       = 140;     % number of cells
+cfl      = 0.9;     % courant number
+nx       = 100;     % number of cells
 mx       = nx+1;    % number of nodes
-ICx      = 1;       % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-tEnd     = 0.10;    % final time to compute
-dtdx     = 0.20;    % dt/dx (fixed for testing)
+ICx      = 5;       % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
+tEnd     = 0.04;    % final time to compute
 etpfix   = 0.90;	% {#} Harten's sonic entropy fix value, {0} no entropy fix
 plot_fig = 1;       % {1} plot figures, {0} do NOT plot figures
 wrt_sol  = 1;       % {1} write solution, {0} do NOT write solution file
 
 %% Physical Constanst
-%gamma = 1.4;         % Ratio of specific heats
-gamma = 4.8;
+gamma = 1.4;         % Ratio of specific heats
+%gamma = 4.8;
 
 %% Domain
 xn = linspace(0,1,mx);          % cells nodes
 dx = max(xn(2:mx)-xn(1:mx-1));  % Cell size
 x  = xn(1:mx-1)+dx/2;        	% Cell centers
-
-%% Time 
-dt = dtdx*dx;       % time step
-t  = 0:dt:tEnd;
 
 %% IC for Euler Riemann solver
 [r,u,p]=Euler_IC1d(x,ICx);
@@ -80,10 +75,14 @@ H = gamma/(gamma-1)*p./r + u.^2/2;
     U = [r; r.*u; E];
         % U1 = Density, U2 = Momentum, U3 = Total Energy
 
+% Initial time and Time step
+t = 0;
+        
 %% Main Loop
 n = 1;  % counter
 U_next = zeros(3,nx);
-for time = t; 
+%for time = t; 
+while t < tEnd
     % Compute Roe Averages
     % Velovity 'u'
     u_bar = (sqrt (r(L)).*u(L) + sqrt (r(R)).*u(R)) ...
@@ -136,6 +135,11 @@ for time = t;
     lambda1_bar = repmat(lambda_bar(1,:),3,1);
     lambda2_bar = repmat(lambda_bar(2,:),3,1);
     lambda3_bar = repmat(lambda_bar(3,:),3,1);
+
+    % Update time step
+    dt = dx*cfl/max(abs(lambda_bar(3,:)));
+    t = t + dt;
+    dtdx = dt/dx;
     
     % Roe Fluxes
     Flux = 0.5*(FL+FR)-0.5*(alpha1_bar.*lambda1_bar.*k1_bar + ...

@@ -61,7 +61,7 @@ switch input
         u  = [0         0        ];
         t  = [4.38385   8.972544 ];
         r  = [0.2253353 0.1204582];
-        
+                
     case{8} % Bogus case 2, Unknown
         fprintf('Case 8: Bogus case 2, Unknown\n');
         u  = [0         0        ];

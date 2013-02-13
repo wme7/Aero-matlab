@@ -14,11 +14,11 @@ name        ='SBBGK1d'; % Simulation Name
 CFL         = 0.05;     % CFL condition
 r_time      = 1/1000;  % Relaxation time
 tEnd        = 0.1;      % End time
-theta       = 1;        % {-1} BE, {0} MB, {1} FD.
+theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 fmodel      = 1;        % {1} UU. model, {2} ES model.
-quad        = 2;        % for DOM-NC = 1, DOM-GH = 2, MD-DOM-GH = 3
+quad        = 3;        % for DOM-NC = 1, DOM-GH = 2, MD-DOM-GH = 3
 method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
-IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
+IC_case     = 3;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
 plot_figs   = 1;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG
@@ -28,7 +28,7 @@ Pp          = P_deg+1;  % Polinomials Points
 RK_stages   = 4;        % Number of RK stages
 
 %% Space Discretization
-nx  = 160;                      % Desided number of points in our domain
+nx  = 100;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 

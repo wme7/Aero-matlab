@@ -11,14 +11,14 @@ clear all;  close all; %clc;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
-CFL         = 5/100;    % CFL condition
+CFL         = 15/100;    % CFL condition
 r_time      = 1/10000;  % Relaxation time
-tEnd        = 0.1;      % End time
+tEnd        = 0.02;     % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 quad        = 1;        % for DOM-NC = 1, DOM-GH = 2, DDOM-5pGH = 3
 method      = 2;        % for {1} Upwind, {2} TVD,
-IC_case     = 3;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-plot_figs   = 0;        % 0: no, 1: yes please!
+IC_case     = 5;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
+plot_figs   = 1;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG
 P_deg       = 0;        % Polinomial Degree
@@ -27,7 +27,7 @@ Pp          = P_deg+1;  % Polinomials Points
 RK_stages   = 4;        % Number of RK stages
 
 %% Space Discretization
-nx  = 200;                      % Desided number of points in our domain
+nx  = 100;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
@@ -56,7 +56,7 @@ end
 switch quad
 
     case{1} % Newton Cotes Quadrature for D.O.M.
-    V  = [-20,20];  % range: a to b
+    V  = [-40,40];  % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
     [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
     nv = length(v);     v = repmat(v,1,nx);     w = repmat(w,1,nx);
@@ -69,7 +69,7 @@ switch quad
     v = repmat(v,1,nx);     w = repmat(w,1,nx);
     
     case{3} % Gauss Hermite Quadrature for Dynamic-D.O.M.
-    nv = 5;         % nodes required = 5 (the actual value)
+    nv = 3;         % nodes required = 5 (the actual value)
     [c_star,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;          % quadrature constant.
     w = w.*exp(c_star.^2); % weighting function of the Gauss-Hermite quadrature
@@ -121,7 +121,7 @@ end
 % First we need to define how big is our time step. Due to the discrete
 % ordinate method the problem is similar to evolve the same problem for
 % every mesoscopic velocity.
-dt = dx*CFL/max(v(:,1)); 
+dt = dx*CFL/max(abs(v(:,1))); 
 dtdx = dt/dx;  % precomputed to save some flops
 
 % Time domain discretization
@@ -134,7 +134,7 @@ time = 0:dt:tEnd;
 tic
 switch method
             
-    case{1} % UPWIND O(h)
+    case{1} % Upwind O(h)
         % Using discrete ordinate method (discrete and constant velocity
         % values in phase-space domain)
         a = v;
@@ -154,8 +154,8 @@ switch method
             end
             if plot_figs == 1 
             % Plot Macroscopic variables
-            figure(2)
-            subplot(2,3,1); plot(x,rho(1,:),'.'); axis([0,1,0,1.4]); title('Density')
+            figure(2) % ([0,1,0,1.4])
+            subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
             subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
             subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
             subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
@@ -385,13 +385,13 @@ if write_ans == 1
     fprintf('All Results have been saved!\n')
 end
 
-if plot_figs ~= 1
+if plot_figs == 1
     % Plot Macroscopic variables
     figure(2)
-    subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
-    subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
-    subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
-    subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
-    subplot(2,3,5); plot(x,t(1,:),'.'); axis tight; title('Temperature')
-    subplot(2,3,6); plot(x,E(1,:),'.'); axis tight; title('Energy')
+    subplot(2,3,1); plot(x,rho(1,:),'o'); axis tight; title('Density')
+    subplot(2,3,2); plot(x,ux(1,:),'o'); axis tight; title('velocity in x')
+    subplot(2,3,3); plot(x,p(1,:),'o'); axis tight; title('Pressure')
+    subplot(2,3,4); plot(x,z(1,:),'o'); axis tight; title('Fugacity')
+    subplot(2,3,5); plot(x,t(1,:),'o'); axis tight; title('Temperature')
+    subplot(2,3,6); plot(x,E(1,:),'o'); axis tight; title('Energy')
 end

@@ -16,14 +16,14 @@
 clear all; clc; close all;
 
 %% Parameters
-    cfl = 0.35;  % Courant Number
+    cfl = 0.20;  % Courant Number
      dx = 0.02;  % Spatial step size
  tStart = 0.00;  % Start time
    tEnd = 3.15;  % End time
-IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine {5} Riemann
+IC_case = 1;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine {5} Riemann
 bc_type = 3;     % {1} Dirichlet, {2} Neumann, {3} Periodic
 fluxsplit = 2;   % {1} Godunov, {2} Global LF, {3} Local LF
-fluxtype = 1;    % {1} Scalar, {2}, Burgers
+fluxtype = 2;    % {1} Scalar, {2}, Burgers
 
 %% Define our Flux function
 switch fluxtype
@@ -44,7 +44,7 @@ end
     k = 2;              % for WENO3 k=2
     gcells = k;         % gosht cells to add
     a = 1 - gcells*dx;  % a
-    b = 2 + gcells*dx;  % b
+    b = 3 + gcells*dx;  % b
     x = a:dx:b;         % x grid
     nx = length(x);     % number of points
 
@@ -67,7 +67,7 @@ end
 % Initialize vector variables 
 it_count = 0;           % Iteration counter
 u_next = zeros(1,nx);   % u in next time step
-h = zeros(2,nx-1);      % Flux values at the cell boundaries
+%h = zeros(2,nx-1);      % Flux values at the cell boundaries
 hn = zeros(1,nx-1);     % Flux values at x_i+1/2 (-)
 hp = zeros(1,nx-1);     % Flux values at x_i-1/2 (+)
 
@@ -90,7 +90,9 @@ while time <= tEnd
     % Reconstruct Fluxes values at cells interfaces
     for i = 3:nx-2
         xr = i-2:i+2; % x-range of cells
+        %xr = i-3:i+3; % x-range of cells
         [hn(i),hp(i-1)] = WENO3_1d_flux(vp(xr),vn(xr));
+        %[hn(i),hp(i-1)] = WENO5_1d_flux(vp(xr),vn(xr));
     end
     h = sum([hn;hp]);
                 
@@ -101,6 +103,7 @@ while time <= tEnd
 
     % Apply BCs
     u_next = WENO3_1d_BCs(u_next,bc_type,nx);
+    %u_next = WENO5_1d_BCs(u_next,bc_type,nx);
     
     % UPDATE Info
     u = u_next;

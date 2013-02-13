@@ -13,12 +13,12 @@ clc;  clear all;  close all;
 name        ='SBBGK1d'; % Simulation Name
 CFL         = 0.05;     % CFL condition
 r_time      = 1/10000;  % Relaxation time
-tEnd        = 0.15;      % End time
+tEnd        = 0.013;      % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 fmodel      = 1;        % {1} UU. model, {2} ES model.
-quad        = 2;        % for NC = 1 , GH = 2
-method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
-IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
+quad        = 1;        % {1} NC , {2} GH
+method      = 2;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
+IC_case     = 6;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
 plot_figs   = 1;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG
@@ -47,6 +47,7 @@ end
 
 %% Initial Conditions in physical Space
 % Load Macroscopic Fugacity [z], Velocity[u] and Temperature[t] 
+    %[z0,u0,t0,p0,rho0,E0] = SSBGK_IC1d(x,IC_case);
     [z0,u0,t0,p0,rho0,E0] = SSBGK_IC1d(x,IC_case);
 
 %% Microscopic Velocity Discretization (using Discrete Ordinate Method)
@@ -62,7 +63,7 @@ switch quad
     [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
         
     case{2} % Gauss Hermite Quadrature:
-    nv = 60;          % nodes desired (the actual value)
+    nv = 80;          % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;            % quadrature constant.
     w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature
@@ -101,13 +102,14 @@ if plot_figs == 1
    zlabel('f - Probability');
 end
 % Compute Initial Macroscopic Momemts:
-%    [rho,rhou,E] = macromoments1d(k,w,f0,v); Just for testing
+    %[rho,rhou,E] = macromoments1d(k,w,f0,v); %Just for testing
+    %[~,~,~,p] = macroproperties1d(rho,rhou,E,nx,nv,theta);
     
 %% Marching Scheme
 % First we need to define how big is our time step. Due to the discrete
 % ordinate method the problem is similar to evolve the same problem for
 % every mesoscopic velocity.
-dt = dx*CFL/max(v(:,1)); 
+dt = dx*CFL/max(abs(v(:,1))); 
 dtdx = dt/dx;  % precomputed to save someflops
 
 % Time domain discretization
@@ -120,7 +122,97 @@ time = 0:dt:tEnd;
 tic
 switch method
     
-    case{1} % TVD 0(h^2)
+    case{1} % Upwind 0(h)
+        % Using discrete ordinate method (discrete and constant velocity
+        % values in phase-space domain)
+        a = v(:,1);
+        
+        % Load initial condition
+        f = f0;
+                        
+        for tsteps = time
+            % Plot and redraw figures every time step for visualization
+            if plot_figs == 1
+            % Plot f distribution
+            figure(1)
+            surf(f); grid on; set(gca,'xDir','reverse');
+            xlabel('x - Spatial Domain');
+            ylabel('v - Velocity Space');
+            zlabel('f - Probability');
+            % Plot Macroscopic variables
+            figure(2)
+            subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
+            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+            subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
+            subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
+            subplot(2,3,5); plot(x,t(1,:),'.'); axis tight; title('Temperature')
+            subplot(2,3,6); plot(x,E(1,:),'.'); axis tight; title('Energy')
+            end
+            % Write Results
+            if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
+                fprintf(file, 'ZONE T = "time %0.4f"\n', tsteps);
+                fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
+                for i = 1:nx
+                    fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
+                        x(1,i),n(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),r(1,i));
+                end
+            end
+            
+            % Compute equilibrium distribution for the current t_step
+            switch fmodel
+                case{1} % U.U.
+                    f_eq = f_equilibrium_1d(z,ux,v,t,theta);
+                case{2} % E.S.
+                    f_eq = f_SE_equilibrium_1d(z,p,rho,ux,v,t,theta);
+                otherwise
+                    error('Order must be between 1 and 2');
+            end
+                        
+            % initialize variables
+            u_next = zeros(1,nx);
+            u_eq = zeros(1,nx);
+            u = zeros(1,nx);
+                              
+            % (this part can, and should be done in parallel!)
+            for i = 1:nv
+                % load subcase
+                u_eq(:) = f_eq(i,:);
+                u(:) = f(i,:);
+                
+                % Compute TVD Fluxes
+                [F_left,F_right] = Upwindflux1d(u,a(i,:));
+
+                % Compute next time step
+                u_next = u - dtdx*(F_right - F_left) ...
+                    + (dt/r_time)*(u_eq-u);
+
+                % BC
+                u_next(1) = u_next(2);
+                u_next(nx) = u_next(nx-1);
+
+                % UPDATE info
+                u = u_next;
+                
+                % Going back to f
+                f(i,:) = u(:);
+            end
+            
+            % Compute macroscopic moments
+            [rho,rhoux,E] = macromoments1d(k,w,f,v);
+            
+            % UPDATE macroscopic properties 
+            % (here lies a paralellizing computing challenge)
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,nv,theta);
+            
+            % Apply DOM
+            [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
+            %[p,rho,E] = apply_DOM(p,rho,E,nv); % Classical variables
+            
+            % Update figures
+            drawnow
+        end
+    
+    case{2} % TVD 0(h^2)
         % Using discrete ordinate method (discrete and constant velocity
         % values in phase-space domain)
         a = v(:,1);
@@ -216,7 +308,114 @@ switch method
             drawnow
         end
         
-    case{2} % WENO k = 3 i.e. O(h^5) 
+    case{3,4} % WENO(r = 2)3, 0(h^5) & WENO(r = 3)5, 0(h^9)
+        % Using discrete ordinate method (discrete and constant velocity
+        % values in phase-space domain)
+        a = v(:,1);
+        
+        % Load initial condition
+        f = f0;
+                        
+        for tsteps = time
+            % Plot and redraw figures every time step for visualization
+            if plot_figs == 1
+            % Plot f distribution
+            figure(1)
+            surf(f); grid on; set(gca,'xDir','reverse');
+            xlabel('x - Spatial Domain');
+            ylabel('v - Velocity Space');
+            zlabel('f - Probability');
+            % Plot Macroscopic variables
+            figure(2)
+            subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
+            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+            subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
+            subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
+            subplot(2,3,5); plot(x,t(1,:),'.'); axis tight; title('Temperature')
+            subplot(2,3,6); plot(x,E(1,:),'.'); axis tight; title('Energy')
+            end
+            % Write Results
+            if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
+                fprintf(file, 'ZONE T = "time %0.4f"\n', tsteps);
+                fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
+                for i = 1:nx
+                    fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
+                        x(1,i),n(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),r(1,i));
+                end
+            end
+            
+            % Compute equilibrium distribution for the current t_step
+            switch fmodel
+                case{1} % U.U.
+                    f_eq = f_equilibrium_1d(z,ux,v,t,theta);
+                case{2} % E.S.
+                    f_eq = f_SE_equilibrium_1d(z,p,rho,ux,v,t,theta);
+                otherwise
+                    error('Order must be between 1 and 2');
+            end
+                        
+            % initialize variables
+            u_next = zeros(1,nx);
+            u_eq = zeros(1,nx);
+            u = zeros(1,nx);
+            hn = zeros(1,nx-1);     % Flux values at x_i+1/2 (-)
+            hp = zeros(1,nx-1);     % Flux values at x_i-1/2 (+)
+                              
+            % (this part can, and should be done in parallel!)
+            for i = 1:nv
+                % Load subcase
+                u_eq(:) = f_eq(i,:);
+                u(:) = f(i,:);
+                
+                % Scalar Flux Spliting
+                [vp,vn] = WENO_scalarfluxsplit(a(i)*u);
+                
+                % Reconstruct Fluxes values at cells interfaces
+                switch method
+                    case(3) % WENO3
+                        for j = 3:nx-2
+                            xr = j-2:j+2; % x-range of cells
+                            [hn(j),hp(j-1)] = WENO3_1d_flux(vp(xr),vn(xr));
+                        end
+                        h = sum([hn;hp]);
+                    case{4} % WENO5
+                        for j = 4:nx-3
+                            xr = j-3:j+3; % x-range of cells
+                            [hn(j),hp(j-1)] = WENO5_1d_flux(vp(xr),vn(xr));
+                        end
+                        h = sum([hn;hp]);
+                end
+                
+                % Compute next time step
+                for j = 4:nx-3
+                    u_next(j) = u(j) - dtdx*(h(j) - h(j-1))...
+                        + (dt/r_time)*(u_eq(j)-u(j));
+                end
+                
+                % BC
+                u_next = WENO3_1d_BCs(u_next,2,nx); %2:Neumann BC
+
+                % UPDATE info
+                u = u_next;
+                
+                % Going back to f
+                f(i,:) = u(:);
+            end
+            
+            % Compute macroscopic moments
+            [rho,rhoux,E] = macromoments1d(k,w,f,v);
+            
+            % UPDATE macroscopic properties 
+            % (here lies a paralellizing computing challenge)
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,nv,theta);
+            
+            % Apply DOM
+            [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
+            %[p,rho,E] = apply_DOM(p,rho,E,nv); % Classical variables
+            
+            % Update figures
+            drawnow
+        end
         
     otherwise
         error('Order must be between 1 and 2');
@@ -227,4 +426,15 @@ fprintf('Simulation has been completed succesfully!\n')
 if write_ans == 1
     fclose(file);
     fprintf('All Results have been saved!\n')
+end
+
+if plot_figs ~= 1
+    % Plot Macroscopic variables
+    figure(2)
+    subplot(2,3,1); plot(x,rho(1,:),'o'); axis tight; title('Density')
+    subplot(2,3,2); plot(x,ux(1,:),'o'); axis tight; title('velocity in x')
+    subplot(2,3,3); plot(x,p(1,:),'o'); axis tight; title('Pressure')
+    subplot(2,3,4); plot(x,z(1,:),'o'); axis tight; title('Fugacity')
+    subplot(2,3,5); plot(x,t(1,:),'o'); axis tight; title('Temperature')
+    subplot(2,3,6); plot(x,E(1,:),'o'); axis tight; title('Energy')
 end
