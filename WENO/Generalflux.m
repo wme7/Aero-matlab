@@ -1,5 +1,5 @@
 function h = Generalflux(f,df,u,strategy)
-% General flux subroutine 
+% General flux Spliting subroutine 
 % We use 1 of 4 flux strategies/algorithms optimized for matlab.
 
 %% Parameters
@@ -27,7 +27,7 @@ switch strategy
         beta = max(abs(fluxmat));
         h = 0.5*(flx(1:nx-1) + flx(2:nx) - beta.*(u(2:nx) - u(1:nx-1)));
         
-    case{4} % Upwind Flux
+    case{4} % Upwind Flux | Godunov 
 
         % For dflux is constant along the domain!
         a_p = max(dflx - abs(dflx))/2 == [0]; %#ok<NBRAK> % boolen operator for a>0

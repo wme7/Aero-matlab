@@ -11,9 +11,9 @@
 clear all; close all; clc;
 
 %% Parameters
-      a = -1.10;     % Scalar velocity in x direction
-     dx = 0.01;     % Spatial step size
-    cfl = 0.62;     % Courant Number
+      a = -0.57;     % Scalar velocity in x direction
+     dx = 0.02;     % Spatial step size
+    cfl = 0.60;     % Courant Number
      dt = cfl*dx/abs(a); % time step size
    dtdx = dt/dx;    % precomputed to save some flops
    tEnd = 0.25;     % End time

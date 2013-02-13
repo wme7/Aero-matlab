@@ -1,5 +1,5 @@
 function h = WENOflux1d(f,df,u,strategy)
-% General flux subroutine 
+% General flux spliting subroutine 
 % We use 1 of 4 flux strategies/algorithms optimized for matlab.
 % coded by Manuel Diaz, 2012.12.21 (the end of the world)
 

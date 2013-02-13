@@ -16,17 +16,27 @@
 clear all; clc; close all;
 
 %% Parameters
-    cfl = 0.40;  % Courant Number
+    cfl = 0.35;  % Courant Number
      dx = 0.02;  % Spatial step size
  tStart = 0.00;  % Start time
    tEnd = 3.15;  % End time
-IC_case = 3;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine {5} Riemann
-bc_type = 2;     % {1} Dirichlet, {2} Neumann, {3} Periodic
+IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine {5} Riemann
+bc_type = 3;     % {1} Dirichlet, {2} Neumann, {3} Periodic
+fluxsplit = 2;   % {1} Godunov, {2} Global LF, {3} Local LF
+fluxtype = 1;    % {1} Scalar, {2}, Burgers
 
 %% Define our Flux function
-     f = @(w) w.^2/2;
-% and the Derivate of the flux function
-    df = @(w) w;
+switch fluxtype
+    case{1}
+        a = 0.5;   % scalar advection speed
+        f = @(w) a*w;
+        df = @(w) a*ones(size(w));
+    case{2}
+        f = @(w) w.^2/2;
+        df = @(w) w;
+    otherwise
+        error('case not available')
+end
 
 %% Discretization of Domain
 % Depending on the size of the degree of the WENO stencil we are using then
@@ -58,8 +68,8 @@ bc_type = 2;     % {1} Dirichlet, {2} Neumann, {3} Periodic
 it_count = 0;           % Iteration counter
 u_next = zeros(1,nx);   % u in next time step
 h = zeros(2,nx-1);      % Flux values at the cell boundaries
-hn = zeros(1,nx-1);     % Flux values at u_i+1/2 (-)
-hp = zeros(1,nx-1);     % Flux values at u_i-1/2 (+)
+hn = zeros(1,nx-1);     % Flux values at x_i+1/2 (-)
+hp = zeros(1,nx-1);     % Flux values at x_i-1/2 (+)
 
 while time <= tEnd
     % Plot Evolution
@@ -75,24 +85,8 @@ while time <= tEnd
     time = time + dt;           % iteration actual time.
     
     % Flux Spliting
-    fluxsplit = 3;
-    switch fluxsplit
-        case{1} % Godunov (non-conservative)
-            v = f(u);
-            vp = 0.5*(v + abs(v)); %flux^{+}
-            vn = 0.5*(v - abs(v)); %flux^{-}
-        case{2} % Local Lax-Friedrichs
-            v = f(u); alpha = abs(df(u));
-            vp = 0.5.*(v + alpha.*u); %flux^{+}
-            vn = 0.5.*(v - alpha.*u); %flux^{-}
-        case{3} % (Global) Lax-Friedrichs
-            v = f(u); alpha = max(abs(df(u)));
-            vp = 0.5.*(v + alpha.*u); %flux^{+}
-            vn = 0.5.*(v - alpha.*u); %flux^{-}
-        otherwise
-            error('only cases 1 and 2 are available')
-    end
-    
+    [vp,vn] = WENO_fluxsplit(u,f,df,fluxsplit);
+
     % Reconstruct Fluxes values at cells interfaces
     for i = 3:nx-2
         xr = i-2:i+2; % x-range of cells

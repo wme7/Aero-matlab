@@ -36,25 +36,6 @@ bm = min(b,0);
 flm = zeros(ny,nx); flp = zeros(ny,nx); frm = zeros(ny,nx); frp = zeros(ny,nx);
 glm = zeros(ny,nx); glp = zeros(ny,nx); grm = zeros(ny,nx); grp = zeros(ny,nx);
 
-% %% Polynomial Reconstruction Coeficients (C_rj)
-% switch Degree
-%     
-%     case{1} % 1D Problem, % 1rd Order ENO, 3th order WENO
-%         c = [ 1; ...
-%               1 ];
-%     case{2} % 2D Problem, % 2rd Order ENO, 4th order WENO
-%         c = [ 3/2 -1/2; ...
-%               1/2  1/2; ...
-%              -1/2  3/2 ];
-%     case{3} % 3D Problem, % 3rd Order ENO, 5th order WENO
-%         c = [ 11/6 -7/6  1/3; ...
-%                1/3  5/6 -1/6; ...
-%               -1/6  5/6  1/3; ...
-%                1/3 -7/6 11/6 ];
-%     otherwise
-%         error('only available cases: Degree = 1, 2 and 3')
-% end
-
     c = [-1/6 1/3 5/6 -7/6 11/6];
     
 %% Compute Weno Fluxes:
