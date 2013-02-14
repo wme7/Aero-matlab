@@ -11,13 +11,13 @@ clear all;  close all; %clc;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
-CFL         = 15/100;    % CFL condition
+CFL         = 3/100;    % CFL condition
 r_time      = 1/10000;  % Relaxation time
-tEnd        = 0.02;     % End time
+tEnd        = 0.10;     % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
-quad        = 1;        % for DOM-NC = 1, DOM-GH = 2, DDOM-5pGH = 3
+quad        = 3;        % for DOM-NC = 1, DOM-GH = 2, DDOM-5pGH = 3
 method      = 2;        % for {1} Upwind, {2} TVD,
-IC_case     = 5;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
+IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}DE, {6}Cavitation
 plot_figs   = 1;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG
@@ -69,7 +69,7 @@ switch quad
     v = repmat(v,1,nx);     w = repmat(w,1,nx);
     
     case{3} % Gauss Hermite Quadrature for Dynamic-D.O.M.
-    nv = 3;         % nodes required = 5 (the actual value)
+    nv = 5;         % nodes required = 5 (the actual value)
     [c_star,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;          % quadrature constant.
     w = w.*exp(c_star.^2); % weighting function of the Gauss-Hermite quadrature
@@ -203,7 +203,7 @@ switch method
 %                 if tsteps == 0; vx_old = ux; end
                 if tsteps == 0; c_old = v; end
                 
-                % Compute TVD Fluxes
+                % Compute Upwind Fluxes
                 [F_left,F_right] = Upwindflux1d(u,a(i,:));
 
                 % Compute Material Derivates Correction values
@@ -271,6 +271,9 @@ switch method
                 
         % Load initial condition
         f = f0;
+        
+        % Compute Distribution slope values @ c_star points
+        dudc = GaussSlope(c_star,f);
                         
         for tsteps = time
             % Plot and redraw figures every time step for visualization
@@ -322,6 +325,13 @@ switch method
                 % load subcase
                 u_eq(:) = f_eq(i,:);
                 u(:) = f(i,:);
+%                 vx = ux(i,:);
+                b = sqrt(t(i,:)); 
+                c = v(i,:);
+                
+%                 if tsteps == 0; b_old = sqrt(t); end
+%                 if tsteps == 0; vx_old = ux; end
+                if tsteps == 0; c_old = v; end
                 
                 % Compute the smoothness factors, r(j), from data, u(j).
                 [r] = theta1d(u,a(i,:));
@@ -331,10 +341,19 @@ switch method
 
                 % Compute TVD Fluxes
                 [F_left,F_right] = TVDflux1d(u,a(i,:),dtdx,phi);
+                
+                % Compute Material Derivates Correction values
+%                 DvxDt = MatDev(vx,vx_old(i,:),a(i,:),dtdx);
+%                 DbDt = MatDev(b,b_old(i,:),a(i,:),dtdx);
+                DcDt = MatDev(c,c_old(i,:),a(i,:),dtdx);
 
                 % Compute next time step
+%                 u_next = u - dtdx*(F_right - F_left) ...
+%                     + (dt/r_time)*(u_eq-u);
+                
                 u_next = u - dtdx*(F_right - F_left) ...
-                    + (dt/r_time)*(u_eq-u);
+                    - (dt/r_time)*(u-u_eq) ...
+                    + (1./b).*dudc(i,:).*DcDt ;
 
                 % BC
                 u_next(1) = u_next(2);
@@ -345,6 +364,11 @@ switch method
                 
                 % Going back to f
                 f(i,:) = u(:);
+                
+                % Save Old info
+%                 vx_old(i,:) = vx;
+%                 b_old(i,:) = b;
+                c_old(i,:) = c;
             end
             
             % Compute macroscopic moments
@@ -385,7 +409,7 @@ if write_ans == 1
     fprintf('All Results have been saved!\n')
 end
 
-if plot_figs == 1
+if plot_figs ~= 1
     % Plot Macroscopic variables
     figure(2)
     subplot(2,3,1); plot(x,rho(1,:),'o'); axis tight; title('Density')

@@ -10,22 +10,22 @@
 clc;  clear all;  close all;
 
 %% Simulation Parameters
-name        ='SBBGK1d'; % Simulation Name
-CFL         = 0.05;     % CFL condition
-r_time      = 1/10000;  % Relaxation time
-tEnd        = 0.013;      % End time
-theta       = 0;        % {-1} BE, {0} MB, {1} FD.
-fmodel      = 1;        % {1} UU. model, {2} ES model.
-quad        = 1;        % {1} NC , {2} GH
-method      = 2;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
-IC_case     = 6;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-plot_figs   = 1;        % 0: no, 1: yes please!
-write_ans   = 0;        % 0: no, 1: yes please!
+    name	='SBBGK1d'; % Simulation Name
+    CFL     = 15/100;   % CFL condition
+    r_time  = 1/10000;  % Relaxation time
+    tEnd  	= 0.04;     % End time
+    theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
+    fmodel  = 1;        % {1} UU. model, {2} ES model.
+    quad   	= 1;        % {1} NC , {2} GH
+    method 	= 1;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
+    IC_case	= 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
+  plot_figs = 0;        % 0: no, 1: yes please!
+  write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
-P_deg       = 0;        % Polinomial Degree
-Pp          = P_deg+1;  % Polinomials Points
+    P_deg	= 0;        % Polinomial Degree
+    Pp      = P_deg+1;  % Polinomials Points
 % Using RK integration time step
-RK_stages   = 4;        % Number of RK stages
+  RK_stages	= 4;        % Number of RK stages
 
 %% Space Discretization
 nx  = 100;                      % Desided number of points in our domain
@@ -58,7 +58,7 @@ end
 switch quad
 
     case{1} % Newton Cotes Quadrature:
-    V  = [-20,20];  % range: a to b
+    V  = [-40,40];  % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
     [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
         
@@ -319,7 +319,7 @@ switch method
         for tsteps = time
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1
-            % Plot f distribution
+            % Plot evolution of 'f' distribution function
             figure(1)
             surf(f); grid on; set(gca,'xDir','reverse');
             xlabel('x - Spatial Domain');

@@ -13,15 +13,15 @@ function SBBGK_1d_func(name,CFL,r_time,tEnd,theta,quad,method,IC_case, ...
 
 %% Simulation Parameters
 % name        ='SBBGK1d'; % Simulation Name
-% CFL         = 0.05;     % CFL condition
+% CFL         = 15/100;     % CFL condition
 % r_time      = 1/10000;  % Relaxation time
-% tEnd        = 0.2;      % End time
-% theta       = 1;        % {-1} BE, {0} MB, {1} FD.
+% tEnd        = 0.02;      % End time
+% theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 % quad        = 1;        % for NC = 1 , GH = 2
 % method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
-% IC_case     = 7;        % Reimann IC cases available :{1,2,3,4,5,6,7}
+% IC_case     = 5;        % Reimann IC cases available :{1,2,3,4,5,6,7}
 % plot_figs   = 0;        % 0: no, 1: yes please!
-% write_ans   = 1;        % 0: no, 1: yes please!
+% write_ans   = 0;        % 0: no, 1: yes please!
 % % Using DG
 % P_deg       = 0;        % Polinomial Degree
 % Pp          = P_deg+1;  % Polinomials Points
@@ -53,7 +53,7 @@ fprintf(file, 'VARIABLES = "x" "density" "velocity" "energy" "pressure" "tempera
 switch quad
 
     case{1} % Newton Cotes Quadrature:
-    V  = [-20,20];  % range: a to b
+    V  = [-40,40];  % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
     [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
         

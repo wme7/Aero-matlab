@@ -1,4 +1,4 @@
-function [r0,u1_0,u2_0,t0,p] = macroproperties2d(n,j_x,j_y,E,nx,ny,nv,theta)
+function [r,u1,u2,t,p] = macroproperties2d(n,j_x,j_y,E,nx,ny,theta)
 %% Recover Macroscopic Properties
 % compute back, fugacity, macroscopic velocities, temperature and pressure.
     % Computing first velocites from the momentum:
@@ -46,12 +46,4 @@ switch theta
         p = (1/2).*n.*t;
     otherwise 
         error('theta can only be: -1, 0, +1 ');
-end
-
-% Using Discrete Ordinate Method: (Replicating Data for easyer arrays Ops)
-for j = 1:ny
-    for i = 1:nx
-    r0(:,:,j,i)   = r(j,i)*ones(nv,nv);  u1_0(:,:,j,i) = u1(j,i)*ones(nv,nv);
-    u2_0(:,:,j,i) = u2(j,i)*ones(nv,nv); t0(:,:,j,i)   = t(j,i)*ones(nv,nv);
-    end
 end

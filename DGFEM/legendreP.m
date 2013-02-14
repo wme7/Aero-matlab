@@ -1,6 +1,6 @@
 function legP = legendreP(x,k)
-% compute the value of the legendre polinomial of degree 'k' por column
-% values 'x'
+% compute the value of the legendre polinomial of degree 'k' for every
+% column value 'x'
 
 %number of points
 p = k+1;
