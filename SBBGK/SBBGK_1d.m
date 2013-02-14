@@ -11,16 +11,16 @@ clc;  clear all;  close all;
 
 %% Simulation Parameters
     name	='SBBGK1d'; % Simulation Name
-    CFL     = 15/100;   % CFL condition
+    CFL     = 10/100;   % CFL condition
     r_time  = 1/10000;  % Relaxation time
-    tEnd  	= 0.04;     % End time
+    tEnd  	= 0.10;     % End time
     theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 1;        % {1} UU. model, {2} ES model.
-    quad   	= 1;        % {1} NC , {2} GH
-    method 	= 1;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
+    quad   	= 2;        % {1} NC , {2} GH
+    method 	= 2;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
     IC_case	= 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
   plot_figs = 0;        % 0: no, 1: yes please!
-  write_ans = 0;        % 0: no, 1: yes please!
+  write_ans = 1;        % 0: no, 1: yes please!
 % Using DG
     P_deg	= 0;        % Polinomial Degree
     Pp      = P_deg+1;  % Polinomials Points
@@ -154,7 +154,7 @@ switch method
                 fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
                 for i = 1:nx
                     fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
-                        x(1,i),n(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),r(1,i));
+                        x(1,i),rho(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),z(1,i));
                 end
             end
             
@@ -244,7 +244,7 @@ switch method
                 fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
                 for i = 1:nx
                     fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
-                        x(1,i),n(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),r(1,i));
+                        x(1,i),rho(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),z(1,i));
                 end
             end
             
@@ -340,7 +340,7 @@ switch method
                 fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
                 for i = 1:nx
                     fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
-                        x(1,i),n(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),r(1,i));
+                        x(1,i),rho(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),z(1,i));
                 end
             end
             

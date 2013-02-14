@@ -11,16 +11,16 @@ clc;  clear all;  close all;
 
 %% Simulation Parameters
     name   ='SBBGK2d';  % Simulation Name
-    CFL    = 20/100;    % CFL condition
-    r_time = 1/1000;    % Relaxation time
-    tEnd   = 0.04;      % Out time
+    CFL    = 50/100;    % CFL condition
+    r_time = 1/10000;   % Relaxation time
+    tEnd   = 0.20;      % Out time
     theta  = 0;         % {-1} BE, {0} MB, {1} FD.
-    fmodel  = 1;        % {1} UU. model, {2} ES model.
+   fmodel  = 1;         % {1} UU. model, {2} ES model.
     quad   = 2;         % {1} NC , {2} GH
-    method = 1;         % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
+    method = 1;         % {1} TVD, {2} WENO3, {3} WENO5
    IC_case = 5;         % Reimann cases: 1~17
  plot_figs = 0;         % 0: no, 1: yes please!
- write_ans = 0;         % 0: no, 1: yes please!
+ write_ans = 1;         % 0: no, 1: yes please!
  % Using DG
     P_deg  = 0;         % Polinomial Degree
     Pp 	   = P_deg+1;   % Polinomials Points
@@ -28,7 +28,7 @@ clc;  clear all;  close all;
 RK_stages   = 4;        % Number of RK stages
 
 %% Space Discretization
-nx = 100; ny = 100;
+nx = 80; ny = 80;
 [X,dx,Y,dy] = grid2d(0,1,nx,0,1,ny);
 [x,y] = meshgrid(X,Y);
 
@@ -42,7 +42,7 @@ if write_ans == 1
     % 'w' specifies that it will be written.
     % similarly 'r' is for reading and 'a' for appending.
     fprintf(file, 'TITLE = "%s"\n',ID);
-    fprintf(file, 'VARIABLES = "x" "density" "velocity" "energy" "pressure" "temperature" "fugacity"\n');
+    fprintf(file, 'VARIABLES = "x" "y" "n" "E" "p" "t" "z"\n');
 end
 
 %% Velocity Discretization:
@@ -92,6 +92,7 @@ end
     f0 = f_equilibrium_2d(z,ux,uy,t,vx,vy,theta);
 
 % Plot Probability Distribution Function, f, for an expecific point in space:
+if plot_figs == 1
     figure(1)  
     i = 2; j = 2;
     zz = f0(:,:,j,i);
@@ -100,6 +101,7 @@ end
     ylabel('v2 - Velocity Space in y');
 	zlabel('f - Probability');
 	clear zz i j
+end
     
 % Compute Initial Macroscopic Momemts:
     [rho,rhoux,rhouy,E] = macromoments2d(k,wx,wy,f0,vx,vy);
@@ -149,12 +151,14 @@ switch method
             subplot(2,3,5); EE(:,:) = E(:,:); h5 = surf(EE); title('Energy')
             end
             % Write Results
-            if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
+            if write_ans == 1 && (mod(tsteps,10*dt) == 0 || tsteps == time(end))
                 fprintf(file, 'ZONE T = "time %0.4f"\n', tsteps);
-                fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
+                fprintf(file, 'I = %d, J = %d, K = 1, F = POINT\n\n',nx,ny);
+                for j = 1:ny
                 for i = 1:nx
                     fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
-                        x(1,i),n(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),r(1,i));
+                        x(j,i),y(j,i),rho(j,i),E(j,i),p(j,i),t(1,1,j,i),z(1,1,j,i));
+                end
                 end
             end
             
@@ -230,10 +234,10 @@ end
 
 if plot_figs ~= 1
     % Plot Macroscopic variables
-figure(2)
-            subplot(2,3,1); nn(:,:) = rho(:,:); h2 = surf(nn); title('Density')
-            subplot(2,3,2); pp(:,:) = p(:,:); h4 = surf(pp); title('Pressure')
-            subplot(2,3,3); tt(:,:) = t(1,1,:,:); h3 = surf(tt); title('Temperature')
-            subplot(2,3,4); zz(:,:) = z(1,1,:,:); h1 = surf(zz); title('Fugacity')
-            subplot(2,3,5); EE(:,:) = E(:,:); h5 = surf(EE); title('Energy')
+    figure(2)
+    subplot(2,3,1); nn(:,:) = rho(:,:); h2 = surface(nn); title('Density')
+    subplot(2,3,2); pp(:,:) = p(:,:); h4 = surface(pp); title('Pressure')
+    subplot(2,3,3); tt(:,:) = t(1,1,:,:); h3 = surface(tt); title('Temperature')
+    subplot(2,3,4); zz(:,:) = z(1,1,:,:); h1 = surface(zz); title('Fugacity')
+    subplot(2,3,5); EE(:,:) = E(:,:); h5 = surface(EE); title('Energy')
 end
