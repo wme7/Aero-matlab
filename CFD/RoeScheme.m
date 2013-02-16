@@ -23,11 +23,11 @@ clear all; clc; % close all;
 global gamma
 
 %% Parameters
-cfl      = 0.9;     % courant number
+%cfl     = 0.9;     % Courant number
 nx       = 100;     % number of cells
 mx       = nx+1;    % number of nodes
-ICx      = 5;       % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-tEnd     = 0.04;    % final time to compute
+ICx      = 12;      % IC: {1}~{12}. See Euler_IC1d.m
+%tEnd    = 0.01;    % final time to compute
 etpfix   = 0.90;	% {#} Harten's sonic entropy fix value, {0} no entropy fix
 plot_fig = 1;       % {1} plot figures, {0} do NOT plot figures
 wrt_sol  = 1;       % {1} write solution, {0} do NOT write solution file
@@ -42,7 +42,7 @@ dx = max(xn(2:mx)-xn(1:mx-1));  % Cell size
 x  = xn(1:mx-1)+dx/2;        	% Cell centers
 
 %% IC for Euler Riemann solver
-[r,u,p]=Euler_IC1d(x,ICx);
+[r,u,p,tEnd,cfl] = Euler_IC1d(x,ICx);
 
 % Specific internal energy of the IC
 e_s = p./((gamma-1).*r);
@@ -55,7 +55,7 @@ H = gamma/(gamma-1)*p./r + u.^2/2;
 
 %% Exact Riemann Solution
 [xx,rhoexact,uexact,pexact,machexact,entroexact,energexact] = ...
-    Exact_Riemann(r(1),u(1),p(1),r(nx),u(nx),p(nx),tEnd);
+   Exact_Riemann(r(1),u(1),p(1),r(nx),u(nx),p(nx),tEnd);
 
 % %% Left and right conditions for Dirichlet BC's
 %     r_left  = r(1);  % r_left

@@ -1,4 +1,4 @@
-function [r_0,u_0,v_0,t_0] = reimann_IC2d(x,y,input)
+function [r_0,u_0,v_0,t_0] = SSBGK_IC2d(x,y,input)
 % Load the IC of a classical 2D Riemann Problem configuration. 
 % In the notation we take advantage of the matlab array notation as follows
 %
@@ -12,18 +12,21 @@ function [r_0,u_0,v_0,t_0] = reimann_IC2d(x,y,input)
 %% Initial Physical Properties per case:
 switch input
     case{5} % Configuration 5
+        fprintf('Configuration 5 \n');
         r = [ 0.142  0.4253 0.142  0.6635 ];
         u = [-0.75  -0.75   0.75   0.75   ];
         v = [-0.5    0.5    0.5   -0.5    ];
         t = [ 2.078  1.1494 2.078  0.87685];
         
     case{13} % Configuration 13
+        fprintf('Configuration 13 \n');
         r = [0.142   0.4253 0.4448 0.151  ];
         u = [0       0      0      0      ];
         v = [-0.3    0.3    0.697  0.26254];
         t = [2.0782  1.1494 0.7083 1.273  ];
         
-    case{17} % Configuration 13
+    case{17} % Configuration 17
+        fprintf('Configuration 17 \n');
         r = [ 0.142011  0.142011 0.38035  0.142  ];
         u = [ 0.1       0.0      0.0      0.0    ];
         v = [-0.4      -0.3      0.1264  -0.97905];
@@ -35,9 +38,8 @@ end
 
 %% Load Selected case Initial condition:
 % Parameters
-[ny nx] = size(x);
-[ny nx] = size(y);
-
+[~,nx] = size(x);
+[ny,~] = size(y);
 
 % Preallocate u_0,
 r_0 = zeros(ny,nx);

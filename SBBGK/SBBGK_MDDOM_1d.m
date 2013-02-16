@@ -17,8 +17,8 @@ tEnd        = 0.10;     % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 fmodel      = 1;        % {1} UU. model, {2} ES model.
 quad        = 3;        % {1} DOM-NC, {2} DOM-GH, {3} MD-DOM-GH
-method      = 2;        % {1} TVD, {2} WENO3 
-IC_case     = 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
+method      = 1;        % {1} TVD, {2} WENO3 
+IC_case     = 8;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
 plot_figs   = 1;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG

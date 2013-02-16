@@ -65,7 +65,7 @@ switch ICcase
         
     case {5} % Riemann
         
-        u0  = 1*(x <= x_mid) + 0*(x > x_mid);
+        u0  = 1.5*(x <= x_mid) + 0.5*(x > x_mid);
         
     otherwise
         error('case not in the list')

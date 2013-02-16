@@ -1,26 +1,26 @@
-%% 1D Boltzmann Equation
-% Finite Difference solution of the Semi-classical Boltzmann Equation to
-% recover Euler macroscopic continuum solution. By Manuel Diaz 2012.10.06
+%% 1D Semi-classical Boltzmann-BGK Equation
+% Numerical solution of the Boltzmann-BGK Equation to recover Euler macroscopic
+% continuum solution. Coded by Manuel Diaz 2012.10.06
 %
-% Boltzmann Trasnport Equation:
+% Semi-classical Boltzmann-BGK Transport Equation:
 %
 % $$\frac{\partial f}{\partial t}+\vec F\cdot \nabla_p f + \vec v
-% \cdot\nabla_{\vec x} f =\widehat{\Omega } (f)$$
+% \cdot\nabla_{\vec x} f =\widehat{\Omega } (f) = - \frac{f-f^{eq}}{\tau}$$
 %
 clc;  clear all;  close all;
 
 %% Simulation Parameters
     name	='SBBGK1d'; % Simulation Name
-    CFL     = 10/100;   % CFL condition
+    CFL     = 15/100;   % CFL condition
     r_time  = 1/10000;  % Relaxation time
-    tEnd  	= 0.10;     % End time
+    %tEnd  	= 0.05;     % End time
     theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 1;        % {1} UU. model, {2} ES model.
-    quad   	= 2;        % {1} NC , {2} GH
-    method 	= 2;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
-    IC_case	= 1;        % IC: {1}Sod's, {2}LE, {3}RE, {4}DS, {5}SS, {6}Cavitation
-  plot_figs = 0;        % 0: no, 1: yes please!
-  write_ans = 1;        % 0: no, 1: yes please!
+    quad   	= 1;        % {1} NC , {2} GH
+    method 	= 3;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
+    IC_case	= 8;        % IC: {1}~{12}. See Euler_IC1d.m
+  plot_figs = 1;        % 0: no, 1: yes please!
+  write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
     P_deg	= 0;        % Polinomial Degree
     Pp      = P_deg+1;  % Polinomials Points
@@ -48,7 +48,7 @@ end
 %% Initial Conditions in physical Space
 % Load Macroscopic Fugacity [z], Velocity[u] and Temperature[t] 
     %[z0,u0,t0,p0,rho0,E0] = SSBGK_IC1d(x,IC_case);
-    [z0,u0,t0,p0,rho0,E0] = SSBGK_IC1d(x,IC_case);
+    [z0,u0,t0,p0,rho0,E0,tEnd,~] = SSBGK_IC1d(x,IC_case);
 
 %% Microscopic Velocity Discretization (using Discrete Ordinate Method)
 % that is to make coincide discrete values of microscopic velocities with
@@ -58,7 +58,7 @@ end
 switch quad
 
     case{1} % Newton Cotes Quadrature:
-    V  = [-40,40];  % range: a to b
+    V  = [-20,20];  % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
     [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
         
@@ -358,8 +358,6 @@ switch method
             u_next = zeros(1,nx);
             u_eq = zeros(1,nx);
             u = zeros(1,nx);
-            hn = zeros(1,nx-1);     % Flux values at x_i+1/2 (-)
-            hp = zeros(1,nx-1);     % Flux values at x_i-1/2 (+)
                               
             % (this part can, and should be done in parallel!)
             for i = 1:nv
@@ -373,24 +371,14 @@ switch method
                 % Reconstruct Fluxes values at cells interfaces
                 switch method
                     case(3) % WENO3
-                        for j = 3:nx-2
-                            xr = j-2:j+2; % x-range of cells
-                            [hn(j),hp(j-1)] = WENO3_1d_flux(vp(xr),vn(xr));
-                        end
-                        h = sum([hn;hp]);
+                        [F_left,F_right] = WENO3_1d_driver(vp,vn);
                     case{4} % WENO5
-                        for j = 4:nx-3
-                            xr = j-3:j+3; % x-range of cells
-                            [hn(j),hp(j-1)] = WENO5_1d_flux(vp(xr),vn(xr));
-                        end
-                        h = sum([hn;hp]);
+                        [F_left,F_right] = WENO5_1d_driver(vp,vn);
                 end
                 
                 % Compute next time step
-                for j = 4:nx-3
-                    u_next(j) = u(j) - dtdx*(h(j) - h(j-1))...
-                        + (dt/r_time)*(u_eq(j)-u(j));
-                end
+                u_next = u - dtdx*(F_right - F_left) ...
+                    + (dt/r_time)*(u_eq-u);
                 
                 % BC
                 u_next = WENO3_1d_BCs(u_next,2,nx); %2:Neumann BC

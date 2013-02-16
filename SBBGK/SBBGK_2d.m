@@ -1,19 +1,19 @@
-%% 2D Boltzmann Equation
-% Numerical solution of the boltzmann equation to recover Euler macroscopic
-% continuum solution. By Manuel Diaz 2012.10.06
+%% 2D Semi-classical Boltzmann-BGK Equation
+% Numerical solution of the Boltzmann-BGK Equation to recover Euler macroscopic
+% continuum solution. Coded by Manuel Diaz 2013.02.14
 %
-% Boltzmann Trasnport Equation:
+% Semi-classical Boltzmann-BGK Transport Equation:
 %
 % $$\frac{\partial f}{\partial t}+\vec F\cdot \nabla_p f + \vec v
-% \cdot\nabla_{\vec x} f =\widehat{\Omega } (f)$$
+% \cdot\nabla_{\vec x} f =\widehat{\Omega } (f) = - \frac{f-f^{eq}}{\tau}$$
 %
 clc;  clear all;  close all;
 
 %% Simulation Parameters
     name   ='SBBGK2d';  % Simulation Name
-    CFL    = 50/100;    % CFL condition
+    CFL    = 10/100;    % CFL condition
     r_time = 1/10000;   % Relaxation time
-    tEnd   = 0.20;      % Out time
+    tEnd   = 0.30;      % Out time
     theta  = 0;         % {-1} BE, {0} MB, {1} FD.
    fmodel  = 1;         % {1} UU. model, {2} ES model.
     quad   = 2;         % {1} NC , {2} GH
@@ -25,10 +25,10 @@ clc;  clear all;  close all;
     P_deg  = 0;         % Polinomial Degree
     Pp 	   = P_deg+1;   % Polinomials Points
 % Using RK integration time step
-RK_stages   = 4;        % Number of RK stages
+RK_stages  = 4;         % Number of RK stages
 
 %% Space Discretization
-nx = 80; ny = 80;
+nx = 200; ny = 200;
 [X,dx,Y,dy] = grid2d(0,1,nx,0,1,ny);
 [x,y] = meshgrid(X,Y);
 
@@ -205,6 +205,9 @@ switch method
             % UPDATE macroscopic properties 
             % (here lies a parallel computing challenge)
             [z1,ux1,uy1,t1,p1] = macroproperties2d(rho,rhoux,rhouy,E,nx,ny,theta);
+            
+            % Test temperature data
+            if t <= 0; error('Temperature is negative'); end;
             
             % Using Discrete Ordinate Method: (Replicating data for easier arrays Ops)
             for j = 1:ny
