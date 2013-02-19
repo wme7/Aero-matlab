@@ -26,15 +26,15 @@ global gamma
 %cfl     = 0.9;     % Courant number
 nx       = 100;     % number of cells
 mx       = nx+1;    % number of nodes
-ICx      = 12;      % IC: {1}~{12}. See Euler_IC1d.m
+ICx      = 1;      % IC: {1}~{12}. See Euler_IC1d.m
 %tEnd    = 0.01;    % final time to compute
 etpfix   = 0.90;	% {#} Harten's sonic entropy fix value, {0} no entropy fix
 plot_fig = 1;       % {1} plot figures, {0} do NOT plot figures
 wrt_sol  = 1;       % {1} write solution, {0} do NOT write solution file
 
 %% Physical Constanst
-gamma = 1.4;         % Ratio of specific heats
-%gamma = 4.8;
+%gamma = 1.4;         % Ratio of specific heats
+gamma = 2;
 
 %% Domain
 xn = linspace(0,1,mx);          % cells nodes

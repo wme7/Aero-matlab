@@ -12,9 +12,9 @@ xL = -1.0; xR = 1.0;
 StartUp1D;
 
 % Set initial conditions
-epsilon = 0.1;
+epsilon = 0.001;
 u = -tanh((x+0.5)/(2*epsilon)) + 1.0;
 
 % Solve Problem
-FinalTime = 1.5;
+FinalTime = 0.75;
 [u] = Burgers1D(u,epsilon,xL,xR,FinalTime);

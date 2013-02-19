@@ -2,7 +2,7 @@
 Globals1D;
 
 % Polynomial order used for approximation 
-N = 6;
+N = 10;
 
 % Generate simple mesh
 [Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 100);
