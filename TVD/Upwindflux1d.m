@@ -30,12 +30,7 @@ f_r = zeros(1,nx); %frl = zeros(1,nx); frh = zeros(1,nx);
 for j = x
     % Compute fluxes for TVD
     f_r(j) = a_p(j)*u(j) + a_m(j)*u(j+1);
-    %frh(j) = (1/2)*a(j)*(u(j)+u(j+1)) - (1/2)*(a(j)^2)*dtdx*(u(j+1)-u(j));
-    %f_r(j) = frl(j) + phi_x(j)*( frh(j) - frl(j) );
-    
     f_s(j) = a_p(j)*u(j-1) + a_m(j)*u(j);
-    %fsh(j) = (1/2)*a(j)*(u(j-1)+u(j)) - (1/2)*(a(j)^2)*dtdx*(u(j)-u(j-1));
-    %f_s(j)  = fsl(j) + phi_x(j-1)*( fsh(j) - fsl(j) );
 end
 
 return

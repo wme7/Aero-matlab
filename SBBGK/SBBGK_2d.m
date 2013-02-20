@@ -72,19 +72,15 @@ nv = length(v);
     vy = repmat(vy,[1,1,ny,nx]);    wy = repmat(wy,[1,1,ny,nx]);
 
 %% Initial Conditions
-% Load Macroscopic Velocity, Temperature and Fugacity
+% Semiclassical ICs: Fugacity[z], Velocity[u] and Temperature[T] 
     [z0,ux0,uy0,t0] = SSBGK_IC2d(x,y,IC_case);
     
 % Using Discrete Ordinate Method: (Replicating Data for easyer arrays Ops)
-    z = zeros(nv,nv);   ux = zeros(nv,nv);
-    uy = zeros(nv,nv);   t = zeros(nv,nv);
-
-for j = 1:ny
-     for i = 1:nx
-     z(:,:,j,i) = z0(j,i)*ones(nv,nv);  ux(:,:,j,i) = ux0(j,i)*ones(nv,nv);
-     uy(:,:,j,i) = uy0(j,i)*ones(nv,nv);  t(:,:,j,i) = t0(j,i)*ones(nv,nv);
-     end
-end
+    %[a,b,c,d] = apply_DOM_2d(a,b,c,d,nv,nx,ny)
+    z = reshape(z0,1,1,ny,nx);    z = repmat(z,[nv,nv,1]);
+    ux = reshape(ux0,1,1,ny,nx);  ux = repmat(ux,[nv,nv,1]);
+    uy = reshape(uy0,1,1,ny,nx);  uy = repmat(uy,[nv,nv,1]);
+    t = reshape(t0,1,1,ny,nx);    t = repmat(t,[nv,nv,1]);
 
 % Compute distribution IC of our mesoscopic method by assuming the equilibrium
 % state of the macroscopic IC. Using the semiclassical Equilibrium
@@ -116,7 +112,7 @@ dtdx = dt/dx;  % precomputed to save someflops
 dtdy = dt/dy;  % precomputed to save someflops
 
 % time domain discretization
-time = 0:dt:tEnd;
+time = 1 %0:dt:tEnd;
 
 % By negleting any force field acting over our domian, the classic
 % transport Boltzmann equation will resemble to a pure advection equation.
@@ -210,12 +206,10 @@ switch method
             if t <= 0; error('Temperature is negative'); end;
             
             % Using Discrete Ordinate Method: (Replicating data for easier arrays Ops)
-            for j = 1:ny
-                for i = 1:nx
-                z(:,:,j,i)  = z1(j,i)*ones(nv,nv);  ux(:,:,j,i) = ux1(j,i)*ones(nv,nv);
-                uy(:,:,j,i) = uy1(j,i)*ones(nv,nv); t(:,:,j,i) = t1(j,i)*ones(nv,nv);
-                end
-            end
+            z = reshape(z1,1,1,ny,nx);    z = repmat(z,[nv,nv,1]);
+            ux = reshape(ux1,1,1,ny,nx);  ux = repmat(ux,[nv,nv,1]);
+            uy = reshape(uy1,1,1,ny,nx);  uy = repmat(uy,[nv,nv,1]);
+            t = reshape(t1,1,1,ny,nx);    t = repmat(t,[nv,nv,1]);
             
             % Update Figures
             drawnow

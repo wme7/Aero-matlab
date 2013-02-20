@@ -16,19 +16,19 @@
 clear all; clc; close all;
 
 %% Parameters
-    cfl = 0.30;  % Courant Number
+    cfl = 0.10;  % Courant Number
      dx = 0.02;  % Spatial step size
  tStart = 0.00;  % Start time
    tEnd = 3.15;  % End time
 IC_case = 1;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine {5} Riemann
-bc_type = 2;     % {1} Dirichlet, {2} Neumann, {3} Periodic
+bc_type = 1;     % {1} Dirichlet, {2} Neumann, {3} Periodic
 fluxsplit = 2;   % {1} Godunov, {2} Global LF, {3} Local LF
 fluxtype = 1;    % {1} Scalar, {2}, Burgers
 
 %% Define our Flux function
 switch fluxtype
     case{1}
-        a = -0.5;   % scalar advection speed
+        a = 0.5;   % scalar advection speed
         f = @(w) a*w;
         df = @(w) a*ones(size(w));
     case{2}
@@ -88,7 +88,7 @@ while time <= tEnd
     [vp,vn] = WENO_fluxsplit(u,f,df,fluxsplit);
 
     % Reconstruct Fluxes values at cells interfaces
-    [h_left,h_right] = WENO3_1d_driver(vp,vn);
+    [h_left,h_right] = WENO5_1d_driver(vp,vn);
     
     % Update Next time step
     u_next = u - dtdx *(h_right - h_left);

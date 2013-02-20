@@ -50,8 +50,7 @@ if write_ans == 1
 end
 
 %% Initial Conditions in physical Space
-% Load Macroscopic Fugacity [z], Velocity[u] and Temperature[t] 
-    %[z0,u0,t0,p0,rho0,E0] = SSBGK_IC1d(x,IC_case);
+% Semiclassical ICs: Fugacity[z], Velocity[u] and Temperature[t] 
     [z0,u0,t0,p0,rho0,E0,tEnd,~] = SSBGK_IC1d(x,IC_case);
 
 %% Microscopic Velocity Discretization (using Discrete Ordinate Method)
