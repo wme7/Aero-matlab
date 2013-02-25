@@ -2,7 +2,7 @@
 Globals1D;
 
 % Polynomial order used for approximation 
-N = 3;
+N = 4;
 
 % Generate simple mesh
 [Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 40);
@@ -12,14 +12,15 @@ StartUp1D;
 
 % Set up initial conditions -- Sod's problem
 MassMatrix = inv(V')/V;
-cx = ones(Np,1)*sum(MassMatrix*x,1)/2; 
+%cx = ones(Np,1)*sum(MassMatrix*x,1)/2; 
 
 %u = ones(Np,K).*( sin(2*pi*cx) );
 u = sin(2*pi*x);
-FinalTime = 0.2;
+FinalTime = 1.4;
 
 % Solve Problem
 [u] = iBurgers1D(u,FinalTime);
 snapnow;
 
+% Plot Figure
 plot(x,u,'-o'); grid on;

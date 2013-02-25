@@ -71,7 +71,7 @@ switch quad
     
     case{3} % Uniformly distributed velocity points
     V  = [-7,7]; % range: a to b
-    nv = 20;       % nodes desired (the actual value)
+    nv = 3;       % nodes desired (the actual value)
     v = linspace(V(1),V(2),nv)';
     [v_star,w] = GaussHermite(3); % for integrating range: -inf to inf
     w = w.*exp(v_star.^2); % weighting function of the Gauss-Hermite quadrature

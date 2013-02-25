@@ -11,6 +11,7 @@ global rk4a rk4b rk4c
 global Nfaces EToE EToF
 global V invV
 global NODETOL
+global MassMatrix
 
 % Low storage Runge-Kutta coefficients
 rk4a = [            0.0 ...
