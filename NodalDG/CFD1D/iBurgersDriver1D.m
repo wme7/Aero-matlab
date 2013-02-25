@@ -2,10 +2,10 @@
 Globals1D;
 
 % Polynomial order used for approximation 
-N = 10;
+N = 3;
 
 % Generate simple mesh
-[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 100);
+[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 40);
 
 % Initialize solver and construct grid and metric
 StartUp1D;
@@ -16,8 +16,10 @@ cx = ones(Np,1)*sum(MassMatrix*x,1)/2;
 
 %u = ones(Np,K).*( sin(2*pi*cx) );
 u = sin(2*pi*x);
-FinalTime = 0.30;
+FinalTime = 0.2;
 
 % Solve Problem
 [u] = iBurgers1D(u,FinalTime);
 snapnow;
+
+plot(x,u,'-o'); grid on;

@@ -11,7 +11,7 @@ N = 5;
 StartUp1D;
 
 %% Set initial conditions
-u = sin(x);
+u = sin(2*pi*x);
 
 % u_0 = zeros(1,K*Np);
 % jump = [0.9 1.1];
@@ -23,8 +23,10 @@ u = sin(x);
 %     end
 % end
 % Load Initial Condition
-u = reshape(u_0,Np,K);
+%u = reshape(u_0,Np,K);
 
 %% Solve Problem
-FinalTime = 1.2;
+FinalTime = 0.12;
 [u] = Advec1D(u,FinalTime);
+
+plot(x,u);
