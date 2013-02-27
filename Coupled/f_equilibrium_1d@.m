@@ -1,14 +1,18 @@
-function f = f_equilibrium_1d(z,u,c,t,theta) 
+function f = f_equilibrium_1d(r,u,x,t,R) 
 % Compute equilibrum in 1d cases for:
 %
 % MB:  Maxwell-Boltzmann, theta =  0
 % FD:  Fermi-Diract,      theta = +1
 % BE:  Bose-Einstein,     theta = -1
 %
-% Inputs:
+% inputs:
 % u: macroscopic velocity
 % x: microscopic velocity
 % t: temperature
-% z: fugacity
 
-f = 1./(exp( (c-u).^2 ./ t)./z + theta);
+
+
+
+% f = 1./(exp( (x-u).^2 ./ t)./r + theta);
+
+f = r*(1/2*pi*R*t)./(exp(- (x-u).^2 ./ (2*R*t)))  

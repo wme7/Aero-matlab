@@ -126,35 +126,36 @@ end
 
 %% Load Selected case Initial condition:
 % number of points required
- nx = length(x);
+ [k,nx] = size(x);
 
 % Preallocating
-r_0 = zeros(1,nx); 
-u_0 = zeros(1,nx); 
-t_0 = zeros(1,nx); 
-p_0 = zeros(1,nx);
-rho_0 = zeros(1,nx);
-E_0 = zeros(1,nx);
+r_0 = zeros(k,nx); 
+u_0 = zeros(k,nx); 
+t_0 = zeros(k,nx); 
+p_0 = zeros(k,nx);
+rho_0 = zeros(k,nx);
+E_0 = zeros(k,nx);
 % Parameters of regions dimensions
-x_middle = ceil(nx/2);
-l_1 = 1:x_middle; l_2 = x_middle+1:nx;
+x_middle = (x(end)-x(1))/2;
+L = find(x<=x_middle);
+R = find(x>x_middle);
 
 % Initial Condition for our 2D domain
 % Fugacity
-r_0(l_1) = r(1); % region 1
-r_0(l_2) = r(2); % region 2
+r_0(L) = r(1); % region 1
+r_0(R) = r(2); % region 2
 % Velovity in x
-u_0(l_1) = u(1); % region 1
-u_0(l_2) = u(2); % region 2
+u_0(L) = u(1); % region 1
+u_0(R) = u(2); % region 2
 % temperature
-t_0(l_1) = t(1); % region 1
-t_0(l_2) = t(2); % region 2
+t_0(L) = t(1); % region 1
+t_0(R) = t(2); % region 2
 % pressure
-p_0(l_1) = p(1); % region 1
-p_0(l_2) = p(2); % region 2
+p_0(L) = p(1); % region 1
+p_0(R) = p(2); % region 2
 % density
-rho_0(l_1) = rho(1); % region 1
-rho_0(l_2) = rho(2); % region 2
+rho_0(L) = rho(1); % region 1
+rho_0(R) = rho(2); % region 2
 % Energy
-E_0(l_1) = E(1); % region 1
-E_0(l_2) = E(2); % region 2
+E_0(L) = E(1); % region 1
+E_0(R) = E(2); % region 2
