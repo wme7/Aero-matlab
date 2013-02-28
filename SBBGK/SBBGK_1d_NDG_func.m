@@ -1,3 +1,5 @@
+function SBBGK_1d_NDG_func(name,CFL,r_time,theta,quad,method,IC_case, ...
+        plot_figs,write_ans,P_deg,Pp,fmodel,RK_stages,~)
 %% 1D Semi-classical Boltzmann-BGK Equation
 % Numerical solution of the Boltzmann-BGK Equation to recover Euler macroscopic
 % continuum solution. Coded by Manuel Diaz 2013.02.25
@@ -7,25 +9,25 @@
 % $$\frac{\partial f}{\partial t}+\vec F\cdot \nabla_p f + \vec v
 % \cdot\nabla_{\vec x} f =\widehat{\Omega } (f) = - \frac{f-f^{eq}}{\tau}$$
 %
-clc;  clear all;  close all;
+% clc;  clear all;  close all;
 
 %% Simulation Parameters
-    name	='SBBGK1d'; % Simulation Name
-    CFL     = 15/100;   % CFL condition
-    r_time  = 1/10000;  % Relaxation time
-    %tEnd  	= 0.05;     % End time - Parameter part of ICs
-    theta 	= -1;        % {-1} BE, {0} MB, {1} FD.
-    fmodel  = 2;        % {1} UU. model, {2} ES model.
-    quad   	= 1;        % {1} NC , {2} GH
-    method 	= 1;        % {1} Nodal DG
-    IC_case	= 7;        % IC: {1}~{12}. See SSBGK_IC1d.m
-  plot_figs = 0;        % 0: no, 1: yes please!
-  write_ans = 0;        % 0: no, 1: yes please!
-% Using DG
-    P_deg	= 3;        % Polinomial Degree
-    Pp      = P_deg+1;  % Polinomials Points
-% Using RK integration time step
-  RK_stages	= 3;        % Number of RK stages
+%     name	='SBBGK1d';   % Simulation Name
+%     CFL     = 15/100;   % CFL condition
+%     r_time  = 1/10000;  % Relaxation time
+%     %tEnd  	= 0.05;   % End time - Parameter part of ICs
+%     theta 	= -1;     % {-1} BE, {0} MB, {1} FD.
+%     fmodel  = 2;        % {1} UU. model, {2} ES model.
+%     quad   	= 1;      % {1} NC , {2} GH
+%     method 	= 1;      % {1} Nodal DG
+%     IC_case	= 7;      % IC: {1}~{12}. See SSBGK_IC1d.m
+%   plot_figs = 0;        % 0: no, 1: yes please!
+%   write_ans = 0;        % 0: no, 1: yes please!
+% % Using DG
+%     P_deg	= 3;          % Polinomial Degree
+%     Pp      = P_deg+1;  % Polinomials Points
+% % Using RK integration time step
+%   RK_stages	= 3;      % Number of RK stages
 
 %% Driver script for solving the 1D BBGK equations
 Globals1D;
@@ -100,7 +102,7 @@ switch fmodel
     case{2} % E.S.
         f0 = f_ES_equilibrium_1d(z,p,rho,ux,v,t,theta);
 otherwise 
-        error('Order must be between 1 and 2');
+        error('Option are {1}UU and {2}ES');
 end
     
 % Plot IC of Distribution function, f, in Phase-Space:
@@ -124,7 +126,7 @@ end
 % Prepare for adaptive time stepping
 mindx = min(x(2,:)-x(1,:));
 dt = mindx*CFL/max(abs(v(:,1))); 
-dtdx = dt/mindx;  % precomputed to save someflops
+%dtdx = dt/mindx;  % precomputed to save someflops
 
 % Time domain discretization
 time = 0:dt:tEnd;
@@ -186,7 +188,7 @@ switch method
             end
                         
             % initialize variables
-            u_next = zeros(Pp,K);
+            %u_next = zeros(Pp,K);
             u_eq = zeros(Pp,K);
             u = zeros(Pp,K);
                               

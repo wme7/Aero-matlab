@@ -19,13 +19,13 @@ clc;  clear all;  close all;
     quad   	= 1;        % {1} NC , {2} GH
     method 	= 3;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
     IC_case	= 8;        % IC: {1}~{12}. See Euler_IC1d.m
-  plot_figs = 1;        % 0: no, 1: yes please!
+  plot_figs = 0;        % 0: no, 1: yes please!
   write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
     P_deg	= 0;        % Polinomial Degree
     Pp      = P_deg+1;  % Polinomials Points
 % Using RK integration time step
-  RK_stages	= 4;        % Number of RK stages
+  RK_stages	= 1;        % Number of RK stages
 
 %% Space Discretization
 nx  = 100;                      % Desided number of points in our domain
@@ -34,10 +34,6 @@ dx  = max(x(2:end)-x(1:end-1)); % delta x
 
 %% Define a ID name for results file
 [ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,r_time,IC_case);
-
-%% Contants
-    global gamma 
-    gamma = 1.4;
 
 %% Open a Files to store the Results
 if write_ans == 1
