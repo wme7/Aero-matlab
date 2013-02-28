@@ -11,35 +11,30 @@ clc;  clear all;  close all;
 
 %% Simulation Parameters
     name	='SBBGK1d'; % Simulation Name
-    CFL     = 15/100;   % CFL condition
+    CFL     = 10/100;   % CFL condition
     r_time  = 1/10000;  % Relaxation time
     %tEnd  	= 0.05;     % End time
     theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 1;        % {1} UU. model, {2} ES model.
     quad   	= 2;        % {1} NC , {2} GH
     method 	= 1;        % {1} Nodal DG
-    IC_case	= 1;        % IC: {1}~{12}. See Euler_IC1d.m
+    IC_case	= 8;        % IC: {1}~{12}. See SSBGK_IC1d.m
   plot_figs = 1;        % 0: no, 1: yes please!
   write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
-    P_deg	= 0;        % Polinomial Degree
+    P_deg	= 3;        % Polinomial Degree
     Pp      = P_deg+1;  % Polinomials Points
 % Using RK integration time step
-  RK_stages	= 4;        % Number of RK stages
+  RK_stages	= 3;        % Number of RK stages
 
-%% Space Discretization
-% nx  = 100;                      % Desided number of cells in our domain
-% x   = linspace(0,1,nx);         % Physical domain -x
-% dx  = max(x(2:end)-x(1:end-1)); % delta x
-
-% Driver script for solving the 1D Euler equations
+%% Driver script for solving the 1D BBGK equations
 Globals1D;
 
 % Polynomial order used for approximation 
-N = 4;
+N = P_deg;
 
 % Generate simple mesh
-[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 20);
+[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 100);
 
 % Initialize solver and construct grid and metric
 StartUp1D;
@@ -90,7 +85,7 @@ end
     nv = length(v);
 % Using D.O.M.
     v = reshape(v,[1,1,nv]);    w = reshape(w,[1,1,nv]);
-    v = repmat(v,N+1,K);        w = repmat(w,N+1,K);
+    v = repmat(v,Pp,K);        w = repmat(w,Pp,K);
 
 %% Applying Discrete Ordinate Method on ICs:
 [z,ux,t] = apply_DG_DOM(z0,u0,t0,nv);  % Semi-classical IC
@@ -118,7 +113,7 @@ if plot_figs == 1
    zlabel('f - Probability');
 end
 % Compute Initial Macroscopic Momemts:
-    %[rho,rhou,E] = macromoments1d(k,w,f0,v); %Just for testing
+    %[rho,rhoux,E] = macromoments1d(k,w,f0,v); %Just for testing
     %[~,~,~,p] = macroproperties1d(rho,rhou,E,nx,nv,theta);
     
 %% Marching Scheme
@@ -161,20 +156,22 @@ switch method
             zlabel('f - Probability');
             % Plot Macroscopic variables
             figure(2)
-            subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
-            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
-            subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
-            subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
-            subplot(2,3,5); plot(x,t(1,:),'.'); axis tight; title('Temperature')
-            subplot(2,3,6); plot(x,E(1,:),'.'); axis tight; title('Energy')
+            subplot(2,3,1); plot(x,rho(:,:,1),'.'); axis tight; title('Density')
+            subplot(2,3,2); plot(x,ux(:,:,1),'.'); axis tight; title('velocity in x')
+            subplot(2,3,3); plot(x,p(:,:,1),'.'); axis tight; title('Pressure')
+            subplot(2,3,4); plot(x,z(:,:,1),'.'); axis tight; title('Fugacity')
+            subplot(2,3,5); plot(x,t(:,:,1),'.'); axis tight; title('Temperature')
+            subplot(2,3,6); plot(x,E(:,:,1),'.'); axis tight; title('Energy')
             end
             % Write Results
             if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
                 fprintf(file, 'ZONE T = "time %0.4f"\n', tsteps);
-                fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
-                for i = 1:nx
+                fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', K);
+                for i = 1:K
+                    for j = 1:Pp
                     fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
-                        x(1,i),rho(1,i),ux(1,i),E(1,i),p(1,i),t(1,i),z(1,i));
+                        x(j,i),rho(j,i,1),ux(j,i,1),E(j,i,1),p(j,i,1),t(j,1,i),z(j,i,1));
+                    end
                 end
             end
             
@@ -189,36 +186,36 @@ switch method
             end
                         
             % initialize variables
-            u_next = zeros(N+1,K);
-            u_eq = zeros(N+1,K);
-            u = zeros(N+1,K);
+            u_next = zeros(Pp,K);
+            u_eq = zeros(Pp,K);
+            u = zeros(Pp,K);
                               
             % (this part can, and should be done in parallel!)
             for i = 1:nv
                 % load subcase
-                u_eq(:) = f_eq(i,:);
-                u(:) = f(i,:);
+                u_eq(:,:) = f_eq(:,:,i);
+                u(:,:) = f(:,:,i);
                 
                 % Limit initial solution
                 u = SlopeLimitN(u);
                 
                 % 3rd order SSP Runge-Kutta
                 % SSP RK Stage 1.
-                [rhsu]  = iBurgersRHS1D(u);
+                [rhsu]  = SBBGK_RHS1D(a(i),u,u_eq,r_time);
                 u1  = u  + dt*rhsu;
                 
                 % Limit fields
                 u1  = SlopeLimitN(u1);
                 
                 % SSP RK Stage 2.
-                [rhsu]  = iBurgersRHS1D(u1);
+                [rhsu]  = SBBGK_RHS1D(a(i),u1,u_eq,r_time);
                 u2   = (3*u  + u1  + dt*rhsu )/4;
                 
                 % Limit fields
                 u2  = SlopeLimitN(u2);
                 
                 % SSP RK Stage 3.
-                [rhsu]  = iBurgersRHS1D(u2);
+                [rhsu]  = SBBGK_RHS1D(a(i),u2,u_eq,r_time);
                 u  = (u  + 2*u2  + 2*dt*rhsu )/3;
                 
                 % Limit solution
@@ -228,7 +225,7 @@ switch method
                 u = u_next;
                 
                 % Going back to f
-                f(i,:) = u(:);
+                f(:,:,i) = u(:,:);
             end
             
             % Compute macroscopic moments
@@ -260,10 +257,10 @@ end
 if plot_figs ~= 1
     % Plot Macroscopic variables
     figure(2)
-    subplot(2,3,1); plot(x,rho(1,:),'o'); axis tight; title('Density')
-    subplot(2,3,2); plot(x,ux(1,:),'o'); axis tight; title('velocity in x')
-    subplot(2,3,3); plot(x,p(1,:),'o'); axis tight; title('Pressure')
-    subplot(2,3,4); plot(x,z(1,:),'o'); axis tight; title('Fugacity')
-    subplot(2,3,5); plot(x,t(1,:),'o'); axis tight; title('Temperature')
-    subplot(2,3,6); plot(x,E(1,:),'o'); axis tight; title('Energy')
+    subplot(2,3,1); plot(x,rho(:,:,1),'-o'); axis tight; title('Density')
+    subplot(2,3,2); plot(x,ux(:,:,1),'-o'); axis tight; title('velocity in x')
+    subplot(2,3,3); plot(x,p(:,:,1),'-o'); axis tight; title('Pressure')
+    subplot(2,3,4); plot(x,z(:,:,1),'-o'); axis tight; title('Fugacity')
+    subplot(2,3,5); plot(x,t(:,:,1),'-o'); axis tight; title('Temperature')
+    subplot(2,3,6); plot(x,E(:,:,1),'-o'); axis tight; title('Energy')
 end
