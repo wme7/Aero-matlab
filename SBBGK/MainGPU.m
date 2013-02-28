@@ -20,7 +20,7 @@ method      = 1;        % for TVD = 1, WENO3 = 2, WENO5 = 3
 fmodel      = 2;        % {1} UU. model, {2} ES model.
 IC_case     = 1;        % Reimann IC cases 1~12.
 plot_figs   = 0;        % 0: no, 1: yes please!
-write_ans   = 0;        % 0: no, 1: yes please!
+write_ans   = 1;        % 0: no, 1: yes please!
 % Using DG
 P_deg       = 3;        % Polinomial Degree <-- Carefull when using DG!
 Pp          = P_deg+1;  % Polinomials Points
@@ -33,7 +33,7 @@ nx          = 100;      % Desided number of points in our domain
 tau = [1/10 1/100 1/1000 1/10000];  % Relaxation time per case
 
 %% Excecute SBBGK in Parallel using 4 processors
-parfor i = cases
+parfor i = 1
     SBBGK_1d_NDG_func(name,CFL,tau(i),theta,quad,method,IC_case, ...
         plot_figs,write_ans,P_deg,Pp,fmodel,RK_stages,nx)
 end

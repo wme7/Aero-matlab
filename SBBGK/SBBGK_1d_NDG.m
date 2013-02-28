@@ -16,11 +16,11 @@ clc;  clear all;  close all;
     %tEnd  	= 0.05;     % End time - Parameter part of ICs
     theta 	= -1;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 2;        % {1} UU. model, {2} ES model.
-    quad   	= 1;        % {1} NC , {2} GH
+    quad   	= 2;        % {1} NC , {2} GH
     method 	= 1;        % {1} Nodal DG
     IC_case	= 7;        % IC: {1}~{12}. See SSBGK_IC1d.m
   plot_figs = 0;        % 0: no, 1: yes please!
-  write_ans = 0;        % 0: no, 1: yes please!
+  write_ans = 1;        % 0: no, 1: yes please!
 % Using DG
     P_deg	= 3;        % Polinomial Degree
     Pp      = P_deg+1;  % Polinomials Points
@@ -168,9 +168,9 @@ switch method
                 fprintf(file, 'ZONE T = "time %0.4f"\n', tsteps);
                 fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', Pp*K);
                 for i = 1:K % Elements
-                    for j = 1:Pp % Element's nodes
+                    for j = 1:N+1 % Element's nodes
                     fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
-                        x(j,i),rho(j,i,1),ux(j,i,1),E(j,i,1),p(j,i,1),t(j,1,i),z(j,i,1));
+                        x(j,i),rho(j,i,1),ux(j,i,1),E(j,i,1),p(j,i,1),t(j,i,1),z(j,i,1));
                     end
                 end
             end

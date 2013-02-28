@@ -172,7 +172,7 @@ switch method
                 for i = 1:K % Elements
                     for j = 1:Pp % Element's nodes
                     fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
-                        x(j,i),rho(j,i,1),ux(j,i,1),E(j,i,1),p(j,i,1),t(j,1,i),z(j,i,1));
+                        x(j,i),rho(j,i,1),ux(j,i,1),E(j,i,1),p(j,i,1),t(j,i,1),z(j,i,1));
                     end
                 end
             end
