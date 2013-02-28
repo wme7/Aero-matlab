@@ -1,6 +1,6 @@
 %% 1D Semi-classical Boltzmann-BGK Equation
 % Numerical solution of the Boltzmann-BGK Equation to recover Euler macroscopic
-% continuum solution. Coded by Manuel Diaz 2012.10.06
+% continuum solution. Coded by Manuel Diaz 2013.02.25
 %
 % Semi-classical Boltzmann-BGK Transport Equation:
 %
@@ -13,7 +13,7 @@ clc;  clear all;  close all;
     name	='SBBGK1d'; % Simulation Name
     CFL     = 10/100;   % CFL condition
     r_time  = 1/10000;  % Relaxation time
-    %tEnd  	= 0.05;     % End time
+    %tEnd  	= 0.05;     % End time - Parameter part of ICs
     theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 1;        % {1} UU. model, {2} ES model.
     quad   	= 2;        % {1} NC , {2} GH
@@ -113,7 +113,7 @@ if plot_figs == 1
    zlabel('f - Probability');
 end
 % Compute Initial Macroscopic Momemts:
-    %[rho,rhoux,E] = macromoments1d(k,w,f0,v); %Just for testing
+    %[rho,rhoux,E] = macromoments_DG_1d(k,w,f0,v); %Just for testing
     %[~,~,~,p] = macroproperties1d(rho,rhou,E,nx,nv,theta);
     
 %% Marching Scheme
@@ -157,7 +157,7 @@ switch method
             % Plot Macroscopic variables
             figure(2)
             subplot(2,3,1); plot(x,rho(:,:,1),'.'); axis tight; title('Density')
-            subplot(2,3,2); plot(x,ux(:,:,1),'.'); axis tight; title('velocity in x')
+            subplot(2,3,2); plot(x,ux(:,:,1),'.'); axis tight; title('x-Velocity')
             subplot(2,3,3); plot(x,p(:,:,1),'.'); axis tight; title('Pressure')
             subplot(2,3,4); plot(x,z(:,:,1),'.'); axis tight; title('Fugacity')
             subplot(2,3,5); plot(x,t(:,:,1),'.'); axis tight; title('Temperature')
@@ -229,11 +229,11 @@ switch method
             end
             
             % Compute macroscopic moments
-            [rho,rhoux,E] = macromoments1d(k,w,f,v);
+            [rho,rhoux,E] = macromoments_DG_1d(k,w,f,v);
             
             % UPDATE macroscopic properties 
             % (here lies a paralellizing computing challenge)
-            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,nv,theta);
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,theta,fmodel);
             
             % Apply DOM
             [z,ux,t] = apply_DG_DOM(z,ux,t,nv); % Semi-classical variables
@@ -258,7 +258,7 @@ if plot_figs ~= 1
     % Plot Macroscopic variables
     figure(2)
     subplot(2,3,1); plot(x,rho(:,:,1),'-o'); axis tight; title('Density')
-    subplot(2,3,2); plot(x,ux(:,:,1),'-o'); axis tight; title('velocity in x')
+    subplot(2,3,2); plot(x,ux(:,:,1),'-o'); axis tight; title('x-Velocity')
     subplot(2,3,3); plot(x,p(:,:,1),'-o'); axis tight; title('Pressure')
     subplot(2,3,4); plot(x,z(:,:,1),'-o'); axis tight; title('Fugacity')
     subplot(2,3,5); plot(x,t(:,:,1),'-o'); axis tight; title('Temperature')

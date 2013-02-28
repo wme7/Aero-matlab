@@ -13,13 +13,13 @@ clc;  clear all;  close all;
     name	='SBBGK1d'; % Simulation Name
     CFL     = 15/100;   % CFL condition
     r_time  = 1/10000;  % Relaxation time
-    %tEnd  	= 0.05;     % End time
-    theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
+    %tEnd  	= 0.05;     % End time - Parameter part of ICs
+    theta 	= 1;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 1;        % {1} UU. model, {2} ES model.
-    quad   	= 2;        % {1} NC , {2} GH
+    quad   	= 1;        % {1} NC , {2} GH
     method 	= 3;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
-    IC_case	= 1;        % IC: {1}~{12}. See Euler_IC1d.m
-  plot_figs = 0;        % 0: no, 1: yes please!
+    IC_case	= 8;        % IC: {1}~{12}. See Euler_IC1d.m
+  plot_figs = 1;        % 0: no, 1: yes please!
   write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
     P_deg	= 0;        % Polinomial Degree
@@ -87,12 +87,12 @@ end
 % Compute distribution IC of our mesoscopic method by assuming the equilibrium 
 % state of the macroscopic IC. Using the semiclassical Equilibrium
 % distribuition function:
-switch fmodel 
+switch fmodel
     case{1} % U.U.
         f0 = f_equilibrium_1d(z,ux,v,t,theta);
     case{2} % E.S.
-        f0 = f_SE_equilibrium_1d(z,p,rho,ux,v,t,theta);
-otherwise 
+        f0 = f_ES_equilibrium_1d(z,p,rho,ux,v,t,theta);
+    otherwise
         error('Order must be between 1 and 2');
 end
     
@@ -145,7 +145,7 @@ switch method
             % Plot Macroscopic variables
             figure(2)
             subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
-            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('x-Velocity')
             subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
             subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
             subplot(2,3,5); plot(x,t(1,:),'.'); axis tight; title('Temperature')
@@ -166,11 +166,11 @@ switch method
                 case{1} % U.U.
                     f_eq = f_equilibrium_1d(z,ux,v,t,theta);
                 case{2} % E.S.
-                    f_eq = f_SE_equilibrium_1d(z,p,rho,ux,v,t,theta);
+                    f_eq = f_ES_equilibrium_1d(z,p,rho,ux,v,t,theta);
                 otherwise
                     error('Order must be between 1 and 2');
             end
-                        
+                                    
             % initialize variables
             u_next = zeros(1,nx);
             u_eq = zeros(1,nx);
@@ -201,11 +201,11 @@ switch method
             end
             
             % Compute macroscopic moments
-            [rho,rhoux,E] = macromoments1d(k,w,f,v);
+            [rho,rhoux,E,Wxx] = macromoments1d(k,w,f,v,ux);
             
             % UPDATE macroscopic properties 
             % (here lies a paralellizing computing challenge)
-            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,nv,theta);
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,Wxx,nx,theta,fmodel);
             
             % Apply DOM
             [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
@@ -235,7 +235,7 @@ switch method
             % Plot Macroscopic variables
             figure(2)
             subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
-            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('x-Velocity')
             subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
             subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
             subplot(2,3,5); plot(x,t(1,:),'.'); axis tight; title('Temperature')
@@ -256,7 +256,7 @@ switch method
                 case{1} % U.U.
                     f_eq = f_equilibrium_1d(z,ux,v,t,theta);
                 case{2} % E.S.
-                    f_eq = f_SE_equilibrium_1d(z,p,rho,ux,v,t,theta);
+                    f_eq = f_ES_equilibrium_1d(z,p,rho,ux,v,t,theta);
                 otherwise
                     error('Order must be between 1 and 2');
             end
@@ -297,11 +297,11 @@ switch method
             end
             
             % Compute macroscopic moments
-            [rho,rhoux,E] = macromoments1d(k,w,f,v);
+            [rho,rhoux,E,Wxx] = macromoments1d(k,w,f,v,ux);
             
             % UPDATE macroscopic properties 
             % (here lies a paralellizing computing challenge)
-            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,nv,theta);
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,Wxx,nx,theta,fmodel);
             
             % Apply DOM
             [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
@@ -331,7 +331,7 @@ switch method
             % Plot Macroscopic variables
             figure(2)
             subplot(2,3,1); plot(x,rho(1,:),'.'); axis tight; title('Density')
-            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('velocity in x')
+            subplot(2,3,2); plot(x,ux(1,:),'.'); axis tight; title('x-Velocity')
             subplot(2,3,3); plot(x,p(1,:),'.'); axis tight; title('Pressure')
             subplot(2,3,4); plot(x,z(1,:),'.'); axis tight; title('Fugacity')
             subplot(2,3,5); plot(x,t(1,:),'.'); axis tight; title('Temperature')
@@ -352,7 +352,7 @@ switch method
                 case{1} % U.U.
                     f_eq = f_equilibrium_1d(z,ux,v,t,theta);
                 case{2} % E.S.
-                    f_eq = f_SE_equilibrium_1d(z,p,rho,ux,v,t,theta);
+                    f_eq = f_ES_equilibrium_1d(z,p,rho,ux,v,t,theta);
                 otherwise
                     error('Order must be between 1 and 2');
             end
@@ -394,11 +394,11 @@ switch method
             end
             
             % Compute macroscopic moments
-            [rho,rhoux,E] = macromoments1d(k,w,f,v);
+            [rho,rhoux,E,Wxx] = macromoments1d(k,w,f,v,ux);
             
             % UPDATE macroscopic properties 
             % (here lies a paralellizing computing challenge)
-            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,nv,theta);
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,Wxx,nx,theta,fmodel);
             
             % Apply DOM
             [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
@@ -423,7 +423,7 @@ if plot_figs ~= 1
     % Plot Macroscopic variables
     figure(2)
     subplot(2,3,1); plot(x,rho(1,:),'o'); axis tight; title('Density')
-    subplot(2,3,2); plot(x,ux(1,:),'o'); axis tight; title('velocity in x')
+    subplot(2,3,2); plot(x,ux(1,:),'o'); axis tight; title('x-Velocity')
     subplot(2,3,3); plot(x,p(1,:),'o'); axis tight; title('Pressure')
     subplot(2,3,4); plot(x,z(1,:),'o'); axis tight; title('Fugacity')
     subplot(2,3,5); plot(x,t(1,:),'o'); axis tight; title('Temperature')
