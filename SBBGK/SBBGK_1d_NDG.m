@@ -15,8 +15,8 @@ clc;  clear all;  close all;
     r_time  = 1/10000;  % Relaxation time
     %tEnd  	= 0.05;     % End time - Parameter part of ICs
     theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
-    fmodel  = 1;        % {1} UU. model, {2} ES model.
-    quad   	= 2;        % {1} NC , {2} GH
+    fmodel  = 2;        % {1} UU. model, {2} ES model.
+    quad   	= 1;        % {1} NC , {2} GH
     method 	= 1;        % {1} Nodal DG
     IC_case	= 8;        % IC: {1}~{12}. See SSBGK_IC1d.m
   plot_figs = 1;        % 0: no, 1: yes please!
@@ -67,9 +67,9 @@ end
 switch quad
 
     case{1} % Newton Cotes Quadrature:
-    V  = [-20,20];  % range: a to b
+    Vv  = [-20,20];  % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
-    [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
+    [v,w,k] = cotes_xw(Vv(1),Vv(2),nv,5); % Using Netwon Cotes Degree 5
         
     case{2} % Gauss Hermite Quadrature:
     nv = 80;          % nodes desired (the actual value)
@@ -98,7 +98,7 @@ switch fmodel
     case{1} % U.U.
         f0 = f_equilibrium_1d(z,ux,v,t,theta);
     case{2} % E.S.
-        f0 = f_SE_equilibrium_1d(z,p,rho,ux,v,t,theta);
+        f0 = f_ES_equilibrium_1d(z,p,rho,ux,v,t,theta);
 otherwise 
         error('Order must be between 1 and 2');
 end
@@ -113,7 +113,7 @@ if plot_figs == 1
    zlabel('f - Probability');
 end
 % Compute Initial Macroscopic Momemts:
-    %[rho,rhoux,E] = macromoments_DG_1d(k,w,f0,v); %Just for testing
+    %[rho,rhoux,E,Wxx] = macromoments_DG_1d(k,w,f0,v,ux); %Just for testing
     %[~,~,~,p] = macroproperties1d(rho,rhou,E,nx,nv,theta);
     
 %% Marching Scheme
@@ -180,7 +180,7 @@ switch method
                 case{1} % U.U.
                     f_eq = f_equilibrium_1d(z,ux,v,t,theta);
                 case{2} % E.S.
-                    f_eq = f_SE_equilibrium_1d(z,p,rho,ux,v,t,theta);
+                    f_eq = f_ES_equilibrium_1d(z,p,rho,ux,v,t,theta);
                 otherwise
                     error('Order must be between 1 and 2');
             end
@@ -229,11 +229,11 @@ switch method
             end
             
             % Compute macroscopic moments
-            [rho,rhoux,E] = macromoments_DG_1d(k,w,f,v);
+            [rho,rhoux,E,Wxx] = macromoments_DG_1d(k,w,f,v,ux);
             
             % UPDATE macroscopic properties 
             % (here lies a paralellizing computing challenge)
-            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,nx,theta,fmodel);
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,Wxx,nx,theta,fmodel);
             
             % Apply DOM
             [z,ux,t] = apply_DG_DOM(z,ux,t,nv); % Semi-classical variables
