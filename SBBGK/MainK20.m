@@ -3,7 +3,7 @@
 clc; clear all; close all; 
 
 if matlabpool('size') == 0  % checking to see if my pool is already open.
-    matlabpool open 4       % Simultaneous cases to evaluate in K20.
+    matlabpool open 12       % Simultaneous cases to evaluate in K20.
 end
 
 %% Number of cases

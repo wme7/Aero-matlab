@@ -11,16 +11,16 @@ clc;  clear all;  close all;
 
 %% Simulation Parameters
     name	='SBBGK1d'; % Simulation Name
-    CFL     = 15/100;   % CFL condition
+    CFL     = 30/100;   % CFL condition
     r_time  = 1/10000;  % Relaxation time
     %tEnd  	= 0.05;     % End time - Parameter part of ICs
     theta 	= -1;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 2;        % {1} UU. model, {2} ES model.
     quad   	= 2;        % {1} NC , {2} GH
     method 	= 1;        % {1} Nodal DG
-    IC_case	= 7;        % IC: {1}~{12}. See SSBGK_IC1d.m
-  plot_figs = 0;        % 0: no, 1: yes please!
-  write_ans = 1;        % 0: no, 1: yes please!
+    IC_case	= 8;        % IC: {1}~{12}. See SSBGK_IC1d.m
+  plot_figs = 1;        % 0: no, 1: yes please!
+  write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
     P_deg	= 3;        % Polinomial Degree
     Pp      = P_deg+1;  % Polinomials Points
@@ -72,7 +72,7 @@ switch quad
     [v,w,k] = cotes_xw(Vv(1),Vv(2),nv,5); % Using Netwon Cotes Degree 5
         
     case{2} % Gauss Hermite Quadrature:
-    nv = 80;          % nodes desired (the actual value)
+    nv = 20;          % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;            % quadrature constant.
     w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature
@@ -232,9 +232,14 @@ switch method
             [rho,rhoux,E,Wxx] = macromoments_DG_1d(k,w,f,v,ux);
             
             % UPDATE macroscopic properties 
+            try
             % (here lies a paralellizing computing challenge)
             [z,ux,t,p] = macroproperties_DG_1d(rho,rhoux,E,Wxx,K,Pp,theta,fmodel);
-            
+            catch ME
+                ME % show error message
+                break
+            end
+                                    
             % Apply DOM
             [z,ux,t] = apply_DG_DOM(z,ux,t,nv); % Semi-classical variables
             %[p,rho,E] = apply_DG_DOM(p,rho,E,nv); % Classical variables

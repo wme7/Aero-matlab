@@ -234,9 +234,14 @@ switch method
             [rho,rhoux,E,Wxx] = macromoments_DG_1d(k,w,f,v,ux);
             
             % UPDATE macroscopic properties 
+            try
             % (here lies a paralellizing computing challenge)
             [z,ux,t,p] = macroproperties_DG_1d(rho,rhoux,E,Wxx,K,Pp,theta,fmodel);
-            
+            catch ME
+                ME % show error message
+                break
+            end
+                                    
             % Apply DOM
             [z,ux,t] = apply_DG_DOM(z,ux,t,nv); % Semi-classical variables
             %[p,rho,E] = apply_DG_DOM(p,rho,E,nv); % Classical variables
