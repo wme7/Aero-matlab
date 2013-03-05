@@ -42,23 +42,22 @@ R = 2/1000;  % Radious of plate [m]
 r = linspace(0,R,40); % Domain
 s = 3.18E9;  % Source term [W/m^3]
 k = 15;      % Conduction constant [W/(m.K)]
-C_1 = 0;
-C_2 = s*R^2/(2*(k+1));
+C_1 = 0; C_2 = s*R^2/(2*(k+1));
 T_exact = C_1*r.^(1-1/k)+C_2-s*r.^2/(2*(k+1));
 
 % Linear Approximation
-Alpha1_1 = s/(750*k);
-Alpha1_0 = - Alpha1_1*(2/1000);
-T1 = Alpha1_0 + Alpha1_1*r;
+Alpha1_0 = 0; 
+Alpha1_1 = (2*R*s)/(3*k);
+T1 = Alpha1_0 + Alpha1_1*(R-r);
 
 % Quadratic Approximation
- Alpha2_1 = 0.006*s/k;
-Alpha2_2 = - 1.75*s/k;
-Alpha2_0 = - Alpha2_1*(2/1000) - Alpha2_2*(2/1000)^2;
-T2 = Alpha2_0 + Alpha2_1*r + Alpha2_2*r.^2;
+Alpha2_0 = 0; 
+Alpha2_1 = 3*R*s/k;
+Alpha2_2 = - 7*s/(4*k);
+T2 = Alpha2_0 + Alpha2_1*(R-r) + Alpha2_2*(r-R).^2;
 
 % Draw Figure
 figure(2)
 hold on; title('Plate Temperature, T(r)')
 plot(r,T_exact,'-k'); plot(r,T1,'ok'); plot(r,T2,'sk');
-xlabel('r'),ylabel('temperature ºK');legend('exact','linear','quadratic',4)
+xlabel('r'),ylabel('temperature ºK');legend('exact','linear','quadratic',1)

@@ -150,7 +150,7 @@ switch method
             subplot(2,3,6); plot(x,E(1,:),'.'); axis tight; title('Energy')
             end
             % Write Results
-            if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
+            if write_ans == 1 && (mod(tsteps,10*dt) == 0 || tsteps == time(end))
                 fprintf(file, 'ZONE T = "time %0.4f"\n', tsteps);
                 fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
                 for i = 1:nx
