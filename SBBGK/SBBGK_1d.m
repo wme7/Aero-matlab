@@ -16,10 +16,10 @@ clc;  clear all;  close all;
     %tEnd  	= 0.05;     % End time - Parameter part of ICs
     theta 	= 1;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 1;        % {1} UU. model, {2} ES model.
-    quad   	= 1;        % {1} NC , {2} GH
+    quad   	= 2;        % {1} NC , {2} GH
     method 	= 3;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
-    IC_case	= 8;        % IC: {1}~{12}. See Euler_IC1d.m
-  plot_figs = 0;        % 0: no, 1: yes please!
+    IC_case	= 1;        % IC: {1}~{14}. See Euler_IC1d.m
+  plot_figs = 1;        % 0: no, 1: yes please!
   write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
     P_deg	= 0;        % Polinomial Degree
@@ -28,7 +28,7 @@ clc;  clear all;  close all;
   RK_stages	= 1;        % Number of RK stages
 
 %% Space Discretization
-nx  = 100;                      % Desided number of points in our domain
+nx  = 200;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
@@ -101,8 +101,8 @@ if plot_figs == 1
    zlabel('f - Probability');
 end
 % Compute Initial Macroscopic Momemts:
-    %[rho,rhou,E] = macromoments1d(k,w,f0,v); %Just for testing
-    %[~,~,~,p] = macroproperties1d(rho,rhou,E,nx,nv,theta);
+    [rho,rhou,E] = macromoments1d(k,w,f0,v,ux); %Just for testing
+    [~,~,~,p] = macroproperties1d(rho,rhou,E,p,nx,theta,fmodel);
     
 %% Marching Scheme
 % First we need to define how big is our time step. Due to the discrete
@@ -200,8 +200,13 @@ switch method
             [rho,rhoux,E,Wxx] = macromoments1d(k,w,f,v,ux);
             
             % UPDATE macroscopic properties 
+            try
             % (here lies a paralellizing computing challenge)
             [z,ux,t,p] = macroproperties1d(rho,rhoux,E,Wxx,nx,theta,fmodel);
+            catch ME
+                ME % show error message
+                break
+            end
             
             % Apply DOM
             [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
@@ -296,8 +301,13 @@ switch method
             [rho,rhoux,E,Wxx] = macromoments1d(k,w,f,v,ux);
             
             % UPDATE macroscopic properties 
+            try
             % (here lies a paralellizing computing challenge)
             [z,ux,t,p] = macroproperties1d(rho,rhoux,E,Wxx,nx,theta,fmodel);
+            catch ME
+                ME % show error message
+                break
+            end
             
             % Apply DOM
             [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables

@@ -104,12 +104,19 @@ switch input
         rho = [ 1.0 0.125];
         tEnd = 0.1; cfl = 0.15;
         
-	case{7} % Bogus case 1, Unknown
+	case{13} % Bogus case 1, Unknown
         fprintf('Case 7: Bogus case 1, Unknown \n');
         u  = [0         0        ];
         t  = [4.38385   8.972544 ];
         r  = [0.2253353 0.1204582];
         tEnd = 0.1; cfl = 0.15;
+        
+    case{14} % Manuel's Blastwave
+        fprintf('Manuel`s Blastwave, IAM 2013 \n');
+        p   = [4.00 0.10 1.00];
+        u   = [1.00 0.00 -1.0];
+        rho = [0.90 0.90 0.90];
+        tEnd = 0.20; cfl = 0.15;
         
     otherwise 
         error('Available cases: 1~13');
@@ -128,34 +135,70 @@ end
 % number of points required
  [k,nx] = size(x);
 
-% Preallocating
-r_0 = zeros(k,nx); 
-u_0 = zeros(k,nx); 
-t_0 = zeros(k,nx); 
-p_0 = zeros(k,nx);
-rho_0 = zeros(k,nx);
-E_0 = zeros(k,nx);
-% Parameters of regions dimensions
-x_middle = (x(end)-x(1))/2;
-L = find(x<=x_middle);
-R = find(x>x_middle);
-
-% Initial Condition for our 2D domain
-% Fugacity
-r_0(L) = r(1); % region 1
-r_0(R) = r(2); % region 2
-% Velovity in x
-u_0(L) = u(1); % region 1
-u_0(R) = u(2); % region 2
-% temperature
-t_0(L) = t(1); % region 1
-t_0(R) = t(2); % region 2
-% pressure
-p_0(L) = p(1); % region 1
-p_0(R) = p(2); % region 2
-% density
-rho_0(L) = rho(1); % region 1
-rho_0(R) = rho(2); % region 2
-% Energy
-E_0(L) = E(1); % region 1
-E_0(R) = E(2); % region 2
+ switch input
+     case{1,2,3,4,5,6,7,8,9,10,11,12,13} % L and R IC's
+         % Preallocating
+         r_0 = zeros(k,nx); u_0 = zeros(k,nx); t_0 = zeros(k,nx);
+         p_0 = zeros(k,nx); rho_0 = zeros(k,nx); E_0 = zeros(k,nx);
+         % Parameters of regions dimensions
+         x_middle = (x(end)-x(1))/2;
+         L = find(x<=x_middle);
+         R = find(x>x_middle);
+         
+         % Initial Condition for our 2D domain
+         % Fugacity
+         r_0(L) = r(1); % region 1
+         r_0(R) = r(2); % region 2
+         % Velovity in x
+         u_0(L) = u(1); % region 1
+         u_0(R) = u(2); % region 2
+         % temperature
+         t_0(L) = t(1); % region 1
+         t_0(R) = t(2); % region 2
+         % pressure
+         p_0(L) = p(1); % region 1
+         p_0(R) = p(2); % region 2
+         % density
+         rho_0(L) = rho(1); % region 1
+         rho_0(R) = rho(2); % region 2
+         % Energy
+         E_0(L) = E(1); % region 1
+         E_0(R) = E(2); % region 2
+         
+     case{14} % 3-zones IC's
+         % Preallocating
+         r_0 = zeros(k,nx); u_0 = zeros(k,nx); t_0 = zeros(k,nx);
+         p_0 = zeros(k,nx); rho_0 = zeros(k,nx); E_0 = zeros(k,nx);
+         % Parameters of regions dimensions
+         L = abs(x(end)-x(1));
+         x_a = x(1); x_b = 0.3*L; x_c = 0.7*L; x_d = x(end);
+         L = find(x>=x_a & x<=x_b);
+         C = find(x> x_b & x<=x_c);
+         R = find(x> x_c & x<=x_d);
+         
+         % Initial Condition for our 2D domain
+         % Fugacity
+         r_0(L) = r(1); % region 1
+         r_0(C) = r(2); % region 2
+         r_0(R) = r(3); % region 2
+         % Velovity in x
+         u_0(L) = u(1); % region 1
+         u_0(C) = u(2); % region 2
+         u_0(R) = u(3); % region 2
+         % temperature
+         t_0(L) = t(1); % region 1
+         t_0(C) = t(2); % region 2
+         t_0(R) = t(3); % region 2
+         % pressure
+         p_0(L) = p(1); % region 1
+         p_0(C) = p(2); % region 2
+         p_0(R) = p(3); % region 2
+         % density
+         rho_0(L) = rho(1); % region 1
+         rho_0(C) = rho(2); % region 2
+         rho_0(R) = rho(3); % region 2
+         % Energy
+         E_0(L) = E(1); % region 1
+         E_0(C) = E(2); % region 2
+         E_0(R) = E(3); % region 2
+ end
