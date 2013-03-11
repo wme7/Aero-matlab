@@ -6,9 +6,11 @@ function [r,u,t,p] = macroproperties1d(n,nux,E,Wxx,nx,theta,fmodel)
    
 % to compute fugacity, temperature and pressure, we need to rely on the
 % distribution fucntion that we where are using: MB, FD, BE.
-
 switch theta
     case{-1} % BE
+        r = zeros(zise(nx,1));
+        t = zeros(zise(nx,1));
+        p = zeros(zise(nx,1));
     % If BE: we apply bisection method to the approx BE distribution Eq.
         r_a = 0.001; r_b = 0.99; tol = 1e-7;
         for i = 1:nx
@@ -25,6 +27,9 @@ switch theta
         end
         
     case{1} % FD
+        r = zeros(zise(nx,1));
+        t = zeros(zise(nx,1));
+        p = zeros(zise(nx,1));
     % if FD: we apply bisection method to the approx FD distribution Eq.
         r_a = 0.001; r_b = 0.99; tol = 1e-7;
         for i = 1:nx

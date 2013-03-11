@@ -8,9 +8,9 @@ theta =  0; fprintf('MB statistic');
 %theta = -1; fprintf('BE statistic');
 
 % IC's
-z = 0.3000; u = 1.00; t = 0.1; % random
+%z = 0.3000; u = 1.00; t = 0.1; % random
 %z = 0.0394; u = 0.00; t = 3.2; % Sod's right
-%z = 0.2821; u = 0.75; t = 4.0; % Sod's left
+z = 0.2821; u = 0.75; t = 4.0; % Sod's left
 
 % Create functions
 M = @(c) 1./((1./z).*exp((c-u).^2./t) + theta); 

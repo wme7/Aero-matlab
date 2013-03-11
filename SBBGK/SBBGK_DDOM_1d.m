@@ -16,7 +16,7 @@ r_time      = 1/10000;  % Relaxation time
 %tEnd       = 0.04;     % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 quad        = 3;        % for DOM-NC = 1, DOM-GH = 2, DDOM-5pGH = 3
-method      = 3;        % for {1} Upwind, {2} TVD, {3} WENO3
+method      = 1;        % for {1} Upwind, {2} TVD, {3} WENO3
 IC_case     = 12;        % % IC: {1}~{12}. See Euler_IC1d.m
 plot_figs   = 1;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
@@ -56,7 +56,7 @@ end
 switch quad
 
     case{1} % Newton Cotes Quadrature for D.O.M.
-    V  = [-40,40];  % range: a to b
+    V  = [-20,20];  % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
     [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
     nv = length(v);     v = repmat(v,1,nx);     w = repmat(w,1,nx);
@@ -69,7 +69,7 @@ switch quad
     v = repmat(v,1,nx);     w = repmat(w,1,nx);
     
     case{3} % Gauss Hermite Quadrature for Dynamic-D.O.M.
-    nv = 5;         % nodes required = 5 (the actual value)
+    nv = 3;         % nodes required = 3 (the actual value)
     [c_star,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;          % quadrature constant.
     w = w.*exp(c_star.^2); % weighting function of the Gauss-Hermite quadrature

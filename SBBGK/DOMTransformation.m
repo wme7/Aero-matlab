@@ -43,8 +43,14 @@ f5 = A*exp(-v_star.^2);
 rho = sum(sqrt(2*sigma^2)*w.*f5);
 
 %% Visualization
-subplot(1,2,1); grid on; hold on; plot(c2,f2,'--k'); plot(v_star,f5,'og'); hold off;
-subplot(1,2,2); grid on; hold on; plot(x,y,'-*r'); plot(x,f3,'-ob'); hold off;
+subplot(1,2,1); grid on; hold on; 
+                         plot(c2,f2,'--k','LineWidth',2); 
+                         plot(v_star,f5,'og','LineWidth',2); 
+                         hold off;
+subplot(1,2,2); grid on; hold on; 
+                         plot(x,y,'-*r','LineWidth',2); 
+                         plot(x,f3,'-ob','LineWidth',2);
+                         hold off;
 
 % Using DOM for comparison:
 g = @(x) 1./((1/z).*exp((x-u).^2/t)+theta);
