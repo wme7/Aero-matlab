@@ -11,14 +11,14 @@ clc;  clear all;  close all;
 
 %% Simulation Parameters
     name	='SBBGK1d'; % Simulation Name
-    CFL     = 30/100;   % CFL condition
+    CFL     = 15/100;   % CFL condition
     r_time  = 1/10000;  % Relaxation time
     %tEnd  	= 0.05;     % End time - Parameter part of ICs
-    theta 	= -1;        % {-1} BE, {0} MB, {1} FD.
+    theta 	= 1;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 2;        % {1} UU. model, {2} ES model.
     quad   	= 2;        % {1} NC , {2} GH
     method 	= 1;        % {1} Nodal DG
-    IC_case	= 8;        % IC: {1}~{12}. See SSBGK_IC1d.m
+    IC_case	= 1;        % IC: {1}~{14}. See SSBGK_IC1d.m
   plot_figs = 1;        % 0: no, 1: yes please!
   write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
@@ -72,7 +72,7 @@ switch quad
     [v,w,k] = cotes_xw(Vv(1),Vv(2),nv,5); % Using Netwon Cotes Degree 5
         
     case{2} % Gauss Hermite Quadrature:
-    nv = 20;          % nodes desired (the actual value)
+    nv = 80;          % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;            % quadrature constant.
     w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature

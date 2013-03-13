@@ -1,4 +1,4 @@
-function [ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,tau,IC_case)
+function [ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,tau,IC_case,fmodel)
 %% ID name generator 
 % Generates ID and IDn for an specific simulation using the controling 
 % parameters.
@@ -15,6 +15,15 @@ switch theta
     otherwise
         error('not a valid theta value')
 end
+% Model of the Equilibrium Distribution
+switch fmodel
+    case{1} %UU
+        feq = 'UU';
+    case{2} %ES
+        feq = 'ES';
+    otherwise
+        error('Feq case not available')
+end
 % Elements used
 elements  = num2str(nx);
 % Polinomial Degree
@@ -30,5 +39,5 @@ ic = num2str(IC_case);
 f = '.plt';
 
 %% Generate ID
-IDn = [name,statistic,'X',elements,' ','P',P_degree,'RK',RKs,'w',omega,'IC',ic,f];
-ID = [name,statistic,'X',elements,'-','P',P_degree,'RK',RKs,'w',omega,'IC',ic];
+IDn = [name,statistic,feq,'X',elements,' ','P',P_degree,'RK',RKs,'w',omega,'IC',ic,f];
+ID = [name,statistic,feq,'X',elements,'-','P',P_degree,'RK',RKs,'w',omega,'IC',ic];
