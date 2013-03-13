@@ -7,33 +7,34 @@
 % $$\frac{\partial f}{\partial t}+\vec F\cdot \nabla_p f + \vec v
 % \cdot\nabla_{\vec x} f =\widehat{\Omega } (f) = - \frac{f-f^{eq}}{\tau}$$
 %
-clc;  clear all;  close all;
+clear all; close all; %clc;
 
 %% Simulation Parameters
     name	='SBBGK1d'; % Simulation Name
-    CFL     = 15/100;   % CFL condition
+    %CFL    = 15/100;   % CFL condition <- Part of IC's parameters
+    f_case  = 2;        % {1} Relaxation Model, {2} Euler Limit
     r_time  = 1/10000;  % Relaxation time
-    %tEnd  	= 0.05;     % End time - Parameter part of ICs
-    theta 	= 1;        % {-1} BE, {0} MB, {1} FD.
-    fmodel  = 1;        % {1} UU. model, {2} ES model.
-    quad   	= 2;        % {1} NC , {2} GH
-    method 	= 3;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
+    %tEnd  	= 0.05;     % End time <- Part of IC's parameters
+    theta 	= -1;        % {-1} BE, {0} MB, {1} FD.
+    fmodel  = 2;        % {1} UU. model, {2} ES model.
+    quad   	= 2;        % {1} 200NC , {2} 80GH
+    method 	= 1;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
     IC_case	= 1;        % IC: {1}~{14}. See Euler_IC1d.m
   plot_figs = 1;        % 0: no, 1: yes please!
   write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
-    P_deg	= 0;        % Polinomial Degree
+    P_deg	= 1;        % Polinomial Degree
     Pp      = P_deg+1;  % Polinomials Points
 % Using RK integration time step
   RK_stages	= 1;        % Number of RK stages
 
 %% Space Discretization
-nx  = 200;                      % Desided number of points in our domain
+nx  = 100;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
 %% Define a ID name for results file
-[ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,r_time,IC_case);
+[ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,r_time,IC_case,fmodel,f_case);
 
 %% Open a Files to store the Results
 if write_ans == 1
@@ -47,34 +48,29 @@ end
 
 %% Initial Conditions in physical Space
 % Semiclassical ICs: Fugacity[z], Velocity[u] and Temperature[t] 
-    [z0,u0,t0,p0,rho0,E0,tEnd,~] = SSBGK_IC1d(x,IC_case);
+    [z0,u0,t0,p0,rho0,E0,tEnd,CFL] = SSBGK_IC1d(x,IC_case);
 
-%% Microscopic Velocity Discretization (using Discrete Ordinate Method)
-% that is to make coincide discrete values of microscopic velocities with
-% values as the value points for using a quadrature method, so that we can
-% integrate the velocity probability distribution to recover our
-% macroscopics properties.
+%% Microscopic Velocity Discretization (For DOM)
 switch quad
 
     case{1} % Newton Cotes Quadrature:
     V  = [-20,20];  % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
     [v,w,k] = cotes_xw(V(1),V(2),nv,5); % Using Netwon Cotes Degree 5
-        
+    nv = length(v); % actual number of discrete velocity points
+    v = repmat(v,1,nx);     w = repmat(w,1,nx);   % using DOM
+    
     case{2} % Gauss Hermite Quadrature:
     nv = 80;          % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;            % quadrature constant.
     w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature
+    nv = length(v); % actual number of discrete velocity points
+    v = repmat(v,1,nx);     w = repmat(w,1,nx);   % using DOM
     
     otherwise
         error('Order must be between 1 and 2');
 end
-%% Velocity-Space Grid:
-% The actual nv value will be computed using 'length' vector function:
-    nv = length(v); 
-% Using D.O.M.
-    v = repmat(v,1,nx);     w = repmat(w,1,nx);
 
 %% Applying Discrete Ordinate Method on ICs:
 [z,ux,t] = apply_DOM(z0,u0,t0,nv);  % Semi-classical IC
@@ -101,8 +97,8 @@ if plot_figs == 1
    zlabel('f - Probability');
 end
 % Compute Initial Macroscopic Momemts:
-    [rho,rhou,E] = macromoments1d(k,w,f0,v,ux); %Just for testing
-    [~,~,~,p] = macroproperties1d(rho,rhou,E,p,nx,theta,fmodel);
+    %[rho,rhoux,E,ne,Wxx] = macromoments1d(k,w,f0,v,ux); %Just for testing
+    %[~,~,~,p] = macroproperties1d(rho,rhoux,E,ne,Wxx,nx,theta,fmodel);
     
 %% Marching Scheme
 % First we need to define how big is our time step. Due to the discrete
@@ -122,14 +118,13 @@ tic
 switch method
     
     case{1} % Upwind 0(h)
-        % Using discrete ordinate method (discrete and constant velocity
-        % values in phase-space domain)
-        a = v(:,1);
-        
-        % Load initial condition
+        % Load IC
         f = f0;
                         
         for tsteps = time
+            % Update scalar speed
+            a = v(:,1);
+            
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1
             % Plot f distribution
@@ -168,15 +163,20 @@ switch method
             end
                                     
             % initialize variables
-            u_next = zeros(1,nx);
             u_eq = zeros(1,nx);
             u = zeros(1,nx);
                               
             % (this part can, and should be done in parallel!)
             for i = 1:nv
                 % load subcase
-                u_eq(:) = f_eq(i,:);
-                u(:) = f(i,:);
+                switch f_case
+                    case{1} % Relaxation Scheme
+                        u_eq(:) = f_eq(i,:);
+                        u(:) = f(i,:);
+                    case{2} % Euler Limit
+                        u_eq(:) = f_eq(i,:);
+                        u(:) = f_eq(i,:);
+                end
                 
                 % Compute TVD Fluxes
                 [F_left,F_right] = Upwindflux1d(u,a(i,:));
@@ -197,14 +197,14 @@ switch method
             end
             
             % Compute macroscopic moments
-            [rho,rhoux,E,Wxx] = macromoments1d(k,w,f,v,ux);
+            [rho,rhoux,E,ne,Wxx] = macromoments1d(k,w,f,v,ux);
             
             % UPDATE macroscopic properties 
             try
             % (here lies a paralellizing computing challenge)
-            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,Wxx,nx,theta,fmodel);
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,ne,Wxx,nx,theta,fmodel);
             catch ME
-                ME % show error message
+                ME %#ok<NOPTS> % show error message
                 break
             end
             
@@ -217,14 +217,13 @@ switch method
         end
     
     case{2} % TVD 0(h^2)
-        % Using discrete ordinate method (discrete and constant velocity
-        % values in phase-space domain)
-        a = v(:,1);
-        
-        % Load initial condition
+        % Load IC
         f = f0;
                         
         for tsteps = time
+            % Update velocity coeficients
+            a = v(:,1);
+            
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1
             % Plot f distribution
@@ -263,15 +262,20 @@ switch method
             end
                         
             % initialize variables
-            u_next = zeros(1,nx);
             u_eq = zeros(1,nx);
             u = zeros(1,nx);
                               
             % (this part can, and should be done in parallel!)
             for i = 1:nv
-                % load subcase
-                u_eq(:) = f_eq(i,:);
-                u(:) = f(i,:);
+                % Load subcase
+                switch f_case
+                    case{1} % Relaxation Scheme
+                        u_eq(:) = f_eq(i,:);
+                        u(:) = f(i,:);
+                    case{2} % Euler Limit
+                        u_eq(:) = f_eq(i,:);
+                        u(:) = f_eq(i,:);
+                end
                 
                 % Compute the smoothness factors, r(j), from data, u(j).
                 [r] = theta1d(u,a(i));
@@ -298,14 +302,14 @@ switch method
             end
             
             % Compute macroscopic moments
-            [rho,rhoux,E,Wxx] = macromoments1d(k,w,f,v,ux);
+            [rho,rhoux,E,ne,Wxx] = macromoments1d(k,w,f,v,ux);
             
             % UPDATE macroscopic properties 
             try
             % (here lies a paralellizing computing challenge)
-            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,Wxx,nx,theta,fmodel);
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,ne,Wxx,nx,theta,fmodel);
             catch ME
-                ME % show error message
+                ME %#ok<NOPTS> % show error message
                 break
             end
             
@@ -318,14 +322,13 @@ switch method
         end
         
     case{3,4} % WENO(r = 2)3, 0(h^5) & WENO(r = 3)5, 0(h^9)
-        % Using discrete ordinate method (discrete and constant velocity
-        % values in phase-space domain)
-        a = v(:,1);
-        
         % Load initial condition
         f = f0;
                         
         for tsteps = time
+            % Update scalar velocity
+            a = v(:,1);
+            
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1
             % Plot evolution of 'f' distribution function
@@ -364,15 +367,20 @@ switch method
             end
                         
             % initialize variables
-            u_next = zeros(1,nx);
             u_eq = zeros(1,nx);
             u = zeros(1,nx);
                               
             % (this part can, and should be done in parallel!)
             for i = 1:nv
                 % Load subcase
-                u_eq(:) = f_eq(i,:);
-                u(:) = f(i,:);
+                switch f_case
+                    case{1} % Relaxation Scheme
+                        u_eq(:) = f_eq(i,:);
+                        u(:) = f(i,:);
+                    case{2} % Euler Limit
+                        u_eq(:) = f_eq(i,:);
+                        u(:) = f_eq(i,:);
+                end
                 
                 % Scalar Flux Spliting
                 [vp,vn] = WENO_scalarfluxsplit(a(i)*u);
@@ -400,14 +408,14 @@ switch method
             end
             
             % Compute macroscopic moments
-            [rho,rhoux,E,Wxx] = macromoments1d(k,w,f,v,ux);
+            [rho,rhoux,E,ne,Wxx] = macromoments1d(k,w,f,v,ux);
             
             % UPDATE macroscopic properties 
             try
             % (here lies a paralellizing computing challenge)
-            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,Wxx,nx,theta,fmodel);
+            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,ne,Wxx,nx,theta,fmodel);
             catch ME
-                ME % show error message
+                ME %#ok<NOPTS> % show error message
                 break
             end
                     
@@ -420,7 +428,7 @@ switch method
         end
         
     otherwise
-        error('Order must be between 1 and 2');
+        error('Method must be between 1, 2 and 3');
 end
 toc
 %% Close file with Results

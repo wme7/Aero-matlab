@@ -20,11 +20,11 @@ f_case      = 2;        % {1}Relaxation Model, {2}Euler limit
 r_time      = 1/10000;  % Relaxation time
 %tEnd       = 0.04;     % End time <- part of IC's
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
-quad        = 1;        % {1} DOM-200NC, {2} DOM-60GH, {3} DDOM-3GH
+quad        = 2;        % {1} DOM-200NC, {2} DOM-60GH, {3} DDOM-3GH
 method      = 1;        % for {1} Upwind
 fmodel      = 1;        % UU model for f^Eq <- fixed for the moment
 IC_case     = 1;        % % IC: {1}~{14}. See Euler_IC1d.m
-plot_figs   = 1;        % 0: no, 1: yes please!
+plot_figs   = 0;        % 0: no, 1: yes please!
 
 %% Space Discretization
 nx  = 100;                      % Desided number of points in our domain

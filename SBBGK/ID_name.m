@@ -1,4 +1,4 @@
-function [ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,tau,IC_case,fmodel)
+function [ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,tau,IC_case,fmodel,f_case)
 %% ID name generator 
 % Generates ID and IDn for an specific simulation using the controling 
 % parameters.
@@ -24,6 +24,16 @@ switch fmodel
     otherwise
         error('Feq case not available')
 end
+% Relaxation model or Euler limit
+switch f_case
+    case{1} % Relaxation Model
+        f_c = '';
+    case{2} % Euler Limit
+        f_c = 'EL';
+    otherwise
+        error('Feq case not available')
+end
+
 % Elements used
 elements  = num2str(nx);
 % Polinomial Degree
@@ -39,5 +49,5 @@ ic = num2str(IC_case);
 f = '.plt';
 
 %% Generate ID
-IDn = [name,statistic,feq,'X',elements,' ','P',P_degree,'RK',RKs,'w',omega,'IC',ic,f];
-ID = [name,statistic,feq,'X',elements,'-','P',P_degree,'RK',RKs,'w',omega,'IC',ic];
+IDn = [name,statistic,feq,'X',elements,' ','P',P_degree,'RK',RKs,'w',omega,'IC',ic,f_c,f];
+ID = [name,statistic,feq,'X',elements,'-','P',P_degree,'RK',RKs,'w',omega,'IC',f_c,ic];
