@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/W32TeX) (format=pdflatex 2013.1.18)  18 FEB 2013 21:36
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/W32TeX) (format=pdflatex 2013.1.18)  13 MAR 2013 17:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -299,17 +299,12 @@ Package epstopdf Info: Source file: <DGFEM_RK_01.eps>
 (epstopdf)                    date: 2013-02-18 21:36:20
 (epstopdf)                    size: 12857 bytes
 (epstopdf)             Output file: <DGFEM_RK_01-eps-converted-to.pdf>
-(epstopdf)                    date: 2013-02-18 21:32:25
+(epstopdf)                    date: 2013-02-18 21:36:35
 (epstopdf)                    size: 9283 bytes
 (epstopdf)             Command: <repstopdf --outfile=DGFEM_RK_01-eps-converted-
 to.pdf DGFEM_RK_01.eps>
 (epstopdf)             \includegraphics on input line 312.
-runsystem(repstopdf --outfile=DGFEM_RK_01-eps-converted-to.pdf DGFEM_RK_01.eps)
-...executed safely (allowed).
-
-Package epstopdf Info: Result file: <DGFEM_RK_01-eps-converted-to.pdf>
-(epstopdf)                    date: 2013-02-18 21:36:35
-(epstopdf)                    size: 9283 bytes.
+Package epstopdf Info: Output file is already uptodate.
  <DGFEM_RK_01-eps-converted-to.pdf, id=24, 381.425pt x 314.17375pt>
 File: DGFEM_RK_01-eps-converted-to.pdf Graphic file (type pdf)
 
