@@ -20,8 +20,8 @@ clear all; close all; %clc;
     quad   	= 2;        % {1} 200NC , {2} 80GH
     method 	= 1;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
     IC_case	= 1;        % IC: {1}~{14}. See Euler_IC1d.m
-  plot_figs = 1;        % 0: no, 1: yes please!
-  write_ans = 0;        % 0: no, 1: yes please!
+  plot_figs = 0;        % 0: no, 1: yes please!
+  write_ans = 1;        % 0: no, 1: yes please!
 % Using DG
     P_deg	= 1;        % Polinomial Degree
     Pp      = P_deg+1;  % Polinomials Points
@@ -29,7 +29,7 @@ clear all; close all; %clc;
   RK_stages	= 1;        % Number of RK stages
 
 %% Space Discretization
-nx  = 100;                      % Desided number of points in our domain
+nx  = 1000;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 

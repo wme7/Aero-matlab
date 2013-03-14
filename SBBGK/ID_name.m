@@ -24,16 +24,6 @@ switch fmodel
     otherwise
         error('Feq case not available')
 end
-% Relaxation model or Euler limit
-switch f_case
-    case{1} % Relaxation Model
-        f_c = '';
-    case{2} % Euler Limit
-        f_c = 'EL';
-    otherwise
-        error('Feq case not available')
-end
-
 % Elements used
 elements  = num2str(nx);
 % Polinomial Degree
@@ -45,9 +35,18 @@ omega = 1/tau;
 omega = num2str(omega);
 % Initial Condition Number
 ic = num2str(IC_case);
+% Relaxation model or Euler limit
+switch f_case
+    case{1} % Relaxation Model
+        % Do nothing
+    case{2} % Euler Limit
+        omega = 'EL';
+    otherwise
+        error('Feq case not available')
+end
 % Tecplot format
 f = '.plt';
 
 %% Generate ID
-IDn = [name,statistic,feq,'X',elements,' ','P',P_degree,'RK',RKs,'w',omega,'IC',ic,f_c,f];
-ID = [name,statistic,feq,'X',elements,'-','P',P_degree,'RK',RKs,'w',omega,'IC',f_c,ic];
+IDn = [name,statistic,feq,'X',elements,' ','P',P_degree,'RK',RKs,'w',omega,'IC',ic,f];
+ID = [name,statistic,feq,'X',elements,'-','P',P_degree,'RK',RKs,'w',omega,'IC',ic];

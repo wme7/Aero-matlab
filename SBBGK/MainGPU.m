@@ -23,10 +23,10 @@ IC_case     = 1;        % Reimann IC cases 1~12.
 plot_figs   = 0;        % 0: no, 1: yes please!
 write_ans   = 0;        % 0: no, 1: yes please!
 % Using DG
-P_deg       = 3;        % Polinomial Degree <-- Carefull when using DG!
+P_deg       = 1;        % Polinomial Degree <-- Carefull when using DG!
 Pp          = P_deg+1;  % Polinomials Points
 % Using RK integration time step
-RK_stages   = 4;        % Number of RK stages
+RK_stages   = 1;        % Number of RK stages
 % Grid size and Elements
 nx          = 100;      % Desided number of points in our domain 
 
