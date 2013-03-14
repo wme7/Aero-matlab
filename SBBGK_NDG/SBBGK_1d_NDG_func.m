@@ -46,7 +46,7 @@ StartUp1D;
 MassMatrix = inv(V')/V;
 
 %% Define a ID name for results file
-[ID, IDn] = ID_name(name,theta,K,P_deg,RK_stages,r_time,IC_case,fmodel,f_case);
+[ID, IDn] = ID_name(name,theta,K,P_deg,RK_stages,r_time,IC_case,fmodel,f_case,method);
 
 %% Open a Files to store the Results
 if write_ans == 1
@@ -138,7 +138,7 @@ time = 0:dt:tEnd;
 tic
 switch method
     
-    case{1} % Nodal DG
+    case{5} % Nodal DG
         % Using discrete ordinate method (discrete and constant velocity
         % values in phase-space domain)
         a(:,1) = v(1,1,:);

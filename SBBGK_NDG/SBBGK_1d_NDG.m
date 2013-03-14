@@ -18,7 +18,7 @@ clc;  clear all;  close all;
     theta 	= 1;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 2;        % {1} UU. model, {2} ES model.
     quad   	= 2;        % {1} NC , {2} GH
-    method 	= 1;        % {1} Nodal DG
+    method 	= 5;        % {5} Nodal DG only
     IC_case	= 1;        % IC: {1}~{14}. See SSBGK_IC1d.m
   plot_figs = 1;        % 0: no, 1: yes please!
   write_ans = 0;        % 0: no, 1: yes please!
@@ -44,7 +44,7 @@ StartUp1D;
 MassMatrix = inv(V')/V;
 
 %% Define a ID name for results file
-[ID, IDn] = ID_name(name,theta,K,P_deg,RK_stages,r_time,IC_case,fmodel,f_case);
+[ID, IDn] = ID_name(name,theta,K,P_deg,RK_stages,r_time,IC_case,fmodel,f_case,method);
 
 %% Open a Files to store the Results
 if write_ans == 1
@@ -137,7 +137,7 @@ time = 0:dt:tEnd;
 tic
 switch method
     
-    case{1} % Nodal DG
+    case{5} % Nodal DG
         % Using discrete ordinate method (discrete and constant velocity
         % values in phase-space domain)
         a(:,1) = v(1,1,:);

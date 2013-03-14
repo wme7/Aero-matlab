@@ -1,4 +1,4 @@
-function [ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,tau,IC_case,fmodel,f_case)
+function [ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,tau,IC_case,fmodel,f_case,method)
 %% ID name generator 
 % Generates ID and IDn for an specific simulation using the controling 
 % parameters.
@@ -24,6 +24,21 @@ switch fmodel
     otherwise
         error('Feq case not available')
 end
+% Method
+switch method
+    case{1} % Upwind
+        advec = ' Upwind';
+    case{2} % TVD
+        advec = ' TVD';
+    case{3} % WENO3
+        advec = ' WENO3';
+    case{4} % WENO5
+        advec = ' WENO5';
+    case{5} % DG
+        advec = ' DG';
+    otherwise
+        error('Advection method not available')
+end
 % Elements used
 elements  = num2str(nx);
 % Polinomial Degree
@@ -48,5 +63,5 @@ end
 f = '.plt';
 
 %% Generate ID
-IDn = [name,statistic,feq,'X',elements,' ','P',P_degree,'RK',RKs,'w',omega,'IC',ic,f];
-ID = [name,statistic,feq,'X',elements,'-','P',P_degree,'RK',RKs,'w',omega,'IC',ic];
+IDn = [name,statistic,feq,'X',elements,' ','P',P_degree,'RK',RKs,'w',omega,'IC',ic,advec,f];
+ID = [name,statistic,feq,'X',elements,'-','P',P_degree,'RK',RKs,'w',omega,'IC',advec,ic];

@@ -29,12 +29,12 @@ clear all; close all; %clc;
   RK_stages	= 1;        % Number of RK stages
 
 %% Space Discretization
-nx  = 1000;                      % Desided number of points in our domain
+nx  = 200;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
 %% Define a ID name for results file
-[ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,r_time,IC_case,fmodel,f_case);
+[ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,r_time,IC_case,fmodel,f_case,method);
 
 %% Open a Files to store the Results
 if write_ans == 1
