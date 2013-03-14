@@ -15,12 +15,12 @@
 clear all;  close all; %clc;
 
 %% Simulation Parameters
-CFL         = 4/100;    % CFL condition <- can be made part of IC's
+CFL         = 5/100;    % CFL condition <- can be made part of IC's
 f_case      = 2;        % {1}Relaxation Model, {2}Euler limit
 r_time      = 1/10000;  % Relaxation time
 %tEnd       = 0.04;     % End time <- part of IC's
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
-quad        = 2;        % {1} DOM-200NC, {2} DOM-60GH, {3} DDOM-3GH
+quad        = 3;        % {1} DOM-200NC, {2} DOM-80GH, {3} DDOM-3GH
 method      = 1;        % for {1} Upwind
 fmodel      = 1;        % UU model for f^Eq <- fixed for the moment
 IC_case     = 1;        % % IC: {1}~{14}. See Euler_IC1d.m
@@ -49,7 +49,7 @@ switch quad
     J = ones(size(v)); % Jacobian = 1;
     
     case{2} % Gauss Hermite Quadrature for D.O.M.
-    nv = 60;        % nodes desired (the actual value)
+    nv = 80;        % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;          % quadrature constant.
     w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature
@@ -92,30 +92,30 @@ end
 [rho,rhoux,E,ne] = macromoments_star_1d(J,k,w,f0,v,ux);
     
 %% Marching Scheme
-% First we need to define how big is our time step. Due to the discrete
-% ordinate method the problem is similar to evolve the same scalar
-% advection equation problem for every microscopic velocity.
-dt = dx*CFL/max(abs(v(:,1))); 
-dtdx = dt/dx;  % precomputed to save some flops
 
-% Time domain discretization
-time = 0:dt:tEnd;
+% Initial time
+time = 0;
 
-% By negleting any force field acting over our domian, the classic
-% transport Boltzmann equation will resemble to a pure advection equation.
-% Thus WENO, TVD, DG or CPR can be used easyly to compute evolution of 'f'
-% in the phase-space domain:  
+% Set 50 save points
+%savept = linspace(0,tEnd,50);
+
 tic
 switch method
             
     case{1} % Upwind O(h)
         % Load IC
         f = f0;
-        
+               
         % Main loop
-        for tsteps = time
+        %for tsteps = time
+        while time < tEnd
             % Update discrete velocity points for DDOM
             a = v;
+            
+            % Update time step
+            dt = dx*CFL/max(max(abs(a)));
+            time = time + dt;
+            dtdx = dt/dx;
             
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1 

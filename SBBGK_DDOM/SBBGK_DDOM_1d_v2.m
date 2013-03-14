@@ -11,13 +11,13 @@ clear all;  close all; %clc;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
-CFL         = 4/100;    % CFL condition <- can be made part of IC's parameters
+CFL         = 5/100;    % CFL condition <- can be made part of IC's parameters
 f_case      = 1;        % {1} Relaxation Model, {2} Euler limit
 r_time      = 1/10000;  % Relaxation time
 %tEnd       = 0.04;     % End time <- part of IC's parameters
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 quad        = 3;        % {1} DOM-200NC, {2} DOM-80GH, {3} DDOM-3GH
-method      = 3;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
+method      = 1;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
 fmodel      = 1;        % {1} UU model, {2} ES model
 IC_case     = 1;        % % IC: {1}~{14}. See Euler_IC1d.m
 plot_figs   = 1;        % 0: no, 1: yes please!
@@ -108,19 +108,16 @@ end
 [rho,rhoux,E,ne] = macromoments_star_1d(J,k,w,f0,v,ux);
     
 %% Marching Scheme
-% First we need to define how big is our time step. Due to the discrete
-% ordinate method the problem is similar to evolve the same scalar
-% advection equation problem for every microscopic velocity.
-dt = dx*CFL/max(abs(v(:,1))); 
-dtdx = dt/dx;  % precomputed to save some flops
 
-% Time domain discretization
-time = 0:dt:tEnd;
+% Initial time
+time = 0;
 
-% By negleting any force field acting over our domian, the classic
-% transport Boltzmann equation will resemble to a pure advection equation.
-% Thus WENO, TVD, DG or CPR can be used easyly to compute evolution of 'f'
-% in the phase-space domain:  
+% Initial time step 'dt'
+dt = dx*CFL/max(abs(v(:,1)));
+
+% Set 50 save points
+savept = linspace(0,tEnd,50);
+ 
 tic
 switch method
             
@@ -129,9 +126,15 @@ switch method
         f = f0;
         
         % Main loop
-        for tsteps = time
+        %for tsteps = time
+        while time <= tEnd
             % Update discrete velocity points for DDOM
             a = v;
+            
+            % Update time step
+            dt = dx*CFL/max(max(abs(a)));
+            time = time + dt;
+            dtdx = dt/dx; 
             
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1 
@@ -153,8 +156,10 @@ switch method
             subplot(2,3,6); plot(x,E(1,:),'.'); axis auto; title('Energy')
             end
             % Write Results
-            if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
-                fprintf(file, 'ZONE T = "time %0.4f"\n', tsteps);
+            tol = dt/2;
+            %if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
+            if write_ans == 1 && max( (time < savept+tol) & (time > savept-tol) )
+                fprintf(file, 'ZONE T = "time %0.4f"\n', time);
                 fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
                 for i = 1:nx
                     fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
@@ -231,6 +236,11 @@ switch method
             % Update discrete velocity points for DDOM
             a = v;
             
+            % Update time step
+            dt = dx*CFL/max(max(abs(a)));
+            time = time + dt;
+            dtdx = dt/dx;
+            
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1 
             % Plot f distribution
@@ -251,8 +261,9 @@ switch method
             subplot(2,3,6); plot(x,E(1,:),'.'); axis auto; title('Energy')
             end
             % Write Results
-            if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
-                fprintf(file, 'ZONE T = "time %0.4f"\n', tsteps);
+            %if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
+            if write_ans == 1 && max( (time < savept+tol) & (time > savept-tol) )
+                fprintf(file, 'ZONE T = "time %0.4f"\n', time);
                 fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
                 for i = 1:nx
                     fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
@@ -335,6 +346,11 @@ switch method
             % Update discrete velocity points for DDOM
             a = v;
             
+            % Update time step
+            dt = dx*CFL/max(max(abs(a)));
+            time = time + dt;
+            dtdx = dt/dx;
+            
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1 
             % Plot f distribution
@@ -355,8 +371,9 @@ switch method
             subplot(2,3,6); plot(x,E(1,:),'.'); axis auto; title('Energy')
             end
             % Write Results
-            if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
-                fprintf(file, 'ZONE T = "time %0.4f"\n', tsteps);
+            %if write_ans == 1 && (mod(tsteps,5*dt) == 0 || tsteps == time(end))
+            if write_ans == 1 && max( (time < savept+tol) & (time > savept-tol) )
+                fprintf(file, 'ZONE T = "time %0.4f"\n', time);
                 fprintf(file, 'I = %d, J = 1, K = 1, F = POINT\n\n', nx);
                 for i = 1:nx
                     fprintf(file, '%f\t%f\t%f\t%f\t%f\t%f\t%f\t\n', ...
