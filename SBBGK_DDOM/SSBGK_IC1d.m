@@ -21,7 +21,7 @@ function [r_0,u_0,t_0,p_0,rho_0,E_0,tEnd,cfl] = SSBGK_IC1d(x,input)
 %% Initial Physical Properties per case:
 switch input
     case{1} % Configuration 1, Sod's Problem
-        fprintf('Case 1: Sods problem for DDOM\n');
+        fprintf('Case 1: Sods test for DDOM\n');
         p   = [1.000 0.100];
         u   = [0.000 0.000];
         rho = [1.000 0.125];
@@ -117,6 +117,13 @@ switch input
         u   = [1.00 0.00 -1.0];
         rho = [0.90 0.90 0.90];
         tEnd = 0.20; cfl = 0.15;
+    
+    case{15} % Configuration 1, Sjogreen test
+        fprintf('Case 1: Sjogreen test for DDOM\n');
+        p   = [0.400 0.400];
+        u   = [-2.00 2.000];
+        rho = [1.000 1.000];
+        tEnd = 0.14; cfl = 0.15;
         
     otherwise 
         error('Available cases: 1~13');
@@ -136,7 +143,7 @@ end
  [k,nx] = size(x);
 
  switch input
-     case{1,2,3,4,5,6,7,8,9,10,11,12,13} % L and R IC's
+     case{1,2,3,4,5,6,7,8,9,10,11,12,13,15} % L and R IC's
          % Preallocating
          r_0 = zeros(k,nx); u_0 = zeros(k,nx); t_0 = zeros(k,nx);
          p_0 = zeros(k,nx); rho_0 = zeros(k,nx); E_0 = zeros(k,nx);

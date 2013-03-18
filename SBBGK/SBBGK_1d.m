@@ -18,7 +18,7 @@ clear all; close all; %clc;
     theta 	= -1;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 2;        % {1} UU. model, {2} ES model.
     quad   	= 2;        % {1} 200NC , {2} 80GH
-    method 	= 1;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
+    method 	= 3;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
     IC_case	= 1;        % IC: {1}~{14}. See Euler_IC1d.m
   plot_figs = 0;        % 0: no, 1: yes please!
   write_ans = 1;        % 0: no, 1: yes please!
@@ -29,7 +29,7 @@ clear all; close all; %clc;
   RK_stages	= 1;        % Number of RK stages
 
 %% Space Discretization
-nx  = 200;                      % Desided number of points in our domain
+nx  = 1000;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
