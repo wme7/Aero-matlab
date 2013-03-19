@@ -11,10 +11,10 @@
 clear all; clc; close all;
 
 %% Parameters
-     dx = 0.10;  % Spatial step size
-    cfl = 0.80;  % Courant Number
+     dx = 1/200; % Spatial step size
+    cfl = 0.50;  % Courant Number
  tStart = 0.00;  % Start time
-   tEnd = 1.15;  % End time
+   tEnd = 2.00;  % End time
 IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
 limiter = 2;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 flxtype = 3;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind <-non-conservative!
@@ -25,7 +25,7 @@ flxtype = 3;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind <-non-conservative!
     df = @(w) w;
 
 %% Discretization of Domain
-      x = 0:dx:1;     % x grid
+      x = 0:dx:2;     % x grid
       nx = length(x); % number of points
 
 %% Initial Condition
@@ -51,7 +51,7 @@ h = zeros(1,nx);        % Flux values at the cell boundaries
 
 while time <= tEnd
     % Plot Evolution
-    plot(x,u,'.'); axis([x(1) x(end) min(u0)-0.1 max(u0)+0.1])
+    plot(x,u,'or'); axis([x(1) x(end) min(u0)-0.1 max(u0)+0.1])
     xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); 
     title 'Invicid Burgers using TVD scheme';
     

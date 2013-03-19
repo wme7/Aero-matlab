@@ -61,7 +61,8 @@ switch ICcase
 
     case {4} % sinusoidal wave
         
-        u0 = 1/2 + sin(2*pi*x);
+        %u0 = 1/2 + sin(2*pi*x);
+        u0 = 2 + 0.5*sin(pi*x);
         
     otherwise
         error('case not in the list')
