@@ -11,10 +11,9 @@
 clear all; clc; close all;
 
 %% Parameters
-     dx = 0.01;  % Spatial step size
-    cfl = 0.80;  % Courant Number
- tStart = 0.00;  % Start time
-   tEnd = 1.20;  % End time
+     dx = 1/200; % Spatial step size
+    cfl = 1/2;   % Courant Number
+   tEnd = 2.00;  % End time
 IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
 limiter = 1;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 flxtype = 4;     % {1} Godunov, {2} Roe, {3} LF, {4} LLF, {5} Upwind {not conservative}
@@ -33,7 +32,7 @@ flxtype = 4;     % {1} Godunov, {2} Roe, {3} LF, {4} LLF, {5} Upwind {not conser
      u0 = IC_iBurgers(x,IC_case); 
 
 % Load initial time
-    time = tStart;
+    t = 0;
      
 % Load Initial Condition
     u = u0;
@@ -49,21 +48,21 @@ it_count = 0;           % Iteration counter
 u_next = zeros(1,nx);   % u in next time step
 h = zeros(1,nx);        % Flux values at the cell boundaries
 
-while time < tEnd
+while t < tEnd
     % Plot Evolution
     plot(x,u); axis([x(1) x(end) min(u0)-0.1 max(u0)+0.1])
     
     % Update time step
     dt   = cfl*dx/abs(max(u));  % time step size
     dtdx = dt/dx;               % precomputed to save some flops
-    time = time + dt;           % iteration actual time.
+    t = t + dt;           % iteration actual time.
 
     % Compute fluxes at cell boundaries (middle points x_i+1/2)
     h = flux1d(f,df,u,flxtype);
     
     % Compute solution of next time step using Upwind
     for i = 2:nx-1
-    u_next(i) = u(i) - dtdx * (h(i) - h(i-1));
+        u_next(i) = u(i) - dtdx * (h(i) - h(i-1));
     end
 
     % Periodic BC

@@ -15,8 +15,8 @@
 clear all;  close all; %clc;
 
 %% Simulation Parameters
-CFL         = 15/100;   % CFL condition <- can be made part of IC's
-f_case      = 2;        % {1}Relaxation Model, {2}Euler limit
+CFL         = 5/100;   % CFL condition <- can be made part of IC's
+f_case      = 1;        % {1}Relaxation Model, {2}Euler limit
 r_time      = 1/10000;  % Relaxation time
 %tEnd       = 0.04;     % End time <- part of IC's
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
@@ -27,7 +27,7 @@ IC_case     = 1;        % % IC: {1}~{15}. See Euler_IC1d.m
 plot_figs   = 1;        % 0: no, 1: yes please!
 
 %% Space Discretization
-nx  = 400;                      % Desided number of points in our domain
+nx  = 100;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
@@ -62,9 +62,10 @@ switch quad
     k = 1;          % quadrature constant.
     w = w.*exp(c_star.^2); % weighting function of the Gauss-Hermite quadrature
     a = sqrt(t0);   % transformation factor
-    J = a;          % Jacobian for every point in x domain, 'J(x)'.
+    J = 4./a;       % Jacobian for every point in x domain, 'J(x)'.
     v = c_star*a + ones(nv,1)*u0;  % transformation: v = a*(C*) + ux
-    c_star = repmat(c_star,1,nx); w = repmat(w,1,nx); J = repmat(J,nv,1);
+    w = repmat(w,1,nx);
+    c_star = repmat(c_star,1,nx);  J = repmat(J,nv,1);
         
     otherwise
         error('Order must be between 1, 2 and 3');
@@ -90,7 +91,7 @@ if plot_figs == 1 %&& (quad == 1 || quad == 2)
 end
 
 % Compute Initial Macroscopic Momemts:
-[rho,rhoux,E,ne,Wxx] = macromoments_star_1d(J,k,w,f0,v,ux);
+[rho,rhoux,E,rhoe,Wxx] = macromoments_star_1d(J,k,w,f0,v,ux);
     
 %% Marching Scheme
 
@@ -142,7 +143,7 @@ switch method
             u  = zeros(1,nx);
                             
             % (this part can be done in parallel!)
-            for i = 1:nv       
+            for i = 1:nv  % for DDOM i = 1,2,3
                 % Load subcase
                 switch f_case
                     case{1} % Relaxation Scheme
@@ -157,8 +158,8 @@ switch method
                 [F_left,F_right] = Upwindflux1d(u,v(i,:));
              
                 % Compute next time step
-                 u_next = u - dtdx*(F_right - F_left) ...
-                     - (dt/r_time)*(u-u_eq);
+                 u_next = u - dtdx*(F_right - F_left) - (dt/r_time)*(u-u_eq);
+                 
                 % BC
                 u_next(1) = u_next(2);
                 u_next(nx) = u_next(nx-1);
@@ -171,23 +172,28 @@ switch method
             end
             
             % Compute macroscopic moments
-            [rho,rhoux,E,ne,Wxx] = macromoments_star_1d(J,k,w,f,v,ux);
+            n   = k*sum(J.*w .* f);    % Density [n]
+            nux = k*sum(J.*v .* w .* f);   % Macrospic moment [n*ux]
+            nE  = 0.5*k*sum(J.*( v.^2 ).* w .* f);  % Energy Density [n*E]
+            ne  = 0.5*k*sum(J.*( (v-ux).^2 ).* w .* f); % Internal energy [n*e]
             
             % UPDATE macroscopic properties 
-            % (here lies a paralellizing computing challenge)
-            %Wxx = 0; % not need in UU model
-            [z,ux,t,p] = macroproperties1d(rho,rhoux,E,ne,Wxx,nx,theta,fmodel);
+            rho = n;
+            ux = nux./n;
+            p = ne;
+            t = 4*ne./n;
+            z = n./sqrt(pi.*t);
+            E = ne + 0.5*u.^2;
             
             % Apply DOM
             [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
             %[p,rho,E] = apply_DOM(p,rho,E,nv); % Classical variables
             
             % Compute new v and J values if DDOM is used
-            if quad == 3 % if DDOM, update J and v.
-                a = sqrt(t); 
-                J = a;       % Jacobian
-                v = a.*c_star + ux; % transformation: v = a*(C*) + ux
+            if quad == 3 % if DDOM, update a, J and v.
+                a = sqrt(t); J = a; v = a.*c_star + ux;
             end
+            
             % Update figures
             drawnow
         end

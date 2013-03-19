@@ -3,7 +3,7 @@ function [r,u,t,p] = macroproperties1d(n,nux,E,ne,Wxx,nx,theta,fmodel)
 % compute back, fugacity, macroscopic velocities, temperature and pressure.
     % Computing first velocites from the momentum:
     u = nux./n; % mean velocity in x
-    %e = ne./n;  % internal energy
+    e = ne./n;  % internal energy
    
 % to compute fugacity, temperature and pressure, we need to rely on the
 % distribution fucntion that we where are using: MB, FD, BE.
@@ -48,7 +48,10 @@ switch theta
     
     case{0} % MB
     % IF MB: the task is much simple.
-        t = 4*E./n - 2*u.^2;
+        %t = 4*rhoe./rho;
+        %ux = rhoux./rho;
+    
+        t = 4*e;
         r = n./sqrt(pi.*t);
         p = ne;
             

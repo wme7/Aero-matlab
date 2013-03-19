@@ -4,7 +4,7 @@
 clc; clear all; close all;
 
 % Parameters
-cfl = 1/2;  % Courant Number
+cfl = 1/3;  % Courant Number
 tEnd = 2;   % Final time
 
 %% Define Functions
@@ -33,10 +33,10 @@ t = 0;
 % Load IC
 u = u0;
 
-while t < tEnd
+while t<tEnd
     % Update iteration time 't',
     dt = cfl*dx/max(abs(u));
-    if t+dt > tEnd; dt = tEnd-t; end;
+    %if t+dt > tEnd; dt = tEnd-t; end;
     t = t+dt; lambda = dt/dx;
     
     %Prepare u^{n}_{i} arrays in space,
@@ -76,7 +76,7 @@ while t < tEnd
     end
     
     % Create/Update figure
-    plot(x,u1,'ok'); axis([x(1) x(end) min(u0)-0.1 max(u0)+0.1]); 
+    plot(x,u1,'o'); axis([x(1) x(end) min(u0)-0.1 max(u0)+0.1]); 
     drawnow;
     
     % Update information
