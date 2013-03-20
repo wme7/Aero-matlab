@@ -1,0 +1,181 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>macroproperties1d</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-03-20"><meta name="DC.source" content="macroproperties1d.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Recover Macroscopic Properties</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> [r,u,t,p] = macroproperties1d(n,nux,E,ne,Wxx,nx,theta,fmodel)
+</pre><h2>Recover Macroscopic Properties<a name="2"></a></h2><p>compute back, fugacity, macroscopic velocities, temperature and pressure. Computing first velocites from the momentum:</p><pre class="codeinput">    u = nux./n; <span class="comment">% mean velocity in x</span>
+    <span class="comment">%e = ne./n;  % internal energy</span>
+
+<span class="comment">% to compute fugacity, temperature and pressure, we need to rely on the</span>
+<span class="comment">% distribution fucntion that we where are using: MB, FD, BE.</span>
+<span class="keyword">switch</span> theta
+    <span class="keyword">case</span>{-1} <span class="comment">% BE</span>
+        r = zeros(1,nx);
+        t = zeros(1,nx);
+        p = zeros(1,nx);
+    <span class="comment">% If BE: we apply bisection method to the approx BE distribution Eq.</span>
+        r_a = 0.001; r_b = 0.99; tol = 1e-7;
+        <span class="keyword">for</span> i = 1:nx
+            <span class="keyword">if</span> fmodel == 1 <span class="comment">% UU Model</span>
+            psi = @(r_x) 2*E(i)- <span class="keyword">...</span>
+                BE(r_x,1.5)*(n(i)/BE(r_x,0.5))^3/(2*pi) - n(i)*(u(i)^2);
+            <span class="keyword">else</span> <span class="comment">% == 2, ES Model</span>
+            psi = @(r_x) 2*pi*Wxx(i)/n(i)^3 - BE(r_x,1.5)/(BE(r_x,0.5))^3;
+            <span class="keyword">end</span>
+            r_p = bisection(psi,r_a,r_b,tol);
+            r(i) = r_p;
+            t(i) = n(i)^2/(pi*(BE(r_p,0.5))^2);
+            p(i) = E(i) - 1/2*n(i)*(u(i)^2);
+        <span class="keyword">end</span>
+
+    <span class="keyword">case</span>{1} <span class="comment">% FD</span>
+        r = zeros(1,nx);
+        t = zeros(1,nx);
+        p = zeros(1,nx);
+    <span class="comment">% if FD: we apply bisection method to the approx FD distribution Eq.</span>
+        r_a = 0.001; r_b = 0.99; tol = 1e-7;
+        <span class="keyword">for</span> i = 1:nx
+            <span class="keyword">if</span> fmodel == 1 <span class="comment">% UU Model</span>
+            psi = @(r_x) 2*E(i)- <span class="keyword">...</span>
+                FD(r_x,1.5)*(n(i)/FD(r_x,0.5))^3/(2*pi) - n(i)*(u(i)^2);
+            <span class="keyword">else</span> <span class="comment">% == 2, ES Model</span>
+            psi = @(r_x) 2*pi*Wxx(i)/n(i)^3 - FD(r_x,1.5)/(FD(r_x,0.5))^3;
+            <span class="keyword">end</span>
+            r_p = bisection(psi,r_a,r_b,tol);
+            r(i) = r_p;
+            t(i) = n(i)^2/(pi*(FD(r_p,0.5))^2);
+            p(i) = E(i) - 1/2*n(i)*(u(i)^2);
+        <span class="keyword">end</span>
+
+    <span class="keyword">case</span>{0} <span class="comment">% MB</span>
+    <span class="comment">% IF MB: the task is much simple.</span>
+        t = 4*E./n - 2*u.^2;
+        r = n./sqrt(pi.*t);
+        p = ne;
+
+        <span class="comment">%t = 4*E./n - 2*u.^2;</span>
+        <span class="comment">%r = n./sqrt(pi.*t);</span>
+        <span class="comment">%p = E - 1/2.*n.*u.^2;</span>
+
+    <span class="keyword">otherwise</span>
+        error(<span class="string">'theta can only be: -1, 0, +1 '</span>);
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+function [r,u,t,p] = macroproperties1d(n,nux,E,ne,Wxx,nx,theta,fmodel)
+%% Recover Macroscopic Properties
+% compute back, fugacity, macroscopic velocities, temperature and pressure.
+    % Computing first velocites from the momentum:
+    u = nux./n; % mean velocity in x
+    %e = ne./n;  % internal energy
+   
+% to compute fugacity, temperature and pressure, we need to rely on the
+% distribution fucntion that we where are using: MB, FD, BE.
+switch theta
+    case{-1} % BE
+        r = zeros(1,nx);
+        t = zeros(1,nx);
+        p = zeros(1,nx);
+    % If BE: we apply bisection method to the approx BE distribution Eq.
+        r_a = 0.001; r_b = 0.99; tol = 1e-7;
+        for i = 1:nx
+            if fmodel == 1 % UU Model
+            psi = @(r_x) 2*E(i)- ...
+                BE(r_x,1.5)*(n(i)/BE(r_x,0.5))^3/(2*pi) - n(i)*(u(i)^2);
+            else % == 2, ES Model
+            psi = @(r_x) 2*pi*Wxx(i)/n(i)^3 - BE(r_x,1.5)/(BE(r_x,0.5))^3;
+            end
+            r_p = bisection(psi,r_a,r_b,tol);
+            r(i) = r_p;
+            t(i) = n(i)^2/(pi*(BE(r_p,0.5))^2);
+            p(i) = E(i) - 1/2*n(i)*(u(i)^2);
+        end
+        
+    case{1} % FD
+        r = zeros(1,nx);
+        t = zeros(1,nx);
+        p = zeros(1,nx);
+    % if FD: we apply bisection method to the approx FD distribution Eq.
+        r_a = 0.001; r_b = 0.99; tol = 1e-7;
+        for i = 1:nx
+            if fmodel == 1 % UU Model
+            psi = @(r_x) 2*E(i)- ...
+                FD(r_x,1.5)*(n(i)/FD(r_x,0.5))^3/(2*pi) - n(i)*(u(i)^2);
+            else % == 2, ES Model
+            psi = @(r_x) 2*pi*Wxx(i)/n(i)^3 - FD(r_x,1.5)/(FD(r_x,0.5))^3;
+            end
+            r_p = bisection(psi,r_a,r_b,tol);
+            r(i) = r_p;
+            t(i) = n(i)^2/(pi*(FD(r_p,0.5))^2);
+            p(i) = E(i) - 1/2*n(i)*(u(i)^2);
+        end        
+    
+    case{0} % MB
+    % IF MB: the task is much simple.
+        t = 4*E./n - 2*u.^2;
+        r = n./sqrt(pi.*t);
+        p = ne;
+            
+        %t = 4*E./n - 2*u.^2;
+        %r = n./sqrt(pi.*t);
+        %p = E - 1/2.*n.*u.^2;
+        
+    otherwise 
+        error('theta can only be: -1, 0, +1 ');
+end 
+##### SOURCE END #####
+--></body></html>

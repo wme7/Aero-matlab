@@ -15,7 +15,7 @@
 clear all;  close all; %clc;
 
 %% Simulation Parameters
-CFL         = 10/100;   % CFL condition <- can be made part of IC's
+CFL         = 2.5/100;  % CFL condition <- can be made part of IC's
 f_case      = 1;        % {1}Relaxation Model, {2}Euler limit
 r_time      = 1/10000;  % Relaxation time
 %tEnd       = 0.20;     % End time <- part of IC's
@@ -23,11 +23,11 @@ theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 quad        = 3;        % {1} DOM-200NC, {2} DOM-80GH, {3} DDOM-3GH
 method      = 1;        % for {1} Upwind
 fmodel      = 1;        % UU model for f^Eq <- fixed for the moment
-IC_case     = 1;        % % IC: {1}~{15}. See Euler_IC1d.m
-plot_figs   = 1;        % 0: no, 1: yes please!
+IC_case     = 15;        % % IC: {1}~{15}. See Euler_IC1d.m
+plot_figs   = 0;        % 0: no, 1: yes please!
 
 %% Space Discretization
-nx  = 200;                      % Desided number of points in our domain
+nx  = 100;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
@@ -137,6 +137,9 @@ switch method
             % Compute equilibrium distribution for the current t_step
             f_eq = 1./(exp( (v-ux).^2 ./ t)./z + theta);
             
+            % Compute Distribution slope values @ c_star points
+            dudc = GaussSlope(c_star,f);
+            
             % initialize variables
             u_eq = zeros(1,nx);
             u  = zeros(1,nx);
@@ -153,11 +156,21 @@ switch method
                         u(:) = f_eq(i,:);
                 end
                 
+                b = sqrt(t(i,:)); 
+                c = v(i,:);
+                
+                if time == dt; c_old = v; end
+                
                 % Compute Upwind Fluxes
                 [F_left,F_right] = Upwindflux1d(u,v(i,:));
+                
+                % Compute Material Derivates Correction values
+                DcDt = MatDev(c,c_old(i,:),v(i,:),dtdx);
              
                 % Compute next time step
-                 u_next = u - dtdx*(F_right - F_left) - (dt/r_time)*(u-u_eq);
+                 u_next = u - dtdx*(F_right - F_left) ...
+                     - (dt/r_time)*(u-u_eq)...
+                    + (1./b).*dudc(i,:).*DcDt ;
                  
                 % BC
                 u_next(1) = u_next(2);
@@ -168,6 +181,9 @@ switch method
                              
                 % Going back to f
                 f(i,:) = u(:);
+                
+                % Save Old info
+                c_old(i,:) = c;
             end
             
             % Compute macroscopic moments

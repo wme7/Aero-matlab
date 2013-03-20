@@ -11,11 +11,13 @@ clear all;  close all; %clc;
 
 %% Simulation Parameters
 name        ='SBBGK1d'; % Simulation Name
-CFL         = 5/100;    % CFL condition
+CFL         = 1/100;    % CFL condition
+f_case      = 1;        % {1}Relaxation Model, {2}Euler limit
 r_time      = 1/10000;  % Relaxation time
 %tEnd       = 0.04;     % End time
 theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 quad        = 3;        % for DOM-NC = 1, DOM-GH = 2, DDOM-5pGH = 3
+fmodel      = 1;        % UU model for f^Eq <- fixed for the moment
 method      = 1;        % for {1} Upwind, {2} TVD, {3} WENO3
 IC_case     = 12;        % % IC: {1}~{14}. See Euler_IC1d.m
 plot_figs   = 1;        % 0: no, 1: yes please!
@@ -24,7 +26,7 @@ write_ans   = 0;        % 0: no, 1: yes please!
 P_deg       = 0;        % Polinomial Degree
 Pp          = P_deg+1;  % Polinomials Points
 % Using RK integration time step
-RK_stages   = 4;        % Number of RK stages
+RK_stages   = 1;        % Number of RK stages
 
 %% Space Discretization
 nx  = 100;                      % Desided number of points in our domain
@@ -32,7 +34,7 @@ x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
 %% Define a ID name for results file
-[ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,r_time,IC_case);
+[ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,r_time,IC_case,fmodel,f_case,method);
 
 %% Open a Files to store the Results
 if write_ans == 1
@@ -89,14 +91,7 @@ end
 % Compute distribution IC: 'f0' of our mesoscopic method by assuming the
 % equilibrium state of the macroscopic IC. We use then the semiclassical
 % Equilibrium distribuition function:
-switch quad 
-    case{1,2} % DOM-NC or DOM-GH
-        f0 = f_equilibrium_1d(z,ux,v,t,theta);
-    case{3}   % DDOM with 3 points GH
-        f0 = f_equilibrium_star_1d(z,c_star,theta);
-otherwise 
-        error('Order must be between 1, 2 and 3');
-end
+f0 = f_equilibrium_1d(z,ux,v,t,theta);
 
 % Plot IC of Distribution function, f, in Phase-Space:
 if plot_figs == 1 %&& (quad == 1 || quad == 2)
@@ -135,14 +130,14 @@ tic
 switch method
             
     case{1} % Upwind O(h)
-        % Using discrete ordinate method (discrete and constant velocity
-        % values in phase-space domain)
-        a = v;
-                
         % Load initial condition
         f = f0;
                         
+        % Main Loop
         for tsteps = time
+            % Update scalar velocities
+            a = v;
+            
             % Plot and redraw figures every time step for visualization
             if plot_figs == 1 %&& (quad == 1 || quad == 2)
             % Plot f distribution
@@ -172,17 +167,9 @@ switch method
                 end
             end
             % Compute equilibrium distribution for the current t_step
-            switch quad
-                case{1,2} % DOM-NC or DOM-GH
-                    f_eq = f_equilibrium_1d(z,ux,v,t,theta);
-                case{3}   % DDOM with 3 points GH
-                    f_eq = f_equilibrium_star_1d(z,c_star,theta);
-                otherwise
-                    error('Order must be between 1, 2 and 3');
-            end
+            f_eq = f_equilibrium_1d(z,ux,v,t,theta);
             
             % initialize variables
-            u_next = zeros(1,nx);
             u_eq = zeros(1,nx);
             u  = zeros(1,nx);
                         

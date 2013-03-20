@@ -12,10 +12,10 @@ clear all; close all; %clc;
 %% Simulation Parameters
     name	='SBBGK1d'; % Simulation Name
     %CFL    = 15/100;   % CFL condition <- Part of IC's parameters
-    f_case  = 2;        % {1} Relaxation Model, {2} Euler Limit
+    f_case  = 1;        % {1} Relaxation Model, {2} Euler Limit
     r_time  = 1/10000;  % Relaxation time
     %tEnd  	= 0.05;     % End time <- Part of IC's parameters
-    theta 	= -1;        % {-1} BE, {0} MB, {1} FD.
+    theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 2;        % {1} UU. model, {2} ES model.
     quad   	= 2;        % {1} 200NC , {2} 80GH
     method 	= 3;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
@@ -29,7 +29,7 @@ clear all; close all; %clc;
   RK_stages	= 1;        % Number of RK stages
 
 %% Space Discretization
-nx  = 1000;                      % Desided number of points in our domain
+nx  = 100;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
