@@ -15,7 +15,7 @@
 clear all;  close all; %clc;
 
 %% Simulation Parameters
-CFL         = 5/100;   % CFL condition <- can be made part of IC's
+CFL         = 10/100;   % CFL condition <- can be made part of IC's
 f_case      = 1;        % {1}Relaxation Model, {2}Euler limit
 r_time      = 1/10000;  % Relaxation time
 %tEnd       = 0.04;     % End time <- part of IC's
@@ -27,7 +27,7 @@ IC_case     = 1;        % % IC: {1}~{15}. See Euler_IC1d.m
 plot_figs   = 1;        % 0: no, 1: yes please!
 
 %% Space Discretization
-nx  = 100;                      % Desided number of points in our domain
+nx  = 200;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
@@ -62,7 +62,7 @@ switch quad
     k = 1;          % quadrature constant.
     w = w.*exp(c_star.^2); % weighting function of the Gauss-Hermite quadrature
     a = sqrt(t0);   % transformation factor
-    J = 4./a;       % Jacobian for every point in x domain, 'J(x)'.
+    J = a;       % Jacobian for every point in x domain, 'J(x)'.
     v = c_star*a + ones(nv,1)*u0;  % transformation: v = a*(C*) + ux
     w = repmat(w,1,nx);
     c_star = repmat(c_star,1,nx);  J = repmat(J,nv,1);
@@ -76,10 +76,8 @@ end
 [p,~,~] = apply_DOM(p0,rho0,E0,nv); % Classical IC
 
 %% Initial Equilibrium Distribution 'f0'
-% Compute distribution IC: 'f0' of our mesoscopic method by assuming the
-% equilibrium state of the macroscopic IC. We use then the semiclassical
-% Equilibrium distribuition function:
-    f0 = f_equilibrium_1d(z,ux,v,t,theta);
+% Semiclassical Equilibrium distribuition function:
+    f0 = 1./(exp( (v-ux).^2 ./ t)./z + theta);
 
         % Plot IC of Distribution function, f, in Phase-Space:
 if plot_figs == 1 %&& (quad == 1 || quad == 2)
@@ -91,23 +89,24 @@ if plot_figs == 1 %&& (quad == 1 || quad == 2)
 end
 
 % Compute Initial Macroscopic Momemts:
-[rho,rhoux,E,rhoe,Wxx] = macromoments_star_1d(J,k,w,f0,v,ux);
+n   = k*sum(J.*w .* f0);  % Density [n]
+nux = k*sum(J.*v .* w .* f0);  % Macrospic moment [n*ux]
+nE  = 0.5*k*sum(J.*( v.^2 ).* w .* f0);  % Energy Density [n*E]
+ne  = 0.5*k*sum(J.*( (v-ux).^2 ).* w .* f0);  % Internal energy [n*e]
+
+% Initial macroscopic properties need to draw figure
+E = nE;
+rho = n;
     
 %% Marching Scheme
-
 % Initial time
 time = 0;
 
-% Set 50 save points
-%savept = linspace(0,tEnd,50);
-
 tic
 switch method
-            
     case{1} % Upwind O(h)
         % Load IC
         f = f0;
-               
         % Main loop
         while time < tEnd
             % Update time step
@@ -136,7 +135,7 @@ switch method
             end
             
             % Compute equilibrium distribution for the current t_step
-            f_eq = f_equilibrium_1d(z,ux,v,t,theta);
+            f_eq = 1./(exp( (v-ux).^2 ./ t)./z + theta);
             
             % initialize variables
             u_eq = zeros(1,nx);
@@ -172,18 +171,18 @@ switch method
             end
             
             % Compute macroscopic moments
-            n   = k*sum(J.*w .* f);    % Density [n]
-            nux = k*sum(J.*v .* w .* f);   % Macrospic moment [n*ux]
+            n   = k*sum(J.*w .* f);  % Density [n]
+            nux = k*sum(J.*v .* w .* f);  % Macrospic moment [n*ux]
             nE  = 0.5*k*sum(J.*( v.^2 ).* w .* f);  % Energy Density [n*E]
-            ne  = 0.5*k*sum(J.*( (v-ux).^2 ).* w .* f); % Internal energy [n*e]
+            ne  = 0.5*k*sum(J.*( (v-ux).^2 ).* w .* f);  % Internal energy [n*e]
             
-            % UPDATE macroscopic properties 
+            % Update macroscopic properties 
             rho = n;
             ux = nux./n;
             p = ne;
             t = 4*ne./n;
             z = n./sqrt(pi.*t);
-            E = ne + 0.5*u.^2;
+            E = ne + 0.5*ux.^2;
             
             % Apply DOM
             [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
@@ -193,7 +192,6 @@ switch method
             if quad == 3 % if DDOM, update a, J and v.
                 a = sqrt(t); J = a; v = a.*c_star + ux;
             end
-            
             % Update figures
             drawnow
         end
