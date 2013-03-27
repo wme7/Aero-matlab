@@ -1,15 +1,14 @@
-function h = hcutfunc(x,a,b)
+function h = hcutfunc(x,a,b,modelfunc)
 % Compute Cut function scaling Hyperbolic tangent to the desired range.
 % NOTE: 'tanh' is constrained to work in the local range of [-4,4] and
 % 'cos' is constrained to work in the local range of [pi,2*pi]. We refer 
 % to this local domain $\xi$.
 % coded by Manuel Diaz, NTU, IAM, 2013.03.27.
-modelfunc = 2;
 
 % Idenfity regions,
 h_Euler = (x<a);
-h_BGK = (x>=b);
-h_Buffer = (x>=a & x<b);
+h_BGK = (x>b);
+h_Buffer = (x>=a & x<=b);
 
 % Identify node Id for every region,
 x_id_Euler = find(h_Euler);
@@ -28,6 +27,8 @@ switch modelfunc
     case{2} % using cos(x) for xi = [pi,2*pi]
         xi = (2*pi-(pi))/(b-a)*(x_buffer - a) - pi;
         h_func = 1/2*(cos(xi)+1);
+    case{3} % Linear function
+        h_func = 1/(b-a)*(x_buffer - a) - 0;
 end
 % define cut function h in all region
 h(x_id_Euler) = 0;
