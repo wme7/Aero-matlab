@@ -23,8 +23,8 @@ theta       = 0;        % {-1} BE, {0} MB, {1} FD.
 quad        = 3;        % {1} DOM-200NC, {2} DOM-80GH, {3} DDOM-3GH
 method      = 1;        % for {1} Upwind
 fmodel      = 1;        % UU model for f^Eq <- fixed for the moment
-IC_case     = 15;        % % IC: {1}~{15}. See Euler_IC1d.m
-plot_figs   = 0;        % 0: no, 1: yes please!
+IC_case     = 7;        % % IC: {1}~{15}. See Euler_IC1d.m
+plot_figs   = 1;        % 0: no, 1: yes please!
 
 %% Space Discretization
 nx  = 100;                      % Desided number of points in our domain

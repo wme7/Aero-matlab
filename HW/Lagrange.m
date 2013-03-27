@@ -8,12 +8,14 @@ close all;
 % Vector X
 %x=[1 2 4 8];
 %x=[-1 -0.8 -0.6 -0.4 -0.2 0 0.2 0.4 0.6 0.8 1];
-x=[1978 1980 1982 1984 1986 1988 1990 1992];
+%x=[1978 1980 1982 1984 1986 1988 1990 1992];
+x = [0 15 30 45 60 75 90];
 %x=[1978 1980 1986 1988 1990 1992];
 % Vector Y
 %y=[1 3 7 11];
 %y=[0.038 0.058 0.1 0.2 0.5 1 0.5 0.2 0.1 0.058 0.038];
-y=[12 12.7 13 15.2 18.2 19.8 24.1 28.1];
+%y=[12 12.7 13 15.2 18.2 19.8 24.1 28.1];
+y = [4  5 4.5 6 6  5 2.5];
 %y=[12 12.7 18.2 19.8 24.1 28.1];
 if length(x)==length(y)
     plot(x,y);
@@ -27,7 +29,8 @@ end
 %xi=0.7;
 %xi=1982;
 %xi=1984;
-xi=1994;
+%xi=1994;
+xi = 90;
 
 %% Lagrange Formulation
 l=length(x);
@@ -59,4 +62,6 @@ for k=1:1:lxpi
 end
 
 %% Plot Comparison Graph
-    plot(x,y,xpi,ypi);
+plot(x,2*y,'o',xpi,2*ypi); title('Lagrange Interpolation for bar problem No.3')
+axis([0,90,0,13]); xlabel('x'); ylabel('y'); legend('intepolated points','Lagrange polynomial',3)
+
