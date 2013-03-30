@@ -3,24 +3,32 @@
 clear all; close all; clc;
 
 % Do my Calculations
-x=(0:0.25:7); sinx=sin(x); cosx=cos(x'); z = cosx*sinx;
+x=(0:0.2:2*pi); sinx=sin(x); cosx=cos(x'); z = cosx*sinx;
 
 % Plot my comparison of functions
 figure(1)
 hold on;
-    h = plot(x,sinx,'--');
-    k = plot(x,cosx,'-.');
+    h = plot(x,sinx,'--r');
+    k = plot(x,cosx,'-.g');
 hold off;
-grid on; 
+grid on; % note that this comand is ignored by tikz
 title('my comparison of sin(x) and cos(x)')
 xlabel('x'); ylabel('y');
-% convert to Tikz
+% Convert to Tikz
 matlab2tikz('myfigure.tex','height','4cm','width','3in')
 
 % Plot surface
 figure(2)
-surf(z);
+mesh(z);
 title('my surface z')
 xlabel('x'); ylabel('y'); zlabel('z');
-% convert to Tikz
+% Convert to Tikz
 matlab2tikz('myfigure2.tex','height','4cm','width','3in')
+
+% Plot Contour
+figure(3)
+contour(z);
+title('my surface z')
+xlabel('x'); ylabel('y'); zlabel('z');
+% Convert to Tikz
+matlab2tikz('myfigure3.tex','height','4cm','width','3in')
