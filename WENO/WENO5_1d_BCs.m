@@ -15,13 +15,13 @@ switch bc_type
         u_next( nx ) = fix_b; % right boundary condition (fixed value)
         
     case{2} % Neumann BC
+        u_next(nx-3) = u_next(nx-4); % right boundary condition
         u_next(nx-2) = u_next(nx-3); % right boundary condition
-        u_next(nx-2) = u_next(nx-2); % right boundary condition
-        u_next(nx-1) = u_next(nx-2); % right boundary condition
-        u_next( nx ) = u_next(nx-2); % right boundary condition
-        u_next(1)    = u_next(3);    % left boundary condition
-        u_next(2)    = u_next(3);    % left boundary condition
-        u_next(3)    = u_next(3);    % left boundary condition
+        u_next(nx-1) = u_next(nx-3); % right boundary condition
+        u_next( nx ) = u_next(nx-3); % right boundary condition
+        u_next(1)    = u_next(4);    % left boundary condition
+        u_next(2)    = u_next(4);    % left boundary condition
+        u_next(3)    = u_next(4);    % left boundary condition
         u_next(4)    = u_next(5);    % left boundary condition
         
     case{3} % Periodic BC

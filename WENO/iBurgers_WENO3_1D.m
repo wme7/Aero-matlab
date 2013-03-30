@@ -94,7 +94,7 @@ while time <= tEnd
     u_next = u - dtdx *(h_right - h_left);
 
     % Apply BCs
-    u_next = WENO5_1d_BCs(u_next,bc_type,nx);
+    u_next = WENO3_1d_BCs(u_next,bc_type,nx);
         
     % UPDATE Info
     u = u_next;
