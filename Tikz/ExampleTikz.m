@@ -13,7 +13,7 @@ hold on;
 hold off;
 grid on; % note that this comand is ignored by tikz
 title('my comparison of sin(x) and cos(x)')
-xlabel('x'); ylabel('y');
+box on; xlabel('x'); ylabel('y'); 
 % Convert to Tikz
 matlab2tikz('myfigure.tex','height','4cm','width','3in')
 
