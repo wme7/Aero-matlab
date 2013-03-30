@@ -1,9 +1,9 @@
 %% 1D Conservation Laws Solver using Upwind
 % To solve Invicid Burgers Equation
 %
-%   u_t + f(u) = 0
+%   $u_t + f(u) = 0$ for x in [a,b]
 %
-% where: f(u) = u^2/2
+% where: $f(u) = u^2/2$
 % 
 % by Manuel Diaz, manuel.ade'at'gmail.com 
 % Institute of Applied Mechanics, 2012.12.17

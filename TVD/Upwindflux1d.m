@@ -1,4 +1,7 @@
 function [f_s,f_r] = Upwindflux1d(u,a)
+% Traditional Upwinding Method for scalar advection equation.
+% coded by Manuel Diaz, NTU, 2012.07.20
+
 %% Grid Size
 nx=length(u);
 x = 2:nx-1;
