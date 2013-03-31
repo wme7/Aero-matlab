@@ -8,7 +8,7 @@ clear all; close all; clc;
 format long
 
 %% Examples
-example = 2;
+example = 3;
 switch example
     case{1} % 2-by-2 Polynomials,
         % Define vector of functions 'f' and matrix of partial derivates 'df',
