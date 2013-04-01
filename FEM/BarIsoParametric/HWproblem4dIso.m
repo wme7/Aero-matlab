@@ -74,7 +74,7 @@ outputDisplacementsReactions(displacements,stiffness, ...
 % output stress
 stress = zeros(numberElements,1);
 for e=1:numberElements;    
-    stress(e) = E*1./L(e)*[-1 1]*displacements(elementNodes(e,:));
+    stress(e) = E*B*displacements(elementNodes(e,:));
 end
 
 %% plot figures

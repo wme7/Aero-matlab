@@ -1,4 +1,4 @@
-function [x,w] = GaussLaguerre_2(n, alpha)
+function [x,w] = GaussLaguerre(n, alpha)
 
 % This function determines the abscisas (x) and weights (w) for the
 % Gauss-Laguerre quadrature of order n>1, on the interval [0, +infinity].

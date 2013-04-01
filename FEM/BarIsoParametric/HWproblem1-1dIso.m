@@ -1,12 +1,14 @@
 % Isoparametric Formulation Implementation
 % clear memory
-clear all
- 
+clear all; close all; clc;
+
+%% Physical parameters
 % E: modulus of elasticity
 % A: area of cross section
 % L: length of bar
-E=2e11; A=12.5e-4; L=[0.75 0.75];  
- 
+E=2e11; A=12.5e-4; L=[0.75,0.75];  
+
+%% Build Elements
 % numberElements: number of elements
 numberElements=2; 
 % numberNodes: number of nodes
@@ -34,42 +36,42 @@ for e=1:numberElements;
       B=naturalDerivatives*invJacobian;
       stiffness(elementDof,elementDof)=...
       stiffness(elementDof,elementDof)+ B'*B*w(ip)*detJacobian*E*A;
-      force(elementDof)=force(elementDof)+60000*shape'*detJacobian*w(ip);
+      force(elementDof) = force(elementDof)+...
+          60000*shape'*detJacobian*w(ip);
   end
 end 
  
-% boundary conditions and solution
+%% BCs and solution
 % prescribed dofs
-prescribedDof=[1];
+prescribedDof = [1];
 % solution
 GDof=numberNodes;
 displacements=solution(GDof,prescribedDof,stiffness,force);
 % output displacements/reactions
-outputDisplacementsReactions(displacements,stiffness,numberNodes,prescribedDof,force)
-x=0:0.01:1.5;
-displacementsexact=(90000*x-30000*x.^2)/(E*A);
-figure(1);
-plot(nodeCoordinates,displacements,'b--square',x,displacementsexact,'r-');
-title('Displacement')
-legend('FEM','Exact sokution',2)
-xlabel('x (m)')
-ylabel('displacement, u (m)')
-%stress=zeros(numberNodes,1);
-for e=1:numberElements;
-    detJacobian=L(e)/2;
-    invJacobian=1/detJacobian;
-    ngp = 2;
-      for ip=1:ngp;
-      [shape,naturalDerivatives]=shapeFunctionL2(xi(ip)); 
-      B=naturalDerivatives*invJacobian;
-      end
+outputDisplacementsReactions(displacements,stiffness, ...
+    numberNodes,prescribedDof,force)
+
+%% Stress
+stress = zeros(numberElements,1);
+for e=1:numberElements;    
     stress(e) = E*B*displacements(elementNodes(e,:));
 end
-x=0:0.01:1.5;
-stressexact=-((60000*x)-90000)/A;
-figure(2);
-stress = [stress,stress(end)]';
-stairs(nodeCoordinates,stress(:));
-hold on;
-plot(x,stressexact);
-hold off;
+
+%% Exact solutions
+x = 0:0.1:1.5;
+displacements_exact=(90000*x-30000*x.^2)/(E*A);
+stress_exact=-((60000*x)-90000)/A;
+
+%% plot figures
+
+% Displacements
+subplot(1,2,1); hold on;
+plot(nodeCoordinates,displacements,'-.sb')
+plot(x,displacements_exact,'-r'); hold off;
+
+% Stress
+subplot(1,2,2); hold on;
+stress = [stress;stress(end)]; 
+stairs(nodeCoordinates,stress,'-.sb')
+plot(x,stress_exact,'-r'); hold off;
+

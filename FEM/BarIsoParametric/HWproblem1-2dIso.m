@@ -1,12 +1,14 @@
 % Isoparametric Formulation Implementation
 % clear memory
 clear all
- 
+
+%% Physical parameters
 % E: modulus of elasticity
 % A: area of cross section
 % L: length of bar
 E=2e11; A=12.5e-4; L=[0.75,0.75];  
- 
+
+%% Build Elements
 % numberElements: number of elements
 numberElements=2; 
 % numberNodes: number of nodes
@@ -39,7 +41,7 @@ for e=1:numberElements;
   end
 end 
  
-% boundary conditions and solution
+%% BCs and solution
 % prescribed dofs
 prescribedDof = [1,3];
 % solution
@@ -49,18 +51,26 @@ displacements=solution(GDof,prescribedDof,stiffness,force);
 outputDisplacementsReactions(displacements,stiffness, ...
     numberNodes,prescribedDof,force)
 
-% output stress
+%% Stress
 stress = zeros(numberElements,1);
 for e=1:numberElements;    
-    stress(e) = E*1./L(e)*[-1 1]*displacements(elementNodes(e,:));
+    stress(e) = E*B*displacements(elementNodes(e,:));
 end
 
+%% Exact solutions
+x = 0:0.1:1.5;
+displacements_exact=(90000*x-30000*x.^2)/(E*A);
+stress_exact=-((60000*x)-90000)/A;
+
 %% plot figures
+
 % Displacements
-subplot(1,2,1); 
+subplot(1,2,1); hold on;
 plot(nodeCoordinates,displacements,'-.sb')
+plot(x,displacements_exact,'-r'); hold off;
 
 % Stress
-subplot(1,2,2)
-stress = [stress;stress(end)];
+subplot(1,2,2); hold on;
+stress = [stress;stress(end)]; 
 stairs(nodeCoordinates,stress,'-.sb')
+plot(x,stress_exact,'-r'); hold off;
