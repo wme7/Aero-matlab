@@ -1,6 +1,6 @@
 % Isoparametric Formulation Implementation
 % clear memory
-clear all; close all; clc;
+clear all
 
 %% Physical parameters
 % E: modulus of elasticity
@@ -37,13 +37,13 @@ for e=1:numberElements;
       stiffness(elementDof,elementDof)=...
       stiffness(elementDof,elementDof)+ B'*B*w(ip)*detJacobian*E*A;
       force(elementDof) = force(elementDof)+...
-          60000*shape'*detJacobian*w(ip);
+          20000*shape'*detJacobian*w(ip);
   end
 end 
  
 %% BCs and solution
 % prescribed dofs
-prescribedDof = [1];
+prescribedDof = [1,3];
 % solution
 GDof=numberNodes;
 displacements=solution(GDof,prescribedDof,stiffness,force);
@@ -54,24 +54,27 @@ outputDisplacementsReactions(displacements,stiffness, ...
 %% Stress
 stress = zeros(numberElements,1);
 for e=1:numberElements;    
-    stress(e) = E*B*displacements(elementNodes(e,:));
+    stress(elementNodes(e,:)) = E*B*displacements(elementNodes(e,:));
 end
 
 %% Exact solutions
 x = 0:0.1:1.5;
-displacements_exact=(90000*x-30000*x.^2)/(E*A);
-stress_exact=-((60000*x)-90000)/A;
+displacements_exact=(30000*x-20000*x.^2)/(2*E*A);
+stress_exact=(15000-20000*x)/A;
 
 %% plot figures
+figure(2)
 
 % Displacements
 subplot(1,2,1); hold on;
 plot(nodeCoordinates,displacements,'-.sb')
 plot(x,displacements_exact,'-r'); hold off;
+xlabel('x'); ylabel('displacement, u'); 
+legend('FEM','Exact Solution',2);
 
 % Stress
 subplot(1,2,2); hold on;
-stress = [stress;stress(end)]; 
 stairs(nodeCoordinates,stress,'-.sb')
 plot(x,stress_exact,'-r'); hold off;
-
+xlabel('x'); ylabel('stress, \sigma'); 
+legend('FEM','Exact Solution',1);

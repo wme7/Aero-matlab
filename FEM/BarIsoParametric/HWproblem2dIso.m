@@ -7,7 +7,7 @@ clear all
 numberElements = 6; 
 
 % Initial Area
-A0 = 12.5e-4; % m^2
+A = 12.5e-4; % m^2
 
 % Modulus of elasticity
 E = 2e11; % N/m^2
@@ -15,14 +15,29 @@ E = 2e11; % N/m^2
 % Length of bar
 Ltotal = 1.5; % m 
 
+%% Exact solutions
+xx = 0:0.1:1.5;
+displacements_exact = (40000*xx.^3/3-45000)/(E*A);
+stress_exact = (40000*xx.^2)/A;
+
+figure(3)
+
+% Displacements
+subplot(1,2,1); hold on;
+plot(xx,displacements_exact,'-r'); 
+
+% Stress
+subplot(1,2,2); hold on;
+
+plot(xx,stress_exact,'-r'); 
+
+test = [1 2 4 8];
+for numberElements = test
+
 % Build nodes coordinates and middle points,
 delta_x = Ltotal/numberElements;
 i = 0:numberElements; 
 x = delta_x*i';x_mid = (x(2:end)-x(1:end-1))/2 + x(1:end-1);
-
-% Evaluate area the center of each element.
-% A: area of cross section
-A = A0;  %*(1+x_mid/Ltotal); % constant cross section
 
 % Length of each element
 L = x(2:end)-x(1:end-1);  
@@ -77,23 +92,29 @@ outputDisplacementsReactions(displacements,stiffness, ...
 %% Stress
 stress = zeros(numberElements,1);
 for e=1:numberElements;    
-    stress(e) = E*B*displacements(elementNodes(e,:));
+    stress(elementNodes(e,:)) = E*B*displacements(elementNodes(e,:));
 end
 
-%% Exact solutions
-x = 0:0.1:1.5;
-displacements_exact=(90000*x-30000*x.^2)/(E*A);
-stress_exact=-((60000*x)-90000)/A;
 
 %% plot figures
 
+switch numberElements
+    case 1
+        line='r*--';
+    case 2
+        line='g*--';
+    case 4
+        line='k*--';
+    case 8
+        line='m*--';
+end
+
 % Displacements
-subplot(1,2,1); hold on;
-plot(nodeCoordinates,displacements,'-.sb')
-plot(x,displacements_exact,'-r'); hold off;
+subplot(1,2,1); plot(nodeCoordinates,displacements,line)
 
 % Stress
-subplot(1,2,2); hold on;
-stress = [stress;stress(end)]; 
-stairs(nodeCoordinates,stress,'-.sb')
-plot(x,stress_exact,'-r'); hold off;
+subplot(1,2,2); stairs(nodeCoordinates,stress,line)
+
+end %end for
+subplot(1,2,1); legend('Exact','NEL=1','NEL=2','NEL=4','NEL=8',2); hold off
+subplot(1,2,2); legend('Exact','NEL=1','NEL=2','NEL=4','NEL=8',2); hold off

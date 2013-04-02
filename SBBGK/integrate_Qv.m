@@ -3,7 +3,7 @@
 clear all; close all; clc;
 
 % paramaters
-nu = 1/2;
+nu = 2;
 z = 0.35;
 
 % fucntion
