@@ -8,6 +8,7 @@ format long;
 %% This function to search key word of ABAQUS inp file and returns the line number
 fnFindLineWithText = @(arr,txt) ...
     find(cellfun(@(x) ~isempty (regexp(x, txt, 'once')), arr), 1);
+
 %% Open file with user interface
 [filename,filepath]=uigetfile('*.inp','Select Input file');
 file = [filepath filename];

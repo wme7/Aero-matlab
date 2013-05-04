@@ -33,11 +33,16 @@ ElemIdx = fnFindLineWithText(lines, '*Element');
 EndIdx  = fnFindLineWithText(lines, '*Nset, nset=Set-1, generate');
 EBC1Idx = fnFindLineWithText(lines, ...
     '*Nset, nset=Set-1, instance=Part-1-1');
+EndEBC1Idx = fnFindLineWithText(lines, ...
+    '*Elset, elset=Set-1, instance=Part-1-1');
 EBC2Idx = fnFindLineWithText(lines, ...
     '*Nset, nset=Set-2, instance=Part-1-1');
-MaterialIdx = fnFindLineWithText(lines,'*Elastic');
-SectionIdx = fnFindLineWithText(lines,'*Solid Section');
-PressureIdx = fnFindLineWithText(lines,'*Dsload');
+EndEBC2Idx = fnFindLineWithText(lines, ...
+    '*Elset, elset=Set-2, instance=Part-1-1');
+EndEBCIdx = fnFindLineWithText(lines, '*Surface'); 
+MaterialIdx = fnFindLineWithText(lines, '*Elastic');
+SectionIdx = fnFindLineWithText(lines, '*Solid Section');
+PressureIdx = fnFindLineWithText(lines, '*Dsload');
 
 %% Import 
 NodePerElement=3;
@@ -62,24 +67,42 @@ end
 drawingMesh(nodeCoordinates,elementNodes,'T3','b-o');
 
 %% Import BCs
-naturalBCs=[];
+naturalBCs=[]; % elements with prescribed forces in their nodes
 surfaceOrientation=[];
 
 for i=1:NodePerElement
     LoadIdx = fnFindLineWithText(lines,...
-        ['*Elset, elset=_Surf-1_S2',num2str(i)]);
+        ['*Elset, elset=_Surf-1_S',num2str(i)]);
     if ~isempty(LoadIdx)
-        generateBC=str2num(lines{LoadIdx+1});
-        naturalBCs=[naturalBCs;generateBC(1):generateBC(3):generateBC(2)];
+        generateBC=cellfun(@cellstr,lines(LoadIdx+1:EndEBCIdx-1));
+        for j = 1:length(generateBC)
+            temp=str2num(generateBC{j});
+            naturalBCs=[naturalBCs,temp];
+        end
         surfaceOrientation=[surfaceOrientation;i];
     end
 end
 
-generateBC=str2num(lines{EBCIdx+1});
-EBC=generateBC(1):generateBC(3):generateBC(2);
+EBC1 = []; % Nodes with prescribed displacement in x
+
+generateBC=cellfun(@cellstr,lines(EBC1Idx+1:EndEBC1Idx-1));
+for i = 1:length(generateBC)
+    temp=str2num(generateBC{i});
+    EBC1=[EBC1,temp];
+end
+
+EBC2 = []; % Nodes with prescribed displacement in y
+
+generateBC=cellfun(@cellstr,lines(EBC2Idx+1:EndEBC2Idx-1));
+for i = 1:length(generateBC)
+    temp=str2num(generateBC{i});
+    EBC2=[EBC2,temp];
+end
+
+%EBC = [EBC1,EBC2]';
 
 GDof=2*numberNodes;
-prescribedDof=sort([2.*EBC-1 2.*EBC]);
+prescribedDof=sort([2.*EBC1-1 2.*EBC]);
 P=[0.01 0];%[Px Py]
 
 %% Import material and section properties
@@ -88,9 +111,11 @@ thickness=str2num(lines{SectionIdx+1});
 %DLoad=cell2str(lines{PressureIdx+1});
 
 E=Mat(1);poisson=Mat(2);
+
 %% Evalute force vector
 force=formForceVectorT3(GDof,naturalBCs,surfaceOrientation,...
     elementNodes,nodeCoordinates,P,thickness);
+
 %% Construct Stiffness matrix for T3 element
 C=E/(1-poisson^2)*[1 poisson 0;poisson 1 0;0 0 (1-poisson)/2];
 
