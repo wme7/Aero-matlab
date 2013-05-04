@@ -13,7 +13,7 @@ E  = 30e6;     poisson = 0.30;  thickness = 1;
 D=E/(1-poisson^2)*[1 poisson 0;poisson 1 0;0 0 (1-poisson)/2];
  
 % Mesh Generation
-test = [1,2,4,8]; % square type of domain is configured
+test = 2 %[1,2,4,8]; % square type of domain is configured
 
 % Initilize figure
 figure(1); 

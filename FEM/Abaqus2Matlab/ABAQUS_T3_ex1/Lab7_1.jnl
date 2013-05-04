@@ -117,3 +117,99 @@ mdb.jobs['Lab-7']._Message(COMPLETED, {'phase': STANDARD_PHASE,
 mdb.jobs['Lab-7']._Message(JOB_COMPLETED, {'time': 'Wed May 01 17:31:47 2013', 
     'jobName': 'Lab-7'})
 # Save by Johnason on 2013_05_01-17.56.57; build 6.12-1 2012_03_13-20.23.18 119612
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].rootAssembly.Set(elements=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].elements.getSequenceFromMask(
+    mask=('[#ffefff84 #3 #0 #6 #5555281a #d5555555 #1 ]', ), ), name='Set-3')
+del mdb.models['Model-1'].rootAssembly.sets['Set-3']
+mdb.models['Model-1'].rootAssembly.Set(elements=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].elements.getSequenceFromMask(
+    mask=('[#ffefff84 #3 #0 #6 #5555281a #d5555555 #1 ]', ), ), name='Set-3')
+mdb.jobs['Lab-7'].submit(consistencyChecking=OFF)
+mdb.jobs['Lab-7']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'Hal', 'handle': 0, 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'E:\\Temp\\Lab-7.odb', 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'Hal', 'handle': 1896, 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(STATUS, {'totalTime': 0.0, 'attempts': 0, 
+    'timeIncrement': 1.0, 'increment': 0, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Lab-7', 'severe': 0, 'iterations': 0, 'phase': STANDARD_PHASE, 
+    'equilibrium': 0})
+mdb.jobs['Lab-7']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Lab-7', 'memory': 26.2225799560547})
+mdb.jobs['Lab-7']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Lab-7', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Lab-7']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(JOB_COMPLETED, {'time': 'Sat May 04 17:46:39 2013', 
+    'jobName': 'Lab-7'})
+mdb.models['Model-1'].rootAssembly.Set(edges=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].edges.getSequenceFromMask(
+    ('[#4 ]', ), ), name='Set-2')
+mdb.models['Model-1'].rootAssembly.Set(edges=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].edges.getSequenceFromMask(
+    ('[#1 ]', ), ), name='Set-1')
+mdb.models['Model-1'].rootAssembly.Set(elements=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].elements.getSequenceFromMask(
+    mask=('[#ffefff84 #3 #0 #6 #5555281a #d5555555 #1 ]', ), ), name='Set-3')
+mdb.models['Model-1'].HistoryOutputRequest(createStepName='Step-1', name=
+    'Stress', rebar=EXCLUDE, region=
+    mdb.models['Model-1'].rootAssembly.sets['Set-3'], sectionPoints=DEFAULT, 
+    variables=('S11', ))
+mdb.jobs['Lab-7'].submit(consistencyChecking=OFF)
+mdb.jobs['Lab-7']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'Hal', 'handle': 0, 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'E:\\Temp\\Lab-7.odb', 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'Hal', 'handle': 4480, 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(STATUS, {'totalTime': 0.0, 'attempts': 0, 
+    'timeIncrement': 1.0, 'increment': 0, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Lab-7', 'severe': 0, 'iterations': 0, 'phase': STANDARD_PHASE, 
+    'equilibrium': 0})
+mdb.jobs['Lab-7']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Lab-7', 'memory': 26.2225799560547})
+mdb.jobs['Lab-7']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Lab-7', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Lab-7']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab-7'})
+mdb.jobs['Lab-7']._Message(JOB_COMPLETED, {'time': 'Sat May 04 17:58:33 2013', 
+    'jobName': 'Lab-7'})
+# Save by Manuel on 2013_05_04-18.11.27; build 6.12-3 2012_10_04-20.39.07 120045
