@@ -1,7 +1,7 @@
 function stress=outputResult(displacements,numberElements,...
-        elementNodes,nodeCoordinates,D,h)
+        elementNodes,nodeCoordinates,D)
 stress=zeros(3,1);    
-for e=numberElements-1:numberElements                           
+for e=1:numberElements                           
   numNodePerElement = length(elementNodes(e,:));
   numEDOF = 2*numNodePerElement;
   elementDof=zeros(1,numEDOF);
@@ -22,5 +22,5 @@ for e=numberElements-1:numberElements
                         0 x3-x2 0 x1-x3 0 x2-x1;
                         x3-x2 y2-y3 x1-x3 y3-y1 x2-x1 y1-y2];
     
-  stress=stress+D*B*displacements(elementDof)/2;
+  stress(e,:)=stress+D*B*displacements(elementDof)/2;
 end

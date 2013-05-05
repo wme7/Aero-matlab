@@ -10,6 +10,10 @@ format long;
 fnFindLineWithText = @(arr,txt) ...
     find(cellfun(@(x) ~isempty (regexp(x, txt, 'once')), arr), 1);
 
+%% Import data from Abaqus Solution,
+Uy_abaqus = importdata('Uy_displacements_lab7_1.rpt');
+S11_abaqus = importdata('S11_stress_lab7_1.rpt');
+
 %% Open file with user interface
 [filename,filepath]=uigetfile('*.inp','Select Input file');
 file = [filepath filename];
@@ -125,8 +129,65 @@ stiffness=formStiffness2D(GDof,numberElements,...
 %% solution
 displacements=solution(GDof,prescribedDof,stiffness,force);
 
+%% matrix D
+D=E/(1-poisson^2)*[1 poisson 0;poisson 1 0;0 0 (1-poisson)/2];
+
+%% stress
+for e = 1:numberElements
+    % elementDof: element degrees of freedom (Dof)
+    elementDof = [];
+    for i = elementNodes(e,:)
+        temp = [2*i-1,2*i];
+        elementDof = [elementDof,temp];
+    end
+    B = Bmat(nodeCoordinates,elementNodes,e);
+    stress(:,e) = D*B*displacements(elementDof);
+end
+
 %% output displacements
 outputDisplacements(displacements, numberNodes, GDof);
 scaleFactor=1.E6;
 drawingMesh(nodeCoordinates+scaleFactor*[displacements(1:2:2*numberNodes) ...
     displacements(2:2:2*numberNodes)],elementNodes,'T3','r--');
+
+%% Find elements arround every EBC1 nodes 
+for i = 1:length(EBC1)
+    [row,col] = find(elementNodes==EBC1(i));
+    elementList{i} = row;
+end
+
+%% Compute stress averages for the nodes in EBC1
+stress = stress';
+for i = 1:length(EBC1)
+    s11 = stress(elementList{i},1);
+    s11_bar(i) = mean(s11);
+    s22 = stress(elementList{i},2);
+    s22_bar(i) = mean(s22);
+    s12 = stress(elementList{i},3);
+    s12_bar(i) = mean(s12);
+end
+
+%% Compute y-Position of EBC1 nodes
+y = nodeCoordinates(EBC1,2);
+
+%% Compute y-displacements in EBC1 nodes
+Uy = displacements(2*EBC1);
+
+%% plot data
+figure(2)
+
+% Displacements Uy,
+subplot(1,2,1); hold on;
+plot(y,Uy,'*b'); 
+plot(sort(y),Uy_abaqus.data(:,2),'-r');
+title('Displacements'); xlabel('U_y,(mm)'); ylabel('y,(mm)');
+legend('Matlab','Abaqus',1);
+hold off;
+
+% Stress S11,
+subplot(1,2,2); hold on; 
+plot(y,s11_bar,'*b'); 
+plot(sort(y),S11_abaqus.data(:,2),'-r');
+title('Stress distribution'); xlabel('\sigma_x,(MPa)'); ylabel('y,(mm)');
+legend('Matlab','Abaqus',1);
+hold off

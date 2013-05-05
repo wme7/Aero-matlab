@@ -765,3 +765,72 @@ mdb.jobs['Lab7_2']._Message(COMPLETED, {'phase': STANDARD_PHASE,
 mdb.jobs['Lab7_2']._Message(JOB_COMPLETED, {'time': 'Wed May 01 23:49:07 2013', 
     'jobName': 'Lab7_2'})
 # Save by Johnason on 2013_05_02-00.26.09; build 6.12-1 2012_03_13-20.23.18 119612
+# Save by Manuel on 2013_05_05-12.36.25; build 6.12-3 2012_10_04-20.39.07 120045
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].rootAssembly.Set(elements=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].elements.getSequenceFromMask(
+    mask=('[#0:8 #200000 ]', ), ), name='Set-4')
+mdb.models['Model-1'].rootAssembly.Set(elements=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].elements.getSequenceFromMask(
+    mask=('[#0 #21c #0:4 #8000 #0 #300000 ]', ), ), name='Set-4')
+mdb.models['Model-1'].rootAssembly.Set(name='Set-5', nodes=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].nodes.getSequenceFromMask(
+    mask=('[#1e00 #0:4 #f00 ]', ), ))
+# Save by Manuel on 2013_05_05-15.44.21; build 6.12-3 2012_10_04-20.39.07 120045
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.jobs['Lab7_2'].submit(consistencyChecking=OFF)
+mdb.jobs['Lab7_2']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'Hal', 'handle': 0, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'E:\\Temp\\Lab7_2.odb', 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'Hal', 'handle': 5444, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STATUS, {'totalTime': 0.0, 'attempts': 0, 
+    'timeIncrement': 1.0, 'increment': 0, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Lab7_2', 'severe': 0, 'iterations': 0, 'phase': STANDARD_PHASE, 
+    'equilibrium': 0})
+mdb.jobs['Lab7_2']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Lab7_2', 'memory': 24.6333541870117})
+mdb.jobs['Lab7_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Lab7_2', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Lab7_2']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(JOB_COMPLETED, {'time': 'Sun May 05 15:44:55 2013', 
+    'jobName': 'Lab7_2'})
+# Save by Manuel on 2013_05_05-16.34.41; build 6.12-3 2012_10_04-20.39.07 120045

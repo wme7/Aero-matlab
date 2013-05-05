@@ -1702,6 +1702,8 @@
  13,
 *Elset, elset=Set-4, instance=Part-1-1
   35,  36,  37,  42, 208, 277, 278
+*Nset, nset=Set-5, instance=Part-1-1
+  10,  11,  12,  13, 169, 170, 171, 172
 *End Assembly
 ** 
 ** MATERIALS
