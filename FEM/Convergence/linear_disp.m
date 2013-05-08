@@ -64,7 +64,7 @@ for e=1:numberElements;
       stiffness(elementDof,elementDof)=...
       stiffness(elementDof,elementDof)+ B'*B*w(ip)*detJacobian*E*A;
       force(elementDof)=force(elementDof)+...
-          c*xc*shape'*detJacobian*w(ip);
+          c*(xc+detJacobian*xi(ip))*shape'*detJacobian*w(ip);
   end
 end 
 
