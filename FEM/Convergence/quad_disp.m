@@ -6,7 +6,7 @@ clc
 % E: modulus of elasticity
 % A: area of cross section
 % L: length of bar
-E=10E4; A=1; c=1; l=1; L=2*l;
+E=1E4; A=1; c=1; l=1; L=2*l;
 
 %u_exact = @(x) (36*log(x/2)-4*x-12*heaviside(x-5)*log(x/5)+8)/E;
 u_exact = @(x) c/(A*E)*(l^2*x-x.^3/6);
@@ -124,23 +124,35 @@ switch numberElements
         str='m*--';
 end
 
-if numberElements > 1
-nodes = elementNodeCoor(1:2:end);
-stress = elementNodeStr(1:2:end);
-else
-nodes = elementNodeCoor;
-stress = elementNodeStr;    
+% Normed Errors,
+L2 = zeros(1,numberElements); en = zeros(1,numberElements);
+for e=1:numberElements; 
+  % elementDof: element degrees of freedom (Dof)
+  elementDof=elementNodes(e,:);
+  detJacobian=Le(e)/2;
+  invJacobian=1/detJacobian;
+  ngp = 4; % Prepare for integration with 4 gauss points
+  [w,xi]=gauss1d(ngp); 
+  xc=0.5*(nodeCoordinates(elementDof(1))+nodeCoordinates(elementDof(end)));
+  Coefficient=zeros(ngp,ngp);
+    for ip=1:ngp
+        x_global = xc + detJacobian*xi(ip); 
+        [shape,naturalDerivatives]=shapeFunctionL3(xi(ip)); 
+        N=shape;
+        B=naturalDerivatives*invJacobian;
+        temp1 = detJacobian*w(ip)*(u_exact(x_global) - ...
+            N*displacements(elementNodes(e,:)))^2;
+        L2(e)=L2(e)+temp1;
+        temp2 = detJacobian*w(ip)*(du_exact(x_global) - ...
+            B*displacements(elementNodes(e,:)))^2;
+        en(e)=en(e)+temp2;
+    end
 end
 
-% Save data for analysis
-h(i) = Le(1);
-L2_quad(i)= sqrt(sum((u_exact(nodeCoordinates') - displacements).^2));
-en_quad(i)= sqrt(sum((du_exact(elementNodeCoor) - (elementNodeStr/(A*E))).^2));
-%en_quad(i)= sqrt(sum((du_exact(nodes) - (stress/(A*E))).^2));
-
-% Matlab Style
-%L2_linear(i) = norm((u_exact(nodeCoordinates') - displacements),2);
-%en_linear(i) = norm((du_exact(elementNodeCoor) - elementNodeStr/(A*E)),2);
+% Data for analysis,
+h(i) = Le(1); % because of uniform mesh assumption
+L2_quad(i) = sqrt(sum(L2));
+en_quad(i) = sqrt(sum(en));
 
 % Plot actual displacements
 plot(nodeCoordinates,displacements,str)
