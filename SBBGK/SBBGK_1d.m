@@ -18,10 +18,10 @@ clear all; close all; %clc;
     theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
     fmodel  = 2;        % {1} UU. model, {2} ES model.
     quad   	= 2;        % {1} 200NC , {2} 80GH
-    method 	= 3;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
-    IC_case	= 1;        % IC: {1}~{14}. See Euler_IC1d.m
-  plot_figs = 0;        % 0: no, 1: yes please!
-  write_ans = 1;        % 0: no, 1: yes please!
+    method 	= 2;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
+    IC_case	= 7;        % IC: {1}~{14}. See Euler_IC1d.m
+  plot_figs = 1;        % 0: no, 1: yes please!
+  write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
     P_deg	= 1;        % Polinomial Degree
     Pp      = P_deg+1;  % Polinomials Points
@@ -61,7 +61,7 @@ switch quad
     v = repmat(v,1,nx);     w = repmat(w,1,nx);   % using DOM
     
     case{2} % Gauss Hermite Quadrature:
-    nv = 80;          % nodes desired (the actual value)
+    nv = 60;          % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;            % quadrature constant.
     w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature

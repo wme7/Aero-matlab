@@ -1,0 +1,972 @@
+# -*- coding: mbcs -*-
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=200.0)
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(40.0, 0.0), point2=(
+    20.0, 10.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(20.0, 10.0), point2=
+    (0.0, 50.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.0, 50.0), point2=(
+    0.0, 90.0))
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[4])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.0, 90.0), point2=(
+    55.0, 160.0))
+mdb.models['Model-1'].sketches['__profile__'].HorizontalConstraint(entity=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[5])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[2], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[5])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=1000.0)
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(40.0, 0.0), point2=(
+    20.0, 10.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(20.0, 10.0), point2=
+    (0.0, 50.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.0, 50.0), point2=(
+    0.0, 90.0))
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[4])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(40.0, 0.0), point2=(
+    40.0, 50.0))
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[5])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(40.0, 50.0), point2=
+    (55.0, 70.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(55.0, 70.0), point2=
+    (95.0, 70.0))
+mdb.models['Model-1'].sketches['__profile__'].HorizontalConstraint(
+    addUndoState=False, entity=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[7])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(95.0, 70.0), point2=
+    (115.0, 50.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(115.0, 50.0), 
+    point2=(115.0, 0.0))
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[9])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(115.0, 0.0), point2=
+    (135.0, 10.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(135.0, 10.0), 
+    point2=(155.0, 50.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(155.0, 50.0), 
+    point2=(155.0, 90.0))
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[12])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(155.0, 90.0), 
+    point2=(130.0, 120.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.0, 90.0), point2=(
+    30.0, 120.0))
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[11], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[14])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[3], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[13])
+mdb.models['Model-1'].sketches['__profile__'].ConstructionLine(angle=90.0, 
+    point1=(55.0, 70.0))
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[5], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[15])
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[15])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(18.9736659610103, 
+    127.947331922021), point2=(56.9866401669569, 203.973280333914))
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(addUndoState=
+    False, entity1=mdb.models['Model-1'].sketches['__profile__'].geometry[14], 
+    entity2=mdb.models['Model-1'].sketches['__profile__'].geometry[16])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].trimExtendCurve(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[14], curve2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[15], point1=(
+    15.1954498291016, 118.940269470215), point2=(55.2389526367188, 
+    175.841064453125))
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[6], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[14])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[6], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[14])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[8], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[13])
+mdb.models['Model-1'].sketches['__profile__'].EqualLengthConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[8], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[13])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.0, 90.0), point2=(
+    20.0, 115.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(155.0, 90.0), 
+    point2=(145.0, 105.0))
+mdb.models['Model-1'].sketches['__profile__'].EqualLengthConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[8], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[14])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].EqualLengthConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[4], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[12])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.0, 90.0), point2=(
+    30.0, 115.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(155.0, 90.0), 
+    point2=(140.0, 110.0))
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[8], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[14])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[6], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[13])
+mdb.models['Model-1'].sketches['__profile__'].ConstructionLine(angle=90.0, 
+    point1=(55.0, 70.0))
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[5], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[15])
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[15])
+mdb.models['Model-1'].sketches['__profile__'].trimExtendCurve(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[13], curve2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[15], point1=(
+    14.7739410400391, 111.296882629395), point2=(55.6604614257813, 
+    136.774871826172))
+mdb.models['Model-1'].sketches['__profile__'].ConstructionLine(point1=(155.0, 
+    50.0), point2=(135.0, 10.0))
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[10], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[17])
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[9], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[17])
+mdb.models['Model-1'].sketches['__profile__'].ConstructionLine(point1=(55.0, 
+    163.333333333341), point2=(93.7500000022592, 215.0))
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[14], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[18])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[11], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[18])
+mdb.models['Model-1'].sketches['__profile__'].ConstructionLine(point1=(
+    137.322330470336, 107.677669529664), point2=(90.0, 185.0))
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[13], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[19])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[3], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[19])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(137.322330470336, 
+    107.677669529664), point2=(82.2472492845263, 217.827831900679))
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[15], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[18])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(55.0, 
+    163.333333333341), point2=(82.2472492845263, 217.827831900679))
+mdb.models['Model-1'].sketches['__profile__'].ConstructionLine(angle=90.0, 
+    point1=(95.0, 70.0))
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[6], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[22])
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[22])
+mdb.models['Model-1'].sketches['__profile__'].ConstructionLine(angle=90.0, 
+    point1=(155.0, 50.0))
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[10], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[23])
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[23])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].ConstructionLine(angle=90.0, 
+    point1=(95.0, 70.0))
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[6], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[18])
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[18])
+mdb.models['Model-1'].sketches['__profile__'].rectangle(point1=(55.0, 
+    163.333333333341), point2=(105.0, 313.33))
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[11], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[21])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[11], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[21])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(55.0, 
+    163.333333333341), point2=(76.8163806162775, 192.421840820462))
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(addUndoState=
+    False, entity1=mdb.models['Model-1'].sketches['__profile__'].geometry[16], 
+    entity2=mdb.models['Model-1'].sketches['__profile__'].geometry[19])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[10], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[16])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[6], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[16])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(55.0, 
+    163.333333333341), point2=(70.0, 205.0))
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[11], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[19])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(137.322330470336, 
+    107.677669529664), point2=(110.0, 170.0))
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[3], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[20])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(137.322330470336, 
+    107.677669529664), point2=(115.0, 160.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(115.0, 160.0), 
+    point2=(365.0, 0.0))
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(115.0, 160.0), 
+    point2=(365.0, 160.0))
+mdb.models['Model-1'].sketches['__profile__'].HorizontalConstraint(
+    addUndoState=False, entity=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[20])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[17], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[20])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].CircleByCenterPerimeter(center=(
+    115.0, 160.0), point1=(365.0, 160.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(115.0, 160.0), 
+    point2=(225.0, 384.499443206436))
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[17], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[20])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[17], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[21])
+mdb.models['Model-1'].sketches['__profile__'].offset(distance=50.0, objectList=
+    (mdb.models['Model-1'].sketches['__profile__'].geometry[21], ), side=LEFT)
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(182.082039324994, 
+    405.967477524976), point2=(226.803398874989, 383.606797749979))
+mdb.models['Model-1'].sketches['__profile__'].PerpendicularConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[22], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[23])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(70.2786404500042, 
+    182.360679774998), point2=(55.0, 163.333333333341))
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].ConstructionLine(angle=90.0, 
+    point1=(155.0, 90.0))
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[11], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[21])
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[21])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(155.0, 
+    406.77925358506), point2=(115.0, 160.0))
+mdb.models['Model-1'].sketches['__profile__'].PerpendicularConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[20], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[22])
+mdb.models['Model-1'].sketches['__profile__'].CoincidentConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[17], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[20])
+mdb.models['Model-1'].sketches['__profile__'].offset(distance=50.0, objectList=
+    (mdb.models['Model-1'].sketches['__profile__'].geometry[22], ), side=RIGHT)
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(105.644149282988, 
+    414.77925358506), point2=(155.0, 406.77925358506))
+mdb.models['Model-1'].sketches['__profile__'].PerpendicularConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[23], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[24])
+mdb.models['Model-1'].sketches['__profile__'].delete(objectList=(
+    mdb.models['Model-1'].sketches['__profile__'].geometry[20], ))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(65.6441492829877, 
+    168.0), point2=(55.0, 163.333333333341))
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[11], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[25])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(55.0, 
+    163.333333333341), point2=(34.9490356445313, 178.371556598693))
+mdb.models['Model-1'].sketches['__profile__'].PerpendicularConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[16], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[25])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(55.0, 
+    163.333333333341), point2=(74.9124096669257, 148.399026080966))
+mdb.models['Model-1'].sketches['__profile__'].PerpendicularConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[16], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[25])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(55.0, 
+    163.333333333341), point2=(82.0, 160.0))
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[11], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[25])
+mdb.models['Model-1'].sketches['__profile__'].trimExtendCurve(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[25], curve2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[23], point1=(
+    59.5472717285156, 173.751113891602), point2=(72.8570251464844, 
+    206.088882446289))
+mdb.models['Model-1'].sketches['__profile__'].autoTrimCurve(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[23], point1=(
+    67.3765563964844, 176.906021118164))
+mdb.models['Model-1'].sketches['__profile__'].autoDimension(objectList=(
+    mdb.models['Model-1'].sketches['__profile__'].geometry[2], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[3], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[4], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[5], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[6], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[7], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[8], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[9], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[10], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[11], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[12], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[14], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[15], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[16], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[17], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[18], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[19], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[21], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[22], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[24], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[26], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[27]))
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].delete(objectList=(
+    mdb.models['Model-1'].sketches['__profile__'].geometry[21], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[17], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[18], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[15]))
+mdb.models['Model-1'].sketches['__profile__'].autoDimension(objectList=(
+    mdb.models['Model-1'].sketches['__profile__'].geometry[2], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[3], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[4], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[5], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[6], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[7], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[8], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[9], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[10], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[11], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[12], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[14], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[16], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[19], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[22], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[24], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[26], 
+    mdb.models['Model-1'].sketches['__profile__'].geometry[27]))
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].HorizontalDimension(textPoint=(
+    38.1601257324219, -34.3835144042969), value=40.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[2], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[4])
+mdb.models['Model-1'].sketches['__profile__'].ObliqueDimension(textPoint=(
+    116.452911376953, -34.3835144042969), value=75.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[4], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[7])
+mdb.models['Model-1'].sketches['__profile__'].HorizontalDimension(textPoint=(
+    152.930206298828, -34.3835144042969), value=40.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[7], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[10])
+mdb.models['Model-1'].sketches['__profile__'].VerticalDimension(textPoint=(
+    236.561126708984, 7.74166870117188), value=10.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[8], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[9])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].VerticalDimension(textPoint=(
+    230.333282470703, 7.74166870117188), value=10.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[9], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[8])
+mdb.models['Model-1'].sketches['__profile__'].VerticalDimension(textPoint=(
+    192.966278076172, 17.6007690429688), value=40.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[10], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[9])
+mdb.models['Model-1'].sketches['__profile__'].VerticalDimension(textPoint=(
+    192.076568603516, 51.659423828125), value=40.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[11], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[10])
+mdb.models['Model-1'].sketches['__profile__'].VerticalDimension(textPoint=(
+    299.729095458984, 10.4305114746094), value=160.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[15], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[8])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[22], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[27])
+mdb.models['Model-1'].sketches['__profile__'].PerpendicularConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[24], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[22])
+mdb.models['Model-1'].sketches['__profile__'].PerpendicularConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[24], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[27])
+mdb.models['Model-1'].sketches['__profile__'].ObliqueDimension(textPoint=(
+    183.179656982422, 141.287506103516), value=249.999999999999, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[17], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[15])
+mdb.models['Model-1'].sketches['__profile__'].ObliqueDimension(textPoint=(
+    106.666290283203, 100.954895019531), value=40.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[5], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[6])
+mdb.models['Model-1'].sketches['__profile__'].VerticalDimension(textPoint=(
+    -45.4707641601563, 55.2445678710938), value=20.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[5], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[4])
+mdb.models['Model-1'].sketches['__profile__'].HorizontalDimension(textPoint=(
+    41.7189025878906, 92.8883361816406), value=15.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[5], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[4])
+mdb.models['Model-1'].sketches['__profile__'].undo()
+mdb.models['Model-1'].sketches['__profile__'].HorizontalDimension(textPoint=(
+    53.2848815917969, 100.05859375), value=15.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[4], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[5])
+mdb.models['Model-1'].Part(dimensionality=TWO_D_PLANAR, name='Part-1', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['Part-1'].BaseShell(sketch=
+    mdb.models['Model-1'].sketches['__profile__'])
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].ConstrainedSketch(gridSpacing=22.13, name='__profile__', 
+    sheetSize=885.58, transform=
+    mdb.models['Model-1'].parts['Part-1'].MakeSketchTransform(
+    sketchPlane=mdb.models['Model-1'].parts['Part-1'].faces[0], 
+    sketchPlaneSide=SIDE1, sketchOrientation=RIGHT, origin=(92.371818, 
+    178.733273, 0.0)))
+mdb.models['Model-1'].parts['Part-1'].projectReferencesOntoSketch(filter=
+    COPLANAR_EDGES, sketch=mdb.models['Model-1'].sketches['__profile__'])
+mdb.models['Model-1'].sketches['__profile__'].VerticalDimension(textPoint=(
+    144.561073845703, -178.213360280273), value=10.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[5], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[6])
+mdb.models['Model-1'].sketches['__profile__'].VerticalDimension(textPoint=(
+    145.187416619141, -140.354000539063), value=40.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[6], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[7])
+mdb.models['Model-1'].sketches['__profile__'].VerticalDimension(textPoint=(
+    145.187416619141, -123.948299855469), value=40.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[8], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[7])
+mdb.models['Model-1'].sketches['__profile__'].PerpendicularConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[12], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[13])
+mdb.models['Model-1'].sketches['__profile__'].PerpendicularConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[13], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[14])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[3], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[16])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[15], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[8])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(addUndoState=
+    False, entity1=mdb.models['Model-1'].sketches['__profile__'].geometry[8], 
+    entity2=mdb.models['Model-1'].sketches['__profile__'].geometry[15])
+mdb.models['Model-1'].sketches['__profile__'].EqualLengthConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[10], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[5])
+mdb.models['Model-1'].sketches['__profile__'].ParallelConstraint(entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[10], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[5])
+mdb.models['Model-1'].sketches['__profile__'].VerticalDimension(textPoint=(
+    196.548012322266, -178.213360280273), value=160.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[10], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[5])
+mdb.models['Model-1'].sketches['__profile__'].ObliqueDimension(textPoint=(
+    87.5632711113281, -33.7168545429687), value=249.999999999999, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[11], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[10])
+mdb.models['Model-1'].sketches['__profile__'].ObliqueDimension(textPoint=(
+    -0.918028206836832, 148.498822509996), value=50.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[12], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[11])
+mdb.models['Model-1'].sketches['__profile__'].ObliqueDimension(textPoint=(
+    63.1355977714844, -204.083904713867), value=155.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[16], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[7])
+mdb.models['Model-1'].sketches['__profile__'].HorizontalDimension(textPoint=(
+    -81.5399698554688, -245.478771657227), value=20.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[17], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[16])
+mdb.models['Model-1'].sketches['__profile__'].HorizontalDimension(textPoint=(
+    -65.2960733710938, -245.411068410156), value=20.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[17], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[0])
+mdb.models['Model-1'].sketches['__profile__'].ObliqueDimension(textPoint=(
+    23.7432943046875, -245.411068410156), value=75.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[0], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[5])
+mdb.models['Model-1'].sketches['__profile__'].HorizontalDimension(textPoint=(
+    29.4266439140625, -245.411068410156), value=20.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[5], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[6])
+mdb.models['Model-1'].sketches['__profile__'].HorizontalDimension(textPoint=(
+    59.1064229667969, -246.04723784375), value=20.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[6], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[7])
+mdb.models['Model-1'].sketches['__profile__'].HorizontalDimension(textPoint=(
+    -38.7737039863281, -79.372677296875), value=15.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[1], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[2])
+mdb.models['Model-1'].sketches['__profile__'].HorizontalDimension(textPoint=(
+    14.271004265625, -78.1003384296875), value=20.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[3], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[4])
+mdb.models['Model-1'].sketches['__profile__'].VerticalDimension(textPoint=(
+    -112.657432013672, -120.087063283203), value=20.0, vertex1=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[2], vertex2=
+    mdb.models['Model-1'].sketches['__profile__'].vertices[1])
+mdb.models['Model-1'].ConstrainedSketch(name='Sketch-1', objectToCopy=
+    mdb.models['Model-1'].sketches['__profile__'])
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].Material(name='Material-1')
+mdb.models['Model-1'].materials['Material-1'].Elastic(table=((200000.0, 0.25), 
+    ))
+mdb.models['Model-1'].HomogeneousSolidSection(material='Material-1', name=
+    'Section-1', thickness=25.0)
+mdb.models['Model-1'].parts['Part-1'].Set(faces=
+    mdb.models['Model-1'].parts['Part-1'].faces.getSequenceFromMask(('[#1 ]', 
+    ), ), name='Set-1')
+mdb.models['Model-1'].parts['Part-1'].SectionAssignment(offset=0.0, 
+    offsetField='', offsetType=MIDDLE_SURFACE, region=
+    mdb.models['Model-1'].parts['Part-1'].sets['Set-1'], sectionName=
+    'Section-1', thicknessAssignment=FROM_SECTION)
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Part-1-1', 
+    part=mdb.models['Model-1'].parts['Part-1'])
+mdb.models['Model-1'].StaticStep(name='Step-1', previous='Initial')
+mdb.models['Model-1'].rootAssembly.Set(name='Set-1', vertices=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].vertices.getSequenceFromMask(
+    ('[#1000 ]', ), ))
+mdb.models['Model-1'].ConcentratedForce(cf1=700.0, createStepName='Step-1', 
+    distributionType=UNIFORM, field='', localCsys=None, name='Load-1', region=
+    mdb.models['Model-1'].rootAssembly.sets['Set-1'])
+mdb.models['Model-1'].rootAssembly.Set(name='Set-2', vertices=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].vertices.getSequenceFromMask(
+    ('[#2 ]', ), ))
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Step-1', 
+    distributionType=UNIFORM, fieldName='', fixed=OFF, localCsys=None, name=
+    'BC-1', region=mdb.models['Model-1'].rootAssembly.sets['Set-2'], u1=0.0, 
+    u2=0.0, ur3=UNSET)
+mdb.models['Model-1'].rootAssembly.Set(name='Set-3', vertices=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].vertices.getSequenceFromMask(
+    ('[#20 ]', ), ))
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Step-1', 
+    distributionType=UNIFORM, fieldName='', fixed=OFF, localCsys=None, name=
+    'BC-2', region=mdb.models['Model-1'].rootAssembly.sets['Set-3'], u1=0.0, 
+    u2=0.0, ur3=UNSET)
+mdb.models['Model-1'].parts['Part-1'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=15.0)
+mdb.models['Model-1'].parts['Part-1'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=5.0)
+mdb.models['Model-1'].parts['Part-1'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=10.0)
+mdb.models['Model-1'].parts['Part-1'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=7.5)
+mdb.models['Model-1'].parts['Part-1'].setMeshControls(elemShape=TRI, regions=
+    mdb.models['Model-1'].parts['Part-1'].faces.getSequenceFromMask(('[#1 ]', 
+    ), ))
+mdb.models['Model-1'].parts['Part-1'].generateMesh()
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
+    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='Job-1', nodalOutputPrecision=SINGLE, 
+    numCpus=1, numGPUs=0, queue=None, scratch='', type=ANALYSIS, 
+    userSubroutine='', waitHours=0, waitMinutes=0)
+mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+del mdb.jobs['Job-1']
+mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
+    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='Lab6_2', nodalOutputPrecision=SINGLE, 
+    numCpus=1, numGPUs=0, queue=None, scratch='', type=ANALYSIS, 
+    userSubroutine='', waitHours=0, waitMinutes=0)
+mdb.jobs['Lab6_2'].submit(consistencyChecking=OFF)
+mdb.jobs['Lab6_2']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'R2D2', 'handle': 0, 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'D:\\ABAQUS_Temp\\Lab6_2.odb', 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'R2D2', 'handle': 4460, 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(STATUS, {'totalTime': 0.0, 'attempts': 0, 
+    'timeIncrement': 1.0, 'increment': 0, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Lab6_2', 'severe': 0, 'iterations': 0, 'phase': STANDARD_PHASE, 
+    'equilibrium': 0})
+mdb.jobs['Lab6_2']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Lab6_2', 'memory': 24.6333236694336})
+mdb.jobs['Lab6_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Lab6_2', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Lab6_2']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(JOB_COMPLETED, {'time': 'Thu Apr 25 00:37:54 2013', 
+    'jobName': 'Lab6_2'})
+# Save by Johnason on 2013_04_25-00.42.30; build 6.12-1 2012_03_13-20.23.18 119612
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].rootAssembly.Set(elements=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].elements.getSequenceFromMask(
+    mask=('[#0 #21c #0:4 #8000 #0 #300000 ]', ), ), name='Set-4')
+mdb.jobs['Lab6_2'].submit(consistencyChecking=OFF)
+mdb.jobs['Lab6_2']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'R2D2', 'handle': 0, 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'D:\\ABAQUS_Temp\\Lab6_2.odb', 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'R2D2', 'handle': 2200, 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(STATUS, {'totalTime': 0.0, 'attempts': 0, 
+    'timeIncrement': 1.0, 'increment': 0, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Lab6_2', 'severe': 0, 'iterations': 0, 'phase': STANDARD_PHASE, 
+    'equilibrium': 0})
+mdb.jobs['Lab6_2']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Lab6_2', 'memory': 24.6333236694336})
+mdb.jobs['Lab6_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Lab6_2', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Lab6_2']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab6_2'})
+mdb.jobs['Lab6_2']._Message(JOB_COMPLETED, {'time': 'Wed May 01 18:04:33 2013', 
+    'jobName': 'Lab6_2'})
+# Save by Johnason on 2013_05_01-18.30.26; build 6.12-1 2012_03_13-20.23.18 119612
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].parts['Part-1'].Set(edges=
+    mdb.models['Model-1'].parts['Part-1'].edges.getSequenceFromMask(('[#10 ]', 
+    ), ), name='Set-2')
+mdb.models['Model-1'].parts['Part-1'].sets.changeKey(fromName='Set-2', toName=
+    'Output')
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.jobs.changeKey(fromName='Lab6_2', toName='Lab7_2')
+mdb.jobs['Lab7_2'].submit(consistencyChecking=OFF)
+mdb.jobs['Lab7_2']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'R2D2', 'handle': 0, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'D:\\ABAQUS_Temp\\Lab7_2.odb', 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'R2D2', 'handle': 3260, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STATUS, {'totalTime': 0.0, 'attempts': 0, 
+    'timeIncrement': 1.0, 'increment': 0, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Lab7_2', 'severe': 0, 'iterations': 0, 'phase': STANDARD_PHASE, 
+    'equilibrium': 0})
+mdb.jobs['Lab7_2']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Lab7_2', 'memory': 24.6333236694336})
+mdb.jobs['Lab7_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Lab7_2', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Lab7_2']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(JOB_COMPLETED, {'time': 'Wed May 01 23:49:07 2013', 
+    'jobName': 'Lab7_2'})
+# Save by Johnason on 2013_05_02-00.26.09; build 6.12-1 2012_03_13-20.23.18 119612
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].parts['Part-1'].Set(elements=
+    mdb.models['Model-1'].parts['Part-1'].elements.getSequenceFromMask(mask=(
+    '[#0 #4000021c #0:4 #8000 #0 #3e0000 #0:2', ' #1000200 #0:3 #6000 #8000 ]', 
+    ), ), name='Set-3')
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.jobs['Lab7_2'].submit(consistencyChecking=OFF)
+mdb.jobs['Lab7_2']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'Lab-PC', 'handle': 0, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\Users\\Johnason\\Dropbox\\FEM 101\\Lab 7\\Lab7_2.odb', 
+    'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'Lab-PC', 'handle': 7900, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STATUS, {'totalTime': 0.0, 'attempts': 0, 
+    'timeIncrement': 1.0, 'increment': 0, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Lab7_2', 'severe': 0, 'iterations': 0, 'phase': STANDARD_PHASE, 
+    'equilibrium': 0})
+mdb.jobs['Lab7_2']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Lab7_2', 'memory': 24.6333236694336})
+mdb.jobs['Lab7_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Lab7_2', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Lab7_2']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab7_2'})
+mdb.jobs['Lab7_2']._Message(JOB_COMPLETED, {'time': 'Fri May 03 21:04:24 2013', 
+    'jobName': 'Lab7_2'})
+# Save by Johnason on 2013_05_03-21.45.20; build 6.12-1 2012_03_13-20.23.18 119612
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].parts['Part-1'].deleteMesh()
+mdb.models['Model-1'].parts['Part-1'].setElementType(elemTypes=(ElemType(
+    elemCode=CPS4, elemLibrary=STANDARD), ElemType(elemCode=CPS3, 
+    elemLibrary=STANDARD, secondOrderAccuracy=OFF, distortionControl=DEFAULT)), 
+    regions=(mdb.models['Model-1'].parts['Part-1'].faces.getSequenceFromMask((
+    '[#1 ]', ), ), ))
+mdb.models['Model-1'].parts['Part-1'].setMeshControls(elemShape=QUAD, regions=
+    mdb.models['Model-1'].parts['Part-1'].faces.getSequenceFromMask(('[#1 ]', 
+    ), ))
+mdb.models['Model-1'].parts['Part-1'].generateMesh()
+# Save by Johnason on 2013_05_16-18.01.30; build 6.12-1 2012_03_13-20.23.18 119612
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].rootAssembly.regenerate()
+# Save by Johnason on 2013_05_16-18.01.40; build 6.12-1 2012_03_13-20.23.18 119612
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.jobs.changeKey(fromName='Lab7_2', toName='Lab9_2')
+mdb.jobs['Lab9_2'].submit(consistencyChecking=OFF)
+mdb.jobs['Lab9_2']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'Hal', 'handle': 0, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'E:\\Temp\\Lab9_2.odb', 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'Hal', 'handle': 1504, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STATUS, {'totalTime': 0.0, 'attempts': 0, 
+    'timeIncrement': 1.0, 'increment': 0, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Lab9_2', 'severe': 0, 'iterations': 0, 'phase': STANDARD_PHASE, 
+    'equilibrium': 0})
+mdb.jobs['Lab9_2']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Lab9_2', 'memory': 24.6767892837524})
+mdb.jobs['Lab9_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Lab9_2', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Lab9_2']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(JOB_COMPLETED, {'time': 'Sun May 19 22:41:20 2013', 
+    'jobName': 'Lab9_2'})
+mdb.models['Model-1'].rootAssembly.Set(elements=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].elements.getSequenceFromMask(
+    mask=('[#e0000000 #8 #0:3 #40000 #0 #1800 ]', ), ), name='Set-4')
+mdb.jobs['Lab9_2'].submit(consistencyChecking=OFF)
+mdb.jobs['Lab9_2']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'Hal', 'handle': 0, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'E:\\Temp\\Lab9_2.odb', 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'Hal', 'handle': 5604, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STATUS, {'totalTime': 0.0, 'attempts': 0, 
+    'timeIncrement': 1.0, 'increment': 0, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Lab9_2', 'severe': 0, 'iterations': 0, 'phase': STANDARD_PHASE, 
+    'equilibrium': 0})
+mdb.jobs['Lab9_2']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Lab9_2', 'memory': 24.6767892837524})
+mdb.jobs['Lab9_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Lab9_2', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Lab9_2']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(JOB_COMPLETED, {'time': 'Sun May 19 22:46:02 2013', 
+    'jobName': 'Lab9_2'})
+del mdb.models['Model-1'].rootAssembly.sets['Set-4']
+mdb.models['Model-1'].rootAssembly.Set(name='Set-4', nodes=
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].nodes.getSequenceFromMask(
+    mask=('[#1e00 #0:4 #3c0 ]', ), ))
+mdb.jobs['Lab9_2'].submit(consistencyChecking=OFF)
+mdb.jobs['Lab9_2']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'Hal', 'handle': 0, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'E:\\Temp\\Lab9_2.odb', 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'Hal', 'handle': 2404, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STATUS, {'totalTime': 0.0, 'attempts': 0, 
+    'timeIncrement': 1.0, 'increment': 0, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Lab9_2', 'severe': 0, 'iterations': 0, 'phase': STANDARD_PHASE, 
+    'equilibrium': 0})
+mdb.jobs['Lab9_2']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Lab9_2', 'memory': 24.6767892837524})
+mdb.jobs['Lab9_2']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Lab9_2', 'severe': 0, 'iterations': 1, 'phase': STANDARD_PHASE, 
+    'equilibrium': 1})
+mdb.jobs['Lab9_2']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Lab9_2'})
+mdb.jobs['Lab9_2']._Message(JOB_COMPLETED, {'time': 'Sun May 19 22:49:08 2013', 
+    'jobName': 'Lab9_2'})
+# Save by Manuel on 2013_05_19-23.10.46; build 6.12-3 2012_10_04-20.39.07 120045

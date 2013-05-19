@@ -1,4 +1,4 @@
-function [x, w] = GaussLegendre_2(n)
+function [x, w] = GaussLegendre(n)
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %
 % This function determines the abscisas (x) and weights (w)  for the        %
@@ -36,7 +36,7 @@ CM  = diag(a,1) + diag(a,-1);
     % - the weights can be derived from the corresponding eigenvectors.
 [V L]   = eig(CM);
 [x ind] = sort(diag(L));
-V       = V(:,ind)';
-w       = 2 * V(:,1).^2;
+% V = V'
+w       = 2 * (V(1,:).^2)';
 
 % Compute Legendre Vandermonde

@@ -1,5 +1,5 @@
 %% DDOM test
-% This subroutine was abuilt to test a dynamic integration method
+% This subroutine was built to test a dynamic integration method
 clear all; clc; close all;
 
 %% Choose Statistic:

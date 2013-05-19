@@ -1,4 +1,8 @@
 % TEST
+clear
+%load('PDF'); load('PDF_eq'); load('v_DOM');
+load('veq'); load('feq');
+
 %% Inputs
 y = log(f); x = v;
 [nv,nx] = size(f);
@@ -21,19 +25,17 @@ y2 = zeros(nv,nx); for i=1:nx; y2(:,i) = polyval(b(:,i),x(:,i)); end;
 subplot(2,2,1); surf(y);
 subplot(2,2,2); surf(y2);
 subplot(2,2,3); surf(exp(y));
-%subplot(2,2,4); surf(exp(y2));
-%figure; surf(abs(y-y2));
 
 %% Recover information from interpolation
 A2 = a(3); A1 = a(2); A0 = a(1);
 sigma = sqrt(-1./(2*a(3,:)));
 mu = a(2,:).*sigma.^2;
-A = exp(a(1,:)+mu.^2./(2*sigma.^2));
+A = exp(a(1,:)+ mu.^2./(2*sigma.^2));
 
 % Apply DOM
 [sigma,mu,A] = apply_DOM(sigma,mu,A,60);
 
 %% Test proposal
 f_next = A.*exp(-(x-mu).^2./(2*sigma.^2));
-subplot(2,2,4); surf(exp(f_next));
-%figure; surf(abs(f-f_next)) %compare output with original input
+subplot(2,2,4); surf(f_next);
+figure; surf(abs(f-f_next)) %compare output with original input
