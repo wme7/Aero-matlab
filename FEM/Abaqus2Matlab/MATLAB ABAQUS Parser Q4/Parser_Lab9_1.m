@@ -204,32 +204,51 @@ for e=1:length(outputEdge)
     average_VM(e) = sum(sigmaVM)/length(sigmaVM);
 end
 
+%% Load Abaqus results
+Sxx_abaqus = importdata('Lab9_1_S11.rpt');
+Sxy_abaqus = importdata('Lab9_1_S12.rpt');
+Syy_abaqus = importdata('Lab9_1_S22.rpt');
+VM_abaqus  = importdata('Lab9_1_VM.rpt');
+
+
 %% Plot Result,
 figure(2)
 subplot(2,2,1)
-x = 0.5:0.25:1;
-plot(x,Syy,'*k')
+y = 0.5:0.25:1;
+plot(y,Syy,'*k')
+hold on
+plot(y,Syy_abaqus.data(:,2),'-b')
+hold off
 title('Stress distribution');
 xlabel('y (mm)');
 ylabel('\sigma_{yy} (MPa)');
 
 subplot(2,2,2)
-x = 0.5:0.25:1;
-plot(x,Sxy,'*k')
+y = 0.5:0.25:1;
+plot(y,Sxy,'*k')
 title('Stress distribution');
+hold on
+plot(y,Sxy_abaqus.data(:,2),'-b')
+hold off
 xlabel('y (mm)');
 ylabel('\sigma_{xy} (MPa)');
 
 subplot(2,2,3)
-x = 0.5:0.25:1;
-plot(x,Sxx,'*k')
+y = 0.5:0.25:1;
+plot(y,Sxx,'*k')
 title('Stress distribution');
+hold on
+plot(y,Sxx_abaqus.data(:,2),'-b')
+hold off
 xlabel('y (mm)');
 ylabel('\sigma_{xx} (MPa)');
 
 subplot(2,2,4)
-x = 0.5:0.25:1;
-plot(x,average_VM,'*k')
+y = 0.5:0.25:1;
+plot(y,average_VM,'*k')
 title('Stress distribution');
+hold on
+plot(y,VM_abaqus.data(:,2),'-b')
+hold off
 xlabel('y (mm)');
 ylabel('\sigma_Mises (MPa)');

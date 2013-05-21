@@ -233,6 +233,10 @@ end
 %     average_VM(e) = sum(sigmaVM)/length(sigmaVM);
 % end
 
+%% Load Abaqus results
+Sxx_abaqus = importdata('Lab9_2_S11.rpt');
+Uy_abaqus = importdata('Lab9_2_U2.rpt');
+
 %% Plot Result,
 y = nodeCoordinates(outputEdge,2);
 disp_set = displacements(2*outputEdge);
@@ -240,12 +244,18 @@ disp_set = displacements(2*outputEdge);
 figure(2)
 subplot(1,2,1)
 plot(y,disp_set,'*k');
+hold on
+plot(Uy_abaqus.data(:,1)+25,Uy_abaqus.data(:,2),'-b')
+hold off
 title('Displacement distribution');
 xlabel('y (mm)');
 ylabel('U_{y} (mm)');
 
 subplot(1,2,2)
 plot(y,Sxx,'*k')
+hold on
+plot(Sxx_abaqus.data(:,1)+25,Sxx_abaqus.data(:,2),'-b')
+hold off
 title('Stress distribution');
 xlabel('y (mm)');
 ylabel('\sigma_{xx} (MPa)');

@@ -1,0 +1,136 @@
+# -*- coding: mbcs -*-
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=200.0)
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.0, 0.0), point2=(
+    2.0, 0.5))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(2.0, 0.5), point2=(
+    2.0, 1.0))
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[3])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(2.0, 1.0), point2=(
+    0.0, 1.0))
+mdb.models['Model-1'].sketches['__profile__'].HorizontalConstraint(
+    addUndoState=False, entity=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[4])
+mdb.models['Model-1'].sketches['__profile__'].PerpendicularConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[3], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[4])
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.0, 1.0), point2=(
+    0.0, 0.0))
+mdb.models['Model-1'].sketches['__profile__'].VerticalConstraint(addUndoState=
+    False, entity=mdb.models['Model-1'].sketches['__profile__'].geometry[5])
+mdb.models['Model-1'].sketches['__profile__'].PerpendicularConstraint(
+    addUndoState=False, entity1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[4], entity2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[5])
+mdb.models['Model-1'].Part(dimensionality=TWO_D_PLANAR, name=
+    'Trapezoidal_plate', type=DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['Trapezoidal_plate'].BaseShell(sketch=
+    mdb.models['Model-1'].sketches['__profile__'])
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].Material(name='Elastic')
+mdb.models['Model-1'].materials['Elastic'].Conductivity(table=((0.0, ), ))
+mdb.models['Model-1'].materials['Elastic'].Elastic(table=((30000000.0, 0.3), ))
+mdb.models['Model-1'].HomogeneousSolidSection(material='Elastic', name=
+    'Section-1', thickness=1.0)
+mdb.models['Model-1'].parts['Trapezoidal_plate'].Set(faces=
+    mdb.models['Model-1'].parts['Trapezoidal_plate'].faces.getSequenceFromMask(
+    ('[#1 ]', ), ), name='Set-1')
+mdb.models['Model-1'].parts['Trapezoidal_plate'].SectionAssignment(offset=0.0, 
+    offsetField='', offsetType=MIDDLE_SURFACE, region=
+    mdb.models['Model-1'].parts['Trapezoidal_plate'].sets['Set-1'], 
+    sectionName='Section-1', thicknessAssignment=FROM_SECTION)
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name=
+    'Trapezoidal_plate-1', part=
+    mdb.models['Model-1'].parts['Trapezoidal_plate'])
+mdb.models['Model-1'].StaticStep(description='My Load', name='Step-1', 
+    previous='Initial')
+mdb.models['Model-1'].rootAssembly.Set(edges=
+    mdb.models['Model-1'].rootAssembly.instances['Trapezoidal_plate-1'].edges.getSequenceFromMask(
+    ('[#1 ]', ), ), name='Set-1')
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Step-1', 
+    distributionType=UNIFORM, fieldName='', fixed=OFF, localCsys=None, name=
+    'BC-1', region=mdb.models['Model-1'].rootAssembly.sets['Set-1'], u1=0.0, 
+    u2=0.0, ur3=UNSET)
+mdb.models['Model-1'].rootAssembly.Surface(name='Surf-1', side1Edges=
+    mdb.models['Model-1'].rootAssembly.instances['Trapezoidal_plate-1'].edges.getSequenceFromMask(
+    ('[#8 ]', ), ))
+mdb.models['Model-1'].Pressure(amplitude=UNSET, createStepName='Step-1', 
+    distributionType=UNIFORM, field='', magnitude=20.0, name='Pressure', 
+    region=mdb.models['Model-1'].rootAssembly.surfaces['Surf-1'])
+mdb.models['Model-1'].parts['Trapezoidal_plate'].setElementType(elemTypes=(
+    ElemType(elemCode=CPS4, elemLibrary=STANDARD), ElemType(elemCode=CPS3, 
+    elemLibrary=STANDARD)), regions=(
+    mdb.models['Model-1'].parts['Trapezoidal_plate'].faces.getSequenceFromMask(
+    ('[#1 ]', ), ), ))
+mdb.models['Model-1'].parts['Trapezoidal_plate'].setElementType(elemTypes=(
+    ElemType(elemCode=CPS4, elemLibrary=STANDARD), ElemType(elemCode=CPS3, 
+    elemLibrary=STANDARD)), regions=(
+    mdb.models['Model-1'].parts['Trapezoidal_plate'].faces.getSequenceFromMask(
+    ('[#1 ]', ), ), ))
+mdb.models['Model-1'].parts['Trapezoidal_plate'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=1.0)
+mdb.models['Model-1'].parts['Trapezoidal_plate'].seedEdgeBySize(constraint=
+    FINER, deviationFactor=0.1, edges=
+    mdb.models['Model-1'].parts['Trapezoidal_plate'].edges.getSequenceFromMask(
+    ('[#1 ]', ), ), minSizeFactor=0.1, size=0.5)
+mdb.models['Model-1'].parts['Trapezoidal_plate'].seedEdgeBySize(constraint=
+    FINER, deviationFactor=0.1, edges=
+    mdb.models['Model-1'].parts['Trapezoidal_plate'].edges.getSequenceFromMask(
+    ('[#4 ]', ), ), minSizeFactor=0.1, size=0.25)
+mdb.models['Model-1'].parts['Trapezoidal_plate'].generateMesh()
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.Job(atTime=None, contactPrint=OFF, description='4Q Elements', echoPrint=OFF
+    , explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='Trapezoidal', nodalOutputPrecision=
+    SINGLE, numCpus=1, numGPUs=0, queue=None, scratch='', type=ANALYSIS, 
+    userSubroutine='', waitHours=0, waitMinutes=0)
+mdb.jobs['Trapezoidal'].submit(consistencyChecking=OFF)
+mdb.jobs['Trapezoidal']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'Hal', 'handle': 0, 'jobName': 'Trapezoidal'})
+mdb.jobs['Trapezoidal']._Message(HEADING, {'phase': BATCHPRE_PHASE, 
+    'heading': '4Q Elements', 'jobName': 'Trapezoidal'})
+mdb.jobs['Trapezoidal']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'E:\\Temp\\Trapezoidal.odb', 'jobName': 'Trapezoidal'})
+mdb.jobs['Trapezoidal']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Trapezoidal'})
+mdb.jobs['Trapezoidal']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'Hal', 'handle': 3212, 'jobName': 'Trapezoidal'})
+mdb.jobs['Trapezoidal']._Message(STEP, {'stepName': 'My Load', 
+    'phase': STANDARD_PHASE, 'stepId': 1, 'jobName': 'Trapezoidal'})
+mdb.jobs['Trapezoidal']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 
+    'step': 0, 'frame': 0, 'jobName': 'Trapezoidal'})
+mdb.jobs['Trapezoidal']._Message(STATUS, {'totalTime': 0.0, 'attempts': 0, 
+    'timeIncrement': 1.0, 'increment': 0, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Trapezoidal', 'severe': 0, 'iterations': 0, 
+    'phase': STANDARD_PHASE, 'equilibrium': 0})
+mdb.jobs['Trapezoidal']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Trapezoidal', 'memory': 23.675500869751})
+mdb.jobs['Trapezoidal']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 
+    'step': 0, 'frame': 1, 'jobName': 'Trapezoidal'})
+mdb.jobs['Trapezoidal']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Trapezoidal', 'severe': 0, 'iterations': 1, 
+    'phase': STANDARD_PHASE, 'equilibrium': 1})
+mdb.jobs['Trapezoidal']._Message(END_STEP, {'phase': STANDARD_PHASE, 
+    'stepId': 1, 'jobName': 'Trapezoidal'})
+mdb.jobs['Trapezoidal']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Trapezoidal'})
+mdb.jobs['Trapezoidal']._Message(JOB_COMPLETED, {
+    'time': 'Mon May 20 16:48:52 2013', 'jobName': 'Trapezoidal'})
+# Save by Manuel on 2013_05_20-17.01.23; build 6.12-3 2012_10_04-20.39.07 120045
