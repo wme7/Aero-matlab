@@ -1,29 +1,26 @@
-function [weights,location] = gauss1d(option)
+function [weights,location] = GaussQuad1d(ngp)
 % Guass weights and abscissas.
 % Taken from http://en.wikipedia.org/wiki/Gaussian_quadrature
 
 % Data Table
-switch option
-    case '1x1'
-        location = [0 0];
-        weights = [4];
-    case '2x2'
-        location = [-sqrt(3)/3,-sqrt(3)/3;
-                     sqrt(3)/3,-sqrt(3)/3;
-                     sqrt(3)/3, sqrt(3)/3;
-                    -sqrt(3)/3, sqrt(3)/3];
-        weights = [1;1;1;1]';
-    case '3x3'
+switch ngp
+    case{1} % ngp =1
+        location = 0;
+        weights = 2;
+    case{2} % ngp =2
+        location = [-sqrt(3)/3,sqrt(3)/3]';
+        weights = [1,1]';
+    case{3} % ngp =3
         location = [-sqrt(3/5),0,sqrt(3/5)]';
         weights = [5/9,8/9,5/9]';
-    case '4x4'
+    case{4} % ngp =4
         x1 = sqrt((3-2*sqrt(6/5))/7);
         x2 = sqrt((3+2*sqrt(6/5))/7);
         location = [-x1,-x2,x2,x1]';
         w1 = (18+sqrt(30))/36;
         w2 = (18-sqrt(30))/36;
         weights = [w1,w2,w2,w1]';
-    case '5x5'
+    case{5} % ngp =5
         x1 = (1/3)*sqrt(5-2*sqrt(10/7));
         x2 = (1/3)*sqrt(5+2*sqrt(10/7));
         x3 = 0;

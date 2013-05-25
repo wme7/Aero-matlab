@@ -4,60 +4,7 @@
 
 %%clear memory
 close all; clc; clear all;
-%% This function to search key word of ABAQUS inp file and returns the line number
-% fnFindLineWithText = @(arr,txt) ...
-%     find(cellfun(@(x) ~isempty(regexp(x,txt, 'once')), arr), 1);
-% %% Open file with user interface
-% [filename,filepath]=uigetfile('*.inp','Select Input file');
-% file = [filepath filename];
-% fileID = fopen(file,'r');
-% if fileID == -1
-%     disp('Error opening the file')
-% end
-% 
-% %% Import all lines into a cell
-% lines = {};
-% while ~feof(fileID)
-%     line = fgetl(fileID);
-%     lines{end+1} = line;
-% end
-% 
-% fclose(fileID);
-% 
-% %% this part to locate key word
-% NodeIdx = fnFindLineWithText(lines, '*Node');
-% ElemIdx = fnFindLineWithText(lines, '*Element');
-% EndIdx = fnFindLineWithText(lines, '*Nset, nset=Set-1, generate');
-% EBCIdx = fnFindLineWithText(lines, ...
-%     '*Nset, nset=Set-1, instance=Part-1-1, generate');
-% MaterialIdx = fnFindLineWithText(lines,'*Elastic');
-% SectionIdx = fnFindLineWithText(lines,'*Solid Section');
-% PressureIdx = fnFindLineWithText(lines,'*Dsload');
-% OutputIdx = fnFindLineWithText(lines,'*Nset, nset=output, generate');
-% SelectIdx = fnFindLineWithText(lines,'*Elset, elset=output');
-% 
-% %% Import 
-% numNodePerElement=4;
-% Node=cellfun(@cellstr,lines(NodeIdx+1:ElemIdx-1));
-% Element=cellfun(@cellstr,lines(ElemIdx+1:EndIdx-1));
-% selectOpt=str2num(lines{SelectIdx+1});
-% 
-% numberNodes=length(Node);
-% numberElements=length(Element);
-% nodeCoordinates=zeros(numberNodes,2);
-% elementNodes=zeros(numberElements,numNodePerElement);
-% %% Import nodes and elements
-% for i=1:numberNodes
-%     temp=str2num(Node{i});
-%     nodeCoordinates(i,:)=temp(2:end);
-% end
-% 
-% for i=1:numberElements
-%     temp=str2num(Element{i});
-%     elementNodes(i,:)=temp(2:end);
-% end
-% 
-% drawingMesh(nodeCoordinates,elementNodes,'Q4','b-o');
+
 %% Load Mesh for Lab 10
 [nodeCoordinates,elementNodes]=Mesh_Lab10('Q4');
 % node coordinates are given in mm
@@ -66,25 +13,6 @@ numberNodes=size(nodeCoordinates,1);
 numberElements=size(elementNodes,1);
 
 %% Import BCs
-% naturalBCs=[];
-% surfaceOrientation=[];
-% 
-% for i=1:numNodePerElement
-%     LoadIdx = fnFindLineWithText(lines,...
-%         ['**Elset, elset=_Surf-1_S',num2str(i)]);
-%     if ~isempty(LoadIdx)
-%         naturalBCs=[naturalBCs;str2num(lines{LoadIdx+1})];
-%         surfaceOrientation=[surfaceOrientation;i];
-%     end
-% end
-% 
-% generateBC=str2num(lines{EBCIdx+1});
-% EBC=generateBC(1):generateBC(3):generateBC(2);
-% outTemp_1=str2num(lines{OutputIdx+1});
-% outputEdge=outTemp_1(1):outTemp_1(3):outTemp_1(2);
-% GDof=2*numberNodes;
-% prescribedDof=sort([2.*EBC-1 2.*EBC]);
-% P=[0 -20];%[Px Py]
 
 % Essential BC's
 GDof = 2*numberNodes;
@@ -95,23 +23,19 @@ force = zeros(GDof,1);
 force(end) = -10; % 10 [kN]
 
 %% Import material and section properties
-% Mat=str2num(lines{MaterialIdx+1});
-% thickness=str2num(lines{SectionIdx+1});
-% %DLoad=cell2str(lines{PressureIdx+1});
-% 
-% E=Mat(1);poisson=Mat(2);
-
 E = 3E7; % [GPa]
 poisson = 0.3; %[-]
 thickness = 1; % [mm]
+
 %% Evalute force vector
 %force=formForceVectorQ4(GDof,naturalBCs,surfaceOrientation,...
 %    elementNodes,nodeCoordinates,thickness);
+
 %% Construct Stiffness matrix for T3 element
-C=E/(1-poisson^2)*[1 poisson 0;poisson 1 0;0 0 (1-poisson)/2];
+D=E/(1-poisson^2)*[1 poisson 0;poisson 1 0;0 0 (1-poisson)/2];
 
 stiffness=formStiffness2D(GDof,numberElements,...
-    elementNodes,numberNodes,nodeCoordinates,C,thickness);
+    elementNodes,numberNodes,nodeCoordinates,D,thickness);
 
 %% solution
 displacements=solution(GDof,prescribedDof,stiffness,force);
@@ -121,3 +45,63 @@ outputDisplacements(displacements, numberNodes, GDof);
 scaleFactor=1.E5;
 drawingMesh(nodeCoordinates+scaleFactor*[displacements(1:2:2*numberNodes) ...
     displacements(2:2:2*numberNodes)],elementNodes,'Q4','r--');
+
+%% B matrix & strain
+% 2 by 2 quadrature
+[gaussWeights,gaussLocations]=gauss2d('2x2');
+
+for e=1:numberElements                           
+  numNodePerElement = length(elementNodes(e,:));
+  numEDOF = 2*numNodePerElement;
+  elementDof=zeros(1,numEDOF);
+  for i = 1:numNodePerElement
+      elementDof(2*i-1)=2*elementNodes(e,i)-1;
+      elementDof(2*i)=2*elementNodes(e,i);   
+  end
+  
+  % cycle for Gauss point
+  for q=1:size(gaussWeights,1)    
+      GaussPoint=gaussLocations(q,:);
+      xi=GaussPoint(1);
+      eta=GaussPoint(2);
+    
+% shape functions and derivatives
+    [shapeFunction,naturalDerivatives]=shapeFunctionQ4(xi,eta);
+
+% Jacobian matrix, inverse of Jacobian, 
+% derivatives w.r.t. x,y    
+    [Jacob,invJacobian,XYderivatives]=...
+        Jacobian(nodeCoordinates(elementNodes(e,:),:),naturalDerivatives);
+    
+%  B matrix
+    B=zeros(3,numEDOF);
+    B(1,1:2:numEDOF)       = XYderivatives(:,1)';        
+    B(2,2:2:numEDOF)  = XYderivatives(:,2)';
+    B(3,1:2:numEDOF)       = XYderivatives(:,2)';
+    B(3,2:2:numEDOF)  = XYderivatives(:,1)';
+   
+  elementNodes(e,:);
+  dis(1:2:8)=displacements([2*(elementNodes(e,:))-1],1);
+  dis(2:2:8)=displacements([2*(elementNodes(e,:))],1);
+  strain=B*dis';
+  stress(:,q)=D*strain;
+
+  end  
+  for q=1:size(gaussWeights,1)   
+      GaussPoint=gaussLocations(q,:);
+      xi=1/GaussPoint(1);
+      eta=1/GaussPoint(2);
+      [shapeFunction,naturalDerivatives]=shapeFunctionQ4(xi,eta);
+      realstressxx(e,q)=stress(1,1:4)*shapeFunction;
+      realstressyy(e,q)=stress(2,1:4)*shapeFunction;
+      realstressxy(e,q)=stress(3,1:4)*shapeFunction;
+      vonmises(e,q)=sqrt(0.5*((realstressxx(e,q)-realstressyy(e,q))^2+(realstressyy(e,q))^2+(realstressxx(e,q))^2+6*(realstressxy(e,q))^2));
+      fprintf('\nStress in element %u\n',e)
+      fprintf('\nStress in node %u\n',q)
+      fprintf('Sigma_xx : %0.6f\n',realstressxx(e,q))
+      fprintf('Sigma_yy : %0.6f\n',realstressyy(e,q))
+      fprintf('Sigma_xy : %0.6f\n',realstressxy(e,q))
+      fprintf('Vonmises : %0.6f\n',vonmises(e,q)) 
+  end
+    
+end  

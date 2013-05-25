@@ -8,8 +8,8 @@ function stiffness=formStiffness2D(GDof,numberElements,...
 
 stiffness=zeros(GDof);
 
-% 3 by 3 quadrature
-[gaussWeights,gaussLocations]=gauss2d('3x3');
+% 4 by 4 quadrature
+[gaussWeights,gaussLocations]=gauss2d('4x4');
 
 for e=1:numberElements                           
   numNodePerElement = length(elementNodes(e,:));
@@ -27,7 +27,7 @@ for e=1:numberElements
     eta=GaussPoint(2);
     
 % shape functions and derivatives
-    [shapeFunction,naturalDerivatives]=shapeFunctionQ8(xi,eta);
+    [shapeFunction,naturalDerivatives]=shapeFunctionQ12(xi,eta);
 
 % Jacobian matrix, inverse of Jacobian, 
 % derivatives w.r.t. x,y    

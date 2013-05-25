@@ -6,9 +6,9 @@
 close all; clc; clear all;
 
 %% Load Mesh for Lab 10
-[nodeCoordinates,elementNodes]=Mesh_Lab10('Q8');
+[nodeCoordinates,elementNodes]=Mesh_Lab10('Q12');
 % node coordinates are given in mm
-NodePerElement=8;
+NodePerElement=12;
 numberNodes=size(nodeCoordinates,1);
 numberElements=size(elementNodes,1);
 
@@ -16,7 +16,7 @@ numberElements=size(elementNodes,1);
 
 % Essential BC's
 GDof = 2*numberNodes;
-prescribedDof = [1,2,3,4,5,6];
+prescribedDof = [1,2,3,4,5,6,7,8];
 
 % Natural BC's
 force = zeros(GDof,1);
@@ -31,7 +31,7 @@ thickness = 1; % [mm]
 %force=formForceVectorQ4(GDof,naturalBCs,surfaceOrientation,...
 %    elementNodes,nodeCoordinates,thickness);
 
-%% Construct Stiffness matrix for Q8 element
+%% Construct Stiffness matrix for Q12 element
 D=E/(1-poisson^2)*[1 poisson 0;poisson 1 0;0 0 (1-poisson)/2];
 
 stiffness=formStiffness2D(GDof,numberElements,...
@@ -48,7 +48,7 @@ drawingMesh(nodeCoordinates+scaleFactor*[displacements(1:2:2*numberNodes) ...
 
 %% B matrix & strain
 % 3 by 3 quadrature
-[gaussWeights,gaussLocations]=gauss2d('3x3');
+[gaussWeights,gaussLocations]=gauss2d('4x4');
 
 for e=1:numberElements                           
   numNodePerElement = length(elementNodes(e,:));
@@ -66,7 +66,7 @@ for e=1:numberElements
       eta=GaussPoint(2);
     
 % shape functions and derivatives
-    [shapeFunction,naturalDerivatives]=shapeFunctionQ8(xi,eta);
+    [shapeFunction,naturalDerivatives]=shapeFunctionQ12(xi,eta);
 
 % Jacobian matrix, inverse of Jacobian, 
 % derivatives w.r.t. x,y    
@@ -81,8 +81,8 @@ for e=1:numberElements
     B(3,2:2:numEDOF)  = XYderivatives(:,1)';
    
   elementNodes(e,:);
-  dis(1:2:16)=displacements([2*(elementNodes(e,:))-1],1);
-  dis(2:2:16)=displacements([2*(elementNodes(e,:))],1);
+  dis(1:2:28)=displacements([2*(elementNodes(e,:))-1],1);
+  dis(2:2:28)=displacements([2*(elementNodes(e,:))],1);
   strain=B*dis';
   stress(:,q)=D*strain;
 
@@ -91,7 +91,7 @@ for e=1:numberElements
       GaussPoint=gaussLocations(q,:);
       xi=1/GaussPoint(1);
       eta=1/GaussPoint(2);
-      [shapeFunction,naturalDerivatives]=shapeFunctionQ8(xi,eta);
+      [shapeFunction,naturalDerivatives]=shapeFunctionQ12(xi,eta);
       realstressxx(e,q)=stress(1,1:8)*shapeFunction;
       realstressyy(e,q)=stress(2,1:8)*shapeFunction;
       realstressxy(e,q)=stress(3,1:8)*shapeFunction;
