@@ -42,7 +42,7 @@ displacements=solution(GDof,prescribedDof,stiffness,force);
 
 %% output displacements
 outputDisplacements(displacements, numberNodes, GDof);
-scaleFactor=1.E6;
+scaleFactor=1.E5;
 drawingMesh(nodeCoordinates+scaleFactor*[displacements(1:2:2*numberNodes) ...
     displacements(2:2:2*numberNodes)],elementNodes,'T3','r--');
 

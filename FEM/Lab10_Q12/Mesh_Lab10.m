@@ -42,12 +42,11 @@ switch name
                             20+20/3 0;20+20/3 10;
                            30 0;30 10/3;30 20/3;30 10];
         elementNodes =  [1 9 12 4 5 7 10 11 8 6 3 2;
-                         9 17 20 12 13 15 18 19 15 14 11 10;
+                         9 17 20 12 13 15 18 19 16 14 11 10;
                          17 25 28 20 21 23 26 27 24 22 19 18];
         %drawingMesh(nodeCoordinates,elementNodes,'Q12','b-o');
         scatter(nodeCoordinates(:,1),nodeCoordinates(:,2))
         
     otherwise
         error('wrong case');
-        
 end
