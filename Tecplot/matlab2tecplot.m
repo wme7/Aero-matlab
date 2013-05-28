@@ -15,12 +15,12 @@ file = fopen('data1.tec','w');
 % h1 gets the handel for the file "mesh1.tec".
 % 'w' specifies that it will be written.
 % similarly 'r' is for reading and 'a' for appending.
-
 fprintf(file, 'TITLE = "Z = sin(YX)"\n');
 fprintf(file, 'VARIABLES = "X" "Y" "Z"\n');
-fprintf(file, 'ZONE T = "Time1"\n');
-fprintf(file, 'I = %d, J = %d, K = 1, F = POINT\n\n', nx,ny);
 
+
+fprintf(file, 'ZONE T = "%1.4f"\n',a);
+fprintf(file, 'I = %d, J = %d, K = 1, F = POINT\n\n', nx,ny);
 for j = 1:ny
     for i = 1:nx
         %fprintf(file, '%f\t%f\t%f\n', x(i),y(j),Z(j,i));

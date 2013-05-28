@@ -15,7 +15,7 @@
 clear all;  close all; %clc;
 
 %% Simulation Parameters
-CFL         = 2.5/100;  % CFL condition <- can be made part of IC's
+CFL         = 10/100;   % CFL condition <- can be made part of IC's
 f_case      = 1;        % {1}Relaxation Model, {2}Euler limit
 r_time      = 1/10000;  % Relaxation time
 %tEnd       = 0.20;     % End time <- part of IC's
@@ -24,10 +24,10 @@ quad        = 3;        % {1} DOM-200NC, {2} DOM-80GH, {3} DDOM-3GH
 method      = 1;        % for {1} Upwind
 fmodel      = 1;        % UU model for f^Eq <- fixed for the moment
 IC_case     = 7;        % % IC: {1}~{15}. See Euler_IC1d.m
-plot_figs   = 0;        % 0: no, 1: yes please!
+plot_figs   = 1;        % 0: no, 1: yes please!
 
 %% Space Discretization
-nx  = 200;                      % Desided number of points in our domain
+nx  = 100;                      % Desided number of points in our domain
 x   = linspace(0,1,nx);         % Physical domain -x
 dx  = max(x(2:end)-x(1:end-1)); % delta x
 
@@ -49,23 +49,18 @@ switch quad
     J = ones(size(v)); % Jacobian = 1;
     
     case{2} % Gauss Hermite Quadrature for D.O.M.
-    nv = 80;        % nodes desired (the actual value)
+    nv = 80;        % number of nodes selected (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;          % quadrature constant.
-    w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature
+    w = w.*exp(v.^2);   % weighting function for fixed GH quadrature
     v = repmat(v,1,nx);     w = repmat(w,1,nx);
-    J = ones(size(v)); % Jacobian = 1;
+    J = ones(size(v));  % Jacobian = 1;
     
     case{3} % Gauss Hermite Quadrature for Dynamic-D.O.M.
-    nv = 3;         % nodes required = 3 (the actual value)
-    [c_star,w] = GaussHermite(nv); % for integrating range: -inf to inf
+    nv = 15;         % number of nodes selected (the actual value)
+    [v,ws] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;          % quadrature constant.
-    w = w.*exp(c_star.^2); % weighting function of the Gauss-Hermite quadrature
-    a = sqrt(t0);   % transformation factor
-    J = a;       % Jacobian for every point in x domain, 'J(x)'.
-    v = c_star*a + ones(nv,1)*u0;  % transformation: v = a*(C*) + ux
-    w = repmat(w,1,nx);
-    c_star = repmat(c_star,1,nx);  J = repmat(J,nv,1);
+    v = repmat(v,1,nx);     ws = repmat(ws,1,nx);
         
     otherwise
         error('Order must be between 1, 2 and 3');
@@ -76,10 +71,20 @@ end
 [p,~,~] = apply_DOM(p0,rho0,E0,nv); % Classical IC
 
 %% Initial Equilibrium Distribution 'f0'
-% Semiclassical Equilibrium distribuition function:
-    f0 = 1./(exp( (v-ux).^2 ./ t)./z + theta);
+% Semiclassical Equilibrium distribuition function,
+f0 = 1./(exp( (v-ux).^2 ./ t)./z + theta);
 
-        % Plot IC of Distribution function, f, in Phase-Space:
+% Compute new v and J values if DDOM is used
+if quad == 3 % if DDOM, update a, J and v.
+    % Define dynamic reference,
+    a = sqrt(t); v_star = (v-ux)./a;
+    % function weights for Dynamic GH quadrature,
+    w = ws.*exp(v_star.^2);
+    % Jacobian for 1D case,
+    J = sqrt(t);
+end
+    
+% Plot IC of Distribution function, f, in Phase-Space:
 if plot_figs == 1 %&& (quad == 1 || quad == 2)
    figure(1)
    surf(f0); grid on;
@@ -89,10 +94,10 @@ if plot_figs == 1 %&& (quad == 1 || quad == 2)
 end
 
 % Compute Initial Macroscopic Momemts:
-n   = k*sum(J.*w .* f0);  % Density [n]
-nux = k*sum(J.*v .* w .* f0);  % Macrospic moment [n*ux]
-nE  = 0.5*k*sum(J.*( v.^2 ).* w .* f0);  % Energy Density [n*E]
-ne  = 0.5*k*sum(J.*( (v-ux).^2 ).* w .* f0);  % Internal energy [n*e]
+n   = k*sum(J.* w .* f0);  % Density [n]
+nux = k*sum(J.^2.* (v_star+ux) .* w .* f0);  % Macrospic moment [n*ux]
+ne  = 0.5*k*sum(J.^3 .*( (J.*v_star+ux).^2 ).* w .* f0);  % Energy Density [n*E]
+nE  = 0.5*k*sum(J.^3 .*( (v-ux./J).^2 ).* w .* f0);  % Internal energy [n*e]
 
 % Initial macroscopic properties need to draw figure
 E = nE;
@@ -110,7 +115,7 @@ switch method
         % Main loop
         while time < tEnd
             % Update time step
-            dt = dx*CFL/max(max(abs(v)));
+            dt = dx*CFL/max(max(abs(v))); % however v_max is always known
             time = time + dt;
             dtdx = dt/dx;
             
@@ -124,7 +129,7 @@ switch method
             zlabel('f - Probability');
             end
             if plot_figs == 1 
-            %% Plot Macroscopic variables
+            % Plot Macroscopic variables
             figure(2) %range = ([0,1,0,1.4])
             subplot(2,3,1); plot(x,rho(1,:),'.'); axis auto; title('Density')
             subplot(2,3,2); plot(x,ux(1,:),'.'); axis auto; title('velocity in x')
@@ -136,9 +141,6 @@ switch method
             
             % Compute equilibrium distribution for the current t_step
             f_eq = 1./(exp( (v-ux).^2 ./ t)./z + theta);
-            
-            % Compute Distribution slope values @ c_star points
-            dudc = GaussSlope(c_star,f);
             
             % initialize variables
             u_eq = zeros(1,nx);
@@ -156,21 +158,11 @@ switch method
                         u(:) = f_eq(i,:);
                 end
                 
-                b = sqrt(t(i,:)); 
-                c = v(i,:);
-                
-                if time == dt; c_old = v; end
-                
                 % Compute Upwind Fluxes
                 [F_left,F_right] = Upwindflux1d(u,v(i,:));
-                
-                % Compute Material Derivates Correction values
-                DcDt = MatDev(c,c_old(i,:),v(i,:),dtdx);
              
                 % Compute next time step
-                 u_next = u - dtdx*(F_right - F_left) ...
-                     - (dt/r_time)*(u-u_eq)...
-                    + (1./b).*dudc(i,:).*DcDt ;
+                 u_next = u - dtdx*(F_right - F_left) - (dt/r_time)*(u-u_eq);
                  
                 % BC
                 u_next(1) = u_next(2);
@@ -181,41 +173,39 @@ switch method
                              
                 % Going back to f
                 f(i,:) = u(:);
-                
-                % Save Old info
-                c_old(i,:) = c;
             end
+                                               
+            % Compute macroscopic moments
+            n   = k*sum(J.* w .* f);  % Density [n]
+            nux = k*sum(J.^2.* (v_star+ux) .* w .* f);  % Macrospic moment [n*ux]
+            ne  = 0.5*k*sum(J.^3.*( (J.*v_star+ux).^2 ).* w .* f);  % Energy Density [n*E]
+            nE  = 0.5*k*sum(J.^3.*( (v-ux./J).^2 ).* w .* f);  % Internal energy [n*e]
             
-            % Compute macroscopic moments (First Time)
-            n   = k*sum(J.*w .* f);  % Density [n]
-            nux = k*sum(J.*v .* w .* f);  % Macrospic moment [n*ux]
-            nE  = 0.5*k*sum(J.*( v.^2 ).* w .* f);  % Energy Density [n*E]
-            ne  = 0.5*k*sum(J.*( (v-ux).^2 ).* w .* f);  % Internal energy [n*e]
-            
-            % Update macroscopic properties 
-            rho = n;
+            % Compute ux and t
             ux = nux./n;
-            p = ne;
             t = 4*ne./n;
-            z = n./sqrt(pi.*t);
-            E = ne + 0.5*ux.^2;
-            
+                        
             % Apply DOM
-            [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
+            [~,ux,t] = apply_DOM(1,ux,t,nv); % Semi-classical variables
             %[p,rho,E] = apply_DOM(p,rho,E,nv); % Classical variables
             
-            % Compute new v and J values if DDOM is used
+            % Compute Dynamic quadrature requirements
             if quad == 3 % if DDOM, update a, J and v.
-                a = sqrt(t); J = a; v = a.*c_star + ux;
+                % Define dynamic reference,
+                a = sqrt(t); v_star = (v-ux)./a;
+                % function weights for Dynamic GH quadrature,
+                w = ws.*exp(v_star.^2);
+                % Jacobian for 1D case,
+                J = sqrt(t);
             end
+
+            % Compute macroscopic moments (again)
+            n   = k*sum(J.* w .* f);  % Density [n]
+            nux = k*sum(J.^2.* (v_star+ux) .* w .* f);  % Macrospic moment [n*ux]
+            ne  = 0.5*k*sum(J.^3.*( (J.*v_star+ux).^2 ).* w .* f);  % Energy Density [n*E]
+            nE  = 0.5*k*sum(J.^3.*( (v-ux./J).^2 ).* w .* f);  % Internal energy [n*e]
             
-            % Compute macroscopic moments (Second Time)
-            n   = k*sum(J.*w .* f);  % Density [n]
-            nux = k*sum(J.*v .* w .* f);  % Macrospic moment [n*ux]
-            nE  = 0.5*k*sum(J.*( v.^2 ).* w .* f);  % Energy Density [n*E]
-            ne  = 0.5*k*sum(J.*( (v-ux).^2 ).* w .* f);  % Internal energy [n*e]
-            
-            % Update macroscopic properties 
+            % Update macroscopic properties
             rho = n;
             ux = nux./n;
             p = ne;
@@ -226,7 +216,7 @@ switch method
             % Apply DOM
             [z,ux,t] = apply_DOM(z,ux,t,nv); % Semi-classical variables
             %[p,rho,E] = apply_DOM(p,rho,E,nv); % Classical variables
-
+            
             % Update figures
             drawnow
         end
