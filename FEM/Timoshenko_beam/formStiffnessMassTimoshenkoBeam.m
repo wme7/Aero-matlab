@@ -37,8 +37,8 @@ for e=1:numberElements
     end
 end
 % shear contribution for stiffness matrix
-gaussLocations=[0.];
-gaussWeights=[2.];
+gaussLocations=[0.577350269189626;-0.577350269189626];
+gaussWeights=ones(2,1);
 for e=1:numberElements
     indice=elementNodes(e,:);
     elementDof=[ indice indice+numberNodes];

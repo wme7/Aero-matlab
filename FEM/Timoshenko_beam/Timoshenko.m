@@ -3,7 +3,8 @@
 % MATLAB codes for Finite Element Analysis
 % problem16vibrations.m
 % Timoshenko beam in free vibrations
-% antonio ferreira 2008
+% AJM Ferreira 2008
+% modified by Manuel Diaz, 2013.07.25
 
 % clear memory
 clear all
@@ -13,7 +14,7 @@ clear all
 % I: second moments of area
 % L: length of beam
 % thickness: thickness of beam
-E=10e7; poisson = 0.30;L  = 1;thickness=0.001;
+E=30e6; poisson = 0.30;L  = 1;thickness=0.01;
 I=thickness^3/12;
 EI=E*I;
 kapa=5/6;
@@ -21,13 +22,14 @@ rho=1;
 A=1*thickness;
 % 
 
-P = -1; % uniform pressure
+P = 0; % uniform pressure
+%P = -1; % uniform pressure
 % constitutive matrix
 G=E/2/(1+poisson);
 C=[   EI   0; 0    kapa*thickness*G];
 
 % mesh
-numberElements     = 40;  
+numberElements     = 50;  
 nodeCoordinates=linspace(0,L,numberElements+1);
 xx=nodeCoordinates';x=xx';
 for i=1:size(nodeCoordinates,2)-1
@@ -52,14 +54,17 @@ GDof=2*numberNodes;
 fixedNodeW =[1 ; numberNodes];
 fixedNodeTX=fixedNodeW; 
 % boundary conditions (cantilever)
-fixedNodeW =[1];
-fixedNodeTX=[1];; 
+%fixedNodeW =[1];
+%fixedNodeTX=[1];
+% Free-free
+%fixedNodeW =[];
+%fixedNodeTX=[];
 prescribedDof=[fixedNodeW; fixedNodeTX+numberNodes];
 
-% solution
+% solution (optional*)
 displacements=solution(GDof,prescribedDof,stiffness,force);
 
-% output displacements/reactions
+% output displacements/reactions (optional*)
 outputDisplacementsReactions(displacements,stiffness,...
     GDof,prescribedDof)
 
