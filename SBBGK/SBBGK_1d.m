@@ -178,7 +178,7 @@ switch method
                         u(:) = f_eq(i,:);
                 end
                 
-                % Compute TVD Fluxes
+                % Compute Upwind Fluxes
                 [F_left,F_right] = Upwindflux1d(u,a(i,:));
 
                 % Compute next time step
