@@ -23,26 +23,26 @@ switch quadn
         [xi,w]   = sGaussLobatto(np); % scaled to [-1/2, 1/2]
         xj       = xi*dx;
         w        = w*bb;
-        x        = x + xj; % Create poinst in every cells
+        x        = x + xj; % Create points in every cells
         V        = sLegMat(k,xi);
         
     case{2} % Guass-Lobatto quadrature weights and abscissas 
         [xi,w,V] = GaussLobatto(np); % for the interval [-1,1]
         xj       = xi*dx/2;
         w        = w*bb;
-        x        = x + xj; % Create poinst in every cells
+        x        = x + xj; % Create points in every cells
         
     case{3} % Guass-Legendre quadrature weights and abscissas
         [xi,w,V] = GaussLegendre(np); % for the interval [-1,1]
         xj       = xi*dx/2;
         w        = w*bb;
-        x        = x + xj; % Create poinst in every cells
+        x        = x + xj; % Create points in every cells
                 
     case{4} % Guass-Legendre quadrature weights and abscissas 
         [xi,w,V] = GaussRadau(np); % for the interval [-1,1]
         xj       = xi*dx/2;
         w        = w*bb;
-        x        = x + xj; % Create poinst in every cells
+        x        = x + xj; % Create points in every cells
         
     otherwise
         error('quadrature not available')
