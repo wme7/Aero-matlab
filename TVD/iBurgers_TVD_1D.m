@@ -1,7 +1,7 @@
 %% 1D Conservation Laws Solver using Upwind
 % To solve Invicid Burgers Equation
 %
-%   $u_t + f(u) = 0$ for x in [a,b]
+%   $u_t + a*u_x = 0$ for x in [a,b]
 %
 % where: $f(u) = u^2/2$
 % 
@@ -17,13 +17,14 @@ clear all; clc; close all;
    tEnd = 2.00;  % End time
 IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
 limiter = 2;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
-flxtype = 3;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind <-non-conservative!
+flxtype = 1;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind <-non-conservative!
+      a = 2;     % if linear advec is used
 
 %% Define our Flux function
-     f = @(w) w.^2/2;
+     f = @(w) w.^2/2; %a*w; 
 % and the Derivate of the flux function
-    df = @(w) w;
-
+    df = @(w) w; % a*ones(size(w));
+    
 %% Discretization of Domain
       x = 0:dx:2;     % x grid
       nx = length(x); % number of points

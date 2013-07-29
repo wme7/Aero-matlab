@@ -17,7 +17,7 @@
 clear all; close all; clc;
 
 %% Parameters
-      a = 0.5;      % Scalar velocity in x direction
+      a = 0.25;      % Scalar velocity in x direction
     a_p = max(0,a); % a^{+}
     a_m = min(0,a); % a^{-}
      dx = 0.01;     % Spatial step size
