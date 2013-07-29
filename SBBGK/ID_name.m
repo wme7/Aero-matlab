@@ -6,7 +6,7 @@ function [ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,tau,IC_case,fmodel,f_
 %% Read Parameters
 % Name
 name1 = name(1:2);
-name2 = name(3:end-1);
+name2 = name(3:end-2);
 name3 = name(end-1:end);
 
 % Statistic Used
