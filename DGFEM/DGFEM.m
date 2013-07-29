@@ -13,6 +13,7 @@
 % Function residual will be defined as:
 %
 % Residue(u) = - f(u)_x + s(u)
+% 
 %
 % Based on ideas of the following papers:
 %
