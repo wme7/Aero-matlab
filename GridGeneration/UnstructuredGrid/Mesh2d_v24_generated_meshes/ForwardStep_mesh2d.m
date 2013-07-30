@@ -27,11 +27,11 @@ cnect = [1 2;
         6 1];
 
 a = 0.6; b = 0.2; 
-h = @(x,y) 1/30 + 1/10*sqrt( (x-a).^2+(y-b).^2 );
+h = @(x,y) 1/35 + 1/25*sqrt( (x-a).^2+(y-b).^2 );
     
 % Element Size, hdata
 hdata = [];                 % Initialize hdata class
-hdata.hmax = 1/10;          % Domain element size.
+hdata.hmax = 1/25;          % Domain element size.
 %hdata.edgeh = [2,1/20];     % Element size on specified geometry edges.
 hdata.fun = h;              % User defined size function.
 
