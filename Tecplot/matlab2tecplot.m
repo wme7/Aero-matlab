@@ -16,7 +16,7 @@ file = fopen('data1.tec','w');
 % 'w' specifies that it will be written.
 % similarly 'r' is for reading and 'a' for appending.
 fprintf(file, 'TITLE = "Z = sin(YX)"\n');
-fprintf(file, 'VARIABLES = "X" "Y" "Z"\n');
+fprintf(file, 'VARIABLES = "X", "Y", "Z"\n');
 
 
 fprintf(file, 'ZONE T = "%1.4f"\n',a);
