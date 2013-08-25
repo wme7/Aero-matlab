@@ -10,8 +10,10 @@ y = 0:0.2:1;
 Z = sin(y'*x);
 [ny,nx] = size(Z);
 
+a = 1; % zone or time step
+
 %% Export to Tecplot
-file = fopen('data1.tec','w');
+file = fopen('data1.plt','w');
 % h1 gets the handel for the file "mesh1.tec".
 % 'w' specifies that it will be written.
 % similarly 'r' is for reading and 'a' for appending.

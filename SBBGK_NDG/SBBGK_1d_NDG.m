@@ -14,14 +14,14 @@ clc;  clear all;  close all;
     CFL     = 15/100;   % CFL condition
     f_case  = 1;        % {1} Relaxation model, {2} Euler Limit
     r_time  = 1/10000;  % Relaxation time
-    %tEnd  	= 0.05;     % End time - Parameter part of ICs
-    theta 	= 1;        % {-1} BE, {0} MB, {1} FD.
-    fmodel  = 2;        % {1} UU. model, {2} ES model.
-    quad   	= 2;        % {1} NC , {2} GH
+    tEnd  	= 0.05;     % End time - Parameter part of ICs
+    theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
+    fmodel  = 1;        % {1} UU. model, {2} ES model.
+    quad   	= 1;        % {1} NC , {2} GH
     method 	= 5;        % {5} Nodal DG only
-    IC_case	= 1;        % IC: {1}~{14}. See SSBGK_IC1d.m
-  plot_figs = 1;        % 0: no, 1: yes please!
-  write_ans = 0;        % 0: no, 1: yes please!
+    IC_case	= 3;        % IC: {1}~{14}. See SSBGK_IC1d.m
+  plot_figs = 0;        % 0: no, 1: yes please!
+  write_ans = 1;        % 0: no, 1: yes please!
 % Using DG
     P_deg	= 3;        % Polinomial Degree
     Pp      = P_deg+1;  % Polinomials Points
@@ -58,7 +58,7 @@ end
 
 %% Initial Conditions in physical Space
 % Semiclassical ICs: Fugacity[z], Velocity[u] and Temperature[t] 
-    [z0,u0,t0,p0,rho0,E0,tEnd,~] = SSBGK_IC1d(x,IC_case);
+    [z0,u0,t0,p0,rho0,E0,~,~] = SSBGK_IC1d(x,IC_case);
 
 %% Microscopic Velocity Discretization (using Discrete Ordinate Method)
 % that is to make coincide discrete values of microscopic velocities with

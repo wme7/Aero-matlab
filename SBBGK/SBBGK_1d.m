@@ -11,15 +11,15 @@ clear all; close all; %clc;
 
 %% Simulation Parameters
     name	='SBBGK1d'; % Simulation Name
-    %CFL    = 15/100;   % CFL condition <- Part of IC's parameters
+    CFL    = 15/100;   % CFL condition <- Part of IC's parameters
     f_case  = 1;        % {1} Relaxation Model, {2} Euler Limit
     r_time  = 1/10000;  % Relaxation time
     %tEnd  	= 0.05;     % End time <- Part of IC's parameters
     theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
-    fmodel  = 2;        % {1} UU. model, {2} ES model.
-    quad   	= 2;        % {1} 200NC , {2} 80GH
+    fmodel  = 1;        % {1} UU. model, {2} ES model.
+    quad   	= 1;        % {1} 200NC , {2} 80GH
     method 	= 2;        % {1} Upwind, {2} TVD, {3} WENO3, {4} WENO5
-    IC_case	= 7;        % IC: {1}~{14}. See Euler_IC1d.m
+    IC_case	= 8;        % IC: {1}~{14}. See Euler_IC1d.m
   plot_figs = 1;        % 0: no, 1: yes please!
   write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
@@ -48,7 +48,8 @@ end
 
 %% Initial Conditions in physical Space
 % Semiclassical ICs: Fugacity[z], Velocity[u] and Temperature[t] 
-    [z0,u0,t0,p0,rho0,E0,tEnd,CFL] = SSBGK_IC1d(x,IC_case);
+    %[z0,u0,t0,p0,rho0,E0,tEnd,CFL] = SSBGK_IC1d(x,IC_case);
+    [z0,u0,t0,p0,rho0,E0,tEnd,~] = SSBGK_IC1d(x,IC_case);
 
 %% Microscopic Velocity Discretization (For DOM)
 switch quad
@@ -61,7 +62,7 @@ switch quad
     v = repmat(v,1,nx);     w = repmat(w,1,nx);   % using DOM
     
     case{2} % Gauss Hermite Quadrature:
-    nv = 60;          % nodes desired (the actual value)
+    nv = 80;          % nodes desired (the actual value)
     [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
     k = 1;            % quadrature constant.
     w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature

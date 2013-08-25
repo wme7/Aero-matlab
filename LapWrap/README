@@ -1,0 +1,42 @@
+How to install/test and run lapwrapmw:
+--------------------------------------
+
+0) Untar lapwrapmw-0.8.2.tar (this creates lapwrapmw-0.8.2 directory)
+
+   On Linux:
+	save the file lapwrapmw-0.8.2.tar
+	command line: tar xvf lapwrapmw-0.8.2.tar
+   On Windows: 
+	save the file lapwrapmw-0.8.2.tar
+	use Winrar Extract command or use Cygwin tar -xvf command line
+
+1) Launch Matlab
+
+2) Go in the directory lapwrapmw-0.8.2
+
+3) Type make_windows if you are running Microsoft Windows.
+   or   make_linux if you are running linux/unix.
+
+4) You can then call the functions, or run the demos (demo_gels, demo_syev)
+   or type 'help gels', 'help syev'
+
+On Windows:
+
+> cd lapwrapmw
+> make_windows
+> demo_gels
+> demo_syev
+> help gels
+> help syev
+
+
+On Linux:
+
+> cd lapwrapmw
+> make_linux
+> demo_gels
+> demo_syev
+> help gels
+> help syev
+
+
