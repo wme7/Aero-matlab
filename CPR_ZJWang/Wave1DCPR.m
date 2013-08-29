@@ -17,7 +17,7 @@ k = 5
 % nc: number of elements
 nc = 5
 % cfl: cfl number
-cfl = 0.001
+cfl = 0.04
 % time: the time to stop the simulation
 time = 2
 
