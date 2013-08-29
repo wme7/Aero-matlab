@@ -1,3 +1,5 @@
+function SBBGK_1d_NDG_func(name,CFL,r_time,theta,quad,method,IC_case, ...
+        plot_figs,write_ans,P_deg,Pp,fmodel,f_case,RK_stages,cells)
 %% 1D Semi-classical Boltzmann-BGK Equation
 % Numerical solution of the Boltzmann-BGK Equation to recover Euler macroscopic
 % continuum solution. Coded by Manuel Diaz 2013.02.25
@@ -7,26 +9,26 @@
 % $$\frac{\partial f}{\partial t}+\vec F\cdot \nabla_p f + \vec v
 % \cdot\nabla_{\vec x} f =\widehat{\Omega } (f) = - \frac{f-f^{eq}}{\tau}$$
 %
-clc;  clear all;  close all;
+% clear all;  close all; %clc;
 
 %% Simulation Parameters
-    name	='SBBGK1d'; % Simulation Name
-    CFL     = 15/100;   % CFL condition
-    f_case  = 1;        % {1} Relaxation model, {2} Euler Limit
-    r_time  = 1/10000;  % Relaxation time
-    tEnd  	= 0.05;     % End time - Parameter part of ICs
-    theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
-    fmodel  = 1;        % {1} UU. model, {2} ES model.
-    quad   	= 1;        % {1} NC , {2} GH
-    method 	= 5;        % {5} Nodal DG only
-    IC_case	= 3;        % IC: {1}~{14}. See SSBGK_IC1d.m
-  plot_figs = 1;        % 0: no, 1: yes please!
-  write_ans = 0;        % 0: no, 1: yes please!
-% Using DG
-    P_deg	= 3;        % Polinomial Degree
-    Pp      = P_deg+1;  % Polinomials Points
-% Using RK integration time step
-  RK_stages	= 3;        % Number of RK stages
+%     name	='SBBGK1d'; % Simulation Name
+%     CFL     = 15/100;   % CFL condition
+%     f_case  = 1;        % {1} Relaxation model, {2} Euler Limit
+%     r_time  = 1/10000;  % Relaxation time
+%     %tEnd  	= 0.05;     % End time - Parameter part of ICs
+%     theta 	= 1;        % {-1} BE, {0} MB, {1} FD.
+%     fmodel  = 2;        % {1} UU. model, {2} ES model.
+%     quad   	= 2;        % {1} NC , {2} GH
+%     method 	= 1;        % {1} Nodal DG
+%     IC_case	= 1;        % IC: {1}~{14}. See SSBGK_IC1d.m
+%   plot_figs = 1;        % 0: no, 1: yes please!
+%   write_ans = 0;        % 0: no, 1: yes please!
+% % Using DG
+%     P_deg	= 3;        % Polinomial Degree
+%     Pp      = P_deg+1;  % Polinomials Points
+% % Using RK integration time step
+%   RK_stages	= 3;        % Number of RK stages
 
 %% Driver script for solving the 1D BBGK equations
 Globals1D;
@@ -35,7 +37,7 @@ Globals1D;
 N = P_deg;
 
 % Generate simple mesh
-[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 100);
+[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, cells);
 
 % Initialize solver and construct grid and metric
 StartUp1D;
@@ -58,7 +60,7 @@ end
 
 %% Initial Conditions in physical Space
 % Semiclassical ICs: Fugacity[z], Velocity[u] and Temperature[t] 
-    [z0,u0,t0,p0,rho0,E0,~,~] = SSBGK_IC1d(x,IC_case);
+    [z0,u0,t0,p0,rho0,E0,tEnd,~] = SSBGK_IC1d(x,IC_case);
 
 %% Microscopic Velocity Discretization (using Discrete Ordinate Method)
 % that is to make coincide discrete values of microscopic velocities with
@@ -125,7 +127,6 @@ end
 % Prepare for adaptive time stepping
 mindx = min(x(2,:)-x(1,:));
 dt = mindx*CFL/max(abs(v(:,1))); 
-dtdx = dt/mindx;  % precomputed to save someflops
 
 % Time domain discretization
 time = 0:dt:tEnd;
@@ -187,7 +188,6 @@ switch method
             end
                         
             % initialize variables
-            u_next = zeros(Pp,K);
             u_eq = zeros(Pp,K);
             u = zeros(Pp,K);
                               
