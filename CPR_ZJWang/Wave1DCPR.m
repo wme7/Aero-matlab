@@ -13,7 +13,7 @@ clear all ;
 close all ;
 
 % k: degree of solution polynomial; k+1 is the numer of solution points
-k = 5
+k = 3
 % nc: number of elements
 nc = 5
 % cfl: cfl number
