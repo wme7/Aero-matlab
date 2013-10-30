@@ -1,23 +1,25 @@
-% Just fot Testing
-% Solving a one-dimensional conservation Law.
-% coded by Manuel Diaz, KU, 2013.08.29
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%          Solving 1-D Burgers' equation with CPR/FR
+%
+%              coded by Manuel Diaz, KU, 2013.08.29
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear all; clc; close all;
 
 %% Simulation Parameters
-           CFL = 0.1/100;   % CFL condition
-          tEnd = 0.50;     % End time - Parameter part of ICs
-        method = 6;        % {6} CPR only
+parameter.clf = 0.1/100;	% CFL condition
+parameter.tEnd = 0.50;      % End time - Parameter part of ICs
 % Polynomial degree
-         k_deg = 3;        % Polinomial Degree
-     numberSPs = k_deg+1;  % Number of solution points in [-1,1]
+parameter.kDeg = 3;         % Polinomial Degree
+parameter.numberSPs = kDeg+1;  % Number of solution points in [-1,1]
 % Using RK integration time step
-     RK_stages = 3;        % Number of RK stages
+parameter.RK_stages = 3;	% Number of RK stages
     
 %% Build Lobatto & Radau Polynomials
 % use Lobatto points for the solution points in the standar element [-1,1]
 % and a left Radau Polynomial in this implementation, 
        normSPs = rootsLobattoPolynomial(numberSPs);
-             g = radauPolynomial(k_deg+1); % degree k+1.
+             g = radaurightPolynomial(k_deg+1); % degree k+1.
             dg = diff(g); % derivative, degree k.
 
 %% Build Elements Nodes & Grid
