@@ -7,19 +7,20 @@ classdef meshObj
         numberElements
         solutionDegree
         elementSolPoints
+        mesh
     end
     
     methods
-        function grid = meshObj(range,numberElements,PolyDeg)
+        function obj = meshObj(range,numberElements,PolyDeg)
             if nargin > 0 % Support calling with 0 arguments
-                grid.range = range;
-                grid.numberElements = numberElements;
-                grid.solutionDegree = PolyDeg;
-                grid.elementSolPoints = PolyDeg+1;
+                obj.range = range;
+                obj.numberElements = numberElements;
+                obj.solutionDegree = PolyDeg;
+                obj.elementSolPoints = PolyDeg+1;
             end
         end
-        function xxx
-            
+        function uniformMesh(obj)
+            obj.mesh = obj.range(1):0.1:obj.range(2);
         end
     end
     
