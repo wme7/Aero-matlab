@@ -18,6 +18,10 @@ switch kDeg
         legP = 1/2*(-3*x+5*x^3);
     case(4)
         legP = 1/8*(3-30*x^2+35*x^4);
+    case(5)
+        legP = 1/8*(63*x^5-70*x^3+15*x);
+    case(6)
+        legP = 1/16*(231*x^6-315*x^4+105*x^2-5);
     otherwise
         error('Legendre Polynomial not available');
 end
