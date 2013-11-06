@@ -1,7 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%          Solving 1-D scalar wave equation with CPR/FR
+%              Solving 1-D wave equation with CPR/FR
 %
-%                       du/dt + a dudx = 0
+%               du/dt + df/dx = 0,  for x \in [a,b]
+%                 where f = f(u): linear/nonlinear
 %
 %              coded by Manuel Diaz, NTU, 2013.10.29
 %
@@ -9,21 +10,25 @@
 clc; clear all; close all;
 
 %% Simulation Parameters
-a = -1; % advection speed
-cfl = 0.1; % CFL condition
-tEnd = 0.2; % final time
-K = 4; % degree of accuaracy
+fluxfun = 'nonlinear'; % select flux function
+cfl = 0.05; % CFL condition
+tEnd = 1; % final time
+K = 5; % degree of accuaracy
 nE = 8; % number of elements
 
-%% Prepocessing 
+%% PreProcess
 % Define our Flux function
-flux = @(w) a*w; %w.^2/2; 
-
-% Derivate of the flux function
-dflux = @(w) a*ones(size(w)); %w;
+switch fluxfun
+    case 'linear'
+        a=-1; flux = @(w) a*w; 
+        dflux = @(w) a*ones(size(w));
+    case 'nonlinear' %Burgers
+        flux = @(w) w.^2/2; 
+        dflux = @(w) w; 
+end
 
 % Build 1d mesh
-grid = mesh1d([0 1],nE,'Legendre',K);
+grid = mesh1d([0 2],nE,'LGL',K);
 dx = grid.elementSize; J = grid.Jacobian; x = grid.nodeCoordinates;
 
 % compute gR'(xi) & gL'(xi)
@@ -34,18 +39,18 @@ dRR = RR.eval_dP(grid.solutionPoints); dRL = -flipud(dRR);
 L = LagrangePolynomial(grid.solutionPoints);
 
 % IC
-u0 = IC(x,1);
+u0 = IC(x,2);
 
 %% Solver Loop
-% load IC
-u = u0;
 
-% time step
-dt = cfl*dx/abs(a);
-dtdx = dt/dx;
+% Set initial time & load IC
+t = 0; u = u0; 
 
-for time = 0:dt:tEnd
-
+while t < tEnd
+    % update time
+    dt = cfl*dx/max(max(abs(dflux(u))));
+    t = t + dt;
+    
     % Plot u
     plot(x,u,'-o')
 
@@ -53,10 +58,15 @@ for time = 0:dt:tEnd
     f = flux(u);
 
     % Interpolate u at the boundaries of [-1,1]
-    u_bd = zeros(2,grid.nElements);
-    u_bd(1,:) = double(subs(L.lagrangePolynomial,-1))*u;
-    u_bd(2,:) = double(subs(L.lagrangePolynomial,1))*u;
-
+    switch grid.quadratureType
+        case 'LGL'
+            u_bd = [u(1,:);u(end,:)];
+        otherwise
+            u_bd = zeros(2,grid.nElements);
+            u_bd(1,:) = double(subs(L.lagrangePolynomial,-1))*u;
+            u_bd(2,:) = double(subs(L.lagrangePolynomial,1))*u;
+    end
+ 
     u_faces = zeros(2,grid.nFaces);
     u_faces(1,:) = [u_bd(1,:),0];
     u_faces(2,:) = [0,u_bd(2,:)];
@@ -68,13 +78,19 @@ for time = 0:dt:tEnd
     % Numerical Flux: LF
     alpha = max(max(abs(dflux(u)))); 
     LF = @(a,b) 0.5*(flux(a)+flux(b)-alpha*(b-a));
-    nflux = LF(u_faces(1,:),u_faces(2,:));
+    nflux = LF(u_faces(2,:),u_faces(1,:));
     nfluxL = nflux(1:end-1);
     nfluxR = nflux(2:end);
 
     % interpolate flux at the boundaries of [-1,1]
-    f_bdL = double(subs(L.lagrangePolynomial,-1))*f;
-    f_bdR = double(subs(L.lagrangePolynomial,1))*f;
+    switch grid.quadratureType
+        case 'LGL'
+            f_bdL = f(1,:);
+            f_bdR = f(end,:);
+        otherwise
+            f_bdL = double(subs(L.lagrangePolynomial,-1))*f;
+            f_bdR = double(subs(L.lagrangePolynomial,1))*f;
+    end
 
     % flux derivate
     df = double(subs(L.dlagrangePolynomial,grid.solutionPoints))*f;
@@ -83,7 +99,7 @@ for time = 0:dt:tEnd
     dF = df + dRR*(nfluxL - f_bdL) + dRL*(nfluxR - f_bdR);
 
     % next time info!
-    u_next = u - dt*J*dF;
+    u_next = u - dt*dF/J;
     
     % update info
     u = u_next;
