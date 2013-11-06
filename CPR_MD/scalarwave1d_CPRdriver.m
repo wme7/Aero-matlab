@@ -1,55 +1,94 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %          Solving 1-D scalar wave equation with CPR/FR
 %
+%                       du/dt + a dudx = 0
+%
 %              coded by Manuel Diaz, NTU, 2013.10.29
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc; clear all; close all;
 
 %% Simulation Parameters
-CFL = 0.9; % CFL condition
+a = -1; % advection speed
+cfl = 0.1; % CFL condition
 tEnd = 0.2; % final time
-kDeg = 4; % degree of accuaracy
+K = 4; % degree of accuaracy
+nE = 8; % number of elements
 
-parameter.cfl = CFL; 
-parameter.tEnd = tEnd; 
-parameter.kDeg = kDeg; 
-parameter.nP = kDeg+1; 
+%% Prepocessing 
+% Define our Flux function
+flux = @(w) a*w; %w.^2/2; 
 
-nE = 5; % number of Elements
+% Derivate of the flux function
+dflux = @(w) a*ones(size(w)); %w;
 
-grid.range = [0,1]; % Domain range
-grid.nE = nE;
-grid.nP = kDeg+1;
-grip.nF = [];
+% Build 1d mesh
+grid = mesh1d([0 1],nE,'Legendre',K);
+dx = grid.elementSize; J = grid.Jacobian; x = grid.nodeCoordinates;
 
-%% LGL quadrature data
-[xi,w] = GaussLegendre(parameter.nP);
-%[xi,w,V] = GaussLobatto(parameter.nP);
-grid.nSP = length(xi);
+% compute gR'(xi) & gL'(xi)
+RR = CorrectionPolynomial('RadauRight',K+1); % g: one-order higher
+dRR = RR.eval_dP(grid.solutionPoints); dRL = -flipud(dRR);
 
-%% Load right-Radau Polynomials
-gR = RadauRightP(parameter.nP); % 1-order higher
+% Build Lagrange k-Polynomials
+L = LagrangePolynomial(grid.solutionPoints);
 
-%% compute gR'(xi) & gL'(xi)
-dgR = diff(gR,sym('x'));
-dgR = double(subs(dgR,xi));
-dgL = flipud(dgR);
+% IC
+u0 = IC(x,1);
 
-%% Build Elements Nodes & Grid
+%% Solver Loop
+% load IC
+u = u0;
 
-         range = [0,1];
-numberElements = 5;
-   numberNodes = numberElements*numberSPs; 
-  nodedbCoords = linspace(range(1),range(2),numberElements+1); 
-   elementSize = (range(2)-range(1))/numberElements;
- elementCenter = (nodedbCoords(1:numberElements) + ...
-                  nodedbCoords(2:numberElements+1)) / 2;
-        metric = elementSize/2;
-[scaledSPs,xc] = meshgrid(elementCenter,metric*normSPs);
-    nodeCoords = scaledSPs+xc; % x-Grid
-  elementNodes = reshape(1:numberNodes,numberSPs,numberElements);
-elementdbNodes = [elementNodes(1,:); elementNodes(numberSPs,:) ];
+% time step
+dt = cfl*dx/abs(a);
+dtdx = dt/dx;
 
-%% Load IC
-u0 = IC_iBurgers(x,5);
+for time = 0:dt:tEnd
+
+    % Plot u
+    plot(x,u,'-o')
+
+    % compute fluxes in node coordinates
+    f = flux(u);
+
+    % Interpolate u at the boundaries of [-1,1]
+    u_bd = zeros(2,grid.nElements);
+    u_bd(1,:) = double(subs(L.lagrangePolynomial,-1))*u;
+    u_bd(2,:) = double(subs(L.lagrangePolynomial,1))*u;
+
+    u_faces = zeros(2,grid.nFaces);
+    u_faces(1,:) = [u_bd(1,:),0];
+    u_faces(2,:) = [0,u_bd(2,:)];
+
+    % Periodic BCs
+    u_faces(2,1) = u_faces(2,end); % left BD
+    u_faces(1,end) = u_faces(1,1); % right BD
+
+    % Numerical Flux: LF
+    alpha = max(max(abs(dflux(u)))); 
+    LF = @(a,b) 0.5*(flux(a)+flux(b)-alpha*(b-a));
+    nflux = LF(u_faces(1,:),u_faces(2,:));
+    nfluxL = nflux(1:end-1);
+    nfluxR = nflux(2:end);
+
+    % interpolate flux at the boundaries of [-1,1]
+    f_bdL = double(subs(L.lagrangePolynomial,-1))*f;
+    f_bdR = double(subs(L.lagrangePolynomial,1))*f;
+
+    % flux derivate
+    df = double(subs(L.dlagrangePolynomial,grid.solutionPoints))*f;
+
+    % Compute the derivate: F = f + g*(nfluxL - f_bdL) + g*(nfluxR - f_bdR)
+    dF = df + dRR*(nfluxL - f_bdL) + dRL*(nfluxR - f_bdR);
+
+    % next time info!
+    u_next = u - dt*J*dF;
+    
+    % update info
+    u = u_next;
+
+    % update plot
+    drawnow
+
+end

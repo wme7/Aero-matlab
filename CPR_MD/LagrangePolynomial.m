@@ -1,6 +1,6 @@
-classdef Lagrange
+classdef LagrangePolynomial
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %LAGRANGE class
+    %LAGRANGEPOLYNOMIAL class
     %   Build Lagrange interpolation polynomials
     %
     %   by Manuel Diaz, NTU, 2013.10.12
@@ -13,18 +13,18 @@ classdef Lagrange
     end
     
     properties(Dependent = true, SetAccess = private)
-       lagrangeCoef
-       dlagrangeCoef
+       lagrangePolynomial
+       dlagrangePolynomial
     end
     
     methods
-        function obj = Lagrange(x0)
+        function obj = LagrangePolynomial(x0)
            obj.x0 = x0;
            obj.Pdeg = length(x0)-1;
            obj.nPoints = length(x0);
         end
         
-        function l = get.lagrangeCoef(obj)
+        function l = get.lagrangePolynomial(obj)
             % Build Lagrange base functions
             x = sym('x');
             for i=1:obj.nPoints
@@ -37,7 +37,7 @@ classdef Lagrange
             end
         end
         
-        function D = get.dlagrangeCoef(obj)
+        function D = get.dlagrangePolynomial(obj)
             % Build derivate of Lagrange base functions
             x = sym('x');
             for i=1:obj.nPoints
