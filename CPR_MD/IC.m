@@ -13,7 +13,8 @@ switch ICcase
              % u = 1 for x <  x_mid
              % u = 0 for x >= x_mid
         u0 = zeros(size(x));
-        rhs = find(x<x_mid);
+        xmid = (x(end)-x(1))/2;
+        rhs = find(x<xmid);
         u0(rhs) = 1;
     otherwise
         error('case not in the list')

@@ -13,9 +13,9 @@ clear all ;
 close all ;
 
 % k: degree of solution polynomial; k+1 is the numer of solution points
-k = 3
+k = 5
 % nc: number of elements
-nc = 5
+nc = 10
 % cfl: cfl number
 cfl = 0.04
 % time: the time to stop the simulation
@@ -81,8 +81,6 @@ for n=1:steps
     if rem(n,10) == 0
         drawnow;
     end
-    
-    pause(0.1);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
