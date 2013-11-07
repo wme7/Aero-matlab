@@ -19,8 +19,8 @@ clc;  clear all;  close all;
     fmodel  = 1;        % {1} UU. model, {2} ES model.
     quad   	= 1;        % {1} NC , {2} GH
     method 	= 5;        % {5} Nodal DG only
-    IC_case	= 3;        % IC: {1}~{14}. See SSBGK_IC1d.m
-  plot_figs = 1;        % 0: no, 1: yes please!
+    IC_case	= 7;        % IC: {1}~{14}. See SSBGK_IC1d.m
+  plot_figs = 0;        % 0: no, 1: yes please!
   write_ans = 0;        % 0: no, 1: yes please!
 % Using DG
     P_deg	= 3;        % Polinomial Degree
