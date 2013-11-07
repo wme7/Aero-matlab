@@ -14,12 +14,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc; clear all; close all;
 
-%% Simulation Parameters
-fluxfun = 'linear'; % select flux function
-cfl = 0.02; % CFL condition
+%% Parameters
+fluxfun = 'nonlinear'; % select flux function
+cfl = 0.04; % CFL condition
 tEnd = 2; % final time
-K = 5; % degree of accuaracy
-nE = 20; % number of elements
+K = 3; % degree of accuaracy
+nE = 10; % number of elements
 
 %% PreProcess
 % Define our Flux function
@@ -33,7 +33,7 @@ switch fluxfun
 end
 
 % Build 1d mesh
-xgrid = mesh1d([0 2],nE,'LGL',K);
+xgrid = mesh1d([0 1],nE,'Legendre',K);
 dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
 
 % compute gR'(xi) & gL'(xi)
@@ -47,7 +47,7 @@ L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 
 % IC
-u0 = IC(x,2);
+u0 = IC(x,3);
 
 % Set plot range
 plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];

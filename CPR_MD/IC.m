@@ -7,8 +7,7 @@ switch ICcase
         u0 = exp(-(6*(x-0.5)).^2);
         
     case {2} % sinusoidal wave
-        %u0 = 1/2 + sin(2*pi*x);
-        u0 = 2 + 0.5*sin(2*pi*x);
+        u0 = 0.5*(2 + sin(2*pi*x));
     case {3} % Riemann problem
              % u = 1 for x <  x_mid
              % u = 0 for x >= x_mid

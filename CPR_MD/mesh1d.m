@@ -18,6 +18,7 @@ classdef mesh1d
     properties (Dependent = true, SetAccess = private)
         nNodes
         solutionPoints
+        weights
         elementNodes
         elementFaces
         elementCenter
@@ -129,6 +130,7 @@ classdef mesh1d
             [x,ind] = sort(diag(L));
             % V = V'
             w = 2 * (V(1,:).^2)';
+            clear('ind');
         end
         
     end % Static Methods
@@ -156,6 +158,20 @@ classdef mesh1d
                 otherwise
                     error('quadrature scheme not defined')
             end
+        end
+        
+        function w = get.weights(obj)
+            switch obj.quadratureType
+                case 'Legendre'
+                    [x,w] = obj.GaussLegendre(obj.nSolutionPoints);
+                case 'Laguerre'
+                    [x,w] = obj.GaussLaguerre(obj.nSolutionPoints);
+                case 'LGL'
+                    [x,w] = obj.GaussLobatto(obj.nSolutionPoints);
+                otherwise
+                    error('quadrature scheme not defined')
+            end
+            clear('x');
         end
                 
         function nN = get.nNodes(obj) % Element Nodes

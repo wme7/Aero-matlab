@@ -1,3 +1,5 @@
+function [L1,Linf] = CPRtest(fluxfun,cfl,tEnd,K,nE)
+% Test CPR Method
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %              Solving 1-D wave equation with CPR/FR
 %
@@ -13,11 +15,11 @@
 clc; clear all; close all;
 
 %% Simulation Parameters
-fluxfun = 'linear'; % select flux function
-cfl = 0.03; % CFL condition
-tEnd = 2; % final time
-K = 4; % degree of accuaracy %example: K = 6 -> cfl 0.001
-nE = 6; % number of elements
+%fluxfun = 'linear'; % select flux function
+%cfl = 0.03; % CFL condition
+%tEnd = 2; % final time
+%K = 4; % degree of accuaracy %example: K = 6 -> cfl 0.001
+%nE = 6; % number of elements
 
 %% PreProcess
 % Define our Flux function
@@ -34,6 +36,7 @@ end
 xgrid = mesh1d([0 1],nE,'Legendre',K);
 dx = xgrid.elementSize; J = xgrid.Jacobian; 
 x = xgrid.nodeCoordinates; quad = xgrid.quadratureType;
+w = xgrid.weights;
 
 % compute gR'(xi) & gL'(xi)
 RR = CorrectionPolynomial('RadauRight',K+1); % g: one-order higher
@@ -49,7 +52,7 @@ L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 u0 = IC(x,2);
 
 % Set plot range
-plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
+%plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
 
 %% Solver Loop
 
@@ -68,7 +71,7 @@ while t < tEnd
     it = it+1; 
     
     % Plot u
-    plot(x,u,x,u0,'-o'); axis(plotrange); grid on; 
+    %plot(x,u,x,u0,'-o'); axis(plotrange); grid on; 
        
     % 1st stage
     dF = residual(u,L,dg,flux,dflux,quad);
@@ -84,6 +87,9 @@ while t < tEnd
     
     %pause(0.1)
     if rem(it,10) == 0
-        drawnow;
+    %    drawnow;
     end
 end
+
+%% Compute Norms
+
