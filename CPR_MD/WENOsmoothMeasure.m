@@ -2,7 +2,7 @@
 tic
 clear all; clc;
 
-K = 4;
+K = 5;
 
 xgrid = mesh1d([0,1],10,'LGL',K);
 
@@ -68,9 +68,20 @@ toc
 % for the a Lagrange Polynomial in the standard element
 disp('Approximate WENO limiter implementation')
 tic
-phi0 = interpolateLGL(xi+2);
-phi1 = interpolateLGL(xi);
-phi2 = interpolateLGL(xi-2);
+switch K
+    case 3
+        phi0 = LGL_K3(xi+2);
+        phi1 = LGL_K3(xi);
+        phi2 = LGL_K3(xi-2);
+    case 4
+        phi0 = LGL_K4(xi+2);
+        phi1 = LGL_K4(xi);
+        phi2 = LGL_K4(xi-2);
+    case 5
+        phi0 = LGL_K5(xi+2);
+        phi1 = LGL_K5(xi);
+        phi2 = LGL_K5(xi-2);
+end
 toc
 
 tic
@@ -87,6 +98,7 @@ for j = troubleE
     u_new2(:,j) = w0*P0_tilde + w1*P1 + w2*P2_tilde;
 end
 toc
+%fair result
 
 %%
 plotrange = [0,1,0.9,2.1]; 
@@ -102,4 +114,3 @@ title('Exact Limiter Implementation'); xlabel('x'); ylabel('u(x,t)');
 subplot(2,2,4)
 plot(xgrid.nodeCoordinates,u_new2); axis(plotrange); grid on;
 title('Approximate Limiter Implementation'); xlabel('x'); ylabel('u(x,t)');
-% no good result!
