@@ -26,7 +26,7 @@ classdef LagrangePolynomial
         
         function l = get.lagrangePolynomial(obj)
             % Build Lagrange base functions
-            x = sym('x');
+            syms x;
             for i=1:obj.nPoints
                 l(i)=x/x;
                 for j=1:obj.nPoints
@@ -39,7 +39,7 @@ classdef LagrangePolynomial
         
         function D = get.dlagrangePolynomial(obj)
             % Build derivate of Lagrange base functions
-            x = sym('x');
+            syms x;
             for i=1:obj.nPoints
                 l(i)=x/x;
                 for j=1:obj.nPoints
@@ -48,6 +48,20 @@ classdef LagrangePolynomial
                     end
                 end
                 D(i)=diff(l(i),x);
+            end
+        end
+        
+        function Dn = dnlagrangePolynomial(obj,n)
+            % Build derivate of Lagrange base functions
+            syms x;
+            for i=1:obj.nPoints
+                l(i)=x/x;
+                for j=1:obj.nPoints
+                    if(i ~= j)
+                        l(i)=l(i)*(x-obj.x0(j))/(obj.x0(i)-obj.x0(j));
+                    end
+                end
+                Dn(i)=diff(l(i),x,n);
             end
         end
         
