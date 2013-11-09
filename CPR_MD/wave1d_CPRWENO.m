@@ -33,8 +33,9 @@ switch fluxfun
 end
 
 % Build 1d mesh
-xgrid = mesh1d([0 1],nE,'Legendre',K);
-dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
+xgrid = mesh1d([0 1],nE,'LGL',K);
+dx = xgrid.elementSize; J = xgrid.Jacobian; 
+x = xgrid.nodeCoordinates; w = xgrid.weights';
 
 % compute gR'(xi) & gL'(xi)
 RR = CorrectionPolynomial('RadauRight',K+1); % g: one-order higher
@@ -47,7 +48,7 @@ L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 
 % IC
-u0 = IC(x,2);
+u0 = IC(x,3);
 
 % Set plot range
 plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
@@ -57,7 +58,7 @@ plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
 % Set initial time & load IC
 t = 0; u = u0; it = 0;
 
-while t < tEnd
+%while t < tEnd
     % update time
     dt = cfl*dx/max(max(abs(dflux(u)))); t = t+dt;
     
@@ -65,7 +66,7 @@ while t < tEnd
     it = it+1; 
     
     % Plot u
-    plot(x,u0,'-x',x,u,'-'); axis(plotrange); grid on; 
+    %plot(x,u0,'-x',x,u,'-'); axis(plotrange); grid on; 
     
     % compute fluxes in node coordinates
     f = flux(u);
@@ -106,9 +107,35 @@ while t < tEnd
     u_next = u - dt*dF/J;
     
     % update info
-    u = u_next;
+    %u = u_next;
     
     if rem(it,10) == 0
-        drawnow;
+    %    drawnow;
     end
-end
+%end
+
+%% Find Troubled cells:
+% Build Cell averages for every E_j
+%u0_bar = w*u0/dx;
+u_bar = w*u/2; M = 0.1;
+
+u_1tilde = u_nface(1:end-1) - u_bar;
+u_2tilde = u_bar - u_pface(2:end);
+
+% Taking into account periodic BCs!
+Dpu_bar = [u_bar(2:end),u_bar(1)] - u_bar;
+Dnu_bar = [u_bar(end),u_bar(1:end-1)] - u_bar;
+
+% modif to take care of unsigned zeros
+A = [u_1tilde;Dpu_bar;Dnu_bar]; A(find([u_1tilde;Dpu_bar;Dnu_bar]==0)) = 1e-16; 
+B = [u_2tilde;Dpu_bar;Dnu_bar]; B(find([u_2tilde;Dpu_bar;Dnu_bar]==0)) = 1e-16;
+
+uMOD_1tilde = MODminmod(A,M,dx);
+uMOD_2tilde = MODminmod(B,M,dx);
+
+% Mark troubled cells:
+index = find(uMOD_1tilde ==0 & uMOD_2tilde == 0);
+
+%% WENO reconstruction for troubled cells
+% Compute Smooth indicartors
+

@@ -1,7 +1,7 @@
-function [L1,Linf] = CPRtest(fluxfun,cfl,tEnd,K,nE)
+function [L1_nodes,degree_aveg,Linf_nodes,degree_min] = TestCPRfun(fluxfun,cfl,tEnd,~,K,nE,quad)
 % Test CPR Method
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%              Solving 1-D wave equation with CPR/FR
+%          Test 1-D wave equation with CPR/FR implementation
 %
 %               du/dt + df/dx = 0,  for x \in [a,b]
 %                 where f = f(u): linear/nonlinear
@@ -12,20 +12,21 @@ function [L1,Linf] = CPRtest(fluxfun,cfl,tEnd,K,nE)
 % Ref: A flux reconstruction approach to high-order schemes including
 % Discontinuous Galerkin methods. H.T. Huynh, AIAA 2007.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clc; clear all; close all;
+%clc; clear all; close all;
 
-%% Simulation Parameters
+%% Parameters
 %fluxfun = 'linear'; % select flux function
-%cfl = 0.03; % CFL condition
-%tEnd = 2; % final time
+%cfl = 0.04; % CFL condition
+%tEnd = 2*pi; % final time
 %K = 4; % degree of accuaracy %example: K = 6 -> cfl 0.001
-%nE = 6; % number of elements
+%nE = 20; % number of elements
+%quad = 'LGL';
 
 %% PreProcess
 % Define our Flux function
 switch fluxfun
     case 'linear'
-        a=-2; flux = @(w) a*w; 
+        a=1; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
     case 'nonlinear' %Burgers
         flux = @(w) w.^2/2; 
@@ -33,10 +34,10 @@ switch fluxfun
 end
 
 % Build 1d mesh
-xgrid = mesh1d([0 1],nE,'Legendre',K);
+%xgrid = mesh1d([0 1],nE,'Legendre',K);
+xgrid = mesh1d([0 2*pi],nE,quad,K);
 dx = xgrid.elementSize; J = xgrid.Jacobian; 
-x = xgrid.nodeCoordinates; quad = xgrid.quadratureType;
-w = xgrid.weights;
+x = xgrid.nodeCoordinates; %w = xgrid.weights';
 
 % compute gR'(xi) & gL'(xi)
 RR = CorrectionPolynomial('RadauRight',K+1); % g: one-order higher
@@ -49,7 +50,8 @@ L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 
 % IC
-u0 = IC(x,2);
+%u0 = IC(x,ic);
+u0 = sin(x);
 
 % Set plot range
 %plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
@@ -91,5 +93,24 @@ while t < tEnd
     end
 end
 
-%% Compute Norms
+%% Build Cell averages for every E_j
+%u0_avg = w*u0;
+%u_avg = w*u;
 
+%% Compute Norms
+err = u0-u;
+
+% L1 Error
+%L1_avgs = sum(abs(u0_avg-u_avg));
+L1_nodes = sum(sum(abs(err)));
+deg = zeros(1,xgrid.nNodes);
+for i=1:xgrid.nNodes
+    str = num2str(err(i),'%1.2e');
+    deg(i) = str2double(str(end-1:end));
+end
+degree_aveg = mean(deg);
+
+% L\infty Error
+%Linf_avgs = max(abs(u0_avg-u_avg));
+Linf_nodes = max(max(abs(err)));
+degree_min = min(deg);
