@@ -19,13 +19,13 @@ fluxfun = 'linear'; % select flux function
 cfl = 0.01; % CFL condition
 tEnd = 1; % final time
 K = 5; % degree of accuaracy
-nE = 40; % number of elements
+nE = 10; % number of elements
 
 %% PreProcess
 % Define our Flux function
 switch fluxfun
     case 'linear'
-        a=-1; flux = @(w) a*w; 
+        a=+1; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
     case 'nonlinear' %Burgers
         flux = @(w) w.^2/2; 
@@ -47,7 +47,7 @@ L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 
 % IC
-u0 = IC(x,2);
+u0 = IC(x,3);
 
 % Set plot range
 plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
@@ -88,8 +88,12 @@ while t < tEnd
     u_nface = [0,u_rbd]; % - side 
 
     % Apply Periodic BCs
-    u_nface(1) = u_nface(end); % left BD
-    u_pface(end) = u_pface(1); % right BD
+    %u_nface(1) = u_nface(end); % left BD
+    %u_pface(end) = u_pface(1); % right BD
+    
+    % Apply Neumann BCs
+    u_nface(1) = u_pface(1); % left BD
+    u_pface(end) = u_nface(end);%u_pface(end); % right BD
 
     % LF numerical flux
     alpha = max(max(abs(dflux(u)))); 

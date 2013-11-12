@@ -15,6 +15,7 @@ classdef LagrangePolynomial
     properties(Dependent = true, SetAccess = private)
        lagrangePolynomial
        dlagrangePolynomial
+       WENOBetaCoefs
     end
     
     methods
@@ -63,6 +64,19 @@ classdef LagrangePolynomial
                 end
                 Dn(i)=diff(l(i),x,n);
             end
+        end
+        
+        function Bcoef = get.WENOBetaCoefs(obj)
+            % WENO reconstruction for troubled cells
+            % Compute Smooth / Beta indicators
+            K = obj.Pdeg; Bcoef = zeros(K,K+1); dx = 2;
+            for s = 1:K
+                syms x;
+                dpdx  = obj.dnlagrangePolynomial(s);
+                Bcoef(s,:) = double(int((dx)^(2*s-1)*(dpdx).^2,x,-1,1));
+            end
+            % Beta factors for every element:
+            % B = sum(Bcoef*u);
         end
         
     end % Method
