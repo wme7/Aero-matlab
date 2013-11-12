@@ -49,7 +49,7 @@ L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 
 % IC
-u0 = IC(x,2);
+u0 = IC(x,3);
 
 % Set plot range
 plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
@@ -59,7 +59,7 @@ plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
 % Set initial time & load IC
 t = 0; u = u0; it = 0;
 
-%while t < tEnd
+while t < tEnd
     % update time
     dt = cfl*dx/max(max(abs(dflux(u)))); t = t+dt;
     
@@ -108,17 +108,17 @@ t = 0; u = u0; it = 0;
     u_next = u - dt*dF/J;
     
     % update info
-    %u = u_next;
+    u = u_next;
     
     if rem(it,10) == 0
-    %    drawnow;
+        drawnow;
     end
 %end
 
 %% Find Troubled cells:
 % Build Cell averages for every E_j
 %u0_bar = w*u0/dx;
-u_bar = w*u/2; M = 0.1;
+u_bar = w*u/2; M = 100;
 
 u_1tilde = u_nface(1:end-1) - u_bar;
 u_2tilde = u_bar - u_pface(2:end);
@@ -135,8 +135,60 @@ uMOD_1tilde = MODminmod(A,M,dx);
 uMOD_2tilde = MODminmod(B,M,dx);
 
 % Mark troubled cells:
-trouble = find(uMOD_1tilde ==0 & uMOD_2tilde == 0);
+troubleE = find(uMOD_1tilde ==0 & uMOD_2tilde == 0);
 
 %% WENO reconstruction for troubled cells
-% Compute Smooth indicartors
+% Compute Smooth indicators
+Bcoef = zeros(K,K+1);
+for s = 1:K 
+    syms x;
+    dpdx  = l.dnlagrangePolynomial(s);
+    Bcoef(s,:) = double(int((dx)^(2*s-1)*(dpdx).^2,x,-1,1));
+end
 
+% Beta factors for every element
+B = sum(Bcoef*u);
+
+%%
+gamma = [1e-6,0.999998,1e-6];
+epsilon = 1e-6;
+w_tilde(1) = gamma(1)./(epsilon+B(troubleE)).^2;
+w_tilde(2) = gamma(2)./(epsilon+B(troubleE)).^2;
+w_tilde(3) = gamma(3)./(epsilon+B(troubleE)).^2;
+w0 = w_tilde(1)/sum(w_tilde);
+w1 = w_tilde(2)/sum(w_tilde);
+w2 = w_tilde(3)/sum(w_tilde);
+toc % 0.001 sec
+
+switch K
+    case 3
+        phi0 = LGL_K3(xi+2);
+        phi1 = LGL_K3(xi);
+        phi2 = LGL_K3(xi-2);
+    case 4
+        phi0 = LGL_K4(xi+2);
+        phi1 = LGL_K4(xi);
+        phi2 = LGL_K4(xi-2);
+    case 5
+        phi0 = LGL_K5(xi+2);
+        phi1 = LGL_K5(xi);
+        phi2 = LGL_K5(xi-2);
+end
+
+u_new2 = zeros(size(u));
+for j = troubleE
+    P0 = phi0*u(:,j-1);
+    P1 = phi1*u(:,j);
+    P2 = phi2*u(:,j+1);
+    P0_bar = u_bar(j-1);
+    P1_bar = u_bar(j);
+    P2_bar = u_bar(j+1);
+    P0_tilde = P0 - P0_bar + P1_bar;
+    P2_tilde = P2 - P2_bar + P1_bar;
+    u_new2(:,j) = w0*P0_tilde + w1*P1 + w2*P2_tilde;
+end
+
+%update info
+u = u_new2;
+
+end
