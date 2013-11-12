@@ -10,7 +10,8 @@
 % Ref: A flux reconstruction approach to high-order schemes including
 % Discontinuous Galerkin methods. H.T. Huynh, AIAA 2007.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Notes: Basic Scheme Implementation without RK integration method.
+% Notes: 1.Basic Scheme Implementation without RK integration method.
+% 2. Basic implementation of the WENO limiter.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc; clear all; close all;
 
@@ -48,7 +49,7 @@ L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 
 % IC
-u0 = IC(x,3);
+u0 = IC(x,2);
 
 % Set plot range
 plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
@@ -134,7 +135,7 @@ uMOD_1tilde = MODminmod(A,M,dx);
 uMOD_2tilde = MODminmod(B,M,dx);
 
 % Mark troubled cells:
-index = find(uMOD_1tilde ==0 & uMOD_2tilde == 0);
+trouble = find(uMOD_1tilde ==0 & uMOD_2tilde == 0);
 
 %% WENO reconstruction for troubled cells
 % Compute Smooth indicartors
