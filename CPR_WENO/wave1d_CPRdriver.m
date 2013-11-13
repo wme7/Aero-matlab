@@ -68,7 +68,7 @@ while t < tEnd
     % iteration counter
     it = it+1; 
 
-    [u,tc] = limitSolution(u,xgrid,M,Bcoefs);
+    [u,tc] = limitSolution(u,xgrid,M);
     
     % Plot u
     plot(x,u,x,u0,'-o'); axis(plotrange); grid on; 
@@ -77,13 +77,13 @@ while t < tEnd
     dF = residual(u,L,dg,flux,dflux,quad);
     u = uo-dt*dF/J;
 
-    [u,tc] = limitSolution(u,xgrid,M,Bcoefs);
+    %[u,tc] = limitSolution(u,xgrid,M);
     
     % 2nd Stage
     dF = residual(u,L,dg,flux,dflux,quad); 
     u = 0.75*uo+0.25*(u-dt*dF/J);
 
-    [u,tc] = limitSolution(u,xgrid,M,Bcoefs);
+    %[u,tc] = limitSolution(u,xgrid,M);
     
     % 3rd stage
     dF = residual(u,L,dg,flux,dflux,quad); 

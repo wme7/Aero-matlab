@@ -16,12 +16,12 @@
 clc; clear all; close all;
 
 %% Parameters
-fluxfun = 'nonlinear'; % select flux function
+fluxfun = 'linear'; % select flux function
 cfl = 0.02; % CFL condition
 tEnd = 1; % final time
-K = 4; % degree of accuaracy
+K = 3; % degree of accuaracy
 nE = 20; % number of elements
-M = 0.1; % MODminmod parameter
+M = 10; % MODminmod parameter
 
 %% PreProcess
 % Define our Flux function
@@ -48,7 +48,6 @@ l = LagrangePolynomial(xgrid.solutionPoints);
 L.lcoef = double(subs(l.lagrangePolynomial,-1));
 L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
-Bcoefs = l.WENOBetaCoefs;
 
 % IC
 u0 = IC(x,3);
@@ -103,15 +102,45 @@ while t < tEnd
     % detect troubled cells
     tcd = TroubleCellDectector(u_bar,'MODminmod',1,u_nface,u_pface,M,dx);
     tCells = tcd.troubledCells;
-
+    
+    term = zeros(1,size(ulp,2));
     for j = tCells
         % Build smooth indicators
-        Beta0 = sum(Bcoefs(j-1)*u(j-1));
-        Beta1 = sum(Bcoefs( j )*u( j ));
-        Beta2 = sum(Bcoefs(j+1)*u(j+1));
+        for s = 1:K
+            dpl = ulp(j-1,:);
+            % Derivate 's' times
+            for i = 1:s
+                dpl = polyder(dpl);
+            end
+            integ = dx^(2*s-1)*polyint(conv(dpl,dpl));
+            term(s) = polyval(integ,x(1+K,j-1))-polyval(integ,x(1,j-1));
+        end
+        Beta0 = sum(term);
+        
+        for s = 1:K
+            dpl = ulp(j,:);
+            % Derivate 's' times
+            for i = 1:s
+                dpl = polyder(dpl);
+            end
+            integ = dx^(2*s-1)*polyint(conv(dpl,dpl));
+            term(s) = polyval(integ,x(1+K,j))-polyval(integ,x(1,j));
+        end
+        Beta1 = sum(term);
+        
+        for s = 1:K
+            dpl = ulp(j+1,:);
+            % Derivate 's' times
+            for i = 1:s
+                dpl = polyder(dpl);
+            end
+            integ = dx^(2*s-1)*polyint(conv(dpl,dpl));
+            term(s) = polyval(integ,x(1+K,j+1))-polyval(integ,x(1,j+1));
+        end
+        Beta2 = sum(term);
         
         % Build Weights
-        gamma = [1e-6,0.999998,1e-6]; epsilon = 1e-6; 
+        gamma = [1e-6,0.999998,1e-6]; epsilon = 1e-6;
         w_tilde0 = gamma(1)./(epsilon+Beta0).^2;
         w_tilde1 = gamma(2)./(epsilon+Beta1).^2;
         w_tilde2 = gamma(3)./(epsilon+Beta2).^2;
@@ -120,7 +149,7 @@ while t < tEnd
         w1 = w_tilde1./wsum;
         w2 = w_tilde2./wsum;
         
-        % Modify troubled polynomial
+        % Modify troubled polynomials
         P0 = ulp(j-1,:);
         P1 = ulp( j ,:);
         P2 = ulp(j+1,:);
@@ -130,7 +159,7 @@ while t < tEnd
         P0_tilde = P0(K+1) - P0_bar + P1_bar;
         P2_tilde = P2(K+1) - P2_bar + P1_bar;
         u_new = w0*polyval(P0_tilde,x(:,j)) ...
-            + w1*polyval( P1 ,x(:,j)) ...
+            + w1*polyval(P1,x(:,j)) ...
             + w2*polyval(P2_tilde,x(:,j));
         u(:,j) = u_new; %update info
     end
@@ -184,10 +213,9 @@ while t < tEnd
     
     % Plot u
     plot(x,u0,'-x',x,u,'-'); axis(plotrange); grid on; 
-    %hold on; scatter(x(tCells),u(tCells),10); hold off;
-    
-    if rem(it,10) == 0
+        
+    %if rem(it,10) == 0
         drawnow;
-    end
+    %end
     
 end
