@@ -30,8 +30,12 @@ u_pface = [u_lbd,0]; % + side
 u_nface = [0,u_rbd]; % - side
 
 % Apply Periodic BCs
-u_nface(1) = u_nface(end); % left BD
-u_pface(end) = u_pface(1); % right BD
+%u_nface(1) = u_nface(end); % left BD
+%u_pface(end) = u_pface(1); % right BD
+
+% Apply Neumann BCs
+u_nface(1) = u_pface(1); % left BD
+u_pface(end) = u_nface(end); % right BD
 
 % LF numerical flux
 alpha = max(max(abs(dflux(u))));

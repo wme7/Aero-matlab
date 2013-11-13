@@ -14,10 +14,11 @@ clc; clear all; close all;
 
 %% Simulation Parameters
 fluxfun = 'nonlinear'; % select flux function
-cfl = 0.04; % CFL condition
-tEnd = 2; % final time
-K = 6; % degree of accuaracy %example: K = 6 -> cfl 0.001
-nE = 80; % number of elements
+cfl = 0.02; % CFL condition
+tEnd = 1; % final time
+K = 4; % degree of accuaracy %example: K = 6 -> cfl 0.001
+nE = 20; % number of elements
+M = 100; % MODminmod parameter
 
 %% PreProcess
 % Define our Flux function
@@ -31,7 +32,7 @@ switch fluxfun
 end
 
 % Build 1d mesh
-xgrid = mesh1d([0 1],nE,'Legendre',K);
+xgrid = mesh1d([0 1],nE,'LGL',K);
 dx = xgrid.elementSize; J = xgrid.Jacobian; 
 x = xgrid.nodeCoordinates; quad = xgrid.quadratureType;
 
@@ -44,6 +45,7 @@ l = LagrangePolynomial(xgrid.solutionPoints);
 L.lcoef = double(subs(l.lagrangePolynomial,-1));
 L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
+Bcoefs = l.WENOBetaCoefs;
 
 % IC
 u0 = IC(x,2);
@@ -52,7 +54,6 @@ u0 = IC(x,2);
 plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
 
 %% Solver Loop
-
 
 % Set initial time & load IC
 t = 0; u = u0; it = 0;
@@ -66,24 +67,29 @@ while t < tEnd
     
     % iteration counter
     it = it+1; 
+
+    [u,tc] = limitSolution(u,xgrid,M,Bcoefs);
     
     % Plot u
     plot(x,u,x,u0,'-o'); axis(plotrange); grid on; 
-       
+
     % 1st stage
     dF = residual(u,L,dg,flux,dflux,quad);
     u = uo-dt*dF/J;
 
+    [u,tc] = limitSolution(u,xgrid,M,Bcoefs);
+    
     % 2nd Stage
     dF = residual(u,L,dg,flux,dflux,quad); 
     u = 0.75*uo+0.25*(u-dt*dF/J);
 
+    [u,tc] = limitSolution(u,xgrid,M,Bcoefs);
+    
     % 3rd stage
     dF = residual(u,L,dg,flux,dflux,quad); 
     u = (uo+2*(u-dt*dF/J))/3;
     
-    %pause(0.1)
-    %if rem(it,10) == 0
-        drawnow;
+	%if rem(it,10) == 0
+    drawnow;
     %end
 end

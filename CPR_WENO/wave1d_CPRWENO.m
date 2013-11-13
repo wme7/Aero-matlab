@@ -38,7 +38,6 @@ end
 xgrid = mesh1d([0 1],nE,'LGL',K);
 dx = xgrid.elementSize; J = xgrid.Jacobian; 
 x = xgrid.nodeCoordinates; w = xgrid.weights';
-xi = xgrid.solutionPoints;
 
 % compute gR'(xi) & gL'(xi)
 RR = CorrectionPolynomial('RadauRight',K+1); % g: one-order higher
@@ -68,8 +67,77 @@ while t < tEnd
     
     % iteration counter
     it = it+1; 
+    
+    %% Limiting
+    
+    % Build u_j(x) lagrange polynomials
+    ulp = zeros(size(x,2),size(x,1));
+    for j = 1:nE
+        ulp(j,:) = lagrange(x(:,j),u(:,j)); % interpolation
+    end
+    
+    % Build Cell averages for every E_j
+    u_bar = w*u/2;
+      
+    % Interpolate u and flux values at the boundaries of Ij
+    switch xgrid.quadratureType
+        case 'LGL'
+            u_lbd = u(1,:);
+            u_rbd = u(end,:);
+        otherwise
+            u_lbd = L.lcoef*u;
+            u_rbd = L.rcoef*u;
+    end
+    % Build Numerical fluxes acroos faces
+    u_pface = [u_lbd,0]; % + side 
+    u_nface = [0,u_rbd]; % - side 
+
+    % Apply Periodic BCs
+    %u_nface(1) = u_nface(end); % left BD
+    %u_pface(end) = u_pface(1); % right BD
+    
+    % Apply Neumann BCs
+    u_nface(1) = u_pface(1); % left BD
+    u_pface(end) = u_nface(end); % right BD
        
-    % compute fluxes in node coordinates
+    % detect troubled cells
+    tcd = TroubleCellDectector(u_bar,'MODminmod',1,u_nface,u_pface,M,dx);
+    tCells = tcd.troubledCells;
+
+    for j = tCells
+        % Build smooth indicators
+        Beta0 = sum(Bcoefs(j-1)*u(j-1));
+        Beta1 = sum(Bcoefs( j )*u( j ));
+        Beta2 = sum(Bcoefs(j+1)*u(j+1));
+        
+        % Build Weights
+        gamma = [1e-6,0.999998,1e-6]; epsilon = 1e-6; 
+        w_tilde0 = gamma(1)./(epsilon+Beta0).^2;
+        w_tilde1 = gamma(2)./(epsilon+Beta1).^2;
+        w_tilde2 = gamma(3)./(epsilon+Beta2).^2;
+        wsum = w_tilde0 + w_tilde1 + w_tilde2;
+        w0 = w_tilde0./wsum;
+        w1 = w_tilde1./wsum;
+        w2 = w_tilde2./wsum;
+        
+        % Modify troubled polynomial
+        P0 = ulp(j-1,:);
+        P1 = ulp( j ,:);
+        P2 = ulp(j+1,:);
+        P0_bar = u_bar(j-1);
+        P1_bar = u_bar(j);
+        P2_bar = u_bar(j+1);
+        P0_tilde = P0(K+1) - P0_bar + P1_bar;
+        P2_tilde = P2(K+1) - P2_bar + P1_bar;
+        u_new = w0*polyval(P0_tilde,x(:,j)) ...
+            + w1*polyval( P1 ,x(:,j)) ...
+            + w2*polyval(P2_tilde,x(:,j));
+        u(:,j) = u_new; %update info
+    end
+            
+    %% CPR
+    
+    % compute fluxes at node coordinates
     f = flux(u);
 
     % Interpolate u and flux values at the boundaries of Ij
@@ -96,7 +164,7 @@ while t < tEnd
     % Apply Neumann BCs
     u_nface(1) = u_pface(1); % left BD
     u_pface(end) = u_nface(end); % right BD
-
+    
     % LF numerical flux
     alpha = max(max(abs(dflux(u)))); 
     nflux = 0.5*(flux(u_nface)+flux(u_pface)-alpha*(u_pface-u_nface));
@@ -113,59 +181,6 @@ while t < tEnd
     
     % update info
     u = u_next;
-      
-    % Build Cell averages for every E_j
-    u_bar = w*u/2;
-    
-    % detect troubled cells
-    tcd = TroubleCellDectector(u_bar,'MODminmod',1,u_nface,u_pface,M,dx);
-    tCells = tcd.troubledCells;
-    
-    % build smooth indicators 
-    Beta = sum(Bcoefs*u);
-    
-    % build weights
-    gamma = [1e-6,0.999998,1e-6];
-    epsilon = 1e-6;
-    w_tilde1 = gamma(1)./(epsilon+Beta).^2;
-    w_tilde2 = gamma(2)./(epsilon+Beta).^2;
-    w_tilde3 = gamma(3)./(epsilon+Beta).^2;
-    wsum = w_tilde1+w_tilde2+w_tilde3;
-    w0 = w_tilde1./wsum;
-    w1 = w_tilde2./wsum;
-    w2 = w_tilde3./wsum;
-    
-    % WENO reconstruction
-    switch K
-        case 3
-            phi0 = LGL_K3(xi+2);
-            phi1 = LGL_K3(xi);
-            phi2 = LGL_K3(xi-2);
-        case 4
-            phi0 = LGL_K4(xi+2);
-            phi1 = LGL_K4(xi);
-            phi2 = LGL_K4(xi-2);
-        case 5
-            phi0 = LGL_K5(xi+2);
-            phi1 = LGL_K5(xi);
-            phi2 = LGL_K5(xi-2);
-    end
-    
-    u_new = zeros(size(u));
-    for j = tCells
-        P0 = phi0*u(:,j-1);
-        P1 = phi1*u(:,j);
-        P2 = phi2*u(:,j+1);
-        P0_bar = u_bar(j-1);
-        P1_bar = u_bar(j);
-        P2_bar = u_bar(j+1);
-        P0_tilde = P0 - P0_bar + P1_bar;
-        P2_tilde = P2 - P2_bar + P1_bar;
-        u_new(:,j) = w0(j)*P0_tilde + w1(j)*P1 + w2(j)*P2_tilde;
-    end
-    
-    % Update info
-    u(:,tCells) = u_new(:,tCells);
     
     % Plot u
     plot(x,u0,'-x',x,u,'-'); axis(plotrange); grid on; 
