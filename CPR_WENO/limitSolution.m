@@ -48,10 +48,10 @@ function [u,tCells] = limitSolution(u,xgrid,M)
             Beta2 = sum(term2);
             
             % Build Weights
-            gamma = [1e-6,0.999998,1e-6]; epsilon = 1e-6;
-            w_tilde0 = gamma(1)./(epsilon+Beta0).^2;
-            w_tilde1 = gamma(2)./(epsilon+Beta1).^2;
-            w_tilde2 = gamma(3)./(epsilon+Beta2).^2;
+            epsilon = 1e-6; gamma = [1e-3,0.998,1e-3]; 
+            w_tilde0 = gamma(1)/(epsilon+Beta0)^2;
+            w_tilde1 = gamma(2)/(epsilon+Beta1)^2;
+            w_tilde2 = gamma(3)/(epsilon+Beta2)^2;
             wsum = w_tilde0 + w_tilde1 + w_tilde2;
             w0 = w_tilde0./wsum;
             w1 = w_tilde1./wsum;

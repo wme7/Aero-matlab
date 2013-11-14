@@ -14,11 +14,11 @@ clc; clear all; close all;
 
 %% Simulation Parameters
 fluxfun = 'nonlinear'; % select flux function
-cfl = 0.02; % CFL condition
+cfl = 0.005; % CFL condition
 tEnd = 1.5; % final time
-K = 6; % degree of accuaracy %example: K = 6 -> cfl 0.001
+K = 3; % degree of accuaracy %example: K = 6 -> cfl 0.001
 nE = 40; % number of elements
-M = 1000; % MODminmod parameter
+M = 10; % MODminmod parameter
 
 %% PreProcess
 % Define our Flux function
@@ -32,7 +32,7 @@ switch fluxfun
 end
 
 % Build 1d mesh
-xgrid = mesh1d([0 2*pi],nE,'Legendre',K);
+xgrid = mesh1d([0 2*pi],nE,'LGL',K);
 dx = xgrid.elementSize;     J = xgrid.Jacobian; 
 x = xgrid.nodeCoordinates;  quad = xgrid.quadratureType;
 w = xgrid.weights';     xc = xgrid.elementCenter;
@@ -75,8 +75,8 @@ while t < tEnd
     it = it+1; 
     
     % Limit solution
-    %[u,tcells] = limitSolution(u,xgrid,M);
-    %disp(tcells);
+    [u,tcells] = limitSolution(u,xgrid,M);
+    disp(tcells);
     
     % 1st stage
     dF = residual(u,L,dg,flux,dflux,quad);
