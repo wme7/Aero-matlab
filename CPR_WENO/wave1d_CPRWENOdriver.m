@@ -5,21 +5,20 @@
 %                 where f = f(u): linear/nonlinear
 %
 %              coded by Manuel Diaz, NTU, 2013.10.29
-%                               
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ref: A flux reconstruction approach to high-order schemes including
 % Discontinuous Galerkin methods. H.T. Huynh, AIAA 2007.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Notes: Basic Scheme Implementation without RK integration method.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc; clear all; close all;
 
-%% Parameters
-fluxfun = 'linear'; % select flux function
-cfl = 0.01; % CFL condition
+%% Simulation Parameters
+fluxfun = 'nonlinear'; % select flux function
+cfl = 0.02; % CFL condition
 tEnd = 1; % final time
-K = 5; % degree of accuaracy
-nE = 40; % number of elements
+K = 4; % degree of accuaracy %example: K = 6 -> cfl 0.001
+nE = 20; % number of elements
+M = 30; % MODminmod parameter
 
 %% PreProcess
 % Define our Flux function
@@ -33,8 +32,9 @@ switch fluxfun
 end
 
 % Build 1d mesh
-xgrid = mesh1d([0 1],nE,'Legendre',K);
-dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
+xgrid = mesh1d([0 1],nE,'LGL',K);
+dx = xgrid.elementSize; J = xgrid.Jacobian; 
+x = xgrid.nodeCoordinates; quad = xgrid.quadratureType;
 
 % compute gR'(xi) & gL'(xi)
 RR = CorrectionPolynomial('RadauRight',K+1); % g: one-order higher
@@ -45,6 +45,7 @@ l = LagrangePolynomial(xgrid.solutionPoints);
 L.lcoef = double(subs(l.lagrangePolynomial,-1));
 L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
+Bcoefs = l.WENOBetaCoefs;
 
 % IC
 u0 = IC(x,2);
@@ -57,58 +58,35 @@ plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
 % Set initial time & load IC
 t = 0; u = u0; it = 0;
 
+% Using a 3-stage TVD Runge Kutta time integration
 while t < tEnd
+    uo = u;
+    
     % update time
     dt = cfl*dx/max(max(abs(dflux(u)))); t = t+dt;
     
     % iteration counter
     it = it+1; 
     
+    % Limit solution
+    [u,tcells] = limitSolution(u,xgrid,M);
+    
+    % 1st stage
+    dF = residual(u,L,dg,flux,dflux,quad);
+    u = uo-dt*dF/J;
+
+    % 2nd Stage
+    dF = residual(u,L,dg,flux,dflux,quad); 
+    u = 0.75*uo+0.25*(u-dt*dF/J);
+
+    % 3rd stage
+    dF = residual(u,L,dg,flux,dflux,quad); 
+    u = (uo+2*(u-dt*dF/J))/3;
+    
     % Plot u
-    plot(x,u0,'-x',x,u,'-'); axis(plotrange); grid on; 
-    
-    % compute fluxes in node coordinates
-    f = flux(u);
+    plot(x,u,x,u0,'-o'); axis(plotrange); grid on; 
 
-    % Interpolate u and flux values at the boundaries of Ij
-    switch xgrid.quadratureType
-        case 'LGL'
-            u_lbd = u(1,:);
-            u_rbd = u(end,:);
-            f_lbd = f(1,:);
-            f_rbd = f(end,:);
-        otherwise
-            u_lbd = L.lcoef*u;
-            u_rbd = L.rcoef*u;
-            f_lbd = L.lcoef*f;
-            f_rbd = L.rcoef*f;
-    end
-    % Build Numerical fluxes acroos faces
-    u_pface = [u_lbd,0]; % + side 
-    u_nface = [0,u_rbd]; % - side 
-
-    % Apply Periodic BCs
-    u_nface(1) = u_nface(end); % left BD
-    u_pface(end) = u_pface(1); % right BD
-
-    % LF numerical flux
-    alpha = max(max(abs(dflux(u)))); 
-    nflux = 0.5*(flux(u_nface)+flux(u_pface)-alpha*(u_pface-u_nface));
-    nfluxL = nflux(1:end-1); nfluxR = nflux(2:end);
-
-    % flux derivate
-    df = L.dcoef*f;
-
-    % Compute the derivate: F = f + gL*(nfluxL-f_bdL) + gR*(nfluxR-f_bdR)
-    dF = df + dg.RR*(nfluxL - f_lbd) + dg.RL*(nfluxR - f_rbd);
-
-    % next time info!
-    u_next = u - dt*dF/J;
-    
-    % update info
-    u = u_next;
-    
-    if rem(it,10) == 0
+	if rem(it,10) == 0
         drawnow;
     end
 end

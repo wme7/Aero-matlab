@@ -4,14 +4,18 @@
 %               du/dt + df/dx = 0,  for x \in [a,b]
 %                 where f = f(u): linear/nonlinear
 %
-%              coded by Manuel Diaz, NTU, 2013.10.29
+%              coded by Manuel Diaz, NTU, 2013.11.13
 %                               
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Ref: A flux reconstruction approach to high-order schemes including
-% Discontinuous Galerkin methods. H.T. Huynh, AIAA 2007.
+% Refs: 
+% 1. A flux reconstruction approach to high-order schemes including
+% Discontinuous Galerkin methods. by H.T. Huynh, AIAA 2007.
+% 2. A simple essentially non-oscillatory limiter for the correction
+% procedure vie reconstruction (CPR) framework. by Du, Shu & Zhang 2013.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Notes: 1.Basic Scheme Implementation without RK integration method.
-% 2. Basic implementation of the WENO limiter.
+% Notes: 
+% 1. Basic CPR scheme implementation without RK integration method.
+% 2. Implementation of the 'simple 'WENO limiter.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc; clear all; close all;
 
@@ -77,91 +81,64 @@ while t < tEnd
     
     % Build Cell averages for every E_j
     u_bar = w*u/2;
-      
-    % Interpolate u and flux values at the boundaries of Ij
-    switch xgrid.quadratureType
-        case 'LGL'
-            u_lbd = u(1,:);
-            u_rbd = u(end,:);
-        otherwise
-            u_lbd = L.lcoef*u;
-            u_rbd = L.rcoef*u;
-    end
-    % Build Numerical fluxes acroos faces
-    u_pface = [u_lbd,0]; % + side 
-    u_nface = [0,u_rbd]; % - side 
-
-    % Apply Periodic BCs
-    %u_nface(1) = u_nface(end); % left BD
-    %u_pface(end) = u_pface(1); % right BD
     
-    % Apply Neumann BCs
-    u_nface(1) = u_pface(1); % left BD
-    u_pface(end) = u_nface(end); % right BD
-       
     % detect troubled cells
-    tcd = TroubleCellDectector(u_bar,'MODminmod',1,u_nface,u_pface,M,dx);
+    tcd = TroubleCellDectector(u_bar,'MODminmod',1,u(1,:),u(1+K,:),M,dx);
     tCells = tcd.troubledCells;
     
-    term = zeros(1,size(ulp,2));
+    term0 = zeros(1,size(ulp,2));
+    term1 = zeros(1,size(ulp,2));
+    term2 = zeros(1,size(ulp,2));
     for j = tCells
-        % Build smooth indicators
-        for s = 1:K
-            dpl = ulp(j-1,:);
-            % Derivate 's' times
-            for i = 1:s
-                dpl = polyder(dpl);
+        if ( j~=1 && j~=nE )
+            % Build smooth indicators
+            for s = 1:K
+                dpl0 = ulp(j-1,:);
+                dpl1 = ulp(j,:);
+                dpl2 = ulp(j+1,:);
+                % Derivate 's' times
+                for i = 1:s
+                    dpl0 = polyder(dpl0);
+                    dpl1 = polyder(dpl1);
+                    dpl2 = polyder(dpl2);
+                end
+                % Do: dx^(2s-1)*integrate(dp^2,a,b)
+                integ0 = dx^(2*s-1)*polyint(conv(dpl0,dpl0));
+                term0(s) = polyval(integ0,x(1+K,j-1))-polyval(integ0,x(1,j-1));
+                integ1 = dx^(2*s-1)*polyint(conv(dpl1,dpl1));
+                term1(s) = polyval(integ1,x(1+K,j))-polyval(integ1,x(1,j));
+                integ2 = dx^(2*s-1)*polyint(conv(dpl2,dpl2));
+                term2(s) = polyval(integ2,x(1+K,j+1))-polyval(integ2,x(1,j+1));
             end
-            integ = dx^(2*s-1)*polyint(conv(dpl,dpl));
-            term(s) = polyval(integ,x(1+K,j-1))-polyval(integ,x(1,j-1));
+            Beta0 = sum(term0);
+            Beta1 = sum(term1);
+            Beta2 = sum(term2);
+            
+            % Build Weights
+            gamma = [1e-6,0.999998,1e-6]; epsilon = 1e-6;
+            w_tilde0 = gamma(1)./(epsilon+Beta0).^2;
+            w_tilde1 = gamma(2)./(epsilon+Beta1).^2;
+            w_tilde2 = gamma(3)./(epsilon+Beta2).^2;
+            wsum = w_tilde0 + w_tilde1 + w_tilde2;
+            w0 = w_tilde0./wsum;
+            w1 = w_tilde1./wsum;
+            w2 = w_tilde2./wsum;
+            
+            % Modify troubled polynomials
+            P0 = ulp(j-1,:);
+            P1 = ulp( j ,:);
+            P2 = ulp(j+1,:);
+            P0_bar = zeros(size(P0));
+            P1_bar = zeros(size(P1));
+            P2_bar = zeros(size(P2));
+            P0_bar(K+1) = u_bar(j-1);
+            P1_bar(K+1) = u_bar(j);
+            P2_bar(K+1) = u_bar(j+1);
+            P0_tilde = P0 - P0_bar + P1_bar;
+            P2_tilde = P2 - P2_bar + P1_bar;
+            u_new = w0*P0_tilde + w1*P1 + w2*P2_tilde;
+            u(:,j) = polyval(u_new,x(:,j)); %update info
         end
-        Beta0 = sum(term);
-        
-        for s = 1:K
-            dpl = ulp(j,:);
-            % Derivate 's' times
-            for i = 1:s
-                dpl = polyder(dpl);
-            end
-            integ = dx^(2*s-1)*polyint(conv(dpl,dpl));
-            term(s) = polyval(integ,x(1+K,j))-polyval(integ,x(1,j));
-        end
-        Beta1 = sum(term);
-        
-        for s = 1:K
-            dpl = ulp(j+1,:);
-            % Derivate 's' times
-            for i = 1:s
-                dpl = polyder(dpl);
-            end
-            integ = dx^(2*s-1)*polyint(conv(dpl,dpl));
-            term(s) = polyval(integ,x(1+K,j+1))-polyval(integ,x(1,j+1));
-        end
-        Beta2 = sum(term);
-        
-        % Build Weights
-        gamma = [1e-6,0.999998,1e-6]; epsilon = 1e-6;
-        w_tilde0 = gamma(1)./(epsilon+Beta0).^2;
-        w_tilde1 = gamma(2)./(epsilon+Beta1).^2;
-        w_tilde2 = gamma(3)./(epsilon+Beta2).^2;
-        wsum = w_tilde0 + w_tilde1 + w_tilde2;
-        w0 = w_tilde0./wsum;
-        w1 = w_tilde1./wsum;
-        w2 = w_tilde2./wsum;
-        
-        % Modify troubled polynomials
-        P0 = ulp(j-1,:);
-        P1 = ulp( j ,:);
-        P2 = ulp(j+1,:);
-        P0_bar = u_bar(j-1);
-        P1_bar = u_bar(j);
-        P2_bar = u_bar(j+1);
-        P0_tilde = P0(K+1) - P0_bar + P1_bar;
-        P2_tilde = P2(K+1) - P2_bar + P1_bar;
-        u_new = w0*polyval(P0_tilde,x(:,j)) ...
-            + w1*polyval(P1,x(:,j)) ...
-            + w2*polyval(P2_tilde,x(:,j));
-        u(:,j) = u_new; %update info
     end
             
     %% CPR

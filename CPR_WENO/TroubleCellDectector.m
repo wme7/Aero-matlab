@@ -9,8 +9,8 @@ classdef TroubleCellDectector
         a
         M
         h
-        u_pface
-        u_nface
+        uL
+        uR
     end
     
     properties (Dependent = true, SetAccess = private)
@@ -55,15 +55,15 @@ classdef TroubleCellDectector
     end % Methods
     
     methods
-        function obj = TroubleCellDectector(u,strategy,a,u_nface,u_pface,M,h)
+        function obj = TroubleCellDectector(u,strategy,a,uL,uR,M,h)
             obj.averages = u;
             obj.nCellsIn = length(u);
             obj.detector = strategy;
             obj.a = a;
             obj.M = M;
             obj.h = h;
-            obj.u_nface = u_nface;
-            obj.u_pface = u_pface;
+            obj.uL = uL;
+            obj.uR = uR;
         end
         
         function tCells = get.troubledCells(obj)
@@ -80,8 +80,8 @@ classdef TroubleCellDectector
         function tCells = MODminmod1d(obj)
             u_bar = obj.averages;
             
-            u_1tilde = obj.u_nface(1:end-1) - u_bar;
-            u_2tilde = u_bar - obj.u_pface(2:end);
+            u_1tilde = obj.uR - u_bar;
+            u_2tilde = u_bar - obj.uL;
             
             % Taking into account periodic BCs!
             %Dpu_bar = [u_bar(2:end),u_bar(1)] - u_bar;
