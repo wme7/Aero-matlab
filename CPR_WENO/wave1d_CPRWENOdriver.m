@@ -18,7 +18,7 @@ cfl = 0.02; % CFL condition
 tEnd = 1; % final time
 K = 4; % degree of accuaracy %example: K = 6 -> cfl 0.001
 nE = 20; % number of elements
-M = 30; % MODminmod parameter
+M = 45; % MODminmod parameter
 
 %% PreProcess
 % Define our Flux function
@@ -70,6 +70,7 @@ while t < tEnd
     
     % Limit solution
     [u,tcells] = limitSolution(u,xgrid,M);
+    disp(tcells);
     
     % 1st stage
     dF = residual(u,L,dg,flux,dflux,quad);

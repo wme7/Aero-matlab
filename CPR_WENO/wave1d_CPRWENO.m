@@ -20,12 +20,12 @@
 clc; clear all; close all;
 
 %% Parameters
-fluxfun = 'linear'; % select flux function
+fluxfun = 'nonlinear'; % select flux function
 cfl = 0.02; % CFL condition
 tEnd = 1; % final time
 K = 3; % degree of accuaracy
 nE = 20; % number of elements
-M = 10; % MODminmod parameter
+M = 100; % MODminmod parameter
 
 %% PreProcess
 % Define our Flux function
@@ -84,7 +84,7 @@ while t < tEnd
     
     % detect troubled cells
     tcd = TroubleCellDectector(u_bar,'MODminmod',1,u(1,:),u(1+K,:),M,dx);
-    tCells = tcd.troubledCells;
+    tCells = tcd.troubledCells; disp(tCells);
     
     term0 = zeros(1,size(ulp,2));
     term1 = zeros(1,size(ulp,2));
