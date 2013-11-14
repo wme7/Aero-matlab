@@ -27,7 +27,7 @@ IC_case = 4;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine
 
 %% Initial Condition
 % NOTE: In IC function, we can control the initial max and min value of u. 
-     u0 = IC_iBurgers(x,IC_case); 
+     u0 = IC(x,IC_case); 
 
 % Load initial time
     t = 0;

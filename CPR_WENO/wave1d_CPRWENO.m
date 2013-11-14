@@ -21,11 +21,11 @@ clc; clear all; close all;
 
 %% Parameters
 fluxfun = 'nonlinear'; % select flux function
-cfl = 0.02; % CFL condition
-tEnd = 1; % final time
-K = 3; % degree of accuaracy
+cfl = 0.04; % CFL condition
+tEnd = 2; % final time
+K = 4; % degree of accuaracy
 nE = 20; % number of elements
-M = 100; % MODminmod parameter
+M = 5; % MODminmod parameter
 
 %% PreProcess
 % Define our Flux function
@@ -39,9 +39,10 @@ switch fluxfun
 end
 
 % Build 1d mesh
-xgrid = mesh1d([0 1],nE,'LGL',K);
+xgrid = mesh1d([0 2*pi],nE,'Legendre',K);
 dx = xgrid.elementSize; J = xgrid.Jacobian; 
-x = xgrid.nodeCoordinates; w = xgrid.weights';
+x = xgrid.nodeCoordinates;
+w = xgrid.weights';	xc = xgrid.elementCenter;
 
 % compute gR'(xi) & gL'(xi)
 RR = CorrectionPolynomial('RadauRight',K+1); % g: one-order higher
@@ -54,10 +55,10 @@ L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 
 % IC
-u0 = IC(x,3);
+u0 = IC(x,5);
 
 % Set plot range
-plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
+plotrange = [xgrid.range(1),xgrid.range(2),1.1*min(min(u0)),1.1*max(max(u0))];
 
 %% Solver Loop
 
@@ -142,7 +143,6 @@ while t < tEnd
     end
             
     %% CPR
-    
     % compute fluxes at node coordinates
     f = flux(u);
 
@@ -189,7 +189,8 @@ while t < tEnd
     u = u_next;
     
     % Plot u
-    plot(x,u0,'-x',x,u,'-'); axis(plotrange); grid on; 
+    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid on; 
+    subplot(1,2,2); plot(xc,u_bar,'ro'); axis(plotrange); grid off;  
         
     %if rem(it,10) == 0
         drawnow;

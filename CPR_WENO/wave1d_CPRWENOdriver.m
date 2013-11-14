@@ -15,10 +15,10 @@ clc; clear all; close all;
 %% Simulation Parameters
 fluxfun = 'nonlinear'; % select flux function
 cfl = 0.02; % CFL condition
-tEnd = 1; % final time
-K = 4; % degree of accuaracy %example: K = 6 -> cfl 0.001
-nE = 20; % number of elements
-M = 45; % MODminmod parameter
+tEnd = 1.5; % final time
+K = 6; % degree of accuaracy %example: K = 6 -> cfl 0.001
+nE = 40; % number of elements
+M = 1000; % MODminmod parameter
 
 %% PreProcess
 % Define our Flux function
@@ -26,15 +26,16 @@ switch fluxfun
     case 'linear'
         a=-1; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
-    case 'nonlinear' %Burgers
+    case 'nonlinear' %Burgers 
         flux = @(w) w.^2/2; 
         dflux = @(w) w; 
 end
 
 % Build 1d mesh
-xgrid = mesh1d([0 1],nE,'LGL',K);
-dx = xgrid.elementSize; J = xgrid.Jacobian; 
-x = xgrid.nodeCoordinates; quad = xgrid.quadratureType;
+xgrid = mesh1d([0 2*pi],nE,'Legendre',K);
+dx = xgrid.elementSize;     J = xgrid.Jacobian; 
+x = xgrid.nodeCoordinates;  quad = xgrid.quadratureType;
+w = xgrid.weights';     xc = xgrid.elementCenter;
 
 % compute gR'(xi) & gL'(xi)
 RR = CorrectionPolynomial('RadauRight',K+1); % g: one-order higher
@@ -45,13 +46,18 @@ l = LagrangePolynomial(xgrid.solutionPoints);
 L.lcoef = double(subs(l.lagrangePolynomial,-1));
 L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
-Bcoefs = l.WENOBetaCoefs;
 
 % IC
-u0 = IC(x,2);
+ic = 2; u0 = IC(x,ic);
+if ic==2
+    load('burgersExact.mat');
+    ue = burgersExact(2,:);
+    xe = burgersExact(1,:);
+end
 
 % Set plot range
-plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
+plotrange = [xgrid.range(1),xgrid.range(2),...
+    min(min(min(0.9*u0)),min(min(1.1*u0))),1.1*max(max(u0))];
 
 %% Solver Loop
 
@@ -69,8 +75,8 @@ while t < tEnd
     it = it+1; 
     
     % Limit solution
-    [u,tcells] = limitSolution(u,xgrid,M);
-    disp(tcells);
+    %[u,tcells] = limitSolution(u,xgrid,M);
+    %disp(tcells);
     
     % 1st stage
     dF = residual(u,L,dg,flux,dflux,quad);
@@ -84,10 +90,19 @@ while t < tEnd
     dF = residual(u,L,dg,flux,dflux,quad); 
     u = (uo+2*(u-dt*dF/J))/3;
     
+    % build cell averages
+    u_bar = w*u/2;
+    
     % Plot u
-    plot(x,u,x,u0,'-o'); axis(plotrange); grid on; 
+    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid on; 
+    subplot(1,2,2); plot(xc,u_bar,'ro'); axis(plotrange); grid off; 
 
-	if rem(it,10) == 0
+    %if rem(it,10)==0
         drawnow;
-    end
+    %end
+end    
+%% Final Plot for IC 2
+if ic==2
+    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid on;
+    subplot(1,2,2); plot(xe,ue,'k-',xc,u_bar,'ro'); axis(plotrange);
 end

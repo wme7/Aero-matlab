@@ -29,7 +29,7 @@ flxtype = 4;     % {1} Godunov, {2} Roe, {3} LF, {4} LLF, {5} Upwind {not conser
 
 %% Initial Condition
 % NOTE: In IC function, we can control the initial max and min value of u. 
-     u0 = IC_iBurgers(x,IC_case); 
+     u0 = IC(x,IC_case); 
 
 % Load initial time
     t = 0;

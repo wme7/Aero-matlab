@@ -1,4 +1,4 @@
-function [L1_nodes,degree_aveg,Linf_nodes,degree_min] = TestCPRfun(fluxfun,cfl,tEnd,~,K,nE,quad)
+function [L1_nodes,degree_aveg,Linf_nodes,degree_min] = TestCPRfun(fluxfun,cfl,tEnd,Ic,K,nE,quad)
 % Test CPR Method
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %          Test 1-D wave equation with CPR/FR implementation
@@ -50,8 +50,7 @@ L.rcoef = double(subs(l.lagrangePolynomial,1));
 L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 
 % IC
-%u0 = IC(x,ic);
-u0 = sin(x);
+u0 = IC(x,Ic);
 
 % Set plot range
 %plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];

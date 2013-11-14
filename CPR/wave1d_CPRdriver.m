@@ -13,11 +13,11 @@
 clc; clear all; close all;
 
 %% Simulation Parameters
-fluxfun = 'linear'; % select flux function
-cfl = 0.05; % CFL condition
-tEnd = 2; % final time
+fluxfun = 'nonlinear'; % select flux function
+cfl = 0.02; % CFL condition
+tEnd = 1.5; % final time
 K = 6; % degree of accuaracy %example: K = 6 -> cfl 0.001
-nE = 160; % number of elements
+nE = 40; % number of elements
 
 %% PreProcess
 % Define our Flux function
@@ -31,9 +31,10 @@ switch fluxfun
 end
 
 % Build 1d mesh
-xgrid = mesh1d([0 1],nE,'Legendre',K);
+xgrid = mesh1d([0 2*pi],nE,'Legendre',K);
 dx = xgrid.elementSize; J = xgrid.Jacobian; 
 x = xgrid.nodeCoordinates; quad = xgrid.quadratureType;
+w = xgrid.weights';	xc = xgrid.elementCenter;
 
 % compute gR'(xi) & gL'(xi)
 RR = CorrectionPolynomial('RadauRight',K+1); % g: one-order higher
@@ -49,10 +50,10 @@ L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 u0 = IC(x,2);
 
 % Set plot range
-plotrange = [xgrid.range(1),xgrid.range(2),0.9*min(min(u0)),1.1*max(max(u0))];
+plotrange = [xgrid.range(1),xgrid.range(2),...
+    min(min(min(0.9*u0)),min(min(1.1*u0))),1.1*max(max(u0))];
 
 %% Solver Loop
-
 
 % Set initial time & load IC
 t = 0; u = u0; it = 0;
@@ -66,10 +67,7 @@ while t < tEnd
     
     % iteration counter
     it = it+1; 
-    
-    % Plot u
-    plot(x,u,x,u0,'-o'); axis(plotrange); grid on; 
-       
+           
     % 1st stage
     dF = residual(u,L,dg,flux,dflux,quad);
     u = uo-dt*dF/J;
@@ -82,7 +80,13 @@ while t < tEnd
     dF = residual(u,L,dg,flux,dflux,quad); 
     u = (uo+2*(u-dt*dF/J))/3;
     
-    %pause(0.1)
+    % build cell averages
+    u_bar = w*u/2;
+    
+    % Plot u
+    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid on; 
+    subplot(1,2,2); plot(xc,u_bar,'ro'); axis(plotrange); grid off; 
+    
     %if rem(it,10) == 0
         drawnow;
     %end
