@@ -14,11 +14,11 @@ clc; clear all; close all;
 
 %% Simulation Parameters
 fluxfun = 'nonlinear'; % select flux function
-cfl = 0.005; % CFL condition
+cfl = 0.01; % CFL condition
 tEnd = 1.5; % final time
 K = 3; % degree of accuaracy %example: K = 6 -> cfl 0.001
 nE = 40; % number of elements
-M = 10; % MODminmod parameter
+M = 5;% MODminmod parameter
 
 %% PreProcess
 % Define our Flux function
@@ -49,10 +49,17 @@ L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 
 % IC
 ic = 2; u0 = IC(x,ic);
-if ic==2
+switch ic
+    case 2
     load('burgersExact.mat');
     ue = burgersExact(2,:);
     xe = burgersExact(1,:);
+    case 4
+    load('burgersExact2.mat');
+    ue = burgersExact(2,:);
+    xe = burgersExact(1,:);
+    otherwise
+        % do nothing
 end
 
 % Set plot range
@@ -94,15 +101,15 @@ while t < tEnd
     u_bar = w*u/2;
     
     % Plot u
-    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid on; 
-    subplot(1,2,2); plot(xc,u_bar,'ro'); axis(plotrange); grid off; 
+    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); 
+    subplot(1,2,2); plot(xc,u_bar,'ro'); axis(plotrange); 
 
     %if rem(it,10)==0
         drawnow;
     %end
 end    
 %% Final Plot for IC 2
-if ic==2
-    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid on;
+if ic==2 || ic==4
+    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange);
     subplot(1,2,2); plot(xe,ue,'k-',xc,u_bar,'ro'); axis(plotrange);
 end

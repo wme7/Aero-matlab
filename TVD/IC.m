@@ -61,8 +61,11 @@ switch ICcase
 
     case {4} % sinusoidal wave
         
-        u0 = 1/2 + sin(x);
-        %u0 = 2 + 0.5*sin(pi*x);
+        u0 = 0.5 + sin(x);
+        
+    case {5} % centered sinusoidal wave
+        
+        u0 = sin(x);
         
     otherwise
         error('case not in the list')

@@ -18,7 +18,7 @@ IC = 2; % sinusoidal function
 
 % Parameters
 K   = [3,4,5];
-cfl = [0.0275,0.0275,0.035,0.035,0.041]; % to ensure stability
+cfl = [0.01,0.001,0.0001]; % to ensure stability
 nE  = [20,40,80,160,320];
 %quad = {'Legendre','LGL'};
 
@@ -36,7 +36,7 @@ for l = 1:p1
     for n = 1:p2
         tic;
         [Norm(n,1,l),Deg(n,1,l),Norm(n,2,l),Deg(n,2,l)] = ...
-            TestCPRfun('linear',cfl(n),tEnd,IC,K(l),nE(n),'Legendre');
+            TestCPRfun('linear',cfl(l),tEnd,IC,K(l),nE(n),'LGL');
         toc;        
     end
 end

@@ -62,11 +62,15 @@ u0 = IC(x,Ic);
 t = 0; u = u0; it = 0;
 
 % Using a 3-stage TVD Runge Kutta time integration
-while t < tEnd
+% Fixed time evolution
+dt = cfl*dx/abs(a); 
+time = t:dt:tEnd;
+%while t < tEnd
+for s = time
     uo = u;
     
     % update time
-    dt = cfl*dx/max(max(abs(dflux(u)))); t = t+dt;
+    %dt = cfl*dx/max(max(abs(dflux(u)))); t = t+dt;
     
     % iteration counter
     it = it+1; 
@@ -102,14 +106,9 @@ err = u0-u;
 % L1 Error
 %L1_avgs = sum(abs(u0_avg-u_avg));
 L1_nodes = sum(sum(abs(err)));
-deg = zeros(1,xgrid.nNodes);
-for i=1:xgrid.nNodes
-    str = num2str(err(i),'%1.2e');
-    deg(i) = str2double(str(end-1:end));
-end
-degree_aveg = mean(deg);
+degree_aveg = abs(log10(L1_nodes/xgrid.nNodes));
 
 % L\infty Error
 %Linf_avgs = max(abs(u0_avg-u_avg));
 Linf_nodes = max(max(abs(err)));
-degree_min = min(deg);
+degree_min = abs(log10(Linf_nodes));
