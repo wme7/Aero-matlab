@@ -36,7 +36,7 @@ for l = 1:p1
     for n = 1:p2
         tic;
         [Norm(n,1,l),Deg(n,1,l),Norm(n,2,l),Deg(n,2,l)] = ...
-            TestCPRfun('linear',cfl,tEnd,IC,K(l),nE(n),'Legendre');
+            TestCPRWENOfun('linear',cfl,tEnd,IC,K(l),nE(n),'Legendre');
         toc;        
     end
 end
