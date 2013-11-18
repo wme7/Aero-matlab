@@ -96,17 +96,17 @@ end
 offset = 0.05;
 subplot(221); 
 hold on
-plot(x,u_upwind,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([-0.5,1.5]); title 'One-Sided Upwind'; 
+plot(x,u_upwind,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); ylim([-0.5,1.5]); title 'One-Sided Upwind'; 
 hold off
 subplot(222); 
 hold on
-plot(x,u_LF,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([-0.5,1.5]); title 'Lax-Friedrichs';
+plot(x,u_LF,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); ylim([-0.5,1.5]); title 'Lax-Friedrichs';
 hold off
 subplot(223);
 hold on
-plot(x,u_LW,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([-0.5,1.5]); title 'Lax-wendroff';
+plot(x,u_LW,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); ylim([-0.5,1.5]); title 'Lax-wendroff';
 hold off
 subplot(224); 
 hold on
-plot(x,u_BW,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); yLim([-0.5,1.5]); title 'Beam-Warming';
+plot(x,u_BW,'.'); plot(x,u_exact,'k'); xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); ylim([-0.5,1.5]); title 'Beam-Warming';
 hold off

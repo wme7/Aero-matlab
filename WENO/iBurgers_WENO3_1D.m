@@ -23,7 +23,7 @@ clear all; clc; close all;
 IC_case = 1;     % {1} Gaussian, {2} Slope, {3} Triangle, {4} Sine {5} Riemann
 bc_type = 2;     % {1} Dirichlet, {2} Neumann, {3} Periodic
 fluxsplit = 2;   % {1} Godunov, {2} Global LF, {3} Local LF
-fluxtype = 1;    % {1} Scalar, {2}, Burgers
+fluxtype = 2;    % {1} Scalar, {2}, Burgers
 
 %% Define our Flux function
 switch fluxtype
