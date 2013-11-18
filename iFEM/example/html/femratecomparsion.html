@@ -1,0 +1,183 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>COMPARISON OF CONVERGENCE RATE OF VARIOUS FINITE ELEMENT METHODS</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-02-28"><meta name="DC.source" content="femratecomparsion.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>COMPARISON OF CONVERGENCE RATE OF VARIOUS FINITE ELEMENT METHODS</h1><!--introduction--><p>This example is to compare the rate of convergence of various finite element approximation of the Poisson equation on the unit square:</p><p><img src="femratecomparsion_eq43355.png" alt="$$- \Delta u = f \; \hbox{in } (0,1)^2$$"></p><p>for the Dirichlet boundary condition. Results holds for other boundary conditions.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Problem</a></li><li><a href="#2">P1 element</a></li><li><a href="#4">CR nonconforming P1 element</a></li><li><a href="#6">P2 element</a></li><li><a href="#7">P3 element</a></li><li><a href="#8">Conclusion</a></li></ul></div><h2>Problem<a name="1"></a></h2><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>; clc;
+[node,elem] = squaremesh([0,1,0,1],0.25);
+pde = sincosdata;
+bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+<span class="comment">% pde = sincosNeumanndata;</span>
+<span class="comment">% bdFlag = setboundary(node,elem,'Neumann');</span>
+option.L0 = 2;
+option.maxIt = 5;
+option.printlevel = 1;
+option.plotflag = 0;
+</pre><h2>P1 element<a name="2"></a></h2><pre class="codeinput">err = femPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:     4225,  #nnz:    19593, iter:  9,   err = 5.3273e-09,   time = 0.14 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    16641,  #nnz:    80137, iter: 10,   err = 1.1482e-09,   time = 0.17 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    66049,  #nnz:   324105, iter: 10,   err = 1.3861e-09,   time = 0.62 s
+ #Dof   ||u-u_h||     ||Du-Du_h||   ||DuI-Du_h||  ||uI-u_h||_{max}
+  289   4.74156e-03   2.17567e-01   7.60779e-03   3.20328e-03
+ 1089   1.19232e-03   1.08979e-01   1.91282e-03   8.02597e-04
+ 4225   2.98519e-04   5.45142e-02   4.78894e-04   2.00761e-04
+16641   7.46572e-05   2.72602e-02   1.19767e-04   5.01970e-05
+66049   1.86660e-05   1.36305e-02   2.99441e-05   1.25496e-05
+</pre><img vspace="5" hspace="5" src="femratecomparsion_01.png" alt=""> <p>The optimal rate of convergence of the H1-norm (1st order), L2-norm (2nd order), and discrte maximum norm is observed. The 2nd order convergent rate between two discrete functions <tt>|DuI-Duh</tt>| is known as superconvergence.</p><h2>CR nonconforming P1 element<a name="4"></a></h2><pre class="codeinput">option.elemType = <span class="string">'CR'</span>;
+err = femPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:     3136,  #nnz:    10944, iter: 12,   err = 2.8436e-09,   time = 0.13 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    12416,  #nnz:    44416, iter: 12,   err = 3.0136e-09,   time = 0.14 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    49408,  #nnz:   178944, iter: 12,   err = 3.0174e-09,   time = 0.47 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:   197120,  #nnz:   718336, iter: 12,   err = 2.8506e-09,   time =  2.7 s
+ #Dof   ||u-u_h||     ||Du-Du_h||   ||DuI-Du_h||  ||uI-u_h||_{max}
+   800   1.20461e-03   1.62309e-01   3.64289e-02   1.55729e-03
+  3136   3.01947e-04   8.12465e-02   1.81841e-02   3.97659e-04
+ 12416   7.55369e-05   4.06347e-02   9.08831e-03   1.00099e-04
+ 49408   1.88874e-05   2.03188e-02   4.54369e-03   2.50777e-05
+197120   4.72202e-06   1.01596e-02   2.27178e-03   6.27347e-06
+</pre><img vspace="5" hspace="5" src="femratecomparsion_02.png" alt=""> <p>The optimal rate of convergence of the H1-norm (1st order), L2-norm (2nd order), and discrte maximum norm is observed. But no superconvergence of <tt>|DuI-Duh</tt>|.</p><h2>P2 element<a name="6"></a></h2><pre class="codeinput">option.elemType = <span class="string">'P2'</span>;
+err = femPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:     4225,  #nnz:    34721, iter:  9,   err = 2.3478e-08,   time = 0.15 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    16641,  #nnz:   143137, iter: 11,   err = 7.0014e-10,   time = 0.29 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    66049,  #nnz:   581153, iter: 12,   err = 9.3196e-11,   time = 0.89 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:   263169,  #nnz:  2341921, iter: 13,   err = 1.2514e-11,   time =  4.3 s
+ #Dof   ||u-u_h||     ||Du-Du_h||   ||DuI-Du_h||  ||uI-u_h||_{max}
+  1089   5.72262e-05   8.42020e-03   4.47681e-04   1.36359e-05
+  4225   7.14446e-06   2.10958e-03   5.75511e-05   8.53377e-07
+ 16641   8.92806e-07   5.27686e-04   7.28791e-06   5.33188e-08
+ 66049   1.11594e-07   1.31940e-04   9.16685e-07   3.33926e-09
+263169   1.39490e-08   3.29862e-05   1.14936e-07   2.08791e-10
+</pre><img vspace="5" hspace="5" src="femratecomparsion_03.png" alt=""> <h2>P3 element<a name="7"></a></h2><pre class="codeinput">option.elemType = <span class="string">'P3'</span>;
+err = femPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:     2401,  #nnz:    34049, iter: 14,   err = 5.9261e-08,   time = 0.075 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:     9409,  #nnz:   143265, iter: 16,   err = 5.3279e-09,   time = 0.37 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    37249,  #nnz:   587489, iter: 18,   err = 4.3333e-10,   time = 0.89 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:   148225,  #nnz:  2379105, iter: 20,   err = 3.6910e-11,   time =  3.6 s
+ #Dof   ||u-u_h||     ||Du-Du_h||   ||DuI-Du_h||  ||uI-u_h||_{max}
+  2401   1.65309e-06   1.39305e-04   1.25209e-04   3.58862e-06
+  9409   1.01588e-07   1.72328e-05   1.58836e-05   2.27717e-07
+ 37249   6.29771e-09   2.14244e-06   1.99923e-06   1.41694e-08
+148225   3.92000e-10   2.67067e-07   2.50731e-07   8.87807e-10
+</pre><img vspace="5" hspace="5" src="femratecomparsion_04.png" alt=""> <h2>Conclusion<a name="8"></a></h2><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% COMPARISON OF CONVERGENCE RATE OF VARIOUS FINITE ELEMENT METHODS
+%
+% This example is to compare the rate of convergence of various finite
+% element approximation of the Poisson equation on the unit square:
+%
+% $$- \Delta u = f \; \hbox{in } (0,1)^2$$
+%
+% for the Dirichlet boundary condition. Results holds for other boundary
+% conditions. 
+
+%% Problem
+clear all; close all; clc;
+[node,elem] = squaremesh([0,1,0,1],0.25); 
+pde = sincosdata;
+bdFlag = setboundary(node,elem,'Dirichlet');
+% pde = sincosNeumanndata;
+% bdFlag = setboundary(node,elem,'Neumann');
+option.L0 = 2;
+option.maxIt = 5;
+option.printlevel = 1;
+option.plotflag = 0;
+
+%% P1 element 
+err = femPoisson(node,elem,pde,bdFlag,option);
+
+%%
+% The optimal rate of convergence of the H1-norm (1st order), L2-norm (2nd
+% order), and discrte maximum norm is observed. The 2nd order convergent
+% rate between two discrete functions ||DuI-Duh|| is known as
+% superconvergence.
+
+%% CR nonconforming P1 element
+option.elemType = 'CR';
+err = femPoisson(node,elem,pde,bdFlag,option);
+
+%%
+% The optimal rate of convergence of the H1-norm (1st order), L2-norm (2nd
+% order), and discrte maximum norm is observed. But no superconvergence of
+% ||DuI-Duh||.
+
+%% P2 element
+option.elemType = 'P2';
+err = femPoisson(node,elem,pde,bdFlag,option);
+
+%% P3 element
+option.elemType = 'P3';
+err = femPoisson(node,elem,pde,bdFlag,option);
+
+%% Conclusion
+
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,270 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>quadpts3</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2010-12-19"><meta name="DC.source" content="quadpts3.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">QUADPTS3 quadrature points in 3-D.</a></li><li><a href="#3">Order 1, nQuad 1</a></li><li><a href="#5">Order 2, nQuad 4</a></li><li><a href="#8">Order 3, nQuad 5</a></li><li><a href="#11">Order 4, nQuad 16</a></li><li><a href="#14">Order 5, nQuad 17</a></li><li><a href="#17">Verification</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> [lambda,weight] = quadpts3(order)
+</pre><h2>QUADPTS3 quadrature points in 3-D.<a name="2"></a></h2><p>[lambda,weight] = quadpts3(order) return quadrature points with given order (up to 5) in the barycentric coordinates.</p><p>The output lambda is a matrix of size nQ by 4, where nQ is the number of quadrature points. lambda(i,:) is three barycentric coordinate of the i-th quadrature point and lambda(:,j) is the j-th barycentric coordinate of all quadrature points. The x-y coordinate of the p-th quadrature point can be computed as</p><pre>   pxy = lambda(p,1)*node(elem(:,1),:) ...
+       + lambda(p,2)*node(elem(:,2),:) ...
+       + lambda(p,3)*node(elem(:,3),:) ...
+       + lambda(p,4)*node(elem(:,4),:);</pre><p>The weight of p-th quadrature point is given by weight(p). See verifyquadpts for the usage of qudrature rules to compute integrals over triangles.</p><p>References:</p><div><ul><li>Jinyun, Y. Symmetric Gaussian quadrature formulae for tetrahedronal regions. Comput. Methods Appl. Mech. Engrg.. 43(3):349--353, 1984.</li></ul></div><p>See also verifyquadpts3, quadt, verifyquadpts</p><p>Copyright (C) Long Chen. See COPYRIGHT.txt for details.</p><pre class="codeinput"><span class="keyword">if</span> order&gt;5
+    order = 5;
+<span class="keyword">end</span>
+<span class="keyword">switch</span> order
+</pre><h2>Order 1, nQuad 1<a name="3"></a></h2><pre class="codeinput">    <span class="keyword">case</span> 1
+</pre><pre class="codeinput">        lambda = [1/4, 1/4, 1/4, 1/4];
+        weight = 1;
+</pre><h2>Order 2, nQuad 4<a name="5"></a></h2><pre class="codeinput">    <span class="keyword">case</span> 2
+</pre><pre class="codeinput">        alpha = 0.5854101966249685;
+        beta =  0.138196601125015;
+        lambda = [alpha beta beta beta; <span class="keyword">...</span><span class="comment">.</span>
+                  beta alpha beta beta; <span class="keyword">...</span>
+                  beta beta alpha beta; <span class="keyword">...</span>
+                  beta beta beta alpha];
+        weight = [1/4, 1/4, 1/4, 1/4];
+</pre><h2>Order 3, nQuad 5<a name="8"></a></h2><pre class="codeinput">    <span class="keyword">case</span> 3
+</pre><pre class="codeinput">        lambda = [1/4 1/4 1/4 1/4; <span class="keyword">...</span>
+                  1/2 1/6 1/6 1/6; <span class="keyword">...</span>
+                  1/6 1/2 1/6 1/6; <span class="keyword">...</span>
+                  1/6 1/6 1/2 1/6; <span class="keyword">...</span>
+                  1/6 1/6 1/6 1/2];
+        weight = [-4/5, 9/20, 9/20, 9/20, 9/20];
+</pre><h2>Order 4, nQuad 16<a name="11"></a></h2><pre class="codeinput">    <span class="keyword">case</span> 4
+</pre><pre class="codeinput">        alpha1 = 0.7716429020672371;
+        beta1 =  0.7611903264425430e-1;
+        w1 = 0.5037379410012282e-1;
+        alpha = 0.4042339134672644;
+        beta = 0.7183164526766925e-1;
+        gamma = 0.11970052777978019;
+        w2 = 0.6654206863329239e-1;
+        lambda = [alpha1 beta1 beta1 beta1; <span class="keyword">...</span><span class="comment">.</span>
+                  beta1 alpha1 beta1 beta1; <span class="keyword">...</span>
+                  beta1 beta1 alpha1 beta1; <span class="keyword">...</span>
+                  beta1 beta1 beta1 alpha1; <span class="keyword">...</span>
+                  alpha alpha beta gamma; <span class="keyword">...</span>
+                  alpha alpha gamma beta; <span class="keyword">...</span>
+                  alpha beta alpha gamma; <span class="keyword">...</span>
+                  alpha beta gamma alpha; <span class="keyword">...</span>
+                  alpha gamma beta alpha; <span class="keyword">...</span>
+                  alpha gamma alpha beta; <span class="keyword">...</span>
+                  beta alpha alpha gamma; <span class="keyword">...</span>
+                  beta alpha gamma alpha; <span class="keyword">...</span>
+                  beta gamma alpha alpha; <span class="keyword">...</span>
+                  gamma alpha alpha beta; <span class="keyword">...</span>
+                  gamma alpha beta alpha; <span class="keyword">...</span>
+                  gamma beta alpha alpha];
+        weight = [w1, w1, w1, w1, <span class="keyword">...</span>
+                  w2, w2, w2, w2, w2, w2, <span class="keyword">...</span>
+                  w2, w2, w2, w2, w2, w2];
+</pre><h2>Order 5, nQuad 17<a name="14"></a></h2><pre class="codeinput">    <span class="keyword">case</span> 5
+</pre><pre class="codeinput">        alpha1 = 0.7316369079576180;
+        beta1 =  0.8945436401412733e-1;
+        w1 = 0.6703858372604275e-1;
+        alpha = 0.4214394310662522;
+        beta = 0.2454003792903000e-1;
+        gamma = 0.1325810999384657;
+        w2 = 0.4528559236327399e-1;
+        lambda = [1/4, 1/4, 1/4, 1/4; <span class="keyword">...</span>
+                  alpha1 beta1 beta1 beta1; <span class="keyword">...</span><span class="comment">.</span>
+                  beta1 alpha1 beta1 beta1; <span class="keyword">...</span>
+                  beta1 beta1 alpha1 beta1; <span class="keyword">...</span>
+                  beta1 beta1 beta1 alpha1; <span class="keyword">...</span>
+                  alpha alpha beta gamma; <span class="keyword">...</span>
+                  alpha alpha gamma beta; <span class="keyword">...</span>
+                  alpha beta alpha gamma; <span class="keyword">...</span>
+                  alpha beta gamma alpha; <span class="keyword">...</span>
+                  alpha gamma beta alpha; <span class="keyword">...</span>
+                  alpha gamma alpha beta; <span class="keyword">...</span>
+                  beta alpha alpha gamma; <span class="keyword">...</span>
+                  beta alpha gamma alpha; <span class="keyword">...</span>
+                  beta gamma alpha alpha; <span class="keyword">...</span>
+                  gamma alpha alpha beta; <span class="keyword">...</span>
+                  gamma alpha beta alpha; <span class="keyword">...</span>
+                  gamma beta alpha alpha];
+        weight = [0.1884185567365411, <span class="keyword">...</span>
+                  w1, w1, w1, w1, <span class="keyword">...</span>
+                  w2, w2, w2, w2, w2, w2, <span class="keyword">...</span>
+                  w2, w2, w2, w2, w2, w2];
+<span class="keyword">end</span>
+</pre><h2>Verification<a name="17"></a></h2><p>The order of the quadrature rule is verified by the function verifyquadpts. See <a href="matlab:ifem('verifyquadpts3')">verifyquadpts3</a>.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+function [lambda,weight] = quadpts3(order)
+%% QUADPTS3 quadrature points in 3-D.
+%
+% [lambda,weight] = quadpts3(order) return quadrature points with given
+% order (up to 5) in the barycentric coordinates.
+%
+% The output lambda is a matrix of size nQ by 4, where nQ is the number of
+% quadrature points. lambda(i,:) is three barycentric coordinate of the
+% i-th quadrature point and lambda(:,j) is the j-th barycentric coordinate
+% of all quadrature points. The x-y coordinate of the p-th quadrature point
+% can be computed as 
+%
+%     pxy = lambda(p,1)*node(elem(:,1),:) ...
+%         + lambda(p,2)*node(elem(:,2),:) ... 
+%         + lambda(p,3)*node(elem(:,3),:) ...
+%         + lambda(p,4)*node(elem(:,4),:);
+%
+% The weight of p-th quadrature point is given by weight(p). See
+% verifyquadpts for the usage of qudrature rules to compute integrals over
+% triangles.
+% 
+% References: 
+%
+% * Jinyun, Y. Symmetric Gaussian quadrature formulae for tetrahedronal
+% regions. Comput. Methods Appl. Mech. Engrg.. 43(3):349REPLACE_WITH_DASH_DASH353, 1984.
+%  
+% See also verifyquadpts3, quadt, verifyquadpts
+%
+% Copyright (C) Long Chen. See COPYRIGHT.txt for details. 
+
+if order>5
+    order = 5;
+end
+switch order
+    %% Order 1, nQuad 1
+    case 1 
+        lambda = [1/4, 1/4, 1/4, 1/4];
+        weight = 1;
+    %% Order 2, nQuad 4
+    case 2
+        alpha = 0.5854101966249685; 
+        beta =  0.138196601125015;
+        lambda = [alpha beta beta beta; ....
+                  beta alpha beta beta; ...
+                  beta beta alpha beta; ...
+                  beta beta beta alpha];
+        weight = [1/4, 1/4, 1/4, 1/4];
+    %% Order 3, nQuad 5
+    case 3
+        lambda = [1/4 1/4 1/4 1/4; ...
+                  1/2 1/6 1/6 1/6; ...
+                  1/6 1/2 1/6 1/6; ...
+                  1/6 1/6 1/2 1/6; ...
+                  1/6 1/6 1/6 1/2];
+        weight = [-4/5, 9/20, 9/20, 9/20, 9/20];
+    %% Order 4, nQuad 16
+    case 4
+        alpha1 = 0.7716429020672371; 
+        beta1 =  0.7611903264425430e-1;
+        w1 = 0.5037379410012282e-1;
+        alpha = 0.4042339134672644;
+        beta = 0.7183164526766925e-1;
+        gamma = 0.11970052777978019;
+        w2 = 0.6654206863329239e-1;
+        lambda = [alpha1 beta1 beta1 beta1; ....
+                  beta1 alpha1 beta1 beta1; ...
+                  beta1 beta1 alpha1 beta1; ...
+                  beta1 beta1 beta1 alpha1; ...
+                  alpha alpha beta gamma; ...
+                  alpha alpha gamma beta; ...
+                  alpha beta alpha gamma; ...
+                  alpha beta gamma alpha; ...
+                  alpha gamma beta alpha; ...
+                  alpha gamma alpha beta; ...
+                  beta alpha alpha gamma; ...
+                  beta alpha gamma alpha; ...
+                  beta gamma alpha alpha; ...
+                  gamma alpha alpha beta; ...
+                  gamma alpha beta alpha; ...
+                  gamma beta alpha alpha];                  
+        weight = [w1, w1, w1, w1, ...
+                  w2, w2, w2, w2, w2, w2, ...
+                  w2, w2, w2, w2, w2, w2];
+    %% Order 5, nQuad 17
+    case 5
+        alpha1 = 0.7316369079576180; 
+        beta1 =  0.8945436401412733e-1;
+        w1 = 0.6703858372604275e-1;
+        alpha = 0.4214394310662522;
+        beta = 0.2454003792903000e-1;
+        gamma = 0.1325810999384657;
+        w2 = 0.4528559236327399e-1;
+        lambda = [1/4, 1/4, 1/4, 1/4; ...
+                  alpha1 beta1 beta1 beta1; ....
+                  beta1 alpha1 beta1 beta1; ...
+                  beta1 beta1 alpha1 beta1; ...
+                  beta1 beta1 beta1 alpha1; ...
+                  alpha alpha beta gamma; ...
+                  alpha alpha gamma beta; ...
+                  alpha beta alpha gamma; ...
+                  alpha beta gamma alpha; ...
+                  alpha gamma beta alpha; ...
+                  alpha gamma alpha beta; ...
+                  beta alpha alpha gamma; ...
+                  beta alpha gamma alpha; ...
+                  beta gamma alpha alpha; ...
+                  gamma alpha alpha beta; ...
+                  gamma alpha beta alpha; ...
+                  gamma beta alpha alpha];                  
+        weight = [0.1884185567365411, ...
+                  w1, w1, w1, w1, ...
+                  w2, w2, w2, w2, w2, w2, ...
+                  w2, w2, w2, w2, w2, w2];
+end
+%% Verification
+% The order of the quadrature rule is verified by the function
+% verifyquadpts. See <matlab:ifem('verifyquadpts3') verifyquadpts3>.
+
+##### SOURCE END #####
+--></body></html>

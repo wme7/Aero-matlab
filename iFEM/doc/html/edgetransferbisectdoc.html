@@ -1,0 +1,154 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Check Transfer operator for edge</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-11-13"><meta name="DC.source" content="edgetransferbisectdoc.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Check Transfer operator for edge</h1><!--introduction--><p>The script file to check 2D transfer operator for edges. Face element and edge element share the same transfer in 2D.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Test 3: A coarse  mesh and its any bisection refinement</a></li></ul></div><h2>Test 3: A coarse  mesh and its any bisection refinement<a name="1"></a></h2><pre class="codeinput">node = [0,0; 1,0; 1,1; 0,1];
+elem = [1 2 4; 3 4 2];
+[node,elem] = bisect(node,elem,<span class="string">'all'</span>);
+[node,elem] = bisect(node,elem,[1 2 ]);
+[nodef,elemf,~,~,brother] = bisect(node,elem,[1 6]);
+
+subplot(1,2,1)
+showmesh(node,elem);
+findelem(node,elem);
+findnode(node,<span class="string">'all'</span>);
+subplot(1,2,2)
+showmesh(nodef,elemf);
+findelem(nodef,elemf);
+findnode(nodef,<span class="string">'all'</span>);
+
+[~,edgef] = dofedge(elemf);
+[~,edge] = dofedge(elem);
+
+pro = edgetransferbisect(elem,elemf,brother);
+
+u = inline(<span class="string">'[4.8 - x(:,2), 5.9 + x(:,1)]'</span>,<span class="string">'x'</span>);
+uI_c = edgeinterpolate(u,node,edge);
+uI_f = edgeinterpolate(u,nodef,edgef);
+u_c2f = pro*uI_c;
+
+<span class="comment">%disp('begin test :this is the simplest bisection:')</span>
+<span class="comment">% Compare the solution:</span>
+disp(<span class="string">' Edges     uI_f        u_c2f      uI_f-u_c2f'</span>);
+disp(num2str([(1:size(edgef,1))' uI_f u_c2f uI_f-u_c2f]))
+disp(<span class="string">'the last test is suitable for several possible bisections, so it can used to adaptive mesh.'</span>);
+disp(<span class="string">'if you can see the answer is zero, means our test is successful.'</span>);
+</pre><pre class="codeoutput"> Edges     uI_f        u_c2f      uI_f-u_c2f
+ 1          2.4          2.4            0
+ 2         2.95         2.95            0
+ 3        2.675        2.675            0
+ 4          6.9          6.9            0
+ 5         1.05         1.05            0
+ 6         -2.4         -2.4            0
+ 7        -5.35        -5.35            0
+ 8         -1.9         -1.9            0
+ 9          1.9          1.9            0
+10        -2.95        -2.95            0
+11       -0.525       -0.525 -1.11022e-16
+12         -3.2         -3.2            0
+13          3.2          3.2            0
+14        -2.15        -2.15            0
+15       -2.675       -2.675            0
+16        0.525        0.525            0
+17          0.4          0.4            0
+18        -2.55        -2.55            0
+19         -0.4         -0.4            0
+20         2.55         2.55            0
+the last test is suitable for several possible bisections, so it can used to adaptive mesh.
+if you can see the answer is zero, means our test is successful.
+</pre><img vspace="5" hspace="5" src="edgetransferbisectdoc_01.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Check Transfer operator for edge
+% The script file to check 2D transfer operator for edges.
+% Face element and edge element share the same transfer in 2D.
+
+
+%% Test 3: A coarse  mesh and its any bisection refinement 
+node = [0,0; 1,0; 1,1; 0,1];   
+elem = [1 2 4; 3 4 2];
+[node,elem] = bisect(node,elem,'all');
+[node,elem] = bisect(node,elem,[1 2 ]);
+[nodef,elemf,~,~,brother] = bisect(node,elem,[1 6]);
+
+subplot(1,2,1)
+showmesh(node,elem);
+findelem(node,elem);
+findnode(node,'all');
+subplot(1,2,2)
+showmesh(nodef,elemf);
+findelem(nodef,elemf);
+findnode(nodef,'all');
+
+[~,edgef] = dofedge(elemf);
+[~,edge] = dofedge(elem);
+
+pro = edgetransferbisect(elem,elemf,brother);
+
+u = inline('[4.8 - x(:,2), 5.9 + x(:,1)]','x');
+uI_c = edgeinterpolate(u,node,edge);
+uI_f = edgeinterpolate(u,nodef,edgef);
+u_c2f = pro*uI_c;
+
+%disp('begin test :this is the simplest bisection:')
+% Compare the solution:
+disp(' Edges     uI_f        u_c2f      uI_f-u_c2f');
+disp(num2str([(1:size(edgef,1))' uI_f u_c2f uI_f-u_c2f]))
+disp('the last test is suitable for several possible bisections, so it can used to adaptive mesh.');
+disp('if you can see the answer is zero, means our test is successful.');
+
+##### SOURCE END #####
+--></body></html>

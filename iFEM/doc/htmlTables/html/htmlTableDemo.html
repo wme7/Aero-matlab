@@ -1,0 +1,371 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Printing Variables to HTML Tables in Published Code</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2011-12-17"><meta name="m-file" content="htmlTableDemo"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Printing Variables to HTML Tables in Published Code</h1><!--introduction--><p>One often-requested feature for Cell Mode publishing is to have a command that simply displays the output of a MATLAB&reg; variable as a table. This file shows how to do that.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Passing through HTML</a></li><li><a href="#6">Add column headers and row names</a></li><li><a href="#7">Colorize the table cells</a></li><li><a href="#8">Some test cases</a></li></ul></div><h2>Passing through HTML<a name="1"></a></h2><p>Beginning with R2007a, you can pass HTML directly through to your output file by wrapping it in an HTML tag.</p><p>Look at the difference between these two lines to see how it works.</p><pre class="codeinput">disp(<span class="string">'Option 1: This is &lt;b&gt;bold&lt;/b&gt;'</span>)
+</pre><pre class="codeoutput">Option 1: This is &lt;b&gt;bold&lt;/b&gt;
+</pre><pre class="codeinput">disp(<span class="string">'&lt;html&gt;Option 2: This is &lt;b&gt;bold&lt;/b&gt;&lt;/html&gt;'</span>)
+</pre>Option 2: This is <b>bold</b><p>Here's a matrix...</p><pre class="codeinput">m = magic(4)
+</pre><pre class="codeoutput">
+m =
+
+    16     2     3    13
+     5    11    10     8
+     9     7     6    12
+     4    14    15     1
+
+</pre><p>which I can now display with the help of a function like makeHtmlTable.</p><pre class="codeinput">makeHtmlTable(m);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>16</td><td>2</td><td>3</td><td>13</td></tr>
+<tr><td>5</td><td>11</td><td>10</td><td>8</td></tr>
+<tr><td>9</td><td>7</td><td>6</td><td>12</td></tr>
+<tr><td>4</td><td>14</td><td>15</td><td>1</td></tr>
+</table><p>Here is the help entry for makeHtmlTable</p><pre class="codeinput">help <span class="string">makeHtmlTable</span>
+</pre><pre class="codeoutput"> MAKEHTMLTABLE  Display matrix contents as an HTML table
+    makeHtmlTable(M) where M is an array
+    makeHtmlTable(M, T) where T is a cell array of strings equal in size
+    to M. The contents of T are displayed preferentially when T is not empty.
+    makeHtmlTable(M, T, rowNames, colHeaders) where colHeaders and
+    rowNames are cell arrays.
+    makeHtmlTable(M, T, rowNames, colHeaders, colors) where colors is a
+    standard three-column colormap. Color is scaled like in IMAGESC. NaNs
+    in M are mapped to the color white.
+    makeHtmlTable(M, T, rowNames, colHeaders, colors, strPrecision) where
+    strPrecision specifies the digits of precision displayed as explained
+    in MAT2STR.
+ 
+    Example:
+    makeHtmlTable([1 2; 3 4])
+
+</pre><h2>Add column headers and row names<a name="6"></a></h2><p>If you have them, we can show them.</p><pre class="codeinput">r = {<span class="string">'row 1'</span>,<span class="string">'row 2'</span>,<span class="string">'row 3'</span>,<span class="string">'row 4'</span>};
+c = {<span class="string">'col 1'</span>,<span class="string">'col 2'</span>,<span class="string">'col 3'</span>,<span class="string">'col 4'</span>};
+makeHtmlTable(m,[],r,c);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>col 1</td><td>col 2</td><td>col 3</td><td>col 4</td></tr>
+<tr><td>row 1</td><td>16</td><td>2</td><td>3</td><td>13</td></tr>
+<tr><td>row 2</td><td>5</td><td>11</td><td>10</td><td>8</td></tr>
+<tr><td>row 3</td><td>9</td><td>7</td><td>6</td><td>12</td></tr>
+<tr><td>row 4</td><td>4</td><td>14</td><td>15</td><td>1</td></tr>
+</table><h2>Colorize the table cells<a name="7"></a></h2><p>Here's a little hack for matrix visualization.</p><pre class="codeinput">colorFlag = true;
+cmap = gray;
+cmap(:,1) = 1;
+makeHtmlTable(m,[],r,c,cmap);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>col 1</td><td>col 2</td><td>col 3</td><td>col 4</td></tr>
+<tr><td>row 1</td><td bgcolor=#FFFFFF>16</td><td bgcolor=#FF1010>2</td><td bgcolor=#FF2020>3</td><td bgcolor=#FFCACA>13</td></tr>
+<tr><td>row 2</td><td bgcolor=#FF4040>5</td><td bgcolor=#FFAAAA>11</td><td bgcolor=#FF9595>10</td><td bgcolor=#FF7575>8</td></tr>
+<tr><td>row 3</td><td bgcolor=#FF8585>9</td><td bgcolor=#FF6565>7</td><td bgcolor=#FF5555>6</td><td bgcolor=#FFBABA>12</td></tr>
+<tr><td>row 4</td><td bgcolor=#FF3030>4</td><td bgcolor=#FFDADA>14</td><td bgcolor=#FFEAEA>15</td><td bgcolor=#FF0000>1</td></tr>
+</table><h2>Some test cases<a name="8"></a></h2><p>If all these run to completion, we're doing pretty well.</p><pre class="codeinput">m = hilb(6);
+makeHtmlTable(m,[],[],[],[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>1</td><td>0.5</td><td>0.333333</td><td>0.25</td><td>0.2</td><td>0.166667</td></tr>
+<tr><td>0.5</td><td>0.333333</td><td>0.25</td><td>0.2</td><td>0.166667</td><td>0.142857</td></tr>
+<tr><td>0.333333</td><td>0.25</td><td>0.2</td><td>0.166667</td><td>0.142857</td><td>0.125</td></tr>
+<tr><td>0.25</td><td>0.2</td><td>0.166667</td><td>0.142857</td><td>0.125</td><td>0.111111</td></tr>
+<tr><td>0.2</td><td>0.166667</td><td>0.142857</td><td>0.125</td><td>0.111111</td><td>0.1</td></tr>
+<tr><td>0.166667</td><td>0.142857</td><td>0.125</td><td>0.111111</td><td>0.1</td><td>0.0909091</td></tr>
+</table><pre class="codeinput">cmap = jet/2 + 0.5;
+makeHtmlTable(m,[],[],[],cmap,2);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td bgcolor=#BF7F7F>1</td><td bgcolor=#A7FFD7>0.5</td><td bgcolor=#7FC7FF>0.33</td><td bgcolor=#7F9FFF>0.25</td><td bgcolor=#7F7FFF>0.2</td><td bgcolor=#7F7FEF>0.17</td></tr>
+<tr><td bgcolor=#A7FFD7>0.5</td><td bgcolor=#7FC7FF>0.33</td><td bgcolor=#7F9FFF>0.25</td><td bgcolor=#7F7FFF>0.2</td><td bgcolor=#7F7FEF>0.17</td><td bgcolor=#7F7FDF>0.14</td></tr>
+<tr><td bgcolor=#7FC7FF>0.33</td><td bgcolor=#7F9FFF>0.25</td><td bgcolor=#7F7FFF>0.2</td><td bgcolor=#7F7FEF>0.17</td><td bgcolor=#7F7FDF>0.14</td><td bgcolor=#7F7FD7>0.12</td></tr>
+<tr><td bgcolor=#7F9FFF>0.25</td><td bgcolor=#7F7FFF>0.2</td><td bgcolor=#7F7FEF>0.17</td><td bgcolor=#7F7FDF>0.14</td><td bgcolor=#7F7FD7>0.12</td><td bgcolor=#7F7FCF>0.11</td></tr>
+<tr><td bgcolor=#7F7FFF>0.2</td><td bgcolor=#7F7FEF>0.17</td><td bgcolor=#7F7FDF>0.14</td><td bgcolor=#7F7FD7>0.12</td><td bgcolor=#7F7FCF>0.11</td><td bgcolor=#7F7FC7>0.1</td></tr>
+<tr><td bgcolor=#7F7FEF>0.17</td><td bgcolor=#7F7FDF>0.14</td><td bgcolor=#7F7FD7>0.12</td><td bgcolor=#7F7FCF>0.11</td><td bgcolor=#7F7FC7>0.1</td><td bgcolor=#7F7FC7>0.091</td></tr>
+</table><pre class="codeinput">m = [1 2; 3 4];
+makeHtmlTable(m);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>1</td><td>2</td></tr>
+<tr><td>3</td><td>4</td></tr>
+</table><pre class="codeinput">makeHtmlTable(m,[],[],[],summer);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td bgcolor=#007F66>1</td><td bgcolor=#55AA66>2</td></tr>
+<tr><td bgcolor=#AAD466>3</td><td bgcolor=#FFFF66>4</td></tr>
+</table><pre class="codeinput">makeHtmlTable(m,[],{<span class="string">'top'</span>,<span class="string">'bottom'</span>},{<span class="string">'left'</span>,<span class="string">'right'</span>},winter);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>left</td><td>right</td></tr>
+<tr><td>top</td><td bgcolor=#0000FF>1</td><td bgcolor=#0055D4>2</td></tr>
+<tr><td>bottom</td><td bgcolor=#00AAAA>3</td><td bgcolor=#00FF7F>4</td></tr>
+</table><pre class="codeinput">m = magic(11);
+makeHtmlTable(m,[],[],[],autumn);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td bgcolor=#FF8D00>68</td><td bgcolor=#FFAA00>81</td><td bgcolor=#FFC200>94</td><td bgcolor=#FFDE00>107</td><td bgcolor=#FFFA00>120</td><td bgcolor=#FF0000>1</td><td bgcolor=#FF1800>14</td><td bgcolor=#FF3400>27</td><td bgcolor=#FF5000>40</td><td bgcolor=#FF6D00>53</td><td bgcolor=#FF8900>66</td></tr>
+<tr><td bgcolor=#FFA500>80</td><td bgcolor=#FFC200>93</td><td bgcolor=#FFDE00>106</td><td bgcolor=#FFF600>119</td><td bgcolor=#FF1400>11</td><td bgcolor=#FF1800>13</td><td bgcolor=#FF3400>26</td><td bgcolor=#FF4C00>39</td><td bgcolor=#FF6900>52</td><td bgcolor=#FF8500>65</td><td bgcolor=#FF8900>67</td></tr>
+<tr><td bgcolor=#FFBE00>92</td><td bgcolor=#FFDA00>105</td><td bgcolor=#FFF600>118</td><td bgcolor=#FF1000>10</td><td bgcolor=#FF1400>12</td><td bgcolor=#FF3000>25</td><td bgcolor=#FF4C00>38</td><td bgcolor=#FF6900>51</td><td bgcolor=#FF8500>64</td><td bgcolor=#FF9D00>77</td><td bgcolor=#FFA100>79</td></tr>
+<tr><td bgcolor=#FFDA00>104</td><td bgcolor=#FFF200>117</td><td bgcolor=#FF1000>9</td><td bgcolor=#FF2C00>22</td><td bgcolor=#FF3000>24</td><td bgcolor=#FF4800>37</td><td bgcolor=#FF6500>50</td><td bgcolor=#FF8100>63</td><td bgcolor=#FF9D00>76</td><td bgcolor=#FFA100>78</td><td bgcolor=#FFBE00>91</td></tr>
+<tr><td bgcolor=#FFF200>116</td><td bgcolor=#FF0C00>8</td><td bgcolor=#FF2800>21</td><td bgcolor=#FF2C00>23</td><td bgcolor=#FF4800>36</td><td bgcolor=#FF6500>49</td><td bgcolor=#FF8100>62</td><td bgcolor=#FF9900>75</td><td bgcolor=#FFB600>88</td><td bgcolor=#FFBA00>90</td><td bgcolor=#FFD600>103</td></tr>
+<tr><td bgcolor=#FF0C00>7</td><td bgcolor=#FF2400>20</td><td bgcolor=#FF4000>33</td><td bgcolor=#FF4400>35</td><td bgcolor=#FF6100>48</td><td bgcolor=#FF7D00>61</td><td bgcolor=#FF9900>74</td><td bgcolor=#FFB600>87</td><td bgcolor=#FFBA00>89</td><td bgcolor=#FFD600>102</td><td bgcolor=#FFEE00>115</td></tr>
+<tr><td bgcolor=#FF2400>19</td><td bgcolor=#FF4000>32</td><td bgcolor=#FF4400>34</td><td bgcolor=#FF6100>47</td><td bgcolor=#FF7900>60</td><td bgcolor=#FF9500>73</td><td bgcolor=#FFB200>86</td><td bgcolor=#FFCE00>99</td><td bgcolor=#FFD200>101</td><td bgcolor=#FFEE00>114</td><td bgcolor=#FF0800>6</td></tr>
+<tr><td bgcolor=#FF3C00>31</td><td bgcolor=#FF5900>44</td><td bgcolor=#FF5D00>46</td><td bgcolor=#FF7900>59</td><td bgcolor=#FF9500>72</td><td bgcolor=#FFB200>85</td><td bgcolor=#FFCA00>98</td><td bgcolor=#FFCE00>100</td><td bgcolor=#FFEA00>113</td><td bgcolor=#FF0800>5</td><td bgcolor=#FF2000>18</td></tr>
+<tr><td bgcolor=#FF5900>43</td><td bgcolor=#FF5D00>45</td><td bgcolor=#FF7500>58</td><td bgcolor=#FF9100>71</td><td bgcolor=#FFAE00>84</td><td bgcolor=#FFCA00>97</td><td bgcolor=#FFE600>110</td><td bgcolor=#FFEA00>112</td><td bgcolor=#FF0400>4</td><td bgcolor=#FF2000>17</td><td bgcolor=#FF3C00>30</td></tr>
+<tr><td bgcolor=#FF7100>55</td><td bgcolor=#FF7500>57</td><td bgcolor=#FF9100>70</td><td bgcolor=#FFAE00>83</td><td bgcolor=#FFC600>96</td><td bgcolor=#FFE200>109</td><td bgcolor=#FFE600>111</td><td bgcolor=#FF0400>3</td><td bgcolor=#FF1C00>16</td><td bgcolor=#FF3800>29</td><td bgcolor=#FF5500>42</td></tr>
+<tr><td bgcolor=#FF7100>56</td><td bgcolor=#FF8D00>69</td><td bgcolor=#FFAA00>82</td><td bgcolor=#FFC600>95</td><td bgcolor=#FFE200>108</td><td bgcolor=#FFFF00>121</td><td bgcolor=#FF0000>2</td><td bgcolor=#FF1C00>15</td><td bgcolor=#FF3800>28</td><td bgcolor=#FF5500>41</td><td bgcolor=#FF6D00>54</td></tr>
+</table><p>If both the numeric input is NaN and the string input is non-empty for a given cell, then display the string.</p><pre class="codeinput">m = magic(12);
+t = cell(size(m));
+m(23) = NaN;
+t{23} = <span class="string">'unknown'</span>;
+m(79) = NaN;
+t{79} = <span class="string">'missing'</span>;
+m(120) = NaN;
+t{120} = <span class="string">'no data'</span>;
+makeHtmlTable(m,t,[],[],winter);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td bgcolor=#00FF7F>144</td><td bgcolor=#0000FF>2</td><td bgcolor=#0000FF>3</td><td bgcolor=#00F683>141</td><td bgcolor=#00F683>140</td><td bgcolor=#0008FA>6</td><td bgcolor=#0008FA>7</td><td bgcolor=#00EE87>137</td><td bgcolor=#00EE87>136</td><td bgcolor=#000CF8>10</td><td bgcolor=#0010F6>11</td><td bgcolor=#00EA89>133</td></tr>
+<tr><td bgcolor=#0014F4>13</td><td bgcolor=#00E68B>131</td><td bgcolor=#00E28D>130</td><td bgcolor=#0018F2>16</td><td bgcolor=#001CF0>17</td><td bgcolor=#00DE8F>127</td><td bgcolor=#00DE8F>126</td><td bgcolor=#0020EE>20</td><td bgcolor=#0020EE>21</td><td bgcolor=#00D693>123</td><td bgcolor=#00D693>122</td><td bgcolor=#0028EA>24</td></tr>
+<tr><td bgcolor=#0028EA>25</td><td bgcolor=#00CE97>119</td><td bgcolor=#00CE97>118</td><td bgcolor=#002CE8>28</td><td bgcolor=#0030E6>29</td><td bgcolor=#00CA99>115</td><td bgcolor=#00C69B>114</td><td bgcolor=#0034E4>32</td><td bgcolor=#0038E2>33</td><td bgcolor=#00C29D>111</td><td bgcolor=#00C29D>110</td><td bgcolor=#003CE0>36</td></tr>
+<tr><td bgcolor=#00BE9F>108</td><td bgcolor=#0040DE>38</td><td bgcolor=#0040DE>39</td><td bgcolor=#00B6A3>105</td><td bgcolor=#00B6A3>104</td><td bgcolor=#0048DA>42</td><td bgcolor=#0048DA>43</td><td bgcolor=#00B2A5>101</td><td bgcolor=#00AEA7>100</td><td bgcolor=#004CD8>46</td><td bgcolor=#0050D6>47</td><td bgcolor=#00AAAA>97</td></tr>
+<tr><td bgcolor=#00A5AC>96</td><td bgcolor=#0055D4>50</td><td bgcolor=#0059D2>51</td><td bgcolor=#00A1AE>93</td><td bgcolor=#00A1AE>92</td><td bgcolor=#005DD0>54</td><td bgcolor=#005DD0>55</td><td bgcolor=#0099B2>89</td><td bgcolor=#0099B2>88</td><td bgcolor=#0065CC>58</td><td bgcolor=#0065CC>59</td><td bgcolor=#0095B4>85</td></tr>
+<tr><td bgcolor=#0069CA>61</td><td bgcolor=#0091B6>83</td><td bgcolor=#008DB8>82</td><td bgcolor=#006DC8>64</td><td bgcolor=#0071C6>65</td><td bgcolor=#0089BA>79</td><td bgcolor=#0085BC>78</td><td bgcolor=#0075C4>68</td><td bgcolor=#0075C4>69</td><td bgcolor=#0081BE>75</td><td bgcolor=#0081BE>74</td><td bgcolor=#007DC0>72</td></tr>
+<tr><td bgcolor=#007DC0>73</td><td bgcolor=#0079C2>71</td><td bgcolor=#0079C2>70</td><td bgcolor=#0085BC>76</td><td bgcolor=#0085BC>77</td><td bgcolor=#0075C4>67</td><td bgcolor=#FFFFFF>missing</td><td bgcolor=#0089BA>80</td><td bgcolor=#008DB8>81</td><td bgcolor=#006DC8>63</td><td bgcolor=#0069CA>62</td><td bgcolor=#0091B6>84</td></tr>
+<tr><td bgcolor=#0065CC>60</td><td bgcolor=#0095B4>86</td><td bgcolor=#0095B4>87</td><td bgcolor=#0061CE>57</td><td bgcolor=#0061CE>56</td><td bgcolor=#009DB0>90</td><td bgcolor=#009DB0>91</td><td bgcolor=#0059D2>53</td><td bgcolor=#0059D2>52</td><td bgcolor=#00A1AE>94</td><td bgcolor=#00A5AC>95</td><td bgcolor=#0055D4>49</td></tr>
+<tr><td bgcolor=#0050D6>48</td><td bgcolor=#00AAAA>98</td><td bgcolor=#00AEA7>99</td><td bgcolor=#004CD8>45</td><td bgcolor=#0048DA>44</td><td bgcolor=#00B2A5>102</td><td bgcolor=#00B2A5>103</td><td bgcolor=#0044DC>41</td><td bgcolor=#0044DC>40</td><td bgcolor=#00BAA1>106</td><td bgcolor=#00BAA1>107</td><td bgcolor=#003CE0>37</td></tr>
+<tr><td bgcolor=#00BE9F>109</td><td bgcolor=#0038E2>35</td><td bgcolor=#0038E2>34</td><td bgcolor=#00C29D>112</td><td bgcolor=#00C69B>113</td><td bgcolor=#0034E4>31</td><td bgcolor=#0030E6>30</td><td bgcolor=#00CA99>116</td><td bgcolor=#00CE97>117</td><td bgcolor=#002CE8>27</td><td bgcolor=#002CE8>26</td><td bgcolor=#00D295>120</td></tr>
+<tr><td bgcolor=#00D295>121</td><td bgcolor=#FFFFFF>unknown</td><td bgcolor=#0024EC>22</td><td bgcolor=#00DA91>124</td><td bgcolor=#00DA91>125</td><td bgcolor=#001CF0>19</td><td bgcolor=#001CF0>18</td><td bgcolor=#00DE8F>128</td><td bgcolor=#00E28D>129</td><td bgcolor=#0018F2>15</td><td bgcolor=#0014F4>14</td><td bgcolor=#00E68B>132</td></tr>
+<tr><td bgcolor=#0010F6>12</td><td bgcolor=#00EA89>134</td><td bgcolor=#00EE87>135</td><td bgcolor=#000CF8>9</td><td bgcolor=#000CF8>8</td><td bgcolor=#00F285>138</td><td bgcolor=#00F285>139</td><td bgcolor=#0004FC>5</td><td bgcolor=#0004FC>4</td><td bgcolor=#FFFFFF>no data</td><td bgcolor=#00FA81>143</td><td bgcolor=#0000FF>1</td></tr>
+</table><p>This displays the frequency with which ASCII characters show up in the help entry for the PRINT command.</p><pre class="codeinput">t = num2cell(char(reshape(48:127,8,10)'));
+m = zeros(size(t));
+h = help(<span class="string">'print'</span>);
+<span class="keyword">for</span> i = 1:numel(t)
+    m(i) = sum(h==t{i});
+<span class="keyword">end</span>
+makeHtmlTable(m,t,[],[],summer);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td bgcolor=#048166>0</td><td bgcolor=#007F66>1</td><td bgcolor=#088366>2</td><td bgcolor=#007F66>3</td><td bgcolor=#007F66>4</td><td bgcolor=#007F66>5</td><td bgcolor=#007F66>6</td><td bgcolor=#007F66>7</td></tr>
+<tr><td bgcolor=#007F66>8</td><td bgcolor=#007F66>9</td><td bgcolor=#088366>:</td><td bgcolor=#007F66>;</td><td bgcolor=#007F66><</td><td bgcolor=#007F66>=</td><td bgcolor=#007F66>></td><td bgcolor=#007F66>?</td></tr>
+<tr><td bgcolor=#007F66>@</td><td bgcolor=#0C8566>A</td><td bgcolor=#048166>B</td><td bgcolor=#048166>C</td><td bgcolor=#048166>D</td><td bgcolor=#0C8566>E</td><td bgcolor=#088366>F</td><td bgcolor=#088366>G</td></tr>
+<tr><td bgcolor=#048166>H</td><td bgcolor=#148966>I</td><td bgcolor=#007F66>J</td><td bgcolor=#007F66>K</td><td bgcolor=#088366>L</td><td bgcolor=#088366>M</td><td bgcolor=#0C8566>N</td><td bgcolor=#088366>O</td></tr>
+<tr><td bgcolor=#208F66>P</td><td bgcolor=#007F66>Q</td><td bgcolor=#0C8566>R</td><td bgcolor=#188B66>S</td><td bgcolor=#188B66>T</td><td bgcolor=#048166>U</td><td bgcolor=#007F66>V</td><td bgcolor=#007F66>W</td></tr>
+<tr><td bgcolor=#007F66>X</td><td bgcolor=#007F66>Y</td><td bgcolor=#007F66>Z</td><td bgcolor=#007F66>[</td><td bgcolor=#007F66>\</td><td bgcolor=#007F66>]</td><td bgcolor=#007F66>^</td><td bgcolor=#007F66>_</td></tr>
+<tr><td bgcolor=#007F66>`</td><td bgcolor=#79BC66>a</td><td bgcolor=#188B66>b</td><td bgcolor=#48A366>c</td><td bgcolor=#5DAE66>d</td><td bgcolor=#FFFF66>e</td><td bgcolor=#50A766>f</td><td bgcolor=#2C9566>g</td></tr>
+<tr><td bgcolor=#349966>h</td><td bgcolor=#C6E266>i</td><td bgcolor=#048166>j</td><td bgcolor=#088366>k</td><td bgcolor=#59AC66>l</td><td bgcolor=#309766>m</td><td bgcolor=#AED666>n</td><td bgcolor=#B2D866>o</td></tr>
+<tr><td bgcolor=#6DB666>p</td><td bgcolor=#007F66>q</td><td bgcolor=#AED666>r</td><td bgcolor=#89C466>s</td><td bgcolor=#BEDE66>t</td><td bgcolor=#44A166>u</td><td bgcolor=#148966>v</td><td bgcolor=#188B66>w</td></tr>
+<tr><td bgcolor=#048166>x</td><td bgcolor=#148966>y</td><td bgcolor=#007F66>z</td><td bgcolor=#007F66>{</td><td bgcolor=#007F66>|</td><td bgcolor=#007F66>}</td><td bgcolor=#007F66>~</td><td bgcolor=#007F66></td></tr>
+</table><p>You can even use this to display images. Here's the full image.</p><pre class="codeinput">load <span class="string">mandrill</span>
+image(X);
+colormap(map)
+</pre><img vspace="5" hspace="5" src="htmlTableDemo_01.png" alt=""> <p>Here's a zoomed sub-image of one eye.</p><pre class="codeinput">c = 306;
+cinc = 34;
+r = 10;
+rinc = 26;
+X2 = X((1:rinc)+r, (1:cinc)+c);
+image(X2);
+colormap(map)
+</pre><img vspace="5" hspace="5" src="htmlTableDemo_02.png" alt=""> <pre class="codeinput">makeHtmlTable(X2,[],[],[],map);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td bgcolor=#30281F>20</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F281F>16</td><td bgcolor=#303830>30</td><td bgcolor=#303830>30</td><td bgcolor=#282830>19</td><td bgcolor=#170F0F>5</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F281F>16</td><td bgcolor=#1F170F>8</td><td bgcolor=#171F0F>9</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#282830>19</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F281F>16</td><td bgcolor=#1F170F>8</td><td bgcolor=#17280F>12</td><td bgcolor=#17280F>12</td><td bgcolor=#28171F>10</td><td bgcolor=#172828>14</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F0F28>6</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F0F07>4</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F0F07>4</td></tr>
+<tr><td bgcolor=#1F170F>8</td><td bgcolor=#0F0F07>4</td><td bgcolor=#1F170F>8</td><td bgcolor=#28171F>10</td><td bgcolor=#282830>19</td><td bgcolor=#28171F>10</td><td bgcolor=#17280F>12</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#282830>19</td><td bgcolor=#282830>19</td><td bgcolor=#28171F>10</td><td bgcolor=#0F0F28>6</td><td bgcolor=#0F0F28>6</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F0F07>4</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F281F>16</td><td bgcolor=#0F0F28>6</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F070F>3</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F281F>16</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F070F>3</td><td bgcolor=#1F170F>8</td><td bgcolor=#170F0F>5</td></tr>
+<tr><td bgcolor=#171F0F>9</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F0F28>6</td><td bgcolor=#1F1F17>11</td><td bgcolor=#172828>14</td><td bgcolor=#28171F>10</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F0F28>6</td><td bgcolor=#1F281F>16</td><td bgcolor=#283830>27</td><td bgcolor=#172828>14</td><td bgcolor=#1F281F>16</td><td bgcolor=#171F0F>9</td><td bgcolor=#1F1F17>11</td><td bgcolor=#0F0F28>6</td><td bgcolor=#1F170F>8</td><td bgcolor=#172828>14</td><td bgcolor=#1F281F>16</td><td bgcolor=#28171F>10</td><td bgcolor=#283830>27</td><td bgcolor=#404928>45</td><td bgcolor=#514928>53</td><td bgcolor=#515128>58</td><td bgcolor=#494917>47</td><td bgcolor=#516917>75</td><td bgcolor=#303830>30</td><td bgcolor=#49300F>29</td><td bgcolor=#514928>53</td><td bgcolor=#69510F>64</td><td bgcolor=#494917>47</td><td bgcolor=#30281F>20</td><td bgcolor=#30381F>28</td><td bgcolor=#302817>18</td><td bgcolor=#28171F>10</td></tr>
+<tr><td bgcolor=#28171F>10</td><td bgcolor=#1F281F>16</td><td bgcolor=#1F170F>8</td><td bgcolor=#282830>19</td><td bgcolor=#28171F>10</td><td bgcolor=#1F170F>8</td><td bgcolor=#283830>27</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F281F>16</td><td bgcolor=#282830>19</td><td bgcolor=#491707>15</td><td bgcolor=#515128>58</td><td bgcolor=#493028>31</td><td bgcolor=#695128>70</td><td bgcolor=#69510F>64</td><td bgcolor=#69510F>64</td><td bgcolor=#69510F>64</td><td bgcolor=#69510F>64</td><td bgcolor=#69510F>64</td><td bgcolor=#69510F>64</td><td bgcolor=#8A690F>107</td><td bgcolor=#8A690F>107</td><td bgcolor=#9B931F>158</td><td bgcolor=#CC9328>181</td><td bgcolor=#B3690F>133</td><td bgcolor=#9B931F>158</td><td bgcolor=#CC9328>181</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A690F>107</td><td bgcolor=#AB5107>99</td><td bgcolor=#8A690F>107</td><td bgcolor=#69510F>64</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td></tr>
+<tr><td bgcolor=#172828>14</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F0F28>6</td><td bgcolor=#1F1F17>11</td><td bgcolor=#172828>14</td><td bgcolor=#30518A>61</td><td bgcolor=#174959>36</td><td bgcolor=#495128>56</td><td bgcolor=#493028>31</td><td bgcolor=#49300F>29</td><td bgcolor=#695128>70</td><td bgcolor=#8A510F>81</td><td bgcolor=#726917>95</td><td bgcolor=#AB5107>99</td><td bgcolor=#726917>95</td><td bgcolor=#69510F>64</td><td bgcolor=#695128>70</td><td bgcolor=#8A690F>107</td><td bgcolor=#8A510F>81</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB7228>140</td><td bgcolor=#9B931F>158</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC9328>181</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td></tr>
+<tr><td bgcolor=#0F0F28>6</td><td bgcolor=#0F0F28>6</td><td bgcolor=#171F51>13</td><td bgcolor=#1F1F17>11</td><td bgcolor=#283830>27</td><td bgcolor=#518AB3>143</td><td bgcolor=#284928>35</td><td bgcolor=#69510F>64</td><td bgcolor=#69510F>64</td><td bgcolor=#8A510F>81</td><td bgcolor=#69510F>64</td><td bgcolor=#8A510F>81</td><td bgcolor=#8A690F>107</td><td bgcolor=#69510F>64</td><td bgcolor=#69300F>40</td><td bgcolor=#514928>53</td><td bgcolor=#69300F>40</td><td bgcolor=#69510F>64</td><td bgcolor=#8A690F>107</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC9328>181</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC9328>181</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC9328>181</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#AB5107>99</td></tr>
+<tr><td bgcolor=#0F0F07>4</td><td bgcolor=#1F1F17>11</td><td bgcolor=#28171F>10</td><td bgcolor=#17280F>12</td><td bgcolor=#518272>126</td><td bgcolor=#386969>79</td><td bgcolor=#40381F>32</td><td bgcolor=#8A510F>81</td><td bgcolor=#69300F>40</td><td bgcolor=#AB5107>99</td><td bgcolor=#8A5128>87</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td><td bgcolor=#695128>70</td><td bgcolor=#69510F>64</td><td bgcolor=#8A510F>81</td><td bgcolor=#B3690F>133</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC9328>181</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC590F>129</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC590F>129</td><td bgcolor=#8A690F>107</td></tr>
+<tr><td bgcolor=#0F0F07>4</td><td bgcolor=#1F170F>8</td><td bgcolor=#171F0F>9</td><td bgcolor=#285930>49</td><td bgcolor=#518AB3>143</td><td bgcolor=#494949>54</td><td bgcolor=#69300F>40</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td><td bgcolor=#8A5128>87</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB5107>99</td><td bgcolor=#8A690F>107</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#AB5107>99</td><td bgcolor=#69510F>64</td><td bgcolor=#8A510F>81</td><td bgcolor=#8A510F>81</td><td bgcolor=#69510F>64</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#ED400F>120</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#AB7228>140</td><td bgcolor=#AB5107>99</td></tr>
+<tr><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F0F28>6</td><td bgcolor=#518A8A>137</td><td bgcolor=#518A8A>137</td><td bgcolor=#49300F>29</td><td bgcolor=#8A690F>107</td><td bgcolor=#693028>43</td><td bgcolor=#8A690F>107</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB7228>140</td><td bgcolor=#8A510F>81</td><td bgcolor=#8A510F>81</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A510F>81</td><td bgcolor=#8A510F>81</td><td bgcolor=#69510F>64</td><td bgcolor=#8A510F>81</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A690F>107</td><td bgcolor=#8A510F>81</td><td bgcolor=#8A510F>81</td><td bgcolor=#69510F>64</td><td bgcolor=#AB5107>99</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td></tr>
+<tr><td bgcolor=#0F0F28>6</td><td bgcolor=#1F170F>8</td><td bgcolor=#173049>22</td><td bgcolor=#51ABAB>168</td><td bgcolor=#516969>93</td><td bgcolor=#515128>58</td><td bgcolor=#8A510F>81</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A510F>81</td><td bgcolor=#69300F>40</td><td bgcolor=#49300F>29</td><td bgcolor=#280F07>7</td><td bgcolor=#302817>18</td><td bgcolor=#491707>15</td><td bgcolor=#28171F>10</td><td bgcolor=#49300F>29</td><td bgcolor=#491707>15</td><td bgcolor=#69300F>40</td><td bgcolor=#8A690F>107</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td></tr>
+<tr><td bgcolor=#0F0F28>6</td><td bgcolor=#1F170F>8</td><td bgcolor=#386969>79</td><td bgcolor=#51ABAB>168</td><td bgcolor=#514928>53</td><td bgcolor=#8A5128>87</td><td bgcolor=#69510F>64</td><td bgcolor=#8A510F>81</td><td bgcolor=#8A690F>107</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC7207>148</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#8A510F>81</td><td bgcolor=#69510F>64</td><td bgcolor=#69300F>40</td><td bgcolor=#514928>53</td><td bgcolor=#282807>17</td><td bgcolor=#0F0707>2</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F0707>2</td><td bgcolor=#0F0707>2</td><td bgcolor=#28171F>10</td><td bgcolor=#280F07>7</td><td bgcolor=#69300F>40</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td></tr>
+<tr><td bgcolor=#0F0F07>4</td><td bgcolor=#1F170F>8</td><td bgcolor=#518272>126</td><td bgcolor=#5193CC>154</td><td bgcolor=#514928>53</td><td bgcolor=#69510F>64</td><td bgcolor=#8A690F>107</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#69510F>64</td><td bgcolor=#69300F>40</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F0707>2</td><td bgcolor=#280F07>7</td><td bgcolor=#516917>75</td><td bgcolor=#697251>110</td><td bgcolor=#30381F>28</td><td bgcolor=#0F0707>2</td><td bgcolor=#28171F>10</td><td bgcolor=#1F170F>8</td><td bgcolor=#69170F>25</td><td bgcolor=#69510F>64</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC9328>181</td></tr>
+<tr><td bgcolor=#1F281F>16</td><td bgcolor=#172828>14</td><td bgcolor=#51ABAB>168</td><td bgcolor=#72A3B3>177</td><td bgcolor=#514928>53</td><td bgcolor=#726917>95</td><td bgcolor=#8A5128>87</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC7207>148</td><td bgcolor=#8A690F>107</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A690F>107</td><td bgcolor=#494917>47</td><td bgcolor=#8A510F>81</td><td bgcolor=#1F281F>16</td><td bgcolor=#495951>69</td><td bgcolor=#494917>47</td><td bgcolor=#C4CC61>218</td><td bgcolor=#C4CCCC>220</td><td bgcolor=#ABAB93>203</td><td bgcolor=#1F170F>8</td><td bgcolor=#0F0707>2</td><td bgcolor=#1F170F>8</td><td bgcolor=#282807>17</td><td bgcolor=#933028>60</td><td bgcolor=#8A690F>107</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td></tr>
+<tr><td bgcolor=#0F0F28>6</td><td bgcolor=#386151>67</td><td bgcolor=#72A393>173</td><td bgcolor=#3882B3>125</td><td bgcolor=#69510F>64</td><td bgcolor=#726917>95</td><td bgcolor=#9B931F>158</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A690F>107</td><td bgcolor=#CC9328>181</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#494917>47</td><td bgcolor=#494917>47</td><td bgcolor=#516930>82</td><td bgcolor=#B3C4AB>216</td><td bgcolor=#494917>47</td><td bgcolor=#C4CC61>218</td><td bgcolor=#C4D493>219</td><td bgcolor=#AB9372>179</td><td bgcolor=#28171F>10</td><td bgcolor=#1F170F>8</td><td bgcolor=#280F07>7</td><td bgcolor=#491707>15</td><td bgcolor=#69510F>64</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td></tr>
+<tr><td bgcolor=#0F0F07>4</td><td bgcolor=#283830>27</td><td bgcolor=#51ABAB>168</td><td bgcolor=#51ABAB>168</td><td bgcolor=#696930>96</td><td bgcolor=#726917>95</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#8A690F>107</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A690F>107</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#69510F>64</td><td bgcolor=#69510F>64</td><td bgcolor=#491707>15</td><td bgcolor=#170F0F>5</td><td bgcolor=#28171F>10</td><td bgcolor=#0F070F>3</td><td bgcolor=#695128>70</td><td bgcolor=#8A7249>132</td><td bgcolor=#514928>53</td><td bgcolor=#170F0F>5</td><td bgcolor=#0F0F07>4</td><td bgcolor=#1F170F>8</td><td bgcolor=#49300F>29</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#CC8A0F>170</td></tr>
+<tr><td bgcolor=#1F170F>8</td><td bgcolor=#304917>38</td><td bgcolor=#72A369>166</td><td bgcolor=#518AB3>143</td><td bgcolor=#515128>58</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A690F>107</td><td bgcolor=#9B931F>158</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A510F>81</td><td bgcolor=#69300F>40</td><td bgcolor=#516917>75</td><td bgcolor=#28171F>10</td><td bgcolor=#0F0707>2</td><td bgcolor=#0F070F>3</td><td bgcolor=#1F170F>8</td><td bgcolor=#618228>118</td><td bgcolor=#1F281F>16</td><td bgcolor=#0F0707>2</td><td bgcolor=#170F0F>5</td><td bgcolor=#0F0707>2</td><td bgcolor=#40381F>32</td><td bgcolor=#AB5107>99</td><td bgcolor=#8A690F>107</td><td bgcolor=#B3280F>63</td><td bgcolor=#AB5107>99</td></tr>
+<tr><td bgcolor=#0F0707>2</td><td bgcolor=#17280F>12</td><td bgcolor=#72A393>173</td><td bgcolor=#38A3D4>157</td><td bgcolor=#514928>53</td><td bgcolor=#8A510F>81</td><td bgcolor=#8A690F>107</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#8A690F>107</td><td bgcolor=#B3690F>133</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#726917>95</td><td bgcolor=#8A510F>81</td><td bgcolor=#69510F>64</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#28171F>10</td><td bgcolor=#0F0707>2</td><td bgcolor=#1F170F>8</td><td bgcolor=#000000>1</td><td bgcolor=#170F0F>5</td><td bgcolor=#0F0707>2</td><td bgcolor=#69300F>40</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td></tr>
+<tr><td bgcolor=#0F070F>3</td><td bgcolor=#0F0F07>4</td><td bgcolor=#598251>123</td><td bgcolor=#72A3B3>177</td><td bgcolor=#386151>67</td><td bgcolor=#69510F>64</td><td bgcolor=#8A510F>81</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A690F>107</td><td bgcolor=#AB7228>140</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC9328>181</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#69510F>64</td><td bgcolor=#69510F>64</td><td bgcolor=#282807>17</td><td bgcolor=#280F07>7</td><td bgcolor=#1F170F>8</td><td bgcolor=#1F170F>8</td><td bgcolor=#282807>17</td><td bgcolor=#28171F>10</td><td bgcolor=#69300F>40</td><td bgcolor=#933028>60</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC8A0F>170</td></tr>
+<tr><td bgcolor=#0F0F07>4</td><td bgcolor=#172828>14</td><td bgcolor=#285930>49</td><td bgcolor=#72ABD4>189</td><td bgcolor=#386969>79</td><td bgcolor=#69510F>64</td><td bgcolor=#69510F>64</td><td bgcolor=#8A690F>107</td><td bgcolor=#AB7228>140</td><td bgcolor=#8A690F>107</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td><td bgcolor=#8A510F>81</td><td bgcolor=#69510F>64</td><td bgcolor=#AB5107>99</td><td bgcolor=#726917>95</td><td bgcolor=#69300F>40</td><td bgcolor=#AB5107>99</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#CC590F>129</td><td bgcolor=#CC7207>148</td><td bgcolor=#AB5107>99</td></tr>
+<tr><td bgcolor=#0F0F07>4</td><td bgcolor=#0F0F07>4</td><td bgcolor=#17280F>12</td><td bgcolor=#51ABAB>168</td><td bgcolor=#518272>126</td><td bgcolor=#30281F>20</td><td bgcolor=#8A5128>87</td><td bgcolor=#AB5107>99</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB7228>140</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC590F>129</td><td bgcolor=#AB7228>140</td></tr>
+<tr><td bgcolor=#0F0F28>6</td><td bgcolor=#000000>1</td><td bgcolor=#0F0707>2</td><td bgcolor=#386969>79</td><td bgcolor=#51ABAB>168</td><td bgcolor=#386151>67</td><td bgcolor=#494917>47</td><td bgcolor=#8A510F>81</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC590F>129</td><td bgcolor=#ED400F>120</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC590F>129</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC590F>129</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#AB5107>99</td></tr>
+<tr><td bgcolor=#0F0F07>4</td><td bgcolor=#0F0F07>4</td><td bgcolor=#1F170F>8</td><td bgcolor=#17280F>12</td><td bgcolor=#518A8A>137</td><td bgcolor=#3882B3>125</td><td bgcolor=#40381F>32</td><td bgcolor=#8A510F>81</td><td bgcolor=#8A510F>81</td><td bgcolor=#8A510F>81</td><td bgcolor=#B3690F>133</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#B38A30>164</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#ED400F>120</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC590F>129</td><td bgcolor=#CC9328>181</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC590F>129</td><td bgcolor=#AB7228>140</td><td bgcolor=#AB5107>99</td></tr>
+<tr><td bgcolor=#0F070F>3</td><td bgcolor=#0F070F>3</td><td bgcolor=#0F0F07>4</td><td bgcolor=#17280F>12</td><td bgcolor=#285930>49</td><td bgcolor=#51ABAB>168</td><td bgcolor=#495951>69</td><td bgcolor=#69510F>64</td><td bgcolor=#AB5107>99</td><td bgcolor=#8A690F>107</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC590F>129</td><td bgcolor=#CC590F>129</td><td bgcolor=#CC7207>148</td><td bgcolor=#E54030>121</td><td bgcolor=#D4A317>194</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#ED400F>120</td><td bgcolor=#CC9328>181</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC590F>129</td><td bgcolor=#AB7228>140</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td></tr>
+<tr><td bgcolor=#0F0F07>4</td><td bgcolor=#0F0F07>4</td><td bgcolor=#0F0F28>6</td><td bgcolor=#1F170F>8</td><td bgcolor=#17280F>12</td><td bgcolor=#598251>123</td><td bgcolor=#386969>79</td><td bgcolor=#384028>34</td><td bgcolor=#AB5107>99</td><td bgcolor=#8A690F>107</td><td bgcolor=#AB7228>140</td><td bgcolor=#AB5107>99</td><td bgcolor=#8A690F>107</td><td bgcolor=#AB5107>99</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC590F>129</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC9328>181</td><td bgcolor=#E54030>121</td><td bgcolor=#CC9328>181</td><td bgcolor=#ED400F>120</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC9328>181</td><td bgcolor=#CC7207>148</td><td bgcolor=#B38A30>164</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#8A280F>44</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td></tr>
+<tr><td bgcolor=#0F0F07>4</td><td bgcolor=#0F0F07>4</td><td bgcolor=#171F0F>9</td><td bgcolor=#0F0F07>4</td><td bgcolor=#0F0F28>6</td><td bgcolor=#30381F>28</td><td bgcolor=#518A8A>137</td><td bgcolor=#388293>116</td><td bgcolor=#69510F>64</td><td bgcolor=#8A690F>107</td><td bgcolor=#B3690F>133</td><td bgcolor=#9B931F>158</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#CC590F>129</td><td bgcolor=#AB7228>140</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#AB5107>99</td><td bgcolor=#CC8A0F>170</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB7228>140</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#CC7207>148</td></tr>
+<tr><td bgcolor=#0F0F07>4</td><td bgcolor=#0F070F>3</td><td bgcolor=#0F0F28>6</td><td bgcolor=#0F0707>2</td><td bgcolor=#0F0F07>4</td><td bgcolor=#0F0F07>4</td><td bgcolor=#285930>49</td><td bgcolor=#518A8A>137</td><td bgcolor=#49728A>105</td><td bgcolor=#304917>38</td><td bgcolor=#8A510F>81</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#CC7207>148</td><td bgcolor=#CC7207>148</td><td bgcolor=#AB7228>140</td><td bgcolor=#CC7207>148</td><td bgcolor=#AB5107>99</td><td bgcolor=#CC7207>148</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#B3690F>133</td><td bgcolor=#AB7228>140</td><td bgcolor=#8A690F>107</td><td bgcolor=#69300F>40</td><td bgcolor=#8A690F>107</td><td bgcolor=#8A690F>107</td><td bgcolor=#AB5107>99</td><td bgcolor=#AB5107>99</td><td bgcolor=#B3690F>133</td></tr>
+</table><p class="footer">Copyright 2009 The MathWorks, Inc.<br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Printing Variables to HTML Tables in Published Code
+% One often-requested feature for Cell Mode publishing is to have a command
+% that simply displays the output of a MATLAB® variable as a table. This
+% file shows how to do that.
+%
+% Copyright 2009 The MathWorks, Inc.
+
+%% Passing through HTML
+% Beginning with R2007a, you can pass HTML directly through to your output
+% file by wrapping it in an HTML tag.
+%
+% Look at the difference between these two lines to see how it works.
+
+disp('Option 1: This is <b>bold</b>')
+
+%%
+
+disp('<html>Option 2: This is <b>bold</b></html>')
+
+%%
+% Here's a matrix...
+
+m = magic(4)
+
+%%
+% which I can now display with the help of a function like makeHtmlTable.
+
+makeHtmlTable(m);
+
+%% 
+% Here is the help entry for makeHtmlTable
+
+help makeHtmlTable
+
+%% Add column headers and row names
+% If you have them, we can show them.
+
+r = {'row 1','row 2','row 3','row 4'};
+c = {'col 1','col 2','col 3','col 4'};
+makeHtmlTable(m,[],r,c);
+
+%% Colorize the table cells
+% Here's a little hack for matrix visualization.
+
+colorFlag = true;
+cmap = gray;
+cmap(:,1) = 1;
+makeHtmlTable(m,[],r,c,cmap);
+
+%% Some test cases
+% If all these run to completion, we're doing pretty well.
+m = hilb(6);
+makeHtmlTable(m,[],[],[],[],6);
+
+%%
+
+cmap = jet/2 + 0.5;
+makeHtmlTable(m,[],[],[],cmap,2);
+
+
+%%
+m = [1 2; 3 4];
+makeHtmlTable(m);
+
+%%
+makeHtmlTable(m,[],[],[],summer);
+
+%%
+makeHtmlTable(m,[],{'top','bottom'},{'left','right'},winter);
+
+%%
+
+m = magic(11);
+makeHtmlTable(m,[],[],[],autumn);
+
+%%
+% If both the numeric input is NaN and the string input is non-empty for a
+% given cell, then display the string.
+
+m = magic(12);
+t = cell(size(m));
+m(23) = NaN;
+t{23} = 'unknown';
+m(79) = NaN;
+t{79} = 'missing';
+m(120) = NaN;
+t{120} = 'no data';
+makeHtmlTable(m,t,[],[],winter);
+
+
+%%
+% This displays the frequency with which ASCII characters show up in the
+% help entry for the PRINT command.
+
+t = num2cell(char(reshape(48:127,8,10)'));
+m = zeros(size(t));
+h = help('print');
+for i = 1:numel(t)
+    m(i) = sum(h==t{i});
+end
+makeHtmlTable(m,t,[],[],summer);
+
+
+%% 
+% You can even use this to display images. Here's the full image.
+load mandrill
+image(X);
+colormap(map)
+
+
+%%
+% Here's a zoomed sub-image of one eye.
+c = 306; 
+cinc = 34;
+r = 10; 
+rinc = 26;
+X2 = X((1:rinc)+r, (1:cinc)+c);
+image(X2);
+colormap(map)
+
+%%
+
+makeHtmlTable(X2,[],[],[],map);
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,263 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>afemrateWG</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-11-18"><meta name="DC.source" content="afemrateWG.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">RATE OF CONVERGENCE OF ADAPTIVE FINITE ELEMENT METHOD USING WG ELEMENT</a></li><li><a href="#2">Lshape problem</a></li><li><a href="#3">Kellogg problem</a></li></ul></div><h2>RATE OF CONVERGENCE OF ADAPTIVE FINITE ELEMENT METHOD USING WG ELEMENT<a name="1"></a></h2><p>This example is to show the rate of convergence of the lowest order finite element approximation of the second order elliptic equation.</p><div><ol><li>Lshape problem.</li><li>Kellogg problem.</li></ol></div><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+</pre><h2>Lshape problem<a name="2"></a></h2><pre class="codeinput">[node,elem] = squaremesh([-1,1,-1,1],1);
+[node,elem] = delmesh(node,elem,<span class="string">'x&gt;0 &amp; y&lt;0'</span>);
+bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+pde = Lshapedata;
+format <span class="string">shorte</span>
+option.L0 = 1;
+option.maxIt = 25;
+option.printlevel = 1;
+option.elemType = <span class="string">'WG'</span>;
+option.plotflag = 0;
+err = afemPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    11962,  #nnz:    65498, iter: 21,   err = 8.7672e-09,   time = 0.46 s
+   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}
+
+ans =
+
+   5.0195e-02   2.5915e-01   1.5925e-01   7.1527e-02
+   4.1607e-02   2.3876e-01   1.3913e-01   6.4178e-02
+   3.3259e-02   2.1847e-01   1.1918e-01   3.9080e-02
+   3.1589e-02   2.1891e-01   1.3868e-01   6.3679e-02
+   2.4020e-02   1.9271e-01   1.1393e-01   4.7161e-02
+   1.9277e-02   1.7044e-01   9.0698e-02   2.5208e-02
+   1.4215e-02   1.5825e-01   9.4357e-02   4.1478e-02
+   9.9734e-03   1.2976e-01   6.6407e-02   1.6535e-02
+   8.6124e-03   1.2214e-01   6.8461e-02   2.6810e-02
+   6.8785e-03   1.0563e-01   5.5335e-02   1.0648e-02
+   5.7368e-03   9.5828e-02   5.3195e-02   1.6910e-02
+   4.0829e-03   8.1574e-02   4.1355e-02   6.8912e-03
+   3.6015e-03   7.4316e-02   4.0529e-02   1.0639e-02
+   2.3758e-03   6.2798e-02   3.2109e-02   4.3193e-03
+   1.9145e-03   5.6323e-02   3.0418e-02   6.7051e-03
+   1.5050e-03   4.9460e-02   2.5599e-02   2.7968e-03
+   1.2019e-03   4.4439e-02   2.3785e-02   4.2396e-03
+   9.8700e-04   3.9083e-02   2.0248e-02   1.7789e-03
+   7.5497e-04   3.4592e-02   1.8265e-02   2.6828e-03
+   5.7979e-04   3.0433e-02   1.5774e-02   1.1168e-03
+   4.5094e-04   2.7250e-02   1.4423e-02   1.6887e-03
+   3.5904e-04   2.4213e-02   1.2651e-02   7.0525e-04
+   2.8154e-04   2.1645e-02   1.1417e-02   1.0661e-03
+   2.3705e-04   1.9366e-02   1.0142e-02   4.4484e-04
+   1.9289e-04   1.7275e-02   9.1177e-03   6.7093e-04
+
+</pre><img vspace="5" hspace="5" src="afemrateWG_01.png" alt=""> <h2>Kellogg problem<a name="3"></a></h2><pre class="codeinput">[node,elem] = squaremesh([-1 1 -1 1], 0.25);
+bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+pde = Kelloggdata;
+option.maxIt = 50;
+
+option.elemType = <span class="string">'WG'</span>;
+option.plotflag = 0;
+err = afemPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}
+
+ans =
+
+   6.3477e-03   1.1408e-01   2.0651e-01   1.4615e-02
+   6.1722e-03   1.1393e-01   2.0208e-01   1.6482e-02
+   5.9909e-03   1.1370e-01   1.9765e-01   1.6275e-02
+   5.6115e-03   1.1784e-01   2.1097e-01   1.6857e-02
+   5.5119e-03   1.1790e-01   2.0645e-01   1.7799e-02
+   5.1220e-03   1.2055e-01   2.1536e-01   1.8966e-02
+   5.0235e-03   1.2035e-01   2.1125e-01   1.8547e-02
+   4.9295e-03   1.2048e-01   2.0661e-01   1.8601e-02
+   4.6426e-03   1.2417e-01   2.1423e-01   2.0120e-02
+   4.5530e-03   1.2397e-01   2.1004e-01   1.9650e-02
+   4.4618e-03   1.2406e-01   2.0540e-01   1.9054e-02
+   4.2333e-03   1.2569e-01   2.1049e-01   2.0829e-02
+   4.1447e-03   1.2540e-01   2.0622e-01   2.0314e-02
+   4.0213e-03   1.2639e-01   2.0192e-01   1.9597e-02
+   3.7604e-03   1.2557e-01   2.0067e-01   2.0625e-02
+   3.6477e-03   1.2629e-01   1.9627e-01   1.9869e-02
+   3.4410e-03   1.2633e-01   1.9454e-01   2.0684e-02
+   3.2978e-03   1.2685e-01   1.8885e-01   1.9547e-02
+   3.1617e-03   1.2723e-01   1.8817e-01   2.0557e-02
+   3.0269e-03   1.2682e-01   1.8207e-01   1.9351e-02
+   2.8605e-03   1.2357e-01   1.7949e-01   2.0048e-02
+   2.7428e-03   1.2319e-01   1.7366e-01   1.8860e-02
+   2.6321e-03   1.2274e-01   1.7209e-01   1.9541e-02
+   2.5134e-03   1.2045e-01   1.6541e-01   1.8246e-02
+   2.3383e-03   1.1540e-01   1.6168e-01   1.8622e-02
+   2.2461e-03   1.1458e-01   1.5624e-01   1.7468e-02
+   2.1580e-03   1.1351e-01   1.5429e-01   1.7919e-02
+   2.0730e-03   1.1203e-01   1.4867e-01   1.6735e-02
+   1.9962e-03   1.1082e-01   1.4663e-01   1.7103e-02
+   1.9248e-03   1.0953e-01   1.4152e-01   1.5983e-02
+   1.8580e-03   1.0817e-01   1.3945e-01   1.6278e-02
+   1.7961e-03   1.0676e-01   1.3458e-01   1.5186e-02
+   1.7392e-03   1.0543e-01   1.3260e-01   1.5434e-02
+   1.6300e-03   1.0350e-01   1.2788e-01   1.4390e-02
+   1.5377e-03   1.0121e-01   1.2565e-01   1.4584e-02
+   1.4334e-03   9.8753e-02   1.2109e-01   1.3667e-02
+   1.3351e-03   9.6587e-02   1.1895e-01   1.3926e-02
+   1.2669e-03   9.4292e-02   1.1452e-01   1.3074e-02
+   1.1962e-03   9.2308e-02   1.1241e-01   1.3393e-02
+   1.1448e-03   9.0154e-02   1.0826e-01   1.2557e-02
+   1.0884e-03   8.8093e-02   1.0620e-01   1.2753e-02
+   1.0146e-03   8.5804e-02   1.0234e-01   1.1852e-02
+   9.6838e-04   8.4256e-02   1.0110e-01   1.2438e-02
+   9.2509e-04   8.3157e-02   1.0057e-01   1.2362e-02
+   8.8107e-04   8.1045e-02   9.6274e-02   1.1460e-02
+   8.5739e-04   7.9120e-02   9.3715e-02   1.1139e-02
+   8.3011e-04   7.5995e-02   9.0403e-02   1.0672e-02
+   8.0783e-04   7.4388e-02   8.8109e-02   1.0379e-02
+   7.5009e-04   7.1823e-02   8.5318e-02   9.9702e-03
+   7.2005e-04   7.0177e-02   8.3174e-02   9.6920e-03
+
+</pre><img vspace="5" hspace="5" src="afemrateWG_02.png" alt=""> <pre class="codeinput">display(<span class="string">'   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}'</span>);
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+</pre><pre class="codeoutput">   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}
+
+ans =
+
+   6.3477e-03   1.1408e-01   2.0651e-01   1.4615e-02
+   6.1722e-03   1.1393e-01   2.0208e-01   1.6482e-02
+   5.9909e-03   1.1370e-01   1.9765e-01   1.6275e-02
+   5.6115e-03   1.1784e-01   2.1097e-01   1.6857e-02
+   5.5119e-03   1.1790e-01   2.0645e-01   1.7799e-02
+   5.1220e-03   1.2055e-01   2.1536e-01   1.8966e-02
+   5.0235e-03   1.2035e-01   2.1125e-01   1.8547e-02
+   4.9295e-03   1.2048e-01   2.0661e-01   1.8601e-02
+   4.6426e-03   1.2417e-01   2.1423e-01   2.0120e-02
+   4.5530e-03   1.2397e-01   2.1004e-01   1.9650e-02
+   4.4618e-03   1.2406e-01   2.0540e-01   1.9054e-02
+   4.2333e-03   1.2569e-01   2.1049e-01   2.0829e-02
+   4.1447e-03   1.2540e-01   2.0622e-01   2.0314e-02
+   4.0213e-03   1.2639e-01   2.0192e-01   1.9597e-02
+   3.7604e-03   1.2557e-01   2.0067e-01   2.0625e-02
+   3.6477e-03   1.2629e-01   1.9627e-01   1.9869e-02
+   3.4410e-03   1.2633e-01   1.9454e-01   2.0684e-02
+   3.2978e-03   1.2685e-01   1.8885e-01   1.9547e-02
+   3.1617e-03   1.2723e-01   1.8817e-01   2.0557e-02
+   3.0269e-03   1.2682e-01   1.8207e-01   1.9351e-02
+   2.8605e-03   1.2357e-01   1.7949e-01   2.0048e-02
+   2.7428e-03   1.2319e-01   1.7366e-01   1.8860e-02
+   2.6321e-03   1.2274e-01   1.7209e-01   1.9541e-02
+   2.5134e-03   1.2045e-01   1.6541e-01   1.8246e-02
+   2.3383e-03   1.1540e-01   1.6168e-01   1.8622e-02
+   2.2461e-03   1.1458e-01   1.5624e-01   1.7468e-02
+   2.1580e-03   1.1351e-01   1.5429e-01   1.7919e-02
+   2.0730e-03   1.1203e-01   1.4867e-01   1.6735e-02
+   1.9962e-03   1.1082e-01   1.4663e-01   1.7103e-02
+   1.9248e-03   1.0953e-01   1.4152e-01   1.5983e-02
+   1.8580e-03   1.0817e-01   1.3945e-01   1.6278e-02
+   1.7961e-03   1.0676e-01   1.3458e-01   1.5186e-02
+   1.7392e-03   1.0543e-01   1.3260e-01   1.5434e-02
+   1.6300e-03   1.0350e-01   1.2788e-01   1.4390e-02
+   1.5377e-03   1.0121e-01   1.2565e-01   1.4584e-02
+   1.4334e-03   9.8753e-02   1.2109e-01   1.3667e-02
+   1.3351e-03   9.6587e-02   1.1895e-01   1.3926e-02
+   1.2669e-03   9.4292e-02   1.1452e-01   1.3074e-02
+   1.1962e-03   9.2308e-02   1.1241e-01   1.3393e-02
+   1.1448e-03   9.0154e-02   1.0826e-01   1.2557e-02
+   1.0884e-03   8.8093e-02   1.0620e-01   1.2753e-02
+   1.0146e-03   8.5804e-02   1.0234e-01   1.1852e-02
+   9.6838e-04   8.4256e-02   1.0110e-01   1.2438e-02
+   9.2509e-04   8.3157e-02   1.0057e-01   1.2362e-02
+   8.8107e-04   8.1045e-02   9.6274e-02   1.1460e-02
+   8.5739e-04   7.9120e-02   9.3715e-02   1.1139e-02
+   8.3011e-04   7.5995e-02   9.0403e-02   1.0672e-02
+   8.0783e-04   7.4388e-02   8.8109e-02   1.0379e-02
+   7.5009e-04   7.1823e-02   8.5318e-02   9.9702e-03
+   7.2005e-04   7.0177e-02   8.3174e-02   9.6920e-03
+
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% RATE OF CONVERGENCE OF ADAPTIVE FINITE ELEMENT METHOD USING WG ELEMENT
+%
+% This example is to show the rate of convergence of the lowest order
+% finite element approximation of the second order elliptic equation.
+%
+% # Lshape problem.
+% # Kellogg problem.
+
+clear all; close all;
+%% Lshape problem
+[node,elem] = squaremesh([-1,1,-1,1],1);
+[node,elem] = delmesh(node,elem,'x>0 & y<0');
+bdFlag = setboundary(node,elem,'Dirichlet');
+pde = Lshapedata;
+format shorte
+option.L0 = 1;
+option.maxIt = 25;
+option.printlevel = 1;
+option.elemType = 'WG';
+option.plotflag = 0;
+err = afemPoisson(node,elem,pde,bdFlag,option);
+
+
+%% Kellogg problem
+[node,elem] = squaremesh([-1 1 -1 1], 0.25);
+bdFlag = setboundary(node,elem,'Dirichlet');
+pde = Kelloggdata;
+option.maxIt = 50;
+
+option.elemType = 'WG';
+option.plotflag = 0;
+err = afemPoisson(node,elem,pde,bdFlag,option);
+
+%%
+display('   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}');
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,163 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Project: Fast Solvers for Stokes Equations</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-10-26"><meta name="DC.source" content="projectMGStokes.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Project: Fast Solvers for Stokes Equations</h1><!--introduction--><p>The purpose of this project is to implement fast solvers for solving finite element and finite difference discretization of Stokes equations.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1"><b>Part I: Block Preconditioner</b></a></li><li><a href="#2">Step 1: Direct solvers in preconditioner</a></li><li><a href="#3">Step 2: Replace direct solver by multigrid solver</a></li><li><a href="#4">Step 3: Replace exact multigrid solver by V-cycles</a></li><li><a href="#6"><b>Part II: Block-triangular preconditoner</b></a></li><li><a href="#8"><b>Part III: Multigrid for MAC</b></a></li><li><a href="#9">Step 1: Distributive Gauss-Seidel for one level</a></li><li><a href="#10">Step 2: Transfer operators and two level method</a></li><li><a href="#11">Step 3: Vcycle multigrid method</a></li><li><a href="#13"><b>Part IV: Test Example</b></a></li></ul></div><h2><b>Part I: Block Preconditioner</b><a name="1"></a></h2><p>Given a triangulation, use codes in Project: <a href="projectStokes.html">Stokes Equation</a> to generate matrices for isoP2-P0 and P1CR-P0 for Stokes equations.</p><h2>Step 1: Direct solvers in preconditioner<a name="2"></a></h2><p>Use [inv(A) 0; 0 inv(Mp)] as the preconditioner and call minres.</p><p>Do not form inv(A). Instead the preconditioner can be coded as a subroutine and use backslash to invert <tt>A</tt>.</p><p>For isoP2-P0 and P1CR-P0, the mass matrix for pressure is a diagonal matrix. The inv(Mp) can be realized by a vector multiplication.</p><p>Refine the triangulation several times and list the iteration steps of minres and cpu time. The steps should be uniform but the time may not be linear scaled due to the direct solver used in the preconditioner. Use <tt>showrate</tt> to check the scaling of cpu time vs size of problems.</p><h2>Step 2: Replace direct solver by multigrid solver<a name="3"></a></h2><p>The direct solver of <tt>A</tt> can be replaced by multigrid solvers included in ifem. Try <tt>help mg</tt> or <tt>help amg</tt>.</p><p>To use <tt>mg</tt>, the mesh structure <tt>elem</tt> should be provided. So you need to modify the matrices to build in the Dirichlet boundary condition. If you only take out submatrices associated to free dofs, you can use <tt>amg</tt>.</p><p>Redo the test in step 1. You should get the same iteration steps and now the cpu time scales linearly.</p><h2>Step 3: Replace exact multigrid solver by V-cycles<a name="4"></a></h2><p>Set option.maxIt = 3 and redo the test. The iteration steps could increase but cpu time is saved instead. How about option.maxIt = 1?</p><h2><b>Part II: Block-triangular preconditoner</b><a name="6"></a></h2><p>Use [A B'; 0 -Mp]^{-1} as the preconditioner and call gmres.</p><p>Repeat three steps in Part I.</p><h2><b>Part III: Multigrid for MAC</b><a name="8"></a></h2><p>Implement Vcycle multigrid for MAC scheme based on DGS smoothing. Refer Project: <a href="projectMG.html">Multigrid Methods</a> for Poisson equations.</p><h2>Step 1: Distributive Gauss-Seidel for one level<a name="9"></a></h2><p>This is the Part III of Project: <a href="projectStokesMAC.html">MAC Scheme for Stokes Equations</a>. Make sure DGS converges to the correct solution.</p><h2>Step 2: Transfer operators and two level method<a name="10"></a></h2><p>Code the following subroutines</p><div><ol><li>form residual for momentum and continunity equation</li><li>restrict the residual to the coarse grid</li><li>call DGS in the coarse grid till converge</li><li>prolongate the correction to the fine grid</li></ol></div><p>Note: the index map between coarse and fine grids are slightly different for u,v,p. The restriction and prolongation formula can be found in <a href="http://math.uci.edu/~chenlong/226/MGStokes.pdf">Multigrid Methods for Stokes Equations</a></p><p>Plus presmoothing and one postsmoothing using DGS, you get two level methods. Test your two level methods for different levels. It should convergence in less than 20 steps and indepedent of the number of levels.</p><h2>Step 3: Vcycle multigrid method<a name="11"></a></h2><p>Recrusively apply the two-level method to the coarse grid problem in Step 2.</p><p>Redo the test in Step 2.</p><h2><b>Part IV: Test Example</b><a name="13"></a></h2><div><ol><li>Analytic solution in Project: <a href="projectStokes.html">Stokes Equation</a>.</li><li>Driven cavity problem. The domain is [-1,1]^2. Stokes equation with zero Dirichlet boundary condition except on the top:</li></ol></div><p><img src="projectMGStokes_eq81035.png" alt="$$ \{ y=1; 0<= x <= 1 | u = 1, v = 0 \} $$"></p><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Project: Fast Solvers for Stokes Equations
+%
+% The purpose of this project is to implement fast solvers for solving
+% finite element and finite difference discretization of Stokes equations.
+
+%% *Part I: Block Preconditioner*
+%
+% Given a triangulation, use codes in
+% Project: <projectStokes.html Stokes Equation>
+% to generate matrices for isoP2-P0 and P1CR-P0 for Stokes equations. 
+
+%% Step 1: Direct solvers in preconditioner 
+%
+% Use [inv(A) 0; 0 inv(Mp)] as the preconditioner and call minres.
+%
+% Do not form inv(A). Instead the preconditioner can be coded as a
+% subroutine and use backslash to invert |A|. 
+%
+% For isoP2-P0 and P1CR-P0, the mass matrix for pressure is a diagonal
+% matrix. The inv(Mp) can be realized by a vector multiplication.
+%
+% Refine the triangulation several times and list the iteration steps of
+% minres and cpu time. The steps should be uniform but the time may not be
+% linear scaled due to the direct solver used in the preconditioner. Use
+% |showrate| to check the scaling of cpu time vs size of problems.
+
+%% Step 2: Replace direct solver by multigrid solver
+%
+% The direct solver of |A| can be replaced by multigrid solvers included in
+% ifem. Try |help mg| or |help amg|.
+%
+% To use |mg|, the mesh structure |elem| should be provided. So you need to
+% modify the matrices to build in the Dirichlet boundary condition. If you
+% only take out submatrices associated to free dofs, you can use |amg|.
+%
+% Redo the test in step 1. You should get the same iteration steps and now
+% the cpu time scales linearly. 
+
+%% Step 3: Replace exact multigrid solver by V-cycles
+%
+% Set option.maxIt = 3 and redo the test. The iteration steps could
+% increase but cpu time is saved instead. How about option.maxIt = 1?
+
+%%
+%
+%
+
+%% *Part II: Block-triangular preconditoner*
+%
+% Use [A B'; 0 -Mp]^{-1} as the preconditioner and call gmres.
+%
+% Repeat three steps in Part I.
+
+%%
+%
+
+%% *Part III: Multigrid for MAC*
+%
+%
+% Implement Vcycle multigrid for MAC scheme based on DGS smoothing. Refer
+% Project: <projectMG.html Multigrid Methods> for Poisson equations.
+
+%% Step 1: Distributive Gauss-Seidel for one level
+%
+% This is the Part III of Project: <projectStokesMAC.html MAC Scheme for Stokes Equations>. Make sure DGS converges to the correct
+% solution. 
+
+%% Step 2: Transfer operators and two level method
+%
+% Code the following subroutines
+% 
+% # form residual for momentum and continunity equation
+% # restrict the residual to the coarse grid
+% # call DGS in the coarse grid till converge
+% # prolongate the correction to the fine grid
+%
+% Note: the index map between coarse and fine grids are slightly different
+% for u,v,p. The restriction and prolongation formula can be found in 
+% <http://math.uci.edu/~chenlong/226/MGStokes.pdf Multigrid Methods for Stokes Equations>
+%
+% Plus presmoothing and one postsmoothing using DGS, you get two level
+% methods. Test your two level methods for different levels. It should
+% convergence in less than 20 steps and indepedent of the number of levels.
+
+%% Step 3: Vcycle multigrid method
+%
+% Recrusively apply the two-level method to the coarse grid problem
+% in Step 2.
+%
+% Redo the test in Step 2.
+
+%%
+%
+
+%% *Part IV: Test Example*
+%
+% # Analytic solution in Project: <projectStokes.html Stokes Equation>.
+% # Driven cavity problem. The domain is [-1,1]^2. Stokes equation with
+% zero Dirichlet boundary condition except on the top:
+%
+% $$ \{ y=1; 0<= x <= 1 | u = 1, v = 0 \} $$
+##### SOURCE END #####
+--></body></html>

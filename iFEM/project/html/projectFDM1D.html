@@ -1,0 +1,191 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Project: 1-D Finite Difference Method</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-08-31"><meta name="DC.source" content="projectFDM1D.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Project: 1-D Finite Difference Method</h1><!--introduction--><p>The purpose of this project is to introduce the finite difference. We use 1-D Poisson equation in (0,1) with Dirichlet boundary condition</p><p><img src="projectFDM1D_eq54195.png" alt="$$ - u'' = f \, (0,1), \quad u(0) = a, u(1) = b. $$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Step 1: Generate a grid</a></li><li><a href="#2">Step 2: Generate a matrix equation</a></li><li><a href="#4">Stpe 3: Modify the matrix and right hand side to impose boundary condition</a></li><li><a href="#5">Step 4: Test of code</a></li><li><a href="#7">Step 5: Check the Convergence Rate</a></li></ul></div><h2>Step 1: Generate a grid<a name="1"></a></h2><p>Generate a vector representing a uniform grid with size h of (0,1).</p><pre class="codeinput">N = 10;
+x = linspace(0,1,N);
+plot(x,0,<span class="string">'b.'</span>,<span class="string">'Markersize'</span>,16)
+</pre><img vspace="5" hspace="5" src="projectFDM1D_01.png" alt=""> <h2>Step 2: Generate a matrix equation<a name="2"></a></h2><p>Based on the grid, the function <img src="projectFDM1D_eq35435.png" alt="$u$"> is discretized by a vector <tt>u</tt>. The derivative <img src="projectFDM1D_eq05284.png" alt="$u', u''$"> are approximated by centeral finite difference:</p><p><img src="projectFDM1D_eq62894.png" alt="$$ u'(x_i) \approx \frac{u(i+1) - u(i-1)}{2h} $$"></p><p><img src="projectFDM1D_eq28255.png" alt="$$ u''(x_i) \approx \frac{u(i-1) - 2*u(i) + u(i-1)}{h^2} $$"></p><p>The equation <img src="projectFDM1D_eq72729.png" alt="$-u''(x) = f(x)$"> is discretized at <img src="projectFDM1D_eq95493.png" alt="$x_i, i=1,...,N$"> as</p><p><img src="projectFDM1D_eq83554.png" alt="$$ \frac{-u(i-1) + 2*u(i) - u(i-1)}{h^2} \quad = f(i) $$"></p><p>where <img src="projectFDM1D_eq54878.png" alt="$f(i) = f(x_i)$">. These linear equations can be written as a matrix equation <tt>A*u = f</tt>, where <tt>A</tt> is a tri-diagonal matrix <tt>(-1,2,-1)/h^2</tt>.</p><pre class="codeinput">n = 5;
+e = ones(n,1);
+A = spdiags([e -2*e e], -1:1, n, n);
+display(full(A));
+</pre><pre class="codeoutput">
+ans =
+
+    -2     1     0     0     0
+     1    -2     1     0     0
+     0     1    -2     1     0
+     0     0     1    -2     1
+     0     0     0     1    -2
+
+</pre><p>We use spdiags to speed up the generation of the matrix. If using diag, ....</p><h2>Stpe 3: Modify the matrix and right hand side to impose boundary condition<a name="4"></a></h2><p>The discretization fails at boundary vertices since no nodes outside the interval. Howevery the boundary value is given by the problem: <tt>u(1) = a, u(N) = b</tt>.</p><p>These two equations can be included in the matrix by changing <tt>A(1,:) = [1, 0 ..., 0] and A(:,N) = [0, 0, ..., 1] and |f(1) = a/h^2, f(N) = b/h^2</tt>.</p><pre class="codeinput">A(1,1) = 1;
+A(1,2) = 0;
+A(n,n) = 1;
+A(n,n-1) = 0;
+display(full(A));
+</pre><pre class="codeoutput">
+ans =
+
+     1     0     0     0     0
+     1    -2     1     0     0
+     0     1    -2     1     0
+     0     0     1    -2     1
+     0     0     0     0     1
+
+</pre><h2>Step 4: Test of code<a name="5"></a></h2><pre class="codeinput">[u,x] = poisson1D(0,1,5);
+plot(x,sin(x),x,u,<span class="string">'r*'</span>);
+legend(<span class="string">'exact solution'</span>,<span class="string">'approximate solution'</span>)
+</pre><img vspace="5" hspace="5" src="projectFDM1D_02.png" alt=""> <p>We test ... The result seems correct since the computed solution fits well on the curve of the true solution.</p><h2>Step 5: Check the Convergence Rate<a name="7"></a></h2><pre class="codeinput">err = zeros(4,1);
+h = zeros(4,1);
+<span class="keyword">for</span> k = 1:4
+    [u,x] = poisson1D(0,1,2^k+1);
+    uI = sin(x);
+    err(k) = max(abs(u-uI));
+    h(k) = 1/2^k;
+<span class="keyword">end</span>
+display(err)
+loglog(h,err,h,h.^2);
+legend(<span class="string">'error'</span>,<span class="string">'h^2'</span>);
+axis <span class="string">tight</span>;
+</pre><pre class="codeoutput">
+err =
+
+    0.0012381
+   0.00030663
+   7.7115e-05
+   1.9527e-05
+
+</pre><img vspace="5" hspace="5" src="projectFDM1D_03.png" alt=""> <p>Since these two lines have the same lope, the err decays like h^2.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Project: 1-D Finite Difference Method
+%
+% The purpose of this project is to introduce the finite difference. We use
+% 1-D Poisson equation in (0,1) with Dirichlet boundary condition
+%
+% $$ - u'' = f \, (0,1), \quad u(0) = a, u(1) = b. $$
+
+%% Step 1: Generate a grid
+%
+% Generate a vector representing a uniform grid with size h of (0,1).
+N = 10;
+x = linspace(0,1,N);
+plot(x,0,'b.','Markersize',16)
+
+%% Step 2: Generate a matrix equation
+%
+% Based on the grid, the function $u$ is discretized by a vector |u|. The
+% derivative $u', u''$ are approximated by centeral finite difference:
+%
+% $$ u'(x_i) \approx \frac{u(i+1) - u(i-1)}{2h} $$
+%
+% $$ u''(x_i) \approx \frac{u(i-1) - 2*u(i) + u(i-1)}{h^2} $$ 
+%
+% The equation $-u''(x) = f(x)$ is discretized at $x_i, i=1,...,N$ as
+%
+% $$ \frac{-u(i-1) + 2*u(i) - u(i-1)}{h^2} \quad = f(i) $$
+%
+% where $f(i) = f(x_i)$. These linear equations can be written as a matrix
+% equation |A*u = f|, where |A| is a tri-diagonal matrix |(-1,2,-1)/h^2|.
+n = 5;
+e = ones(n,1);
+A = spdiags([e -2*e e], -1:1, n, n);
+display(full(A));
+%%
+% We use spdiags to speed up the generation of the matrix. If using diag,
+% ....
+
+%% Stpe 3: Modify the matrix and right hand side to impose boundary condition
+% 
+% The discretization fails at boundary vertices since no nodes outside the
+% interval. Howevery the boundary value is given by the problem: |u(1) = a,
+% u(N) = b|.
+%
+% These two equations can be included in the matrix by changing |A(1,:) =
+% [1, 0 ..., 0] and A(:,N) = [0, 0, ..., 1] and |f(1) = a/h^2, f(N) =
+% b/h^2|.
+A(1,1) = 1;
+A(1,2) = 0;
+A(n,n) = 1;
+A(n,n-1) = 0;
+display(full(A));
+
+%% Step 4: Test of code
+[u,x] = poisson1D(0,1,5);
+plot(x,sin(x),x,u,'r*');
+legend('exact solution','approximate solution')
+%%
+% We test ... The result seems correct since the computed solution fits
+% well on the curve of the true solution.
+
+%% Step 5: Check the Convergence Rate
+err = zeros(4,1);
+h = zeros(4,1);
+for k = 1:4
+    [u,x] = poisson1D(0,1,2^k+1);
+    uI = sin(x);
+    err(k) = max(abs(u-uI));
+    h(k) = 1/2^k;
+end
+display(err)
+loglog(h,err,h,h.^2);
+legend('error','h^2');
+axis tight;
+%%
+% Since these two lines have the same lope, the err decays like h^2.
+
+##### SOURCE END #####
+--></body></html>

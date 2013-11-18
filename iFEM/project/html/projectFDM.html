@@ -1,0 +1,126 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Project: Finite Difference Methods</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-10-18"><meta name="DC.source" content="projectFDM.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Project: Finite Difference Methods</h1><!--introduction--><p>The purpose of this project is to write a finite difference code for solving the Poisson equation in a rectangular domain using matrix-free or tensor product matrix.</p><p>Reference:</p><div><ul><li><a href="http://math.uci.edu/~chenlong/226/FDM.pdf">Finite Difference Methods</a></li><li><a href="http://math.uci.edu/~chenlong/226/FDMcode.pdf">Programming of Finite Difference Methods</a></li></ul></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Step 1: Generate a uniform grid and evaluate the right hand side</a></li><li><a href="#2">Step 2: Implement A*u</a></li><li><a href="#3">Step 3: Impose boundary conditions</a></li><li><a href="#4">Step 4: Solve linear algebraic systems</a></li><li><a href="#5">Step 5: Convergence</a></li></ul></div><h2>Step 1: Generate a uniform grid and evaluate the right hand side<a name="1"></a></h2><p>Use <tt>meshgrid</tt> or <tt>ndgrid</tt> to generate a uniform grid of <img src="projectFDM_eq76099.png" alt="$(0,1)\times (0,2)$"> for a given mesh size <img src="projectFDM_eq60012.png" alt="$h$">.</p><p>Evaluate f(x,y) at this uniform grid.</p><h2>Step 2: Implement A*u<a name="2"></a></h2><p>Compare the following three ways of computing A*u</p><div><ul><li>Generate a big sparse matrix using the tensor product of 1-D tri-diagonal finite difference matrix and compute A*u using the matrix</li></ul></div><div><ul><li>Code matrix-free version of A*u</li></ul></div><div><ul><li>Use the tensor product structure to compute A*u without forming the matrix</li></ul></div><p>Use them to verify the truncation error. That is, choosing the exact solution u and compute the max norm | <tt>A*u - f</tt> |. Change h and check the order of truncation error.</p><h2>Step 3: Impose boundary conditions<a name="3"></a></h2><p><b>Dirichlet boundary condition</b> Evaluate the boundary condition at boundary vertices and move to the right hand side.</p><p><b>Neumann boundary condition</b> Change the stencil near the boundary and modify the right hand side.</p><h2>Step 4: Solve linear algebraic systems<a name="4"></a></h2><div><ul><li>Direct methods: Use the big matrix to solve <tt>u = A\f</tt>.</li><li>Iterative methods: Implement Gauss-Seidel method <tt>B(u,f)</tt> and iterate</li></ul></div><pre class="language-matlab"><span class="keyword">while</span> err &gt; tol
+ u = B(u,f);
+ err = norm(f-A*u);
+<span class="keyword">end</span>
+</pre><h2>Step 5: Convergence<a name="5"></a></h2><div><ul><li>Choose a smooth solution and calculate the right hand side f and boundary conditions for the unit square.</li><li>Compute the error uI - uh in maximum norm, where uI is the nodal interpolation.</li><li>Change mesh size h and check the order of convergence</li></ul></div><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Project: Finite Difference Methods
+%
+% The purpose of this project is to write a finite difference code for
+% solving the Poisson equation in a rectangular domain using matrix-free or
+% tensor product matrix. 
+%
+% Reference: 
+%
+% * <http://math.uci.edu/~chenlong/226/FDM.pdf Finite Difference Methods>
+% * <http://math.uci.edu/~chenlong/226/FDMcode.pdf Programming of Finite Difference Methods>
+
+
+%% Step 1: Generate a uniform grid and evaluate the right hand side
+%
+% Use |meshgrid| or |ndgrid| to generate a uniform grid of $(0,1)\times
+% (0,2)$ for a given mesh size $h$.
+%
+% Evaluate f(x,y) at this uniform grid. 
+
+%% Step 2: Implement A*u
+%
+% Compare the following three ways of computing A*u
+%
+% * Generate a big sparse matrix using the tensor product of 1-D tri-diagonal
+% finite difference matrix and compute A*u using the matrix
+%
+% * Code matrix-free version of A*u
+%
+% * Use the tensor product structure to compute A*u without forming the
+% matrix
+%
+% Use them to verify the truncation error. That is, choosing the exact
+% solution u and compute the max norm | |A*u - f| |. Change h and check the
+% order of truncation error.
+%
+%% Step 3: Impose boundary conditions
+%
+% *Dirichlet boundary condition* Evaluate the boundary condition at
+% boundary vertices and move to the right hand side.
+%
+% *Neumann boundary condition* Change the stencil near the boundary and
+% modify the right hand side.
+
+%% Step 4: Solve linear algebraic systems
+%
+% * Direct methods: Use the big matrix to solve |u = A\f|.
+% * Iterative methods: Implement Gauss-Seidel method |B(u,f)| and iterate
+%
+%   while err > tol
+%    u = B(u,f);
+%    err = norm(f-A*u);
+%   end
+
+%% Step 5: Convergence
+%
+% * Choose a smooth solution and calculate the right hand side f and
+% boundary conditions for the unit square.
+% * Compute the error uI - uh in maximum norm, where uI is the nodal
+% interpolation.
+% * Change mesh size h and check the order of convergence
+##### SOURCE END #####
+--></body></html>

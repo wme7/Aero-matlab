@@ -1,0 +1,421 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Shifted Laplacian Preconditioner for solving Helmholtz equation</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-06-07"><meta name="DC.source" content="shiftLapHelmholtz.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Shifted Laplacian Preconditioner for solving Helmholtz equation</h1><!--introduction--><p><img src="shiftLapHelmholtz_eq41911.png" alt="$$- \Delta u + k^2 u = f \; \hbox{in } (0,1)^2.$$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Problem setting</a></li><li><a href="#2">Case: beta = [-1,0]</a></li><li><a href="#7">Case: beta = [0,1]</a></li><li><a href="#12">Case: beta = [1,0.5]</a></li></ul></div><h2>Problem setting<a name="1"></a></h2><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+<span class="keyword">global</span> k        <span class="comment">% wave number</span>
+wavenumberlist = [5 10 20 30 40 50];
+nw = length(wavenumberlist);
+[node,elem] = squaremesh([0,1,0,1],0.25);
+pde = Helmholtzdata1;
+option.L0 = 2;
+option.printlevel = 1;
+option.plotflag = 0;
+option.rateflag = 0;
+option.maxIt = 5;
+bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+option.solver = <span class="string">'slp'</span>;
+option.tol = 1.0e-6;
+</pre><h2>Case: beta = [-1,0]<a name="2"></a></h2><pre class="codeinput">option.shiftparameter = [-1 0];
+itStep = zeros(option.maxIt,nw);
+<span class="keyword">for</span> i = 1:nw
+</pre><pre class="codeinput">    k = wavenumberlist(i);
+    display(k);
+    [err,time,solver,eqn] = femHelmholtz(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">
+k =
+
+     5
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   6.62817e-03   5   5.34283e-02   3.12500e-01
+ 32   1.67329e-03   4   3.14801e-02   1.56250e-01
+ 64   4.19357e-04   4   4.53026e-01   7.81250e-02
+128   1.04909e-04   3   4.54669e+00   3.90625e-02
+256   2.62333e-05   2   1.17842e+03   1.95312e-02
+</pre><pre class="codeoutput">
+k =
+
+    10
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   2.12346e-02   9   8.45829e-03   6.25000e-01
+ 32   5.39898e-03   9   3.30724e-02   3.12500e-01
+ 64   1.35553e-03   8   6.04781e-01   1.56250e-01
+128   3.39246e-04   7   5.86716e+00   7.81250e-02
+256   8.48200e-05   5   2.22504e+03   3.90625e-02
+</pre><pre class="codeoutput">
+k =
+
+    20
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   6.17669e-02   33   7.12034e-02   1.25000e+00
+ 32   1.28898e-02   30   8.78972e-02   6.25000e-01
+ 64   2.70202e-03   31   1.93998e+00   3.12500e-01
+128   5.08632e-04   28   1.06407e+01   1.56250e-01
+256   1.00047e-04   26   2.20600e+03   7.81250e-02
+</pre><pre class="codeoutput">
+k =
+
+    30
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   1.79126e-02   71   2.56556e-01   1.87500e+00
+ 32   7.92008e-03   73   3.58056e-01   9.37500e-01
+ 64   1.21383e-03   65   1.60435e+00   4.68750e-01
+128   3.09307e-04   54   9.48186e+00   2.34375e-01
+256   7.40207e-05   33   1.70498e+03   1.17188e-01
+</pre><pre class="codeoutput">
+k =
+
+    40
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   1.72903e-02    54   1.25559e-01   2.50000e+00
+ 32   5.61833e-03   119   5.78308e-01   1.25000e+00
+ 64   1.27210e-03   113   2.85962e+00   6.25000e-01
+128   2.96478e-04    85   1.15552e+01   3.12500e-01
+256   7.11701e-05    43   1.25688e+03   1.56250e-01
+</pre><pre class="codeoutput">
+k =
+
+    50
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   1.69907e-02     8   6.79832e-03   3.12500e+00
+ 32   4.99878e-03   217   1.32536e+00   1.56250e+00
+ 64   2.54626e-03   203   6.38393e+00   7.81250e-01
+128   7.09215e-04   194   2.78896e+01   3.90625e-01
+256   6.98106e-05    41   1.52543e+03   1.95312e-01
+</pre><pre class="codeinput">    itStep(:,i) = solver.itStep;
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeinput">display(option.shiftparameter);
+n = floor(sqrt(err.N)-1);
+display([<span class="string">'#n\k   '</span>  num2str(wavenumberlist,<span class="string">'%6g'</span>)]);
+display(num2str([n itStep],<span class="string">'%5g'</span>));
+</pre><pre class="codeoutput">
+ans =
+
+    -1     0
+
+#n\k   5    10    20    30    40    50
+ 16    5    9   33   71   54    8
+ 32    4    9   30   73  119  217
+ 64    4    8   31   65  113  203
+128    3    7   28   54   85  194
+256    2    5   26   33   43   41
+</pre><h2>Case: beta = [0,1]<a name="7"></a></h2><pre class="codeinput">option.shiftparameter = [0 1];
+itStep = zeros(option.maxIt,nw);
+<span class="keyword">for</span> i = 1:nw
+</pre><pre class="codeinput">    k = wavenumberlist(i);
+    display(k);
+    [err,time,solver,eqn] = femHelmholtz(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">
+k =
+
+     5
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   6.62817e-03   4   2.31130e+00   3.12500e-01
+ 32   1.67329e-03   4   1.26987e-01   1.56250e-01
+ 64   4.19352e-04   3   6.39779e-01   7.81250e-02
+128   1.04903e-04   3   7.17851e+00   3.90625e-02
+256   2.62344e-05   2   2.20692e+03   1.95312e-02
+</pre><pre class="codeoutput">
+k =
+
+    10
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   2.12346e-02   8   1.74523e-02   6.25000e-01
+ 32   5.39898e-03   8   1.03957e-01   3.12500e-01
+ 64   1.35553e-03   7   1.35424e+00   1.56250e-01
+128   3.39245e-04   6   9.41529e+00   7.81250e-02
+256   8.48275e-05   5   2.06745e+03   3.90625e-02
+</pre><pre class="codeoutput">
+k =
+
+    20
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   6.17669e-02   29   6.30535e-02   1.25000e+00
+ 32   1.28902e-02   27   9.50086e-01   6.25000e-01
+ 64   2.70081e-03   25   2.72914e+00   3.12500e-01
+128   5.13289e-04   24   1.59376e+01   1.56250e-01
+256   1.04289e-04   21   2.48324e+03   7.81250e-02
+</pre><pre class="codeoutput">
+k =
+
+    30
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   1.79126e-02   68   4.42526e-01   1.87500e+00
+ 32   7.92017e-03   62   1.87990e+00   9.37500e-01
+ 64   1.21400e-03   54   5.12693e+00   4.68750e-01
+128   3.10747e-04   47   1.93044e+01   2.34375e-01
+256   7.49114e-05   30   2.24123e+03   1.17188e-01
+</pre><pre class="codeoutput">
+k =
+
+    40
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   1.72899e-02    51   1.84422e+00   2.50000e+00
+ 32   5.62045e-03   103   2.37762e+00   1.25000e+00
+ 64   1.27299e-03    94   7.88416e+00   6.25000e-01
+128   2.98251e-04    79   3.45387e+01   3.12500e-01
+256   7.32390e-05    42   2.16028e+03   1.56250e-01
+</pre><pre class="codeoutput">
+k =
+
+    50
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   1.69907e-02     7   8.79870e-02   3.12500e+00
+ 32   5.00062e-03   193   3.20109e+00   1.56250e+00
+ 64   2.55282e-03   168   1.44046e+01   7.81250e-01
+128   8.74406e-04   158   5.78815e+01   3.90625e-01
+256   7.16273e-05    44   1.26308e+03   1.95312e-01
+</pre><pre class="codeinput">    itStep(:,i) = solver.itStep;
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeinput">display(option.shiftparameter);
+n = floor(sqrt(err.N)-1);
+display([<span class="string">'#n\k   '</span>  num2str(wavenumberlist,<span class="string">'%6g'</span>)]);
+display(num2str([n itStep],<span class="string">'%5g'</span>));
+</pre><pre class="codeoutput">
+ans =
+
+     0     1
+
+#n\k   5    10    20    30    40    50
+ 16    4    8   29   68   51    7
+ 32    4    8   27   62  103  193
+ 64    3    7   25   54   94  168
+128    3    6   24   47   79  158
+256    2    5   21   30   42   44
+</pre><h2>Case: beta = [1,0.5]<a name="12"></a></h2><pre class="codeinput">option.shiftparameter = [1 0.5];
+itStep = zeros(option.maxIt,nw);
+<span class="keyword">for</span> i = 1:nw
+</pre><pre class="codeinput">    k = wavenumberlist(i);
+    display(k);
+    [err,time,solver,eqn] = femHelmholtz(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">
+k =
+
+     5
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   6.62817e-03   3   9.92341e-03   3.12500e-01
+ 32   1.67329e-03   3   6.04340e-02   1.56250e-01
+ 64   4.19399e-04   2   5.55615e-01   7.81250e-02
+128   1.04915e-04   2   5.26034e+00   3.90625e-02
+256   2.62328e-05   2   1.42480e+03   1.95312e-02
+</pre><pre class="codeoutput">
+k =
+
+    10
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   2.12346e-02   6   2.40906e-02   6.25000e-01
+ 32   5.39898e-03   6   1.17684e-01   3.12500e-01
+ 64   1.35553e-03   5   7.98955e-01   1.56250e-01
+128   3.39247e-04   5   7.20414e+00   7.81250e-02
+256   8.48318e-05   4   1.88728e+03   3.90625e-02
+</pre><pre class="codeoutput">
+k =
+
+    20
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   6.17670e-02   21   9.84381e-02   1.25000e+00
+ 32   1.28908e-02   19   2.73059e-01   6.25000e-01
+ 64   2.70268e-03   17   1.29386e+00   3.12500e-01
+128   5.16081e-04   16   9.52402e+00   1.56250e-01
+256   1.23097e-04   16   1.36684e+03   7.81250e-02
+</pre><pre class="codeoutput">
+k =
+
+    30
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   1.79126e-02   53   1.37195e-01   1.87500e+00
+ 32   7.92120e-03   39   4.02382e-01   9.37500e-01
+ 64   1.21409e-03   33   2.30223e+00   4.68750e-01
+128   3.11786e-04   28   1.31188e+01   2.34375e-01
+256   7.86447e-05   25   1.26586e+03   1.17188e-01
+</pre><pre class="codeoutput">
+k =
+
+    40
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   1.72919e-02   37   2.66274e-01   2.50000e+00
+ 32   5.62274e-03   63   7.53790e-01   1.25000e+00
+ 64   1.27420e-03   55   3.66142e+00   6.25000e-01
+128   2.99228e-04   43   1.57473e+01   3.12500e-01
+256   7.51969e-05   30   1.22416e+03   1.56250e-01
+</pre><pre class="codeoutput">
+k =
+
+    50
+
+ #n   ||u-u_h|| iter solvetime k*h
+ 16   1.69907e-02     5   1.99038e-02   3.12500e+00
+ 32   5.00249e-03   113   1.72002e+00   1.56250e+00
+ 64   2.55870e-03    89   6.49505e+00   7.81250e-01
+128   1.00706e-03    83   3.20345e+01   3.90625e-01
+256   7.92030e-05    47   1.18756e+03   1.95312e-01
+</pre><pre class="codeinput">    itStep(:,i) = solver.itStep;
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeinput">display(option.shiftparameter);
+n = floor(sqrt(err.N)-1);
+display([<span class="string">'#n\k   '</span>  num2str(wavenumberlist,<span class="string">'%6g'</span>)]);
+display(num2str([n itStep],<span class="string">'%5g'</span>));
+</pre><pre class="codeoutput">
+ans =
+
+    1.0000    0.5000
+
+#n\k   5    10    20    30    40    50
+ 16    3    6   21   53   37    5
+ 32    3    6   19   39   63  113
+ 64    2    5   17   33   55   89
+128    2    5   16   28   43   83
+256    2    4   16   25   30   47
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Shifted Laplacian Preconditioner for solving Helmholtz equation
+%
+%
+% $$- \Delta u + k^2 u = f \; \hbox{in } (0,1)^2.$$
+%
+%
+
+%% Problem setting
+clear all; close all;
+global k        % wave number
+wavenumberlist = [5 10 20 30 40 50];
+nw = length(wavenumberlist);
+[node,elem] = squaremesh([0,1,0,1],0.25);
+pde = Helmholtzdata1;
+option.L0 = 2;
+option.printlevel = 1;
+option.plotflag = 0;
+option.rateflag = 0;
+option.maxIt = 5;
+bdFlag = setboundary(node,elem,'Dirichlet');
+option.solver = 'slp';
+option.tol = 1.0e-6;
+
+%% Case: beta = [-1,0]  
+option.shiftparameter = [-1 0];
+itStep = zeros(option.maxIt,nw);
+for i = 1:nw
+    k = wavenumberlist(i); 
+    display(k);
+    [err,time,solver,eqn] = femHelmholtz(node,elem,pde,bdFlag,option);
+    %%
+    itStep(:,i) = solver.itStep;
+end
+%% 
+display(option.shiftparameter);
+n = floor(sqrt(err.N)-1);
+display(['#n\k   '  num2str(wavenumberlist,'%6g')]);
+display(num2str([n itStep],'%5g'));
+
+%% Case: beta = [0,1]  
+option.shiftparameter = [0 1];
+itStep = zeros(option.maxIt,nw);
+for i = 1:nw
+    k = wavenumberlist(i); 
+    display(k);
+    [err,time,solver,eqn] = femHelmholtz(node,elem,pde,bdFlag,option);
+    %%
+    itStep(:,i) = solver.itStep;
+end
+%% 
+display(option.shiftparameter);
+n = floor(sqrt(err.N)-1);
+display(['#n\k   '  num2str(wavenumberlist,'%6g')]);
+display(num2str([n itStep],'%5g'));
+
+%% Case: beta = [1,0.5]  
+option.shiftparameter = [1 0.5];
+itStep = zeros(option.maxIt,nw);
+for i = 1:nw
+    k = wavenumberlist(i); 
+    display(k);
+    [err,time,solver,eqn] = femHelmholtz(node,elem,pde,bdFlag,option);
+    %%
+    itStep(:,i) = solver.itStep;
+end
+%% 
+display(option.shiftparameter);
+n = floor(sqrt(err.N)-1);
+display(['#n\k   '  num2str(wavenumberlist,'%6g')]);
+display(num2str([n itStep],'%5g'));
+
+##### SOURCE END #####
+--></body></html>

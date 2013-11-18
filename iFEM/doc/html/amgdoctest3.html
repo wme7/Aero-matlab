@@ -1,0 +1,259 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>AMG TEST III: Robustness to time discretization</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-27"><meta name="DC.source" content="amgdoctest3.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>AMG TEST III: Robustness to time discretization</h1><!--introduction--><p>We consider the linear finite element discretization of heat equation on the unstructured mesh with Neumann boundary conditions. We test the implicit time discretization with various time stepsizes dt = 1/h^4, 1/h^2, 1/h, 1.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Time step: h^4. Mass matrix will dominate.</a></li><li><a href="#5">Time step: h^2</a></li><li><a href="#8">Time step:  h</a></li><li><a href="#11">Time step:  1. Like regularized Neumann problem.</a></li></ul></div><pre class="codeinput">load <span class="string">lakemesh</span>
+</pre><h2>Time step: h^4. Mass matrix will dominate.<a name="2"></a></h2><pre class="codeinput">close <span class="string">all</span>;
+dt = <span class="string">'h^4'</span>;
+[N,itStep,time,err] = amgtest(node,elem,2,[],dt);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.08,   level:  2,   coarse grid 432,   nnz/Nc 6.16
+#dof:    1770,    iter: 11,   err = 4.3648e-09,   time = 0.0932 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.59,   level:  2,   coarse grid 1870,   nnz/Nc 6.96
+#dof:    7876,    iter: 12,   err = 7.7321e-09,   time = 0.638 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.81,   level:  3,   coarse grid 1800,   nnz/Nc 7.96
+#dof:   33081,    iter: 16,   err = 3.3949e-09,   time = 2.37 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.91,   level:  4,   coarse grid 1581,   nnz/Nc 8.40
+#dof:  135463,    iter: 17,   err = 2.6927e-09,   time = 5.72 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.95,   level:  5,   coarse grid 1365,   nnz/Nc 8.44
+#dof:  548115,    iter: 19,   err = 5.0467e-09,   time = 22.3 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1770</td><td>11</td><td>0.0932378</td><td>4.36483e-09</td></tr>
+<tr><td>7876</td><td>12</td><td>0.638126</td><td>7.73208e-09</td></tr>
+<tr><td>33081</td><td>16</td><td>2.36901</td><td>3.39492e-09</td></tr>
+<tr><td>135463</td><td>17</td><td>5.71547</td><td>2.69269e-09</td></tr>
+<tr><td>548115</td><td>19</td><td>22.2607</td><td>5.04669e-09</td></tr>
+</table><pre class="codeinput">r = showrate(N,time,3);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r,3) <span class="string">'}'</span>] ,<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest3_01.png" alt=""> <h2>Time step: h^2<a name="5"></a></h2><pre class="codeinput">close <span class="string">all</span>;
+dt = <span class="string">'h^2'</span>;
+[N,itStep,time,err] = amgtest(node,elem,2,[],dt);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.08,   level:  2,   coarse grid 431,   nnz/Nc 6.16
+#dof:    1770,    iter: 11,   err = 4.1611e-09,   time = 0.0961 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.59,   level:  2,   coarse grid 1864,   nnz/Nc 6.97
+#dof:    7876,    iter: 12,   err = 3.1055e-09,   time = 0.573 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.81,   level:  3,   coarse grid 1802,   nnz/Nc 7.92
+#dof:   33081,    iter: 16,   err = 3.2251e-09,   time = 2.03 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.91,   level:  4,   coarse grid 1607,   nnz/Nc 8.47
+#dof:  135463,    iter: 17,   err = 3.2810e-09,   time = 5.78 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.95,   level:  5,   coarse grid 1371,   nnz/Nc 8.58
+#dof:  548115,    iter: 19,   err = 5.7017e-09,   time = 22.3 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1770</td><td>11</td><td>0.0960589</td><td>4.16113e-09</td></tr>
+<tr><td>7876</td><td>12</td><td>0.573367</td><td>3.10551e-09</td></tr>
+<tr><td>33081</td><td>16</td><td>2.0304</td><td>3.22508e-09</td></tr>
+<tr><td>135463</td><td>17</td><td>5.78185</td><td>3.28105e-09</td></tr>
+<tr><td>548115</td><td>19</td><td>22.3308</td><td>5.70174e-09</td></tr>
+</table><pre class="codeinput">r = showrate(N,time,3);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r,3) <span class="string">'}'</span>] ,<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest3_02.png" alt=""> <h2>Time step:  h<a name="8"></a></h2><pre class="codeinput">close <span class="string">all</span>;
+dt = <span class="string">'h'</span>;
+[N,itStep,time,err] = amgtest(node,elem,2,[],dt);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.08,   level:  2,   coarse grid 444,   nnz/Nc 6.35
+#dof:    1770,    iter: 11,   err = 2.4471e-09,   time = 0.109 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.59,   level:  2,   coarse grid 1858,   nnz/Nc 6.92
+#dof:    7876,    iter: 12,   err = 6.5203e-09,   time = 0.581 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.81,   level:  3,   coarse grid 1781,   nnz/Nc 7.96
+#dof:   33081,    iter: 15,   err = 4.1690e-09,   time =  1.8 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.91,   level:  4,   coarse grid 1597,   nnz/Nc 8.42
+#dof:  135463,    iter: 17,   err = 3.5832e-09,   time = 6.61 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.95,   level:  5,   coarse grid 1412,   nnz/Nc 8.49
+#dof:  548115,    iter: 19,   err = 4.1196e-09,   time = 52.2 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1770</td><td>11</td><td>0.108834</td><td>2.4471e-09</td></tr>
+<tr><td>7876</td><td>12</td><td>0.581419</td><td>6.52032e-09</td></tr>
+<tr><td>33081</td><td>15</td><td>1.79528</td><td>4.16904e-09</td></tr>
+<tr><td>135463</td><td>17</td><td>6.61341</td><td>3.58322e-09</td></tr>
+<tr><td>548115</td><td>19</td><td>52.1972</td><td>4.11963e-09</td></tr>
+</table><pre class="codeinput">r = showrate(N,time,3);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r,3) <span class="string">'}'</span>] ,<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest3_03.png" alt=""> <h2>Time step:  1. Like regularized Neumann problem.<a name="11"></a></h2><pre class="codeinput">close <span class="string">all</span>;
+dt = <span class="string">'1'</span>;
+[N,itStep,time,err] = amgtest(node,elem,2,[],dt);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.08,   level:  2,   coarse grid 432,   nnz/Nc 6.24
+#dof:    1770,    iter: 11,   err = 3.6669e-09,   time = 0.137 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.59,   level:  2,   coarse grid 1869,   nnz/Nc 6.98
+#dof:    7876,    iter: 12,   err = 5.1995e-09,   time = 0.567 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.81,   level:  3,   coarse grid 1779,   nnz/Nc 7.93
+#dof:   33081,    iter: 15,   err = 4.0059e-09,   time = 1.89 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.91,   level:  4,   coarse grid 1596,   nnz/Nc 8.33
+#dof:  135463,    iter: 17,   err = 3.0391e-09,   time = 5.94 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.95,   level:  5,   coarse grid 1350,   nnz/Nc 8.44
+#dof:  548115,    iter: 19,   err = 6.0224e-09,   time = 21.7 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1770</td><td>11</td><td>0.137216</td><td>3.66691e-09</td></tr>
+<tr><td>7876</td><td>12</td><td>0.567369</td><td>5.19946e-09</td></tr>
+<tr><td>33081</td><td>15</td><td>1.8918</td><td>4.00592e-09</td></tr>
+<tr><td>135463</td><td>17</td><td>5.93713</td><td>3.03907e-09</td></tr>
+<tr><td>548115</td><td>19</td><td>21.7079</td><td>6.02243e-09</td></tr>
+</table><pre class="codeinput">r = showrate(N,time,3);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r,3) <span class="string">'}'</span>] ,<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest3_04.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% AMG TEST III: Robustness to time discretization
+%
+% We consider the linear finite element discretization of heat equation on
+% the unstructured mesh with Neumann boundary conditions. We test the
+% implicit time discretization with various time stepsizes dt = 1/h^4,
+% 1/h^2, 1/h, 1.
+
+%%
+load lakemesh
+%% Time step: h^4. Mass matrix will dominate.
+close all;
+dt = 'h^4';
+[N,itStep,time,err] = amgtest(node,elem,2,[],dt);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+r = showrate(N,time,3);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r,3) '}'] ,'Fontsize', 14);
+
+%% Time step: h^2
+close all;
+dt = 'h^2';
+[N,itStep,time,err] = amgtest(node,elem,2,[],dt);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+r = showrate(N,time,3);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r,3) '}'] ,'Fontsize', 14);
+
+%% Time step:  h
+close all;
+dt = 'h';
+[N,itStep,time,err] = amgtest(node,elem,2,[],dt);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+r = showrate(N,time,3);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r,3) '}'] ,'Fontsize', 14);
+
+%% Time step:  1. Like regularized Neumann problem.
+close all;
+dt = '1';
+[N,itStep,time,err] = amgtest(node,elem,2,[],dt);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+r = showrate(N,time,3);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r,3) '}'] ,'Fontsize', 14);
+##### SOURCE END #####
+--></body></html>

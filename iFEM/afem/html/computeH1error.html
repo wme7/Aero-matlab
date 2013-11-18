@@ -1,0 +1,143 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>computeH1error</title><meta name="generator" content="MATLAB 7.9"><meta name="date" content="2009-12-25"><meta name="m-file" content="computeH1error"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> err = computeH1error(node,elem,Du,uh,quadOrder)
+<span class="comment">% COMPUTEH1ERROR H1 norm of the approximation error.</span>
+<span class="comment">%</span>
+<span class="comment">%  err = computeH1error(node,elem,@Du,uh) computes the H1 norm of the</span>
+<span class="comment">%  error between the exact solution Du and finite element approximation</span>
+<span class="comment">%  uh on a mesh described by node and elem.</span>
+<span class="comment">%</span>
+<span class="comment">%  The input parameter Du is a function handle which accepts inputs of</span>
+<span class="comment">%  points and returns the gradient of exact solution. The input parameter</span>
+<span class="comment">%  uh is a column array with length N representing a piecewise linear</span>
+<span class="comment">%  function on the mesh.</span>
+<span class="comment">%</span>
+<span class="comment">%  err = computeH1error(node,elem,@Du,uh,quadOrder) computes error</span>
+<span class="comment">%  using the quadrature rule with order quadOrder (up to 5). The default</span>
+<span class="comment">%  order is 2.</span>
+<span class="comment">%</span>
+<span class="comment">% See also computeH1error3, computeL2error, computeL2error3, getquadpts.</span>
+
+<span class="comment">% Copyright (C) Long Chen. See COPYRIGHT.txt for details.</span>
+
+<span class="keyword">if</span> (nargin&lt;5), quadOrder = 2; <span class="keyword">end</span>
+<span class="comment">% compute gradient of finite element function uh</span>
+[Duh,area] = gradient2(node,elem,uh);
+<span class="comment">% compute gradient of exact solution</span>
+[lambda,weight] = getquadpts(quadOrder);
+nQuad = size(lambda,1);
+err = zeros(size(elem,1),1);
+<span class="keyword">for</span> p = 1:nQuad
+    <span class="comment">% quadrature points in the x-y coordinate</span>
+    pxy = lambda(p,1)*node(elem(:,1),:) <span class="keyword">...</span>
+        + lambda(p,2)*node(elem(:,2),:) <span class="keyword">...</span>
+        + lambda(p,3)*node(elem(:,3),:);
+    err = err + weight(p)*sum((Du(pxy)-Duh).^2,2);
+<span class="keyword">end</span>
+err = area.*err;
+err(isnan(err)) = 0; <span class="comment">% singular values are excluded</span>
+err = sqrt(sum(err));
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.9<br></p></div><!--
+##### SOURCE BEGIN #####
+function err = computeH1error(node,elem,Du,uh,quadOrder)
+% COMPUTEH1ERROR H1 norm of the approximation error.
+%
+%  err = computeH1error(node,elem,@Du,uh) computes the H1 norm of the
+%  error between the exact solution Du and finite element approximation
+%  uh on a mesh described by node and elem. 
+%
+%  The input parameter Du is a function handle which accepts inputs of
+%  points and returns the gradient of exact solution. The input parameter
+%  uh is a column array with length N representing a piecewise linear
+%  function on the mesh.
+%
+%  err = computeH1error(node,elem,@Du,uh,quadOrder) computes error
+%  using the quadrature rule with order quadOrder (up to 5). The default
+%  order is 2.
+%
+% See also computeH1error3, computeL2error, computeL2error3, getquadpts.
+
+% Copyright (C) Long Chen. See COPYRIGHT.txt for details.
+
+if (nargin<5), quadOrder = 2; end
+% compute gradient of finite element function uh
+[Duh,area] = gradient2(node,elem,uh);
+% compute gradient of exact solution
+[lambda,weight] = getquadpts(quadOrder);
+nQuad = size(lambda,1);
+err = zeros(size(elem,1),1);
+for p = 1:nQuad
+    % quadrature points in the x-y coordinate
+    pxy = lambda(p,1)*node(elem(:,1),:) ...
+        + lambda(p,2)*node(elem(:,2),:) ...
+        + lambda(p,3)*node(elem(:,3),:);
+    err = err + weight(p)*sum((Du(pxy)-Duh).^2,2);
+end
+err = area.*err;
+err(isnan(err)) = 0; % singular values are excluded
+err = sqrt(sum(err));
+##### SOURCE END #####
+--></body></html>

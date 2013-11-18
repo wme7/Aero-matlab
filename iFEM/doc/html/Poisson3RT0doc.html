@@ -1,0 +1,198 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Equation: Poisson Equation Discretized by  Element in 3D</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-10"><meta name="DC.source" content="Poisson3RT0doc.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Equation: Poisson Equation Discretized by <img src="Poisson3RT0doc_eq16779.png" alt="$RT_0$"> Element in 3D</h1><!--introduction--><p>We explain the assembling of the matrix equation for the lowest order BDM element discretization of Poisson equation.</p><p>[u,sigma] = Poisson3RT0(node,elem,bdEdge,f,g_D,varargin)</p><p>Created by Ming Wang at Dec 30. 2010.</p><p>Copyright (C) Long Chen. See COPYRIGHT.txt for details.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Data Structure</a></li><li><a href="#2">Local Bases</a></li><li><a href="#3">Mass Matrix</a></li><li><a href="#4">Matrix for Differential Operator</a></li><li><a href="#5">Right hand side</a></li></ul></div><h2>Data Structure<a name="1"></a></h2><pre> [elem2dof,dofSign,face] = dof3RT0(elem);</pre><p>will construct local to global index map; see ifem dof3BDM1doc for details.</p><h2>Local Bases<a name="2"></a></h2><p>Suppose <img src="Poisson3RT0doc_eq00237.png" alt="$i,j,k$"> are the vertices of the <img src="Poisson3RT0doc_eq45221.png" alt="$l$">-th face. The basis are given by</p><p><img src="Poisson3RT0doc_eq92495.png" alt="$$ \phi_l = 2(\lambda_i\nabla \lambda_j \times \nabla\lambda_k +&#xA;            \lambda_j\nabla \lambda_k \times \nabla\lambda_i +&#xA;            \lambda_k\nabla \lambda_i \times \nabla\lambda_j).$$"></p><p>Inside one tetrahedron, the 4 bases functions corresponding to 4 local faces [2 3 4; 1 4 3; 1 2 4; 1 3 2] are:</p><p><img src="Poisson3RT0doc_eq51015.png" alt="$$ \phi_1 = 2(\lambda_2\nabla \lambda_3 \times \nabla\lambda_4&#xA;            + \lambda_3\nabla \lambda_4 \times \nabla\lambda_2&#xA;            + \lambda_4\nabla \lambda_2 \times \nabla\lambda_3).&#xA;$$"></p><p><img src="Poisson3RT0doc_eq88435.png" alt="$$ \phi_2 = 2(\lambda_1\nabla \lambda_4 \times \nabla\lambda_3&#xA;            + \lambda_4\nabla \lambda_1 \times \nabla\lambda_3&#xA;            + \lambda_3\nabla \lambda_1 \times \nabla\lambda_4).&#xA;$$"></p><p><img src="Poisson3RT0doc_eq61858.png" alt="$$ \phi_3 = 2(\lambda_1\nabla \lambda_2 \times \nabla\lambda_4&#xA;            + \lambda_2\nabla \lambda_4 \times \nabla\lambda_1&#xA;            + \lambda_4\nabla \lambda_1 \times \nabla\lambda_2).&#xA;$$"></p><p><img src="Poisson3RT0doc_eq66394.png" alt="$$ \phi_4 = 2(\lambda_1\nabla \lambda_3 \times \nabla\lambda_2&#xA;            + \lambda_3\nabla \lambda_2 \times \nabla\lambda_1&#xA;            + \lambda_2\nabla \lambda_1 \times \nabla\lambda_3).&#xA;$$"></p><p>As for the computation of the integration of divergence of the basis, We have the following good property.</p><p><img src="Poisson3RT0doc_eq77340.png" alt="$$\int_t \phi_i = dofSign(t,i)$$"></p><p>This property can be drived from relationship between Whitney forms. Say the following:</p><p><img src="Poisson3RT0doc_eq90970.png" alt="$$grad w_n = \sum_{e\in patch of n}G_{en}w_e, \qquad&#xA;  curl w_e = \sum_{f\in patch of e}C_{fe}w_f, \qquad&#xA;  div  w_f = \sum_{t\in patch of f}D_{tf}w_t$$"></p><p>where <img src="Poisson3RT0doc_eq26013.png" alt="$w_n, w_e, w_f, w_t$"> are nodal element basis, edge element basis, face element basis, and volume element basis respectively. As for the volume element (or tetrahedral) basis,</p><p><img src="Poisson3RT0doc_eq07290.png" alt="$$ w_t = 1/v(t) \hbox{ on t and 0 otherwise }.$$"></p><p>Because of the different oritentation of local and global faces, from local bases to the global one, the direction should be corrected. That is</p><p>phiGlobal(elem2dof(t,1),:) = phi(t,1)*dofSign(t,1);</p><h2>Mass Matrix<a name="3"></a></h2><p>We use the integral formula</p><p><img src="Poisson3RT0doc_eq20350.png" alt="$$ \int_T&#xA;\lambda_1^{\alpha_1}\lambda_2^{\alpha_2}\lambda_3^{\alpha_3}\lambda_4^{\alpha_4}&#xA;dx = \frac{\alpha_1!\alpha_2!\alpha_3!\alpha_4!3!}{(\sum _{i=1}^4\alpha_i&#xA;+ 3)!}\;|T|,$$"></p><p>to get</p><p><img src="Poisson3RT0doc_eq94909.png" alt="$$ \int _T\lambda_i\lambda_j dx = (1+(i==j))|T|/20. $$"></p><p>For two local bases <img src="Poisson3RT0doc_eq38194.png" alt="$\phi _i$"> and <img src="Poisson3RT0doc_eq50247.png" alt="$\phi _j$"> corresponding to the ith and jth local faces, suppose i = [i1 i2 i3], j = [j1 j2 j3]. Then For two local bases <img src="Poisson3RT0doc_eq91270.png" alt="$\phi_i$"> and <img src="Poisson3RT0doc_eq93485.png" alt="$\phi_j$">,</p><p><img src="Poisson3RT0doc_eq17517.png" alt="$$&#xA;\int_T \phi_i \phi_j dx = \int_T \\&#xA;2(\lambda_{i_1}\nabla \lambda_{i_2}\times\nabla\lambda_{i_3}+&#xA; \lambda_{i_2}\nabla \lambda_{i_3}\times\nabla\lambda_{i_1}+&#xA; \lambda_{i_3}\nabla \lambda_{i_1}\times\nabla\lambda_{i_2})\cdot&#xA;$$"></p><p><img src="Poisson3RT0doc_eq91476.png" alt="$$&#xA;2(\lambda_{j_1}\nabla \lambda_{j_2}\times\nabla\lambda_{j_3}+&#xA; \lambda_{j_2}\nabla \lambda_{j_3}\times\nabla\lambda_{j_1}+&#xA; \lambda_{j_3}\nabla \lambda_{j_1}\times\nabla\lambda_{j_2})dx&#xA;$$"></p><h2>Matrix for Differential Operator<a name="4"></a></h2><p>We record <img src="Poisson3RT0doc_eq22132.png" alt="$\nabla \cdot \phi_i$"> and then the computation <img src="Poisson3RT0doc_eq69364.png" alt="$\int _T \nabla \cdot \phi_i dx$"> is straightforward. Just remember to correct the direction.</p><h2>Right hand side<a name="5"></a></h2><p>We use 5-points quadrature which is exact for cubic polynomials. In the barycentric coordinate, the 5-points are</p><p><img src="Poisson3RT0doc_eq74336.png" alt="$$ p_1 = [1/4, 1/4, 1/4, 1/4], \quad  w_1 = -4/5 $$"></p><p><img src="Poisson3RT0doc_eq82295.png" alt="$$ p_2 = [1/2, 1/6, 1/6, 1/6], \quad  w_2 = 9/20 $$"></p><p><img src="Poisson3RT0doc_eq94827.png" alt="$$ p_3 = [1/6, 1/2, 1/6, 1/6], \quad  w_3 = 9/20 $$"></p><p><img src="Poisson3RT0doc_eq60463.png" alt="$$ p_4 = [1/6, 1/6, 1/2, 1/6], \quad  w_4 = 9/20 $$"></p><p><img src="Poisson3RT0doc_eq63061.png" alt="$$ p_5 = [1/6, 1/6, 1/6, 1/2], \quad  w_5 = 9/20 $$"></p><p>Note that the two for loops are nested in such a way that the point pxy and the evulation Jp is just computed once.</p><p>The local to global assembling is computed using accumarray</p><pre> b = accumarray(elem2dof(:),bt(:),[Ndof 1]);</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Equation: Poisson Equation Discretized by $RT_0$ Element in 3D
+% We explain the assembling of the matrix equation for the lowest order BDM element
+% discretization of Poisson equation. 
+%
+% [u,sigma] = Poisson3RT0(node,elem,bdEdge,f,g_D,varargin)
+%
+% Created by Ming Wang at Dec 30. 2010.
+%
+% Copyright (C) Long Chen. See COPYRIGHT.txt for details. 
+
+%% Data Structure
+%   [elem2dof,dofSign,face] = dof3RT0(elem);
+%
+% will construct local to global index map; see ifem dof3BDM1doc for
+% details.
+%
+%% Local Bases
+% Suppose $i,j,k$ are the vertices of the $l$-th face. The basis are given by
+% 
+% $$ \phi_l = 2(\lambda_i\nabla \lambda_j \times \nabla\lambda_k +
+%             \lambda_j\nabla \lambda_k \times \nabla\lambda_i + 
+%             \lambda_k\nabla \lambda_i \times \nabla\lambda_j).$$
+%
+% Inside one tetrahedron, the 4 bases functions 
+% corresponding to 4 local faces [2 3 4; 1 4 3; 1 2 4; 1 3 2] are:
+%
+% $$ \phi_1 = 2(\lambda_2\nabla \lambda_3 \times \nabla\lambda_4
+%             + \lambda_3\nabla \lambda_4 \times \nabla\lambda_2
+%             + \lambda_4\nabla \lambda_2 \times \nabla\lambda_3).
+% $$
+%
+% $$ \phi_2 = 2(\lambda_1\nabla \lambda_4 \times \nabla\lambda_3
+%             + \lambda_4\nabla \lambda_1 \times \nabla\lambda_3
+%             + \lambda_3\nabla \lambda_1 \times \nabla\lambda_4).
+% $$
+%
+% $$ \phi_3 = 2(\lambda_1\nabla \lambda_2 \times \nabla\lambda_4
+%             + \lambda_2\nabla \lambda_4 \times \nabla\lambda_1
+%             + \lambda_4\nabla \lambda_1 \times \nabla\lambda_2).
+% $$
+%
+% $$ \phi_4 = 2(\lambda_1\nabla \lambda_3 \times \nabla\lambda_2
+%             + \lambda_3\nabla \lambda_2 \times \nabla\lambda_1
+%             + \lambda_2\nabla \lambda_1 \times \nabla\lambda_3).
+% $$
+%
+% As for the computation of the integration of divergence of the basis,
+% We have the following good property.
+%
+% $$\int_t \phi_i = dofSign(t,i)$$
+%
+% This property can be drived from relationship between Whitney forms.
+% Say the following: 
+%
+% $$grad w_n = \sum_{e\in patch of n}G_{en}w_e, \qquad
+%   curl w_e = \sum_{f\in patch of e}C_{fe}w_f, \qquad
+%   div  w_f = \sum_{t\in patch of f}D_{tf}w_t$$
+%
+% where $w_n, w_e, w_f, w_t$ are nodal element basis, edge element basis, 
+% face element basis, and volume element basis respectively.
+% As for the volume element (or tetrahedral) basis, 
+%
+% $$ w_t = 1/v(t) \hbox{ on t and 0 otherwise }.$$
+%
+% Because of the different oritentation of local and global faces, from
+% local bases to the global one, the direction should be corrected. That is
+%
+% phiGlobal(elem2dof(t,1),:) = phi(t,1)*dofSign(t,1);
+
+%% Mass Matrix
+% We use the integral formula 
+%  
+% $$ \int_T
+% \lambda_1^{\alpha_1}\lambda_2^{\alpha_2}\lambda_3^{\alpha_3}\lambda_4^{\alpha_4}
+% dx = \frac{\alpha_1!\alpha_2!\alpha_3!\alpha_4!3!}{(\sum _{i=1}^4\alpha_i
+% + 3)!}\;|T|,$$
+%
+% to get 
+%
+% $$ \int _T\lambda_i\lambda_j dx = (1+(i==j))|T|/20. $$
+%
+% For two local bases $\phi _i$ and $\phi _j$ corresponding to the ith and
+% jth local faces, suppose i = [i1 i2 i3], j = [j1 j2 j3]. Then
+% For two local bases $\phi_i$ and $\phi_j$,
+% 
+% $$
+% \int_T \phi_i \phi_j dx = \int_T \\
+% 2(\lambda_{i_1}\nabla \lambda_{i_2}\times\nabla\lambda_{i_3}+
+%  \lambda_{i_2}\nabla \lambda_{i_3}\times\nabla\lambda_{i_1}+
+%  \lambda_{i_3}\nabla \lambda_{i_1}\times\nabla\lambda_{i_2})\cdot
+% $$
+% 
+% $$
+% 2(\lambda_{j_1}\nabla \lambda_{j_2}\times\nabla\lambda_{j_3}+
+%  \lambda_{j_2}\nabla \lambda_{j_3}\times\nabla\lambda_{j_1}+
+%  \lambda_{j_3}\nabla \lambda_{j_1}\times\nabla\lambda_{j_2})dx
+% $$
+%
+%% Matrix for Differential Operator
+% We record $\nabla \cdot \phi_i$ and then the computation $\int _T \nabla
+% \cdot \phi_i dx$ is straightforward. Just remember to correct the direction.
+
+%% Right hand side
+% We use 5-points quadrature which is exact for cubic polynomials. In the
+% barycentric coordinate, the 5-points are
+%
+% $$ p_1 = [1/4, 1/4, 1/4, 1/4], \quad  w_1 = -4/5 $$
+%
+% $$ p_2 = [1/2, 1/6, 1/6, 1/6], \quad  w_2 = 9/20 $$
+%
+% $$ p_3 = [1/6, 1/2, 1/6, 1/6], \quad  w_3 = 9/20 $$
+%
+% $$ p_4 = [1/6, 1/6, 1/2, 1/6], \quad  w_4 = 9/20 $$
+%
+% $$ p_5 = [1/6, 1/6, 1/6, 1/2], \quad  w_5 = 9/20 $$
+
+%%
+% Note that the two for loops are nested in such a way that the point pxy
+% and the evulation Jp is just computed once.
+%
+% The local to global assembling is computed using accumarray
+%
+%   b = accumarray(elem2dof(:),bt(:),[Ndof 1]);
+
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>

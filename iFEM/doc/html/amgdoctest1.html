@@ -1,0 +1,255 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>AMG TEST I: DIFFERENT MESHES</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-27"><meta name="DC.source" content="amgdoctest1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>AMG TEST I: DIFFERENT MESHES</h1><!--introduction--><p>We consider linear finite element discretization of the Poisson equation with homongenous Dirichlet boundary condition on different meshes.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Uniform mesh</a></li><li><a href="#6">Circle mesh</a></li><li><a href="#9">Unstructured mesh</a></li></ul></div><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+</pre><h2>Uniform mesh<a name="2"></a></h2><pre class="codeinput">[node,elem] = squaremesh([0,1,0,1],0.1);
+[node,elem] = uniformrefine(node,elem);
+[node,elem] = uniformrefine(node,elem);
+showmesh(node,elem);
+snapnow;
+[N,itStep,time,err,errHist] = amgtest(node,elem);
+</pre><img vspace="5" hspace="5" src="amgdoctest1_01.png" alt=""> <pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 4.90,   level:  2,   coarse grid 566,   nnz/Nc 7.96
+#dof:    1521,    iter: 13,   err = 5.1047e-09,   time = 0.324 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 4.95,   level:  2,   coarse grid 2295,   nnz/Nc 8.07
+#dof:    6241,    iter: 14,   err = 7.8622e-09,   time = 1.01 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 4.97,   level:  3,   coarse grid 2117,   nnz/Nc 10.04
+#dof:   25281,    iter: 17,   err = 4.0826e-09,   time = 2.69 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 4.99,   level:  4,   coarse grid 1585,   nnz/Nc 10.14
+#dof:  101761,    iter: 18,   err = 3.7104e-09,   time = 6.04 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 4.99,   level:  5,   coarse grid 1204,   nnz/Nc 10.07
+#dof:  408321,    iter: 19,   err = 9.5598e-09,   time = 18.6 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1521</td><td>13</td><td>0.32428</td><td>5.10471e-09</td></tr>
+<tr><td>6241</td><td>14</td><td>1.00988</td><td>7.86219e-09</td></tr>
+<tr><td>25281</td><td>17</td><td>2.68897</td><td>4.08256e-09</td></tr>
+<tr><td>101761</td><td>18</td><td>6.03576</td><td>3.71035e-09</td></tr>
+<tr><td>408321</td><td>19</td><td>18.5808</td><td>9.55985e-09</td></tr>
+</table><pre class="codeinput">colHeaders = {<span class="string">'Iterations'</span>,<span class="string">'Approximate Error'</span>, <span class="string">'Residual'</span>};
+makeHtmlTable([(0:itStep(end))' errHist],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Iterations</td><td>Approximate Error</td><td>Residual</td></tr>
+<tr><td>0</td><td>1</td><td>1</td></tr>
+<tr><td>1</td><td>0.64778</td><td>47.2984</td></tr>
+<tr><td>2</td><td>0.239125</td><td>11.3022</td></tr>
+<tr><td>3</td><td>0.0592172</td><td>3.09432</td></tr>
+<tr><td>4</td><td>0.0167639</td><td>0.901454</td></tr>
+<tr><td>5</td><td>0.00484905</td><td>0.258648</td></tr>
+<tr><td>6</td><td>0.00139734</td><td>0.0762073</td></tr>
+<tr><td>7</td><td>0.000408771</td><td>0.0222817</td></tr>
+<tr><td>8</td><td>0.000119457</td><td>0.00655522</td></tr>
+<tr><td>9</td><td>3.51965e-05</td><td>0.00195101</td></tr>
+<tr><td>10</td><td>1.04687e-05</td><td>0.000572948</td></tr>
+<tr><td>11</td><td>3.07631e-06</td><td>0.00016884</td></tr>
+<tr><td>12</td><td>9.02155e-07</td><td>4.93164e-05</td></tr>
+<tr><td>13</td><td>2.64392e-07</td><td>1.44885e-05</td></tr>
+<tr><td>14</td><td>7.77209e-08</td><td>4.2877e-06</td></tr>
+<tr><td>15</td><td>2.2933e-08</td><td>1.24639e-06</td></tr>
+<tr><td>16</td><td>6.70498e-09</td><td>3.69033e-07</td></tr>
+<tr><td>17</td><td>1.98477e-09</td><td>1.10261e-07</td></tr>
+<tr><td>18</td><td>5.90875e-10</td><td>3.25297e-08</td></tr>
+<tr><td>19</td><td>1.74359e-10</td><td>9.55985e-09</td></tr>
+</table><pre class="codeinput">r = showrate(N,time,2);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r) <span class="string">'}'</span>] ,<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest1_02.png" alt=""> <h2>Circle mesh<a name="6"></a></h2><pre class="codeinput">close <span class="string">all</span>;
+[node,elem] = circlemesh(0,0,1,0.2);
+[node,elem] = uniformrefine(node,elem);
+[node,elem] = uniformrefine(node,elem);
+showmesh(node,elem);
+snapnow;
+[N,itStep,time,err] = amgtest(node,elem);
+</pre><img vspace="5" hspace="5" src="amgdoctest1_03.png" alt=""> <pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.78,   level:  2,   coarse grid 277,   nnz/Nc 7.90
+#dof:    1083,    iter: 12,   err = 2.2915e-09,   time = 0.0982 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.89,   level:  2,   coarse grid 1097,   nnz/Nc 8.09
+#dof:    4453,    iter: 13,   err = 3.7515e-09,   time = 0.401 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.95,   level:  3,   coarse grid 911,   nnz/Nc 8.87
+#dof:   18057,    iter: 15,   err = 6.0185e-09,   time = 1.06 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.97,   level:  4,   coarse grid 705,   nnz/Nc 9.15
+#dof:   72721,    iter: 17,   err = 3.4491e-09,   time = 2.85 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.99,   level:  5,   coarse grid 571,   nnz/Nc 9.43
+#dof:  291873,    iter: 18,   err = 7.4009e-09,   time = 10.1 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1083</td><td>12</td><td>0.0982043</td><td>2.29152e-09</td></tr>
+<tr><td>4453</td><td>13</td><td>0.400947</td><td>3.75145e-09</td></tr>
+<tr><td>18057</td><td>15</td><td>1.06383</td><td>6.01852e-09</td></tr>
+<tr><td>72721</td><td>17</td><td>2.84512</td><td>3.44914e-09</td></tr>
+<tr><td>291873</td><td>18</td><td>10.0636</td><td>7.40093e-09</td></tr>
+</table><pre class="codeinput">r = showrate(N,time,2);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r) <span class="string">'}'</span>] ,<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest1_04.png" alt=""> <h2>Unstructured mesh<a name="9"></a></h2><pre class="codeinput">close <span class="string">all</span>;
+load <span class="string">lakemesh</span>
+showmesh(node,elem);
+snapnow;
+[N,itStep,time,err] = amgtest(node,elem);
+</pre><img vspace="5" hspace="5" src="amgdoctest1_05.png" alt=""> <pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.08,   level:  2,   coarse grid 431,   nnz/Nc 6.22
+#dof:    1770,    iter: 11,   err = 5.8041e-09,   time = 0.113 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.59,   level:  2,   coarse grid 1858,   nnz/Nc 7.01
+#dof:    7876,    iter: 12,   err = 3.8072e-09,   time = 1.08 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.81,   level:  3,   coarse grid 1792,   nnz/Nc 7.91
+#dof:   33081,    iter: 15,   err = 3.0729e-09,   time = 1.85 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.91,   level:  4,   coarse grid 1593,   nnz/Nc 8.36
+#dof:  135463,    iter: 17,   err = 6.1309e-09,   time = 5.75 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.95,   level:  5,   coarse grid 1387,   nnz/Nc 8.56
+#dof:  548115,    iter: 19,   err = 7.7682e-09,   time = 22.3 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1770</td><td>11</td><td>0.112625</td><td>5.80412e-09</td></tr>
+<tr><td>7876</td><td>12</td><td>1.07548</td><td>3.80724e-09</td></tr>
+<tr><td>33081</td><td>15</td><td>1.85398</td><td>3.07287e-09</td></tr>
+<tr><td>135463</td><td>17</td><td>5.74593</td><td>6.13093e-09</td></tr>
+<tr><td>548115</td><td>19</td><td>22.2799</td><td>7.76824e-09</td></tr>
+</table><pre class="codeinput">r = showrate(N,time,2);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r) <span class="string">'}'</span>],<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest1_06.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% AMG TEST I: DIFFERENT MESHES
+% 
+% We consider linear finite element discretization of the Poisson equation
+% with homongenous Dirichlet boundary condition on different meshes. 
+
+%%
+clear all; close all;
+%% Uniform mesh
+[node,elem] = squaremesh([0,1,0,1],0.1);
+[node,elem] = uniformrefine(node,elem);
+[node,elem] = uniformrefine(node,elem);
+showmesh(node,elem);
+snapnow;
+[N,itStep,time,err,errHist] = amgtest(node,elem);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+colHeaders = {'Iterations','Approximate Error', 'Residual'};
+makeHtmlTable([(0:itStep(end))' errHist],[],[],colHeaders,[],6);
+%%
+r = showrate(N,time,2);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r) '}'] ,'Fontsize', 14);
+
+%% Circle mesh
+close all;
+[node,elem] = circlemesh(0,0,1,0.2);
+[node,elem] = uniformrefine(node,elem);
+[node,elem] = uniformrefine(node,elem);
+showmesh(node,elem);
+snapnow;
+[N,itStep,time,err] = amgtest(node,elem);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+r = showrate(N,time,2);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r) '}'] ,'Fontsize', 14);
+
+%% Unstructured mesh
+close all;
+load lakemesh
+showmesh(node,elem);
+snapnow;
+[N,itStep,time,err] = amgtest(node,elem);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+r = showrate(N,time,2);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r) '}'],'Fontsize', 14);
+##### SOURCE END #####
+--></body></html>

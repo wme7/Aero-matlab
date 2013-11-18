@@ -1,0 +1,127 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Project: Wave Equation</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-24"><meta name="DC.source" content="projectWave.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Project: Wave Equation</h1><!--introduction--><p>In this project we will code finite element or finite difference methods for solving the wave equation.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Wave Equation</a></li><li><a href="#2">Leapfrog Method</a></li><li><a href="#3">Test Example</a></li><li><a href="#4">Output</a></li></ul></div><h2>Wave Equation<a name="1"></a></h2><p><img src="projectWave_eq54820.png" alt="$$ u_{tt} - \Delta u = f, \quad x\in \Omega, t\in (0,T], $$"></p><p><img src="projectWave_eq21718.png" alt="$$ u(x,0) = g(x), \quad x\in \Omega, $$"></p><p><img src="projectWave_eq32583.png" alt="$$ u_{t}(x,0) = h(x), \quad x\in \Omega, $$"></p><p><img src="projectWave_eq60516.png" alt="$$ u = u_D, \quad x\in \partial \Omega, t\in (0,T].$$"></p><h2>Leapfrog Method<a name="2"></a></h2><p>It is a second order explicit method for solving the wave equation.</p><p><img src="projectWave_eq48049.png" alt="$$ (1) \quad \frac{u_j^{n+1}-2u_j^n+ u_{j}^{n-1}}{(\Delta t)^2} - (\Delta _h u^n)_j&#xA;= f^n_j,$$"></p><p>where <img src="projectWave_eq88267.png" alt="$$ \Delta _h $$"> is a discretization of <img src="projectWave_eq86468.png" alt="$$ \Delta $$"> operator using finite difference or finite element method. You are free to chose the one you like. When using finite element methods, you can use mass lumping and multiply the inverse of mass matrix to get a formulation like (1).</p><p>Choose <img src="projectWave_eq60649.png" alt="$u^0$"> by the nodal interpolation, i.e., <img src="projectWave_eq67139.png" alt="$u^0_j=g(x_j)$">. To get <img src="projectWave_eq59601.png" alt="$u^1$">, we introduce the ghost point <img src="projectWave_eq63326.png" alt="$u^{-1}$"> and discretizate the initial velocity using the central difference:</p><p><img src="projectWave_eq30367.png" alt="$$ (2) \quad \frac{u^1_j-u^{-1}_j}{2\Delta t} = h(x_j). $$"></p><p>We use (2) and (1) at <img src="projectWave_eq55631.png" alt="$n =0$"> to eliminate the ghost point and obtain a formula for <img src="projectWave_eq59601.png" alt="$u^1$">.</p><h2>Test Example<a name="3"></a></h2><p>We choose the domain as <img src="projectWave_eq76634.png" alt="$\Omega = (0,12)\times (0,12)$"> and the source term as</p><p><img src="projectWave_eq84813.png" alt="$$ f(x,t) = \exp(-7|x-x_S|) 2a(2a(t-b)^2-1)\exp(-a(t-b)^2), $$"> where</p><p><img src="projectWave_eq42853.png" alt="$$ a = (\frac{\pi}{1.31})^2, \quad b=1.35, \quad x_S = (6,6). $$"></p><p>The boundary and initial conditions</p><p><img src="projectWave_eq48852.png" alt="$$ g = h = 0, \quad u_D = 0. $$"></p><h2>Output<a name="4"></a></h2><p>Check the rate of convergence is second order in both time and space.</p><p><b>Hint</b> When the exact solution is not known, use the double grid principle to estimate the errors. That is, compute the difference between solutions of two consective meshes (the finer one is the uniform refinemen of the coarser one).</p><p>When you verify the rate of h, choose dt small enough. Similarly fix a small h and vary dt to verify the rate in time.</p><p>Read the example in <a href="matlab:doc('getframe')">getframe</a> documentation on how to creat a movie in matlab.</p><p>Run your code and record the movie of the evolution of the function.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Project: Wave Equation
+%
+% In this project we will code finite element or finite difference methods
+% for solving the wave equation. 
+
+%% Wave Equation
+%
+% $$ u_{tt} - \Delta u = f, \quad x\in \Omega, t\in (0,T], $$
+%
+% $$ u(x,0) = g(x), \quad x\in \Omega, $$
+%
+% $$ u_{t}(x,0) = h(x), \quad x\in \Omega, $$
+%
+% $$ u = u_D, \quad x\in \partial \Omega, t\in (0,T].$$
+
+%% Leapfrog Method
+%
+% It is a second order explicit method for solving the wave equation. 
+%
+% $$ (1) \quad \frac{u_j^{n+1}-2u_j^n+ u_{j}^{n-1}}{(\Delta t)^2} - (\Delta _h u^n)_j
+% = f^n_j,$$
+%
+% where $$ \Delta _h $$ is a discretization of $$ \Delta $$ operator using
+% finite difference or finite element method. You are free to chose the one
+% you like. When using finite element methods, you can use mass lumping and
+% multiply the inverse of mass matrix to get a formulation like (1).
+%
+% Choose $u^0$ by the nodal interpolation, i.e., $u^0_j=g(x_j)$. To get
+% $u^1$, we introduce the ghost point $u^{-1}$ and discretizate the
+% initial velocity using the central difference:
+%
+% $$ (2) \quad \frac{u^1_j-u^{-1}_j}{2\Delta t} = h(x_j). $$
+%
+% We use (2) and (1) at $n =0$ to eliminate the ghost point and obtain a
+% formula for $u^1$. 
+
+%% Test Example
+%
+% We choose the domain as $\Omega = (0,12)\times (0,12)$ and the source term as
+%
+% $$ f(x,t) = \exp(-7|x-x_S|) 2a(2a(t-b)^2-1)\exp(-a(t-b)^2), $$ where
+%
+% $$ a = (\frac{\pi}{1.31})^2, \quad b=1.35, \quad x_S = (6,6). $$
+%
+% The boundary and initial conditions
+%
+% $$ g = h = 0, \quad u_D = 0. $$
+
+%% Output
+%
+% Check the rate of convergence is second order in both time and space. 
+%
+% *Hint* When the exact solution is not known, use the double grid
+% principle to estimate the errors. That is, compute the difference between
+% solutions of two consective meshes (the finer one is the uniform
+% refinemen of the coarser one). 
+% 
+% When you verify the rate of h, choose dt small enough. Similarly fix a
+% small h and vary dt to verify the rate in time. 
+%
+% Read the example in <matlab:doc('getframe') getframe> documentation on
+% how to creat a movie in matlab.
+%
+% Run your code and record the movie of the evolution of the function. 
+
+##### SOURCE END #####
+--></body></html>

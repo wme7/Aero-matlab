@@ -1,0 +1,24 @@
+function [Pro,Res] = prolongationexample
+node = [-1,-1; 1,-1; 1,1; -1,1; 0,0];
+elem = [5 4 1; 5 1 2; 5 2 3; 5 3 4];
+figure(1); 
+set(gcf,'Units','normal'); set(gcf,'Position',[0,0,0.5,0.3]);
+subplot(1,2,2); showmesh(node,elem); findnode(node);
+node = [-1,-1; 1,-1; 1,1; -1,1; -1,0; 0,1; 0,0];
+elem = [6 4 7; 7 1 2; 7 2 3; 5 1 7; 6 7 3; 5 7 4];
+subplot(1,2,1); showmesh(node,elem); findnode(node);
+NL = [0 5 7]; 
+HB(6,1) = 5; 
+HB(6,2) = 1; 
+HB(6,3) = 4; 
+HB(7,1) = 6; 
+HB(7,2) = 3; 
+HB(7,3) = 4; 
+fineNode = [5 6]'; 
+coarseNode = [1 2 3 4 5]'; 
+coarseNodeFineIdx = [1 2 3 4 7]';
+ii = [coarseNodeFineIdx; fineNode; fineNode];
+jj = [coarseNode; HB(6:7,2); HB(6:7,3)];
+ss = [ones(5,1); 0.5*ones(2,1); 0.5*ones(2,1)];
+Pro = full(sparse(ii,jj,ss,7,5));
+Res = Pro';

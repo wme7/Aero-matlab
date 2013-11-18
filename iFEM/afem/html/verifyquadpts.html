@@ -1,0 +1,181 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>verifyquadpts</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-06-06"><meta name="DC.source" content="verifyquadpts.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">VERIFYQUADPTS examples and verfication on quadrature rules.</a></li><li><a href="#4">Results</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> verifyquadpts
+</pre><h2>VERIFYQUADPTS examples and verfication on quadrature rules.<a name="2"></a></h2><pre>error = verifyquadpts(n) computes the error of n-th order quadrature
+rule in a triangle. This is an example on the usage of quadrature points
+and verification of qudarture order for approximating integrals in a
+triangle.</pre><p>See also quadpts</p><p>Copyright (C) Long Chen. See COPYRIGHT.txt for details.</p><pre class="codeinput"><span class="comment">% a reference triangle</span>
+node = [0 0; 1 0; 0 1];
+elem = [1 2 3];
+area = 0.5;
+err = zeros(9,2);
+<span class="keyword">for</span> n = 1:9
+    <span class="comment">% get quadrature points</span>
+    [lambda,weight] = quadpts(n);
+    nQuad = size(lambda,1);
+    t1 = 0;
+    t2 = 0;
+    <span class="keyword">for</span> p = 1:nQuad
+        <span class="comment">% quadrature points in the x-y coordinate</span>
+        pxy = lambda(p,1)*node(elem(:,1),:) <span class="keyword">...</span>
+            + lambda(p,2)*node(elem(:,2),:) <span class="keyword">...</span>
+            + lambda(p,3)*node(elem(:,3),:);
+        t1 = t1 + weight(p)*f1(pxy(1),pxy(2),n);
+        t2 = t2 + weight(p)*f2(pxy(1),pxy(2));
+    <span class="keyword">end</span>
+    t1 = t1*area;
+    t2 = t2*area;
+    err(n,1) = abs(t1 - 2/((n+1)*(n+2)));
+    err(n,2) = abs(t2 - (sin(1) - cos(1)));
+<span class="keyword">end</span>
+ts = zeros(9,3); ts = char(ts);
+display(<span class="string">'n     x^n + y^n     sin(x+y)'</span>);
+display([num2str((1:9)') ts num2str(err(:,1),<span class="string">'%0.5e'</span>) ts num2str(err(:,2),<span class="string">'%0.5e'</span>)]);
+</pre><pre class="codeoutput">n     x^n + y^n     sin(x+y)
+1   0.00000e+00   8.01622e-03
+2   2.77556e-17   8.93883e-05
+3   0.00000e+00   5.11954e-05
+4   1.38778e-16   8.07551e-07
+5   1.52656e-16   5.96867e-08
+6   2.49800e-16   3.98070e-10
+7   2.39392e-16   6.13866e-11
+8   4.85723e-17   1.25705e-12
+9   1.17961e-16   2.22045e-16
+</pre><pre class="codeinput"><span class="keyword">end</span>
+
+<span class="keyword">function</span> z = f1(x,y,n)
+z = x.^n + y.^n;
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> z = f2(x,y)
+z = sin(x+y);
+<span class="keyword">end</span>
+</pre><h2>Results<a name="4"></a></h2><p>Let T be the triangle formed by (0,0), (1,0), and (0,1).</p><p>Error1 is for the integral <img src="verifyquadpts_eq11047.png" alt="$\int _{T} x^n + y^n \, dxdy$">. It should be numerically exact.</p><p>Error2 is for the integral <img src="verifyquadpts_eq07591.png" alt="$\int _{T} \sin(x+y) \, dxdy$">. It decays as n increas.</p><p>See the doc for qudrature rules in <a href="matlab:ifemdoc('quadpts')">quadpts</a>.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+function verifyquadpts
+%% VERIFYQUADPTS examples and verfication on quadrature rules.
+%
+%  error = verifyquadpts(n) computes the error of n-th order quadrature
+%  rule in a triangle. This is an example on the usage of quadrature points
+%  and verification of qudarture order for approximating integrals in a
+%  triangle.
+%
+% See also quadpts
+%
+% Copyright (C) Long Chen. See COPYRIGHT.txt for details. 
+
+% a reference triangle
+node = [0 0; 1 0; 0 1];
+elem = [1 2 3];
+area = 0.5;
+err = zeros(9,2);
+for n = 1:9    
+    % get quadrature points
+    [lambda,weight] = quadpts(n);
+    nQuad = size(lambda,1);
+    t1 = 0; 
+    t2 = 0;
+    for p = 1:nQuad
+        % quadrature points in the x-y coordinate
+        pxy = lambda(p,1)*node(elem(:,1),:) ...
+            + lambda(p,2)*node(elem(:,2),:) ...
+            + lambda(p,3)*node(elem(:,3),:);
+        t1 = t1 + weight(p)*f1(pxy(1),pxy(2),n);
+        t2 = t2 + weight(p)*f2(pxy(1),pxy(2));
+    end                
+    t1 = t1*area;
+    t2 = t2*area;
+    err(n,1) = abs(t1 - 2/((n+1)*(n+2)));
+    err(n,2) = abs(t2 - (sin(1) - cos(1)));
+end
+ts = zeros(9,3); ts = char(ts);
+display('n     x^n + y^n     sin(x+y)');
+display([num2str((1:9)') ts num2str(err(:,1),'%0.5e') ts num2str(err(:,2),'%0.5e')]);
+end
+
+function z = f1(x,y,n)
+z = x.^n + y.^n;
+end
+
+function z = f2(x,y)
+z = sin(x+y);
+end
+
+%% Results
+% Let T be the triangle formed by (0,0), (1,0), and (0,1). 
+%
+% Error1 is for the integral 
+% $\int _{T} x^n + y^n \, dxdy$. 
+% It should be numerically exact. 
+%
+% Error2 is for the integral 
+% $\int _{T} \sin(x+y) \, dxdy$.
+% It decays as n increas.
+%
+% See the doc for qudrature rules in <matlab:ifemdoc('quadpts') quadpts>.
+
+##### SOURCE END #####
+--></body></html>

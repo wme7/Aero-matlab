@@ -1,0 +1,291 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Project: Multigrid Methods</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-24"><meta name="DC.source" content="projectMG.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Project: Multigrid Methods</h1><!--introduction--><p>In this project we will learn three ways of implementating multigrid methods: from matrix-free version to matrix-only version depending on how much information on the grid and PDE is provided.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1"><b>Multigrid on Uniform Grids for Poisson Equations</b></a></li><li><a href="#2">Step 1 Gauss-Seidel iteration</a></li><li><a href="#4">Step 2 Two-level method</a></li><li><a href="#5">Step 3 V-cycle Multi-grid method</a></li><li><a href="#6"><b>Multigrid on Hierarchical Grids</b></a></li><li><a href="#7">Step 1 Hierarchical Meshes</a></li><li><a href="#9">Step 2 Transfer Operator and Smoothers</a></li><li><a href="#10">Step 3 V-cycle Multigrid</a></li><li><a href="#11"><b>Algebraic Multigrid Method</b></a></li><li><a href="#12">Step 1 Matrix</a></li><li><a href="#13">Step 2 Coarsening</a></li><li><a href="#14">Step 3 Transfer Operator and Smoothers</a></li><li><a href="#15">Step 4 V-cycle Multigrid</a></li></ul></div><h2><b>Multigrid on Uniform Grids for Poisson Equations</b><a name="1"></a></h2><p>We consider linear finite element or equivalently 5-point stencil discretization of the Poisson equation on a uniform grid of [0,1]^2 with size h. For simplicity, we assume h = 1/2^L and zero Dirichlet bounary condition.</p><pre class="codeinput">set(gcf,<span class="string">'Units'</span>,<span class="string">'normal'</span>); set(gcf,<span class="string">'Position'</span>,[0,0,0.4,0.3]);
+[node,elem] = squaremesh([0,1,0,1],0.25);
+subplot(1,2,1); showmesh(node,elem);
+[node,elem] = uniformrefine(node,elem);
+subplot(1,2,2); showmesh(node,elem);
+</pre><img vspace="5" hspace="5" src="projectMG_01.png" alt=""> <h2>Step 1 Gauss-Seidel iteration<a name="2"></a></h2><div><ul><li>Use two-dimension array to store functions, e.g. u(i,j) and b(i,j). Then   realize A*u and G-S iteration by a double for loop over interior nodes.   For example, one Gauss-Seidel iteration is</li></ul></div><pre class="codeinput">n = 2^5; h = 1/n;
+u = zeros(n,n); b = ones(n,n)*h^2;
+<span class="keyword">for</span> i = 2:n-1
+   <span class="keyword">for</span> j = 2:n-1
+       u(i,j) = (b(i,j) + u(i-1,j) + u(i+1,j) + u(i,j-1) + u(i,j+1))/4;
+   <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><div><ul><li>Check the convergence of Gauss-Seidel iteration by solving <img src="projectMG_eq15562.png" alt="$-\Delta u = 1$">   in (0,1)^2 with zero Dirichlet boundary condition. Plot the error in  suitable norm vs iteration for h = 1/64.</li></ul></div><div><ul><li>Change h from 1/4 to 1/128 and compare the iterations to drive the  error in a suitable norm below the discretiztion error h^2.</li></ul></div><div><ul><li>Choose random initial guess. Plot the error function on the grid for the first 3 steps. Check <tt>surf</tt> and <tt>meshgrid</tt> functions in Matlab for the plot of a 2-D function.</li></ul></div><div><ul><li>(Optional) Code the red-black Gauss-Seidel by choosing the <a href="../redblack.pdf">red-black</a> ordering of nodes. (Write two loops by checking if <tt>mod(i+j,2)==0</tt>).</li></ul></div><h2>Step 2 Two-level method<a name="4"></a></h2><div><ul><li>Figure out the index map between fine grid with size h and coarse grid with size 2h. For example, (i,j) in coarse grid is (2*i-1,2*j-1) in the fine grid.</li></ul></div><div><ul><li>Code the linear prolongation and restriction using the index map. Be carefuly on the value on the boundary points.</li></ul></div><div><ul><li>Code the two-grid SSC method. On fine grid, apply m times G-S iteration and then restrict the residual to the coarse grid. On coarse grid, use G-S iteration in Step 1 to solve the equation below the discretization error. Then prolongate the correction to the fine grid and apply additional m G-S iterations.</li></ul></div><div><ul><li>Change h from 1/4 to 1/128 and compare the iterations of two-level methods.</li></ul></div><h2>Step 3 V-cycle Multi-grid method<a name="5"></a></h2><pre>Choose one of the following approach to implement the MG.</pre><div><ul><li>(Recrusive way) Apply the two-level method to the coarse grid problem in Step 2.</li></ul></div><div><ul><li>(Non-recrusive way) Follow the description of SSC in lecture notes to implement V-cycle.</li></ul></div><p><i>For a non-recrusive implementation of multigrid, the cell structure can be used to store the residual and correction with different size on different levels.</i></p><div><ul><li>Change h from 1/4 to 1/128 and check the iterations and cpu time of MG.</li></ul></div><h2><b>Multigrid on Hierarchical Grids</b><a name="6"></a></h2><p>We consider linear finite element discretization of the Poisson equation on grids obtained by uniform refinement of a coarse grid.</p><pre class="codeinput">[node,elem] = circlemesh(0,0,1,0.25);
+subplot(1,2,1); showmesh(node,elem);
+[node,elem] = uniformrefine(node,elem);
+subplot(1,2,2); showmesh(node,elem);
+</pre><img vspace="5" hspace="5" src="projectMG_02.png" alt=""> <h2>Step 1 Hierarchical Meshes<a name="7"></a></h2><p>Generate the initial grid by</p><pre class="codeinput">[node,elem] = circlemesh(0,0,1,0.25);
+</pre><div><ul><li>Refine the initial mesh J times to get the finest mesh. To get a mesh of the disk, the boundary nodes should be projected onto the unit circle.</li></ul></div><div><ul><li>Construct <tt>HB</tt> in two ways. Either from the output of <tt>uniformrefine</tt> during the refinement or call <tt>uniformcoarsenred</tt> from the finest mesh.</li></ul></div><h2>Step 2 Transfer Operator and Smoothers<a name="9"></a></h2><div><ul><li>Assemble the stiffness matrix A in the finest mesh.</li></ul></div><div><ul><li>Construct prolongation and restriction matrices using <tt>HB</tt>.</li></ul></div><div><ul><li>Compute stiffness matrix in each level by triple product.</li></ul></div><div><ul><li>Store the smoother tril(A) and triu(A) in each level.</li></ul></div><h2>Step 3 V-cycle Multigrid<a name="10"></a></h2><div><ul><li>Follow the lecture notes <a href="http://math.uci.edu/~chenlong/226/Ch6MG.pdf">Introduction to Multigrid method</a> to implement the non-recrusive V-cycle.</li></ul></div><p><i>Be careful on the boundary nodes. Restrict smoothing to interiori nodes only and enforce the residual on boundary nodes to be zero.</i></p><div><ul><li>For one single grid, say J = 4, show the decrease of the residual in certain norm for each iteration of the multigrid method.</li></ul></div><div><ul><li>Test V-cycle MG for J = 3:6. List iteration steps and cpu time.</li></ul></div><h2><b>Algebraic Multigrid Method</b><a name="11"></a></h2><p>We consider solving an SPD matrix equation <tt>Ax = b</tt>, where <tt>A</tt> could be obtained as the finite element discretization on a unstructured grids. A coarsening of the graph of A is needed and restriction and prolongation can be constructued based on the coarsening. A breif introduction on AMG can be found at <a href="https://e-reports-ext.llnl.gov/pdf/333205.pdf">Falgout, RD. An Introduction to Algebraic Multigrid</a></p><h2>Step 1 Matrix<a name="12"></a></h2><div><ul><li>Load the <tt>lakemesh.mat</tt> in ifem/data.</li></ul></div><div><ul><li>Assemble the stiffness matrix on this mesh and take the submatrix associated to interior nodes only.</li></ul></div><p><i>The mesh is only used to generate the matrix. In the later step, only the generated matrix is used.</i></p><pre class="codeinput">load <span class="string">lakemesh.mat</span>;
+figure; clf; showmesh(node,elem);
+A = assemblematrix(node,elem);
+</pre><img vspace="5" hspace="5" src="projectMG_03.png" alt=""> <h2>Step 2 Coarsening<a name="13"></a></h2><p>Use <tt>coarsenAMGc</tt> to get a set of coarse nodes.</p><pre class="codeinput">help <span class="string">coarsenAMGc</span>
+</pre><pre class="codeoutput">  COARSENAMGC coarsen the graph of A.
+ 
+  isC = coarsenAMGc(A) terturns a logical array to make a set of nodes as
+  the coarse ndoes based on As, a strong connectness matrix modified from
+  A. The strong connectness is slightly different with the standard
+  definition.
+ 
+  [isC,As] = coarsenAMGc(A,theta) accepts the parameter theta to define the
+  strong connectness. The default setting is theta = 0.025. It also outputs
+  the strong connectness matrix As which could be used in the constrction
+  of prolongation and restriction.
+ 
+  Example
+    load lakemesh
+    A = assemblematrix(node,elem);
+    [isC,As] = coarsenAMGc(A);
+ 
+  See also: coarsenAMGrs, interpolationAMGs, amg
+ 
+  Reference page in Help browser
+        &lt;a href="matlab:ifem coarseAMGdoc"&gt;coarsenAMGdoc&lt;/a&gt; 
+ 
+  Copyright (C) Long Chen. See COPYRIGHT.txt for details. 
+
+</pre><h2>Step 3 Transfer Operator and Smoothers<a name="14"></a></h2><p>Use <tt>interpolationAMGs</tt> to get restriction and prolongation operators.</p><pre class="codeinput">help <span class="string">interpolationAMGs</span>
+</pre><pre class="codeoutput">  INTERPOLATIONAMGS construct prolongation and restriction matrices
+ 
+  [Pro,Res] = interpolatoinAMGs(A,isC) construct prolongation and
+  restriction matrices use standard matrix-dependent interpolation. 
+ 
+  In the input, A is a SPD matrix and isC is a logical array to indicate
+  nodes in coarse matrix. In the output Pro and Res are prolongation and
+  restriction matrices satisfying Res = Pro'.
+ 
+  The submatrix A_{cf} is used to construct the interpolation of values on
+  fine nodes from that of coarse nodes. The weight is normalized to
+  preserve the constant.
+ 
+  Example
+    load lakemesh
+    A = assemblematrix(node,elem);
+    [isC,As] = coarsenAMGc(A);
+    [Ac,Pro,Res] = interpolatoinAMGs(As,isC);
+ 
+  See also: coarsenAMGc, amg
+ 
+  Copyright (C) Long Chen. See COPYRIGHT.txt for details. 
+
+</pre><h2>Step 4 V-cycle Multigrid<a name="15"></a></h2><p>This step is exact the Step 3 in part 3. To test the robustness, apply <tt>uniformrefine</tt> to the mesh and generate corresponding matrix.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Project: Multigrid Methods
+%
+% In this project we will learn three ways of implementating multigrid
+% methods: from matrix-free version to matrix-only version depending on how
+% much information on the grid and PDE is provided.
+
+%% *Multigrid on Uniform Grids for Poisson Equations*
+%
+% We consider linear finite element or equivalently 5-point stencil
+% discretization of the Poisson equation on a uniform grid of [0,1]^2 with
+% size h. For simplicity, we assume h = 1/2^L and zero Dirichlet bounary
+% condition.
+set(gcf,'Units','normal'); set(gcf,'Position',[0,0,0.4,0.3]);
+[node,elem] = squaremesh([0,1,0,1],0.25);
+subplot(1,2,1); showmesh(node,elem);
+[node,elem] = uniformrefine(node,elem);
+subplot(1,2,2); showmesh(node,elem);
+
+%% Step 1 Gauss-Seidel iteration
+%
+% * Use two-dimension array to store functions, e.g. u(i,j) and b(i,j). Then
+%   realize A*u and G-S iteration by a double for loop over interior nodes.
+%   For example, one Gauss-Seidel iteration is 
+
+n = 2^5; h = 1/n; 
+u = zeros(n,n); b = ones(n,n)*h^2;
+for i = 2:n-1
+   for j = 2:n-1
+       u(i,j) = (b(i,j) + u(i-1,j) + u(i+1,j) + u(i,j-1) + u(i,j+1))/4;
+   end
+end
+
+%%
+% * Check the convergence of Gauss-Seidel iteration by solving $-\Delta u = 1$
+%   in (0,1)^2 with zero Dirichlet boundary condition. Plot the error in
+%  suitable norm vs iteration for h = 1/64.
+%
+% * Change h from 1/4 to 1/128 and compare the iterations to drive the
+%  error in a suitable norm below the discretiztion error h^2.
+%
+% * Choose random initial guess. Plot the error function on the grid for
+% the first 3 steps. Check |surf| and |meshgrid| functions in Matlab for
+% the plot of a 2-D function.
+%
+% * (Optional) Code the red-black Gauss-Seidel by choosing the
+% <../redblack.pdf red-black>
+% ordering of nodes. (Write two loops by checking if |mod(i+j,2)==0|).
+%
+%% Step 2 Two-level method
+% 
+% * Figure out the index map between fine grid with size h and coarse grid
+% with size 2h. For example, (i,j) in coarse grid is (2*i-1,2*j-1) in the
+% fine grid.
+%
+% * Code the linear prolongation and restriction using the index map. Be
+% carefuly on the value on the boundary points.
+%
+% * Code the two-grid SSC method. On fine grid, apply m times G-S iteration
+% and then restrict the residual to the coarse grid. On coarse grid, use
+% G-S iteration in Step 1 to solve the equation below the discretization
+% error. Then prolongate the correction to the fine grid and apply
+% additional m G-S iterations.
+%
+% * Change h from 1/4 to 1/128 and compare the iterations of two-level
+% methods.
+%
+%% Step 3 V-cycle Multi-grid method
+%
+%  Choose one of the following approach to implement the MG.
+%
+% * (Recrusive way) Apply the two-level method to the coarse grid problem
+% in Step 2.
+%
+% * (Non-recrusive way) Follow the description of SSC in lecture notes to
+% implement V-cycle.
+%
+% _For a non-recrusive implementation of multigrid, the cell structure can
+% be used to store the residual and correction with different size on
+% different levels._
+%
+% * Change h from 1/4 to 1/128 and check the iterations and cpu time of MG.
+
+%% *Multigrid on Hierarchical Grids*
+%
+% We consider linear finite element discretization of the Poisson equation
+% on grids obtained by uniform refinement of a coarse grid.
+[node,elem] = circlemesh(0,0,1,0.25);
+subplot(1,2,1); showmesh(node,elem);
+[node,elem] = uniformrefine(node,elem);
+subplot(1,2,2); showmesh(node,elem);
+
+%% Step 1 Hierarchical Meshes
+%
+% Generate the initial grid by 
+[node,elem] = circlemesh(0,0,1,0.25);
+%%
+% * Refine the initial mesh J times to get the finest mesh. To get a mesh of
+% the disk, the boundary nodes should be projected onto the unit circle.
+%
+% * Construct |HB| in two ways. Either from the output of |uniformrefine|
+% during the refinement or call |uniformcoarsenred| from the finest mesh.
+%
+%% Step 2 Transfer Operator and Smoothers
+%
+% * Assemble the stiffness matrix A in the finest mesh.
+%
+% * Construct prolongation and restriction matrices using |HB|.
+%
+% * Compute stiffness matrix in each level by triple product.
+%
+% * Store the smoother tril(A) and triu(A) in each level.
+%
+%% Step 3 V-cycle Multigrid
+%
+% * Follow the lecture notes <http://math.uci.edu/~chenlong/226/Ch6MG.pdf Introduction to Multigrid method> to implement the non-recrusive V-cycle.
+%
+% _Be careful on the boundary nodes. Restrict smoothing to interiori nodes
+% only and enforce the residual on boundary nodes to be zero._
+%
+% * For one single grid, say J = 4, show the decrease of the residual in
+% certain norm for each iteration of the multigrid method.
+%
+% * Test V-cycle MG for J = 3:6. List iteration steps and cpu time.
+
+%% *Algebraic Multigrid Method*
+% 
+% We consider solving an SPD matrix equation |Ax = b|, where |A| could be
+% obtained as the finite element discretization on a unstructured grids. A
+% coarsening of the graph of A is needed and restriction and prolongation
+% can be constructued based on the coarsening. A breif introduction on AMG
+% can be found at <https://e-reports-ext.llnl.gov/pdf/333205.pdf Falgout, RD. An Introduction to Algebraic Multigrid>
+
+%% Step 1 Matrix
+%
+% * Load the |lakemesh.mat| in ifem/data.
+%
+% * Assemble the stiffness matrix on this mesh and take the submatrix
+% associated to interior nodes only.
+%
+% _The mesh is only used to generate the matrix. In the later step, only the
+% generated matrix is used._
+
+load lakemesh.mat;
+figure; clf; showmesh(node,elem);
+A = assemblematrix(node,elem);
+
+%% Step 2 Coarsening
+% Use |coarsenAMGc| to get a set of coarse nodes.
+help coarsenAMGc
+
+%% Step 3 Transfer Operator and Smoothers
+%
+% Use |interpolationAMGs| to get restriction and prolongation operators.
+help interpolationAMGs
+
+%% Step 4 V-cycle Multigrid
+%
+% This step is exact the Step 3 in part 3. To test the robustness, apply
+% |uniformrefine| to the mesh and generate corresponding matrix.
+
+##### SOURCE END #####
+--></body></html>

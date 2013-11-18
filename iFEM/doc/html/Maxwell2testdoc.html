@@ -1,0 +1,424 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Maxwell2testdoc</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-05-04"><meta name="DC.source" content="Maxwell2testdoc.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Edge Element Discretization of Maxwell Equations</a></li><li><a href="#2">The data of the pde</a></li><li><a href="#3">Positive Definite Case</a></li><li><a href="#9">Indefinite with real coefficients</a></li><li><a href="#15">Indefinite: complex coefficients, real solution</a></li><li><a href="#21">Indefinite: real coefficents, complex solution</a></li></ul></div><h2>Edge Element Discretization of Maxwell Equations<a name="1"></a></h2><p>We test Maxwell solvers in iFEM.</p><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>
+rowNames ={<span class="string">'h=1/2'</span>;<span class="string">'h=1/4'</span>;<span class="string">'h=1/8'</span>};
+colHeaders = {<span class="string">'H^curl Error'</span>,<span class="string">'L^2 Error'</span>};
+</pre><h2>The data of the pde<a name="2"></a></h2><div><ul><li>pde = Maxwelldata1; % zero Neumann boundary condition and curl u = 0</li><li>pde = Maxwelldata2; % non-homogenous Neumann boundary condition</li><li>pde = Maxwelldata3; % polynomial data and curl u = 0</li><li>pde = Maxwelldata4; % zero Dirichlet boundary condition</li><li>pde = Maxwelldata5; % linear polynomial data</li><li>pde = planewavedataC; % plane wave with complex coefficients</li><li>pde = planewavedata1; % plane wave with real coefficients</li></ul></div><h2>Positive Definite Case<a name="3"></a></h2><p>curl curl E + E = f.</p><pre class="codeinput">help <span class="string">Maxwelldata2</span>
+</pre><pre class="codeoutput">  MAXWELLDATA2 non-homogenous Dirichlet/Neumann boundary condition
+ 
+        curl(mu^(-1)curl u) - epsilon u = J    in \Omega,  
+                                  n &times; u = n &times; g_D  on \Gamma_D,
+                    n &times; (mu^(-1)curl u) = n &times; g_N  on \Gamma_N.
+ 
+    mu = 1; 
+    epsilon = - 1; % positive type
+    u = [0 cos(x) cos(x)];
+    curlu = [0 sin(x) -sin(x)];
+    J = 2*u;
+    g_N = n &times; curl u;
+ 
+  Copyright (C) Long Chen. See COPYRIGHT.txt for details.
+
+</pre><p>Dirichlet boundary condition</p><pre class="codeinput">[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = Maxwelldata2;
+bdFlag = setboundary3(node,elem,<span class="string">'Dirichlet'</span>);
+option.solver = <span class="string">'cg'</span>;
+cubeMaxwell2;
+</pre><pre class="codeoutput">Time to assemble matrix equation 0.33 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:     2936,   #nnz:    62576,   iter: 41,   err = 8.4286e-07,   time = 0.059 s
+Time to assemble matrix equation 0.78 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:    21424,   #nnz:   637984,   iter: 49,   err = 7.8178e-07,   time = 0.47 s
+Time to assemble matrix equation  6.5 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:   163424,   #nnz:  5703488,   iter: 51,   err = 8.7272e-07,   time =  3.4 s
+</pre><img vspace="5" hspace="5" src="Maxwell2testdoc_01.png" alt=""> <pre class="codeinput">makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>H^curl Error</td><td>L^2 Error</td></tr>
+<tr><td>h=1/2</td><td>0.0146013965394009</td><td>0.0224886574820342</td></tr>
+<tr><td>h=1/4</td><td>0.00359211433880728</td><td>0.00558513172733086</td></tr>
+<tr><td>h=1/8</td><td>0.000886125785167287</td><td>0.00139154356310441</td></tr>
+</table><p>Neumann boundary condition</p><pre class="codeinput">[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = Maxwelldata2;
+bdFlag = setboundary3(node,elem,<span class="string">'Neumann'</span>);
+option.solver = <span class="string">'cg'</span>;
+cubeMaxwell2;
+</pre><pre class="codeoutput">Time to assemble matrix equation 0.22 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:     2936,   #nnz:   104336,   iter: 48,   err = 9.6027e-07,   time = 0.06 s
+Time to assemble matrix equation 0.75 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:    21424,   #nnz:   813280,   iter: 52,   err = 8.5393e-07,   time = 0.62 s
+Time to assemble matrix equation  5.7 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:   163424,   #nnz:  6421184,   iter: 53,   err = 8.1851e-07,   time =  3.5 s
+</pre><img vspace="5" hspace="5" src="Maxwell2testdoc_02.png" alt=""> <pre class="codeinput">makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>H^curl Error</td><td>L^2 Error</td></tr>
+<tr><td>h=1/2</td><td>0.0134266177368825</td><td>0.0209737494345639</td></tr>
+<tr><td>h=1/4</td><td>0.00343117318556147</td><td>0.00539968359247532</td></tr>
+<tr><td>h=1/8</td><td>0.000865116166257337</td><td>0.00136853186976</td></tr>
+</table><p>Optimal first order of convergence is achieved. HX preconditioned CG converges around 20 steps.</p><h2>Indefinite with real coefficients<a name="9"></a></h2><p>curl curl E - E = f.</p><pre class="codeinput">help <span class="string">planewavedata1</span>
+</pre><pre class="codeoutput">  PLANEWAVEDATA1 plane wave solution of Maxwell equations: real solution.
+ 
+        curl(curl u) - u = 0    in \Omega,  
+                   n &times; u = n &times; g_D  on \Gamma_D,
+              n &times; curl u = n &times; g_N  on \Gamma_N?
+ 
+    mu = epsilon = omega = 1;
+    u = [0 cos(x) cos(x)];
+    curlu = [0 sin(x) -sin(x)];
+    curl curl u = u;
+    J = 0;
+    g_N = curl u;
+ 
+  Copyright (C) Long Chen. See COPYRIGHT.txt for details.
+
+</pre><p>Dirichlet boundary condition</p><pre class="codeinput">[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = planewavedata1;
+bdFlag = setboundary3(node,elem,<span class="string">'Dirichlet'</span>);
+option.solver = <span class="string">'cg'</span>;
+cubeMaxwell2;
+</pre><pre class="codeoutput">Time to assemble matrix equation 0.18 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:     2936,   #nnz:    62576,   iter: 60,   err = 9.1110e-07,   time = 0.047 s
+Time to assemble matrix equation 0.76 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:    21424,   #nnz:   637984,   iter: 126,   err = 9.5812e-07,   time =  1.1 s
+Time to assemble matrix equation  5.9 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:   163424,   #nnz:  5703488,   iter: 154,   err = 7.5501e-07,   time =   10 s
+</pre><img vspace="5" hspace="5" src="Maxwell2testdoc_03.png" alt=""> <pre class="codeinput">makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>H^curl Error</td><td>L^2 Error</td></tr>
+<tr><td>h=1/2</td><td>0.0146032299466038</td><td>0.0225980388526662</td></tr>
+<tr><td>h=1/4</td><td>0.00359219152988582</td><td>0.00559246646059697</td></tr>
+<tr><td>h=1/8</td><td>0.000886177415970412</td><td>0.00139207366715338</td></tr>
+</table><p>Neumann boundary condition</p><pre class="codeinput">[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = planewavedata1;
+bdFlag = setboundary3(node,elem,<span class="string">'Neumann'</span>);
+option.solver = <span class="string">'cg'</span>;
+cubeMaxwell2;
+</pre><pre class="codeoutput">Time to assemble matrix equation 0.18 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:     2936,   #nnz:   104336,   iter: 128,   err = 7.7920e-07,   time = 0.15 s
+Time to assemble matrix equation 0.67 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:    21424,   #nnz:   813280,   iter: 181,   err = 8.2920e-07,   time =  2.1 s
+Time to assemble matrix equation  5.2 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:   163424,   #nnz:  6421184,   iter: 196,   err = 5.1285e-07,   time =   12 s
+</pre><img vspace="5" hspace="5" src="Maxwell2testdoc_04.png" alt=""> <pre class="codeinput">makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>H^curl Error</td><td>L^2 Error</td></tr>
+<tr><td>h=1/2</td><td>0.0134327027359751</td><td>0.0210778044370173</td></tr>
+<tr><td>h=1/4</td><td>0.00343131602861415</td><td>0.00540685708819733</td></tr>
+<tr><td>h=1/8</td><td>0.000865118260310063</td><td>0.00136899446446987</td></tr>
+</table><p>Optimal first order of convergence is achieved. HX preconditioned CG converges around 40 steps although the system is indefinite.</p><h2>Indefinite: complex coefficients, real solution<a name="15"></a></h2><p>curl curl E - (1-i)E = f.</p><pre class="codeinput">help <span class="string">planewavedataC</span>
+</pre><pre class="codeoutput">  PLANEWAVEDATAC plane wave solution of Maxwell equations: real solution and complex coefficients
+ 
+        curl(curl u) - (1-i)u = iu    in \Omega,  
+                   n &times; u = n &times; g_D  on \Gamma_D,
+              n &times; curl u = n &times; g_N  on \Gamma_N.
+ 
+    mu = epsilon = omega = 1;
+    u = [0 cos(x) cos(x)];
+    curlu = [0 sin(x) -sin(x)];
+    curl curl u = u;
+    J = 0;
+    g_N = curl u;
+ 
+  Copyright (C) Long Chen. See COPYRIGHT.txt for details.
+
+</pre><p>Dirichlet boundary condition</p><pre class="codeinput">[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = planewavedataC;
+bdFlag = setboundary3(node,elem,<span class="string">'Dirichlet'</span>);
+option.solver = <span class="string">'gmres'</span>;
+cubeMaxwell2;
+</pre><pre class="codeoutput">Time to assemble matrix equation 0.25 s
+General Minimum Residual Method with HX preconditioner 
+#dof:     2936,   #nnz:    62576,   iter: 162,   err = 9.2131e-07,   time = 0.53 s
+Time to assemble matrix equation 0.93 s
+General Minimum Residual Method with HX preconditioner 
+#dof:    21424,   #nnz:   637984,   iter: 249,   err = 9.9179e-07,   time =  6.7 s
+Time to assemble matrix equation  7.6 s
+General Minimum Residual Method with HX preconditioner 
+#dof:   163424,   #nnz:  5703488,   iter: 246,   err = 9.9834e-07,   time =   47 s
+</pre><img vspace="5" hspace="5" src="Maxwell2testdoc_05.png" alt=""> <pre class="codeinput">makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>H^curl Error</td><td>L^2 Error</td></tr>
+<tr><td>h=1/2</td><td>0.132263261303529</td><td>0.264548061183071</td></tr>
+<tr><td>h=1/4</td><td>0.0309092504736598</td><td>0.151732028727805</td></tr>
+<tr><td>h=1/8</td><td>0.0137159481572751</td><td>0.0792324853149368</td></tr>
+</table><p>Neumann boundary condition</p><pre class="codeinput">[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = planewavedataC;
+bdFlag = setboundary3(node,elem,<span class="string">'Neumann'</span>);
+option.solver = <span class="string">'gmres'</span>;
+cubeMaxwell2;
+</pre><pre class="codeoutput">Time to assemble matrix equation 0.21 s
+General Minimum Residual Method with HX preconditioner 
+#dof:     2936,   #nnz:   104336,   iter: 323,   err = 9.8077e-07,   time =  1.2 s
+Time to assemble matrix equation 0.81 s
+General Minimum Residual Method with HX preconditioner 
+#dof:    21424,   #nnz:   813280,   iter: 278,   err = 9.9184e-07,   time =  7.9 s
+Time to assemble matrix equation  6.6 s
+General Minimum Residual Method with HX preconditioner 
+#dof:   163424,   #nnz:  6421184,   iter: 275,   err = 9.8787e-07,   time =   54 s
+</pre><img vspace="5" hspace="5" src="Maxwell2testdoc_06.png" alt=""> <pre class="codeinput">makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>H^curl Error</td><td>L^2 Error</td></tr>
+<tr><td>h=1/2</td><td>0.260506593567336</td><td>0.930182641673929</td></tr>
+<tr><td>h=1/4</td><td>0.0776870252913827</td><td>0.662504088875746</td></tr>
+<tr><td>h=1/8</td><td>0.0263199333151154</td><td>0.467082164039347</td></tr>
+</table><p>Optimal first order of convergence is achieved. HX preconditioned GMRES converges around 90 steps although the system is indefinite.</p><p>Bug: For Neumann boundary condition, the rate of L2 error is not quite right.</p><h2>Indefinite: real coefficents, complex solution<a name="21"></a></h2><pre class="codeinput">help <span class="string">planewavedata</span>
+</pre><pre class="codeoutput">  PLANEWAVEDATA plane wave solution of Maxwell equations: complex solution
+ 
+    epsilon = mu = 1;
+    E = exp(-i*omega*x*d)*P;
+    H = -exp(-i*omega*x*d)*d\times P
+    where d\in S^2, xi \in C^3 and d\times xi = 0.
+    J = 0;
+ 
+  For Maxwell equation in terms of E, we set u = E.
+        curl(curl u) - u = 0    in \Omega,  
+                   n &times; u = n &times; g_D  on \Gamma_D,
+              n &times; curl u = n &times; g_N  on \Gamma_N?
+ 
+  Copyright (C) Long Chen. See COPYRIGHT.txt for details.
+
+</pre><p>Dirichlet boundary condition</p><pre class="codeinput">[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+bdFlag = setboundary3(node,elem,<span class="string">'Dirichlet'</span>);
+option.solver = <span class="string">'cg'</span>;
+planewaveMaxwell2;
+</pre><pre class="codeoutput">Time to assemble matrix equation 0.19 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:     2936,   #nnz:    62576,   iter: 65,   err = 8.1687e-07,   time = 0.068 s
+Time to assemble matrix equation 0.79 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:    21424,   #nnz:   637984,   iter: 140,   err = 8.0011e-07,   time =  1.7 s
+Time to assemble matrix equation    6 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:   163424,   #nnz:  5703488,   iter: 157,   err = 9.4397e-07,   time =   14 s
+</pre><img vspace="5" hspace="5" src="Maxwell2testdoc_07.png" alt=""> <img vspace="5" hspace="5" src="Maxwell2testdoc_08.png" alt=""> <pre class="codeinput">makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>H^curl Error</td><td>L^2 Error</td></tr>
+<tr><td>h=1/2</td><td>0.010121780192587</td><td>0.00522317376770602</td></tr>
+<tr><td>h=1/4</td><td>0.00268288869968222</td><td>0.00139003627173585</td></tr>
+<tr><td>h=1/8</td><td>0.000687724507125389</td><td>0.000357572743745448</td></tr>
+</table><p>Neumann boundary condition</p><pre class="codeinput">[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+bdFlag = setboundary3(node,elem,<span class="string">'Neumann'</span>);
+option.solver = <span class="string">'cg'</span>;
+planewaveMaxwell2;
+</pre><pre class="codeoutput">Time to assemble matrix equation 0.19 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:     2936,   #nnz:   104336,   iter: 143,   err = 9.9004e-07,   time = 0.23 s
+Time to assemble matrix equation 0.68 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:    21424,   #nnz:   813280,   iter: 187,   err = 9.6256e-07,   time =  2.5 s
+Time to assemble matrix equation  5.2 s
+Conjugate Gradient Method using HX preconditioner 
+#dof:   163424,   #nnz:  6421184,   iter: 198,   err = 5.5113e-07,   time =   17 s
+</pre><img vspace="5" hspace="5" src="Maxwell2testdoc_09.png" alt=""> <img vspace="5" hspace="5" src="Maxwell2testdoc_10.png" alt=""> <pre class="codeinput">makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>H^curl Error</td><td>L^2 Error</td></tr>
+<tr><td>h=1/2</td><td>0.0119093124584477</td><td>0.00691212435926085</td></tr>
+<tr><td>h=1/4</td><td>0.00291203652574442</td><td>0.00160115805460911</td></tr>
+<tr><td>h=1/8</td><td>0.000716641068420458</td><td>0.000383843935621451</td></tr>
+</table><p>The computation of error can't handle complex functions. So in planewaveMaxwell the error between uI and uh is computed. Therefore slightly better rate of convergence is observed. The rate of L2 error is almost second order.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Edge Element Discretization of Maxwell Equations
+% We test Maxwell solvers in iFEM.
+
+clear all; close all
+rowNames ={'h=1/2';'h=1/4';'h=1/8'};
+colHeaders = {'H^curl Error','L^2 Error'};
+
+%% The data of the pde
+%
+% * pde = Maxwelldata1; % zero Neumann boundary condition and curl u = 0
+% * pde = Maxwelldata2; % non-homogenous Neumann boundary condition
+% * pde = Maxwelldata3; % polynomial data and curl u = 0
+% * pde = Maxwelldata4; % zero Dirichlet boundary condition
+% * pde = Maxwelldata5; % linear polynomial data
+% * pde = planewavedataC; % plane wave with complex coefficients
+% * pde = planewavedata1; % plane wave with real coefficients
+
+
+%% Positive Definite Case
+% curl curl E + E = f.
+
+help Maxwelldata2
+%% 
+% Dirichlet boundary condition
+[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = Maxwelldata2;
+bdFlag = setboundary3(node,elem,'Dirichlet');
+option.solver = 'cg';
+cubeMaxwell2;
+%%
+makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+
+%% 
+% Neumann boundary condition
+[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = Maxwelldata2;
+bdFlag = setboundary3(node,elem,'Neumann');
+option.solver = 'cg';
+cubeMaxwell2;
+%%
+makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+
+%%
+% Optimal first order of convergence is achieved. HX preconditioned CG
+% converges around 20 steps. 
+
+%% Indefinite with real coefficients
+% curl curl E - E = f.
+
+help planewavedata1
+%% 
+% Dirichlet boundary condition
+[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = planewavedata1;
+bdFlag = setboundary3(node,elem,'Dirichlet');
+option.solver = 'cg';
+cubeMaxwell2;
+%%
+makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+
+%% 
+% Neumann boundary condition
+[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = planewavedata1;
+bdFlag = setboundary3(node,elem,'Neumann');
+option.solver = 'cg';
+cubeMaxwell2;
+%%
+makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+
+%%
+% Optimal first order of convergence is achieved. HX preconditioned CG
+% converges around 40 steps although the system is indefinite.
+
+%% Indefinite: complex coefficients, real solution
+% curl curl E - (1-i)E = f.
+
+help planewavedataC
+%% 
+% Dirichlet boundary condition
+[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = planewavedataC;
+bdFlag = setboundary3(node,elem,'Dirichlet');
+option.solver = 'gmres';
+cubeMaxwell2;
+%%
+makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+
+
+%% 
+% Neumann boundary condition
+[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+pde = planewavedataC;
+bdFlag = setboundary3(node,elem,'Neumann');
+option.solver = 'gmres';
+cubeMaxwell2;
+%%
+makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+
+%%
+% Optimal first order of convergence is achieved. HX preconditioned GMRES
+% converges around 90 steps although the system is indefinite.
+%
+% Bug: For Neumann boundary condition, the rate of L2 error is not quite right.
+
+%% Indefinite: real coefficents, complex solution
+help planewavedata
+%%
+% Dirichlet boundary condition
+[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+bdFlag = setboundary3(node,elem,'Dirichlet');
+option.solver = 'cg';
+planewaveMaxwell2;
+%%
+makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+
+%% 
+% Neumann boundary condition
+[node,elem,HB] = cubemesh([-1,1,-1,1,-1,1],1);
+bdFlag = setboundary3(node,elem,'Neumann');
+option.solver = 'cg';
+planewaveMaxwell2;
+%%
+makeHtmlTable([energyErr L2Err],[],rowNames,colHeaders);
+
+%%
+% The computation of error can't handle complex functions. So in
+% planewaveMaxwell the error between uI and uh is computed. Therefore
+% slightly better rate of convergence is observed. The rate of L2 error is
+% almost second order.
+##### SOURCE END #####
+--></body></html>

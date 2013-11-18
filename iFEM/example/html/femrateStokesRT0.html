@@ -1,0 +1,282 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>RATE OF CONVERGENCE OF THE TMAC DISCRETIZATION FOR THE STOKES EQUANTIONS</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-04-20"><meta name="DC.source" content="femrateStokesRT0.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>RATE OF CONVERGENCE OF THE TMAC DISCRETIZATION FOR THE STOKES EQUANTIONS</h1><!--introduction--><p>This example is to show the rate of convergence of RT0-P0 finite element approximation of the Stokes equations</p><p>- grad div u + curl rot u + grad p  = f   in <img src="femrateStokesRT0_eq17683.png" alt="$\Omega$"></p><p>- div u   = 0   in <img src="femrateStokesRT0_eq17683.png" alt="$\Omega$"></p><p>for the Dirichlet boundary condition:</p><p>u <img src="femrateStokesRT0_eq19223.png" alt="$\cdot$"> t   = g_t   on <img src="femrateStokesRT0_eq08278.png" alt="$\Gamma$"></p><p>u <img src="femrateStokesRT0_eq19223.png" alt="$\cdot$"> n   = g_n   on <img src="femrateStokesRT0_eq08278.png" alt="$\Gamma$"></p><p>In the error table, (u_h,p_h) is the RT0-P0 approximation of velocity and pressure. u_I is the canonical edge interpolant of RT0 element and p_I is the interpolant of p at the barycenter of each triangle. w = rotu is the vorticity, w_h = rot_hu_h is the numerical approximation and w_I is the Lagrange interpolation of w in P1 finite element space.</p><p>Created by Ming Wang, at Nov., 2011. Updated by Long Chen on Apr, 2013.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Example 1: Unit square with bisection grids</a></li><li><a href="#3">Example 2: Unit square with regular grids. Zero Dirichlet condition.</a></li><li><a href="#5">Example 3: Unit square with regular grids. Non-zero Dirichlet condition.</a></li><li><a href="#7">Conclusion</a></li></ul></div><h2>Example 1: Unit square with bisection grids<a name="1"></a></h2><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+<span class="comment">% setup</span>
+[node,elem] = squaremesh([0,1,0,1],0.5);
+pde = Stokesdata2; <span class="comment">% zero Dirichlet boundary condition</span>
+bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+<span class="comment">% option</span>
+option.L0 = 3;
+option.elemType = <span class="string">'RT0-P0'</span>;
+option.maxIt = 5;
+option.solver = <span class="string">'mg'</span>;
+option.refType = <span class="string">'bisect'</span>;
+<span class="comment">% fem</span>
+femStokesHdiv(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">#dof:   1248,  #nnz:  25112, level:  3  MG WCYCLE iter:  9,  err = 1.5291e-09,  time = 0.11 s
+#dof:   5056,  #nnz: 107960, level:  4  MG WCYCLE iter:  9,  err = 2.1122e-09,  time = 0.36 s
+#dof:  20352,  #nnz: 447224, level:  5  MG WCYCLE iter:  9,  err = 5.1819e-09,  time =    1 s
+#dof:  81664,  #nnz: 1820024, level:  6  MG WCYCLE iter: 10,  err = 1.4033e-09,  time =    5 s
+#dof: 327168,  #nnz: 7342712, level:  7  MG WCYCLE iter: 10,  err = 3.4302e-09,  time =   22 s
+===========================================================
+   N   ||u_I-u_h||_1  ||u-u_h||   ||u_I-u_h||_{max}
+  289   4.87536e+00   2.73818e-01   1.06696e-02
+ 1089   5.02284e+00   1.36237e-01   3.01031e-03
+ 4225   5.10056e+00   6.80578e-02   8.11106e-04
+16641   5.13751e+00   3.40276e-02   2.09967e-04
+66049   5.15511e+00   1.70152e-02   5.40987e-05
+===========================================================
+   N   ||p_I-p_h||   ||p-p_h||    ||p_I-p_h||_{max}
+  289   1.19676e+00   1.65026e+00   4.97685e+00
+ 1089   7.95775e-01   9.78649e-01   4.63916e+00
+ 4225   5.44932e-01   6.14967e-01   4.48553e+00
+16641   3.78953e-01   4.04871e-01   4.40999e+00
+66049   2.65682e-01   2.75074e-01   4.37214e+00
+===========================================================
+   N   ||w_I-w_h||   ||w-w_h|
+  289   1.86819e+00   1.13285e+00
+ 1089   1.24420e+00   7.25689e-01
+ 4225   8.52817e-01   4.93120e-01
+16641   5.93373e-01   3.42562e-01
+66049   4.16125e-01   2.40196e-01
+===========================================================
+</pre><img vspace="5" hspace="5" src="femrateStokesRT0_01.png" alt=""> <img vspace="5" hspace="5" src="femrateStokesRT0_02.png" alt=""> <p>For bisection grids, only half order for vorticity and pressure. It is interesting to note that the energy norm <img src="femrateStokesRT0_eq77920.png" alt="$||u_I - u_h||_1$"> doesn't converge due to the loss of consistency <img src="femrateStokesRT0_eq58437.png" alt="$|| rot u - rot_h u_I||$"> for the standard edge interpolant. Also no convergence of maximum norm for pressure at the barycenter.</p><h2>Example 2: Unit square with regular grids. Zero Dirichlet condition.<a name="3"></a></h2><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+<span class="comment">% setup</span>
+[node,elem] = squaremesh([0,1,0,1],0.5);
+pde = Stokesdata2; <span class="comment">% zero Dirichlet boundary condition</span>
+bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+<span class="comment">% option</span>
+option.L0 = 3;
+option.elemType = <span class="string">'RT0-P0'</span>;
+option.maxIt = 5;
+option.solver = <span class="string">'mg'</span>;
+option.printlevel = 1;
+option.refType = <span class="string">'red'</span>;
+<span class="comment">% fem</span>
+femStokesHdiv(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">#dof:   1248,  #nnz:  17210, level:  3  MG WCYCLE iter:  8,  err = 1.0169e-09,  time = 0.13 s
+#dof:   5056,  #nnz:  73754, level:  4  MG WCYCLE iter:  8,  err = 3.6394e-09,  time = 0.24 s
+#dof:  20352,  #nnz: 305114, level:  5  MG WCYCLE iter:  8,  err = 9.0721e-09,  time = 0.79 s
+#dof:  81664,  #nnz: 1240922, level:  6  MG WCYCLE iter:  9,  err = 1.6987e-09,  time =  3.6 s
+#dof: 327168,  #nnz: 5004890, level:  7  MG WCYCLE iter:  9,  err = 3.3939e-09,  time =   16 s
+===========================================================
+   N   ||u_I-u_h||_1  ||u-u_h||   ||u_I-u_h||_{max}
+  289   8.26074e-01   2.94418e-01   6.38834e-03
+ 1089   3.05486e-01   1.46238e-01   8.85145e-04
+ 4225   1.10362e-01   7.29904e-02   1.16317e-04
+16641   3.94316e-02   3.64789e-02   1.48986e-05
+66049   1.40137e-02   1.82374e-02   1.88483e-06
+===========================================================
+   N   ||p_I-p_h||   ||p-p_h||    ||p_I-p_h||_{max}
+  289   1.23720e-01   1.14314e+00   4.10365e-01
+ 1089   3.22240e-02   5.70584e-01   1.17292e-01
+ 4225   8.15081e-03   2.85135e-01   3.09917e-02
+16641   2.04387e-03   1.42546e-01   7.93629e-03
+66049   5.11356e-04   7.12706e-02   2.00634e-03
+===========================================================
+   N   ||w_I-w_h||   ||w-w_h|
+  289   2.08083e-01   3.26969e-01
+ 1089   5.25218e-02   8.38481e-02
+ 4225   1.31649e-02   2.11025e-02
+16641   3.29345e-03   5.28457e-03
+66049   8.23502e-04   1.32170e-03
+===========================================================
+</pre><img vspace="5" hspace="5" src="femrateStokesRT0_03.png" alt=""> <img vspace="5" hspace="5" src="femrateStokesRT0_04.png" alt=""> <p>The same pde data is used but the refinement rule is changed to red refinement. For red refinement grids and zero Dirichlet boundary condition, second order convergence for vorticity, and discrete pressure error (i.e. comparing to the interpolant p_I) is observed. The energy norm of u_I - u_h is 1.5 order.</p><h2>Example 3: Unit square with regular grids. Non-zero Dirichlet condition.<a name="5"></a></h2><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+<span class="comment">% setup</span>
+[node,elem] = squaremesh([0,1,0,1],0.5);
+pde = Stokesdata1;  <span class="comment">% non-zero Dirichlet boundary condition</span>
+bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+<span class="comment">% option</span>
+option.L0 = 3;
+option.elemType = <span class="string">'RT0-P0'</span>;
+option.maxIt = 5;
+option.solver = <span class="string">'mg'</span>;
+option.printlevel = 1;
+option.refType = <span class="string">'red'</span>;
+<span class="comment">% fem</span>
+femStokesHdiv(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">#dof:   1248,  #nnz:  17210, level:  3  MG WCYCLE iter:  7,  err = 7.2926e-09,  time = 0.084 s
+#dof:   5056,  #nnz:  73754, level:  4  MG WCYCLE iter:  7,  err = 7.0585e-09,  time =  0.2 s
+#dof:  20352,  #nnz: 305114, level:  5  MG WCYCLE iter:  7,  err = 6.0617e-09,  time = 0.78 s
+#dof:  81664,  #nnz: 1240922, level:  6  MG WCYCLE iter:  7,  err = 5.4897e-09,  time =  2.8 s
+#dof: 327168,  #nnz: 5004890, level:  7  MG WCYCLE iter:  7,  err = 5.1000e-09,  time =   12 s
+===========================================================
+   N   ||u_I-u_h||_1  ||u-u_h||   ||u_I-u_h||_{max}
+  289   2.49107e-01   4.68316e-01   2.15673e-03
+ 1089   1.04102e-01   2.34417e-01   3.60125e-04
+ 4225   4.04527e-02   1.17239e-01   5.36428e-05
+16641   1.51016e-02   5.86235e-02   7.50065e-06
+66049   5.50934e-03   2.93122e-02   1.00989e-06
+===========================================================
+   N   ||p_I-p_h||   ||p-p_h||    ||p_I-p_h||_{max}
+  289   5.01835e-01   8.58964e-01   9.07722e+00
+ 1089   1.99327e-01   4.01565e-01   7.26445e+00
+ 4225   8.63987e-02   1.94542e-01   6.19933e+00
+16641   4.04824e-02   9.60953e-02   5.61892e+00
+66049   1.97602e-02   4.78470e-02   5.31464e+00
+===========================================================
+   N   ||w_I-w_h||   ||w-w_h|
+  289   1.51963e+00   1.08270e+00
+ 1089   7.55491e-01   5.35842e-01
+ 4225   3.77219e-01   2.67015e-01
+16641   1.88591e-01   1.33398e-01
+66049   9.43109e-02   6.66942e-02
+===========================================================
+</pre><img vspace="5" hspace="5" src="femrateStokesRT0_05.png" alt=""> <img vspace="5" hspace="5" src="femrateStokesRT0_06.png" alt=""> <p>The pde data is changed to non-zero Dirichlet boundary condition. For read refinement grids and non-zero Dirichlet boundary condition, only first order for vorticity, and pressure is observed. The energy norm of u_I - u_h is still 1.5 order.</p><h2>Conclusion<a name="7"></a></h2><p>The rate of convergence of RT0-P0 depends crucially on the symmetry of the grids. For general unstructured grids, only half order for vorticity (i.e. velocity in the energy norm) and pressure. When the grid satisfies the approximately parallegram property, optimal first order is recovered. Furthermore for zero Dirichlet boundary condition, even second order for vorticity and pressure is observed.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% RATE OF CONVERGENCE OF THE TMAC DISCRETIZATION FOR THE STOKES EQUANTIONS
+%
+% This example is to show the rate of convergence of RT0-P0 finite element
+% approximation of the Stokes equations
+%
+% - grad div u + curl rot u + grad p  = f   in $\Omega$      
+%
+% - div u   = 0   in $\Omega$
+%
+% for the Dirichlet boundary condition:
+%
+% u $\cdot$ t   = g_t   on $\Gamma$   
+%
+% u $\cdot$ n   = g_n   on $\Gamma$   
+%
+% In the error table, (u_h,p_h) is the RT0-P0 approximation of velocity and
+% pressure. u_I is the canonical edge interpolant of RT0 element and p_I is
+% the interpolant of p at the barycenter of each triangle. w = rotu is the
+% vorticity, w_h = rot_hu_h is the numerical approximation and w_I is the
+% Lagrange interpolation of w in P1 finite element space.
+% 
+% Created by Ming Wang, at Nov., 2011. Updated by Long Chen on Apr, 2013.
+
+%% Example 1: Unit square with bisection grids
+clear all; close all;
+% setup
+[node,elem] = squaremesh([0,1,0,1],0.5);
+pde = Stokesdata2; % zero Dirichlet boundary condition
+bdFlag = setboundary(node,elem,'Dirichlet');
+% option
+option.L0 = 3;
+option.elemType = 'RT0-P0';
+option.maxIt = 5;
+option.solver = 'mg';
+option.refType = 'bisect';
+% fem
+femStokesHdiv(node,elem,pde,bdFlag,option);
+
+%% 
+% For bisection grids, only half order for vorticity and pressure. It is
+% interesting to note that the energy norm $||u_I - u_h||_1$ doesn't converge
+% due to the loss of consistency $|| rot u - rot_h u_I||$ for the standard
+% edge interpolant. Also no convergence of maximum norm for pressure at the
+% barycenter.
+
+%% Example 2: Unit square with regular grids. Zero Dirichlet condition.
+clear all; close all;
+% setup
+[node,elem] = squaremesh([0,1,0,1],0.5);
+pde = Stokesdata2; % zero Dirichlet boundary condition
+bdFlag = setboundary(node,elem,'Dirichlet');
+% option
+option.L0 = 3;
+option.elemType = 'RT0-P0';
+option.maxIt = 5;
+option.solver = 'mg';
+option.printlevel = 1;
+option.refType = 'red';
+% fem
+femStokesHdiv(node,elem,pde,bdFlag,option);
+%%
+% The same pde data is used but the refinement rule is changed to red
+% refinement. For red refinement grids and zero Dirichlet boundary
+% condition, second order convergence for vorticity, and discrete pressure
+% error (i.e. comparing to the interpolant p_I) is observed. The energy
+% norm of u_I - u_h is 1.5 order.
+
+%% Example 3: Unit square with regular grids. Non-zero Dirichlet condition.
+clear all; close all;
+% setup
+[node,elem] = squaremesh([0,1,0,1],0.5);
+pde = Stokesdata1;  % non-zero Dirichlet boundary condition
+bdFlag = setboundary(node,elem,'Dirichlet');
+% option
+option.L0 = 3;
+option.elemType = 'RT0-P0';
+option.maxIt = 5;
+option.solver = 'mg';
+option.printlevel = 1;
+option.refType = 'red';
+% fem
+femStokesHdiv(node,elem,pde,bdFlag,option);
+%%
+% The pde data is changed to non-zero Dirichlet boundary condition. For
+% read refinement grids and non-zero Dirichlet boundary condition, only
+% first order for vorticity, and pressure is observed. The energy
+% norm of u_I - u_h is still 1.5 order.
+
+%% Conclusion
+%
+% The rate of convergence of RT0-P0 depends crucially on the symmetry of
+% the grids. For general unstructured grids, only half order for vorticity
+% (i.e. velocity in the energy norm) and pressure. When the grid satisfies
+% the approximately parallegram property, optimal first order is recovered.
+% Furthermore for zero Dirichlet boundary condition, even second order for
+% vorticity and pressure is observed.
+
+
+##### SOURCE END #####
+--></body></html>

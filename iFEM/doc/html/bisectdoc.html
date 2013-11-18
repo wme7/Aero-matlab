@@ -1,0 +1,171 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Bisection in Two Dimensions</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2011-02-20"><meta name="m-file" content="bisectdoc"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Bisection in Two Dimensions</h1><!--introduction--><p>We describe basic idea of newest vertex and longest edge bisection algorithm for two dimensional triangular grids.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Bisection method</a></li><li><a href="#2">Newest vertex bisection</a></li><li><a href="#3">Refinement edge</a></li><li><a href="#4">Completion</a></li><li><a href="#5">Bisections of marked triangles</a></li><li><a href="#6">Initial labeling</a></li><li><a href="#7">Longest edge bisection</a></li></ul></div><h2>Bisection method<a name="1"></a></h2><p>In short, the bisection method will divide one triangle into two children triangles by connecting one vertex to the middle point of its opposite edge. Another class of mesh refinement method, known as regular refinement, which divide one triangle into 4 similar small triangles, is implemented in uniformrefine.m.</p><p>There are two main issues in designing a good bisection method.</p><div><ul><li>(B1) Shape regularity.</li><li>(B2) Conformity.</li></ul></div><h2>Newest vertex bisection<a name="2"></a></h2><p>If keep cutting one edge, the smallest angle will decrease and approach to zero. To keep the shape regularity, we can switch the edge to be cutted. Newest vertex bisection is to assign the refinement edge as the edge opposite to the newest vertex added in the bisection. To begin with, for an initial triangulation <img src="bisectdoc_eq04418.png" alt="$\mathcal T_0$">, we can label the longest edge of each triangle as the refinement edge. Once a initial labeling is assigned to <img src="bisectdoc_eq04418.png" alt="$\mathcal T_0$">, the refinement edges of all descendants of triangles in <img src="bisectdoc_eq04418.png" alt="$\mathcal T_0$"> is determined by the combinatorial structure of the triangulation.</p><p>It can be shown that all the descendants of a triangle in <img src="bisectdoc_eq04418.png" alt="$\mathcal T_0$"> fall into four similarity classes and hence (B1) holds. See the following figure for an illustration</p><p><img vspace="5" hspace="5" src="./figures/similarclass.PNG" alt=""> </p><h2>Refinement edge<a name="3"></a></h2><p>How to represent a labeled triangulation? Recall that our representation of a triangle: <tt>elem(t,[1 2 3])</tt> are global indices of three vertices of the triangle <tt>t</tt>. The only requirement on the ordering is that the orientation is counter-clockwise. A cyclical permutation of three indices still represents the same triangle. We shall use the following rule to record the refinement edge:</p><p>The refinement edge of <tt>t</tt> is <tt>elem(t,[2 3])</tt>.</p><p>For newest vertex bisection, <tt>elem(t,1)</tt> will be always the newest vertex of the triangle <tt>t</tt>.</p><h2>Completion<a name="4"></a></h2><p>Bisect some traingles in a triangulation could result in hanging nodes. Neighboring triangles should be bisected (again following the newest vertex rule) to eliminate hangning nodes. This procedure is called completion.</p><p>
+<img src="./figures/completion.PNG" width="120%">
+</p><p>We now describe an efficient completion algorithm for 2-D triangulations. A key observation is that if we cut all edges of the current triangulation (by newest vertex bisection rule), it results in a conforming triangulation. Therefore instead of operating on triangles, we cut enough edges to ensure the conformity.</p><p>Let us denote the refinement edge of <tt>t</tt> by <tt>cutEdge(t)</tt>. We define the refinement neighbor of <tt>t</tt>, denoted by <tt>refineNeighbor(t)</tt>, as the neighbor sharing the refinement edge of <tt>t</tt>. When <tt>cutEdge(t)</tt> is on the boundary, we define <tt>refineNeighbor(t) = t</tt>. Note that <tt>cutEdge(t)</tt> may not be the refinement edge of <tt>refineNeighbor(t)</tt>. To ensure the conformity, it suffices to satisfy the rule</p><p>If <tt>cutEdge(t)</tt> is marked for bisection, so is <tt>cutEdge(refineNeighbor(t))</tt>.</p><p>See bisect.m <tt>Add new nodes</tt> section.</p><h2>Bisections of marked triangles<a name="5"></a></h2><p>We only need to bisect the triangle whose refinement edge is bisected. The local numbering is shown in the following figure. We also need to update the boundary condition i.e. <tt>bdEdge</tt>.</p><p><img vspace="5" hspace="5" src="./figures/bisectupdatebdEdge.png" alt=""> </p><h2>Initial labeling<a name="6"></a></h2><p>Although the completion procedure we proposed will terminate for arbitrary initial labeling, for the sake of shape regularity, we assign the longest edge as the refinement edge of each triangle in the initial triangulation. The subroutine <tt>elem = label(node,elem)</tt> is only need for the initial triangulation.</p><h2>Longest edge bisection<a name="7"></a></h2><p>It is interesting to note that if we call <tt>label</tt> before each call of <tt>bisect</tt>, then <tt>bisect</tt> becomes the longest edge bisection since everytime we switch the refinement edge to the longest edge.</p><p>The longest edge bisection will produce shape regular triangulations. Intuitively the longest edge bisection divides the largest angle, which in turn prevent forming small angles. Rosenberg and Stenger proved that by always bisecting the longest edge, the smallest angle possible is half of the smallest angle in the initial triangulation.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Bisection in Two Dimensions
+% We describe basic idea of newest vertex and longest edge bisection
+% algorithm for two dimensional triangular grids. 
+
+%% Bisection method
+% In short, the bisection method will divide one triangle into two children
+% triangles by connecting one vertex to the middle point of its opposite
+% edge. Another class of mesh refinement method, known as regular
+% refinement, which divide one triangle into 4 similar small triangles, is
+% implemented in uniformrefine.m.
+%
+% There are two main issues in designing a good bisection method.
+% 
+% * (B1) Shape regularity.
+% * (B2) Conformity. 
+% 
+
+%% Newest vertex bisection
+%
+% If keep cutting one edge, the smallest angle will decrease and approach
+% to zero. To keep the shape regularity, we can switch the edge to be
+% cutted. Newest vertex bisection is to assign the refinement edge as the
+% edge opposite to the newest vertex added in the bisection. To begin with,
+% for an initial triangulation $\mathcal T_0$, we can label the longest edge of each
+% triangle as the refinement edge. Once a initial labeling is assigned to $\mathcal T_0$, 
+% the refinement edges of all descendants of triangles in $\mathcal T_0$ is
+% determined by the combinatorial structure of the triangulation. 
+%
+% It can be shown that all the descendants of a triangle in $\mathcal T_0$ 
+% fall into four similarity classes and hence (B1) holds. See the following
+% figure for an illustration
+%
+% <<./figures/similarclass.PNG>>
+
+%% Refinement edge
+% How to represent a labeled triangulation? Recall that our representation
+% of a triangle: |elem(t,[1 2 3])| are global indices of three vertices of
+% the triangle |t|. The only requirement on the ordering is that the
+% orientation is counter-clockwise. A cyclical permutation of three indices
+% still represents the same triangle. We shall use the following rule to
+% record the refinement edge:
+%
+% The refinement edge of |t| is |elem(t,[2 3])|.
+%
+% For newest vertex bisection, |elem(t,1)| will be always the newest vertex
+% of the triangle |t|. 
+
+%% Completion
+% Bisect some traingles in a triangulation could result in hanging nodes.
+% Neighboring triangles should be bisected (again following the newest
+% vertex rule) to eliminate hangning nodes. This procedure is called
+% completion.
+%
+% <html>
+% <img src="./figures/completion.PNG" width="120%">
+% </html>
+% 
+%
+% We now describe an efficient completion algorithm for 2-D triangulations.
+% A key observation is that if we cut all edges of the current
+% triangulation (by newest vertex bisection rule), it results in a
+% conforming triangulation. Therefore instead of operating on triangles,
+% we cut enough edges to ensure the conformity. 
+% 
+% Let us denote the refinement edge of |t| by |cutEdge(t)|. We define the
+% refinement neighbor of |t|, denoted by |refineNeighbor(t)|, as the
+% neighbor sharing the refinement edge of |t|. When |cutEdge(t)| is on the
+% boundary, we define |refineNeighbor(t) = t|. Note that |cutEdge(t)| may
+% not be the refinement edge of |refineNeighbor(t)|. To ensure the
+% conformity, it suffices to satisfy the rule 
+%
+% If |cutEdge(t)| is marked for bisection, so is |cutEdge(refineNeighbor(t))|.
+%
+% See bisect.m |Add new nodes| section.
+
+%% Bisections of marked triangles
+% We only need to bisect the triangle whose refinement edge is bisected.
+% The local numbering is shown in the following figure. We also need to
+% update the boundary condition i.e. |bdEdge|. 
+%
+% <<./figures/bisectupdatebdEdge.png>>
+
+%% Initial labeling
+% Although the completion procedure we proposed will terminate for
+% arbitrary initial labeling, for the sake of shape regularity, we assign
+% the longest edge as the refinement edge of each triangle in the initial
+% triangulation. The subroutine |elem = label(node,elem)| is only need for
+% the initial triangulation. 
+
+%% Longest edge bisection
+% It is interesting to note that if we call |label| before each call of
+% |bisect|, then |bisect| becomes the longest edge bisection since
+% everytime we switch the refinement edge to the longest edge.
+%
+% The longest edge bisection will produce shape regular triangulations.
+% Intuitively the longest edge bisection divides the largest angle, which
+% in turn prevent forming small angles. Rosenberg and Stenger proved that
+% by always bisecting the longest edge, the smallest angle possible is half
+% of the smallest angle in the initial triangulation.
+
+##### SOURCE END #####
+--></body></html>

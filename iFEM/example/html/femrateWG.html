@@ -1,0 +1,193 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>RATE OF CONVERGENCE OF WEAK GALERKIN FINITE ELEMENT METHOD</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-11-13"><meta name="DC.source" content="femrateWG.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>RATE OF CONVERGENCE OF WEAK GALERKIN FINITE ELEMENT METHOD</h1><!--introduction--><p>This example is to show the rate of convergence of CR nonconforming linear finite element approximation of the Poisson equation on the unit square:</p><p><img src="femrateWG_eq43355.png" alt="$$- \Delta u = f \; \hbox{in } (0,1)^2$$"></p><p>for the following boundary condition:</p><div><ol><li>Non-empty Dirichlet boundary condition. <img src="femrateWG_eq39127.png" alt="$u=g_D \hbox{ on }\Gamma_D, \quad \nabla u\cdot n=g_N \hbox{ on }\Gamma_N. \Gamma _N = \{(x,y): x=0, y\in [0,1]\}, \; \Gamma _D = \partial \Omega \backslash \Gamma _N$">.</li><li>Pure Neumann boundary condition. <img src="femrateWG_eq28233.png" alt="$\Gamma _N = \partial \Omega$">.</li><li>Robin boundary condition. <img src="femrateWG_eq04234.png" alt="$g_R u + \nabla u\cdot n=g_N \hbox{ on }\partial \Omega$"></li></ol></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Non-empty Dirichlet boundary condition.</a></li><li><a href="#5">Pure Neumann boundary condition.</a></li><li><a href="#8">Pure Robin boundary condition.</a></li><li><a href="#10">Conclusion</a></li></ul></div><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+[node,elem] = squaremesh([0,1,0,1],0.25);
+option.L0 = 2;
+option.maxIt = 4;
+option.printlevel = 1;
+option.elemType = <span class="string">'WG'</span>;
+option.plotflag = 0;
+</pre><h2>Non-empty Dirichlet boundary condition.<a name="2"></a></h2><pre class="codeinput">pde = sincosdata;
+bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>,<span class="string">'~(x==0)'</span>,<span class="string">'Neumann'</span>,<span class="string">'x==0'</span>);
+err = femPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    20608,  #nnz:   107058, iter: 22,   err = 7.5614e-09,   time = 0.68 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    82176,  #nnz:   462050, iter: 22,   err = 7.5865e-09,   time =  1.4 s
+</pre><img vspace="5" hspace="5" src="femrateWG_01.png" alt=""> <pre class="codeinput">display(<span class="string">'   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}'</span>);
+format <span class="string">shorte</span>
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+</pre><pre class="codeoutput">   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}
+
+ans =
+
+   1.9879e-03   1.6246e-01   6.3330e-02   3.2079e-03
+   4.9724e-04   8.1266e-02   3.1525e-02   8.0320e-04
+   1.2433e-04   4.0637e-02   1.5745e-02   2.0084e-04
+   3.1083e-05   2.0319e-02   7.8704e-03   5.0220e-05
+
+</pre><h2>Pure Neumann boundary condition.<a name="5"></a></h2><pre class="codeinput">pde = sincosNeumanndata;
+<span class="comment">% bdFlag = setboundary(node,elem,'Dirichlet','(x==0)','Neumann','~(x==0)');</span>
+bdFlag = setboundary(node,elem,<span class="string">'Neumann'</span>);
+err = femPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    20608,  #nnz:   108249, iter: 22,   err = 7.6491e-09,   time = 0.57 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    82176,  #nnz:   464729, iter: 22,   err = 8.7841e-09,   time =  1.4 s
+</pre><img vspace="5" hspace="5" src="femrateWG_02.png" alt=""> <pre class="codeinput">display(<span class="string">'   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}'</span>);
+format <span class="string">shorte</span>
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+</pre><pre class="codeoutput">   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}
+
+ans =
+
+   9.9726e-03   6.4852e-01   2.6172e-01   1.7953e-02
+   2.4845e-03   3.2489e-01   1.2710e-01   4.3312e-03
+   8.8151e-04   2.1364e-01   1.1662e-01   9.8067e-02
+   2.2042e-04   1.0687e-01   5.8311e-02   4.9073e-02
+
+</pre><h2>Pure Robin boundary condition.<a name="8"></a></h2><pre class="codeinput">pdeRobin = sincosRobindata;
+bdFlag = setboundary(node,elem,<span class="string">'Robin'</span>);
+err = femPoisson(node,elem,pdeRobin,bdFlag,option);
+</pre><pre class="codeoutput">Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    20608,  #nnz:   108256, iter: 21,   err = 6.2675e-09,   time =  0.6 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    82176,  #nnz:   464736, iter: 21,   err = 6.9218e-09,   time =  1.4 s
+</pre><img vspace="5" hspace="5" src="femrateWG_03.png" alt=""> <pre class="codeinput">display(<span class="string">'   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}'</span>);
+format <span class="string">shorte</span>
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+</pre><pre class="codeoutput">   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}
+
+ans =
+
+   9.7330e-03   6.4838e-01   2.6094e-01   1.6932e-02
+   2.4444e-03   3.2488e-01   1.2708e-01   4.3121e-03
+   6.1181e-04   1.6253e-01   6.3104e-02   1.0824e-03
+   1.5300e-04   8.1274e-02   3.1497e-02   2.7081e-04
+
+</pre><h2>Conclusion<a name="10"></a></h2><p>The optimal rate of convergence of the H1-norm (1st order) and L2-norm (2nd order) is observed. No superconvergence for <tt>|DuI-Duh</tt>|.</p><p>MGCG converges uniformly in all cases.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% RATE OF CONVERGENCE OF WEAK GALERKIN FINITE ELEMENT METHOD
+%
+% This example is to show the rate of convergence of CR nonconforming
+% linear finite element approximation of the Poisson equation on the unit
+% square:
+%
+% $$- \Delta u = f \; \hbox{in } (0,1)^2$$
+%
+% for the following boundary condition:
+%
+% # Non-empty Dirichlet boundary condition. $u=g_D \hbox{ on }\Gamma_D, \quad \nabla u\cdot n=g_N \hbox{ on }\Gamma_N. \Gamma _N = \{(x,y): x=0, y\in [0,1]\}, \; \Gamma _D = \partial \Omega \backslash \Gamma _N$. 
+% # Pure Neumann boundary condition. $\Gamma _N = \partial \Omega$.
+% # Robin boundary condition. $g_R u + \nabla u\cdot n=g_N \hbox{ on }\partial \Omega$
+
+%% 
+clear all; close all;
+[node,elem] = squaremesh([0,1,0,1],0.25); 
+option.L0 = 2;
+option.maxIt = 4;
+option.printlevel = 1;
+option.elemType = 'WG';
+option.plotflag = 0;
+
+%% Non-empty Dirichlet boundary condition.
+pde = sincosdata;
+bdFlag = setboundary(node,elem,'Dirichlet','~(x==0)','Neumann','x==0');
+err = femPoisson(node,elem,pde,bdFlag,option);
+%%
+display('   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}');
+format shorte
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+%%
+
+%% Pure Neumann boundary condition.
+pde = sincosNeumanndata;
+% bdFlag = setboundary(node,elem,'Dirichlet','(x==0)','Neumann','~(x==0)');
+bdFlag = setboundary(node,elem,'Neumann');
+err = femPoisson(node,elem,pde,bdFlag,option);
+%%
+display('   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}');
+format shorte
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+%%
+
+%% Pure Robin boundary condition.
+pdeRobin = sincosRobindata;
+bdFlag = setboundary(node,elem,'Robin');
+err = femPoisson(node,elem,pdeRobin,bdFlag,option);
+%%
+display('   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}');
+format shorte
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+
+%% Conclusion
+%
+% The optimal rate of convergence of the H1-norm (1st order) and L2-norm
+% (2nd order) is observed. No superconvergence for ||DuI-Duh||.
+%
+% MGCG converges uniformly in all cases.
+##### SOURCE END #####
+--></body></html>

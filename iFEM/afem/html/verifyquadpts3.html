@@ -1,0 +1,172 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>verifyquadpts3</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2010-12-19"><meta name="DC.source" content="verifyquadpts3.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">VERIFYQUADPTS3 examples and verfication on quadrature rules.</a></li><li><a href="#4">Results</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> error = verifyquadpts3(n)
+</pre><h2>VERIFYQUADPTS3 examples and verfication on quadrature rules.<a name="2"></a></h2><pre>error = verifyquadpts(n) computes the error of n-th order quadrature
+rule in a triangle. This is an example on the usage of quadrature points
+and verification of qudarture order for approximating integrals in a
+triangle.</pre><p>See also quadpts</p><p>TODO 3D version</p><p>Copyright (C) Long Chen. See COPYRIGHT.txt for details.</p><pre class="codeinput"><span class="keyword">if</span> (n&gt;5), n=5; <span class="keyword">end</span>
+<span class="comment">% a reference tetrahedron</span>
+node = [0 0 0; 1 0 0; 0 1 0; 0 0 1];
+elem = [1 2 3 4];
+volume = 1/6;
+<span class="comment">% get quadrature points</span>
+[lambda,weight] = quadpts3(n);
+nQuad = size(lambda,1);
+t1 = 0;
+t2 = 0;
+<span class="keyword">for</span> p = 1:nQuad
+    <span class="comment">% quadrature points in the x-y coordinate</span>
+    pxyz = lambda(p,1)*node(elem(:,1),:) <span class="keyword">...</span>
+         + lambda(p,2)*node(elem(:,2),:) <span class="keyword">...</span>
+         + lambda(p,3)*node(elem(:,3),:) <span class="keyword">...</span>
+         + lambda(p,4)*node(elem(:,4),:);
+    t1 = t1 + weight(p)*f1(pxyz(1),pxyz(2),pxyz(3),n);
+    t2 = t2 + weight(p)*f2(pxyz(1),pxyz(2),pxyz(3));
+<span class="keyword">end</span>
+t1 = t1*volume;
+t2 = t2*volume;
+error(1) = abs(t1 - 3/((n+1)*(n+2)*(n+3)));
+error(2) = abs(t2 - (sin(1) + 1/2*cos(1)-1));
+</pre><pre class="codeinput"><span class="keyword">end</span>
+
+<span class="keyword">function</span> z = f1(x,y,z,n)
+z = x.^n + y.^n + z.^n;
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> z = f2(x,y,z)
+z = sin(x+y+z);
+<span class="keyword">end</span>
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Order</td><td>Error1</td><td>Error2</td></tr>
+<tr><td>1</td><td>0</td><td>0.00198432226192263</td></tr>
+<tr><td>2</td><td>4.64905891561784e-16</td><td>3.90424069443146e-05</td></tr>
+<tr><td>3</td><td>6.93889390390723e-18</td><td>1.05983806540644e-05</td></tr>
+<tr><td>4</td><td>1.2339088084623e-14</td><td>2.59225165263888e-07</td></tr>
+<tr><td>5</td><td>0</td><td>6.65964305923694e-09</td></tr>
+</table><h2>Results<a name="4"></a></h2><p>Let T be the tetrahedra formed by (0,0,0), (1,0,0), (0,1,0), and (0,0,1).</p><p>Error1 is for the integral <img src="verifyquadpts3_eq33370.png" alt="$\int _{T} x^n + y^n + z^n \, dxdydz$">. It should be numerically exact.</p><p>Error2 is for the integral <img src="verifyquadpts3_eq97329.png" alt="$\int _{T} \sin(x+y+z) \, dxdydz$">. It decays as n increas.</p><p>See the doc for qudrature rules in <a href="matlab:ifem('quadpts3')">quadpts3</a>.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+function error = verifyquadpts3(n)
+%% VERIFYQUADPTS3 examples and verfication on quadrature rules.
+%
+%  error = verifyquadpts(n) computes the error of n-th order quadrature
+%  rule in a triangle. This is an example on the usage of quadrature points
+%  and verification of qudarture order for approximating integrals in a
+%  triangle.
+%
+% See also quadpts
+%
+% TODO 3D version
+%
+% Copyright (C) Long Chen. See COPYRIGHT.txt for details. 
+
+if (n>5), n=5; end
+% a reference tetrahedron
+node = [0 0 0; 1 0 0; 0 1 0; 0 0 1];
+elem = [1 2 3 4];
+volume = 1/6;
+% get quadrature points
+[lambda,weight] = quadpts3(n);
+nQuad = size(lambda,1);
+t1 = 0; 
+t2 = 0;
+for p = 1:nQuad
+    % quadrature points in the x-y coordinate
+    pxyz = lambda(p,1)*node(elem(:,1),:) ...
+         + lambda(p,2)*node(elem(:,2),:) ...
+         + lambda(p,3)*node(elem(:,3),:) ...
+         + lambda(p,4)*node(elem(:,4),:);
+    t1 = t1 + weight(p)*f1(pxyz(1),pxyz(2),pxyz(3),n);
+    t2 = t2 + weight(p)*f2(pxyz(1),pxyz(2),pxyz(3));
+end                
+t1 = t1*volume;
+t2 = t2*volume;
+error(1) = abs(t1 - 3/((n+1)*(n+2)*(n+3)));
+error(2) = abs(t2 - (sin(1) + 1/2*cos(1)-1));
+end
+
+function z = f1(x,y,z,n)
+z = x.^n + y.^n + z.^n;
+end
+
+function z = f2(x,y,z)
+z = sin(x+y+z);
+end
+
+%% Results
+% Let T be the tetrahedra formed by (0,0,0), (1,0,0), (0,1,0), and (0,0,1). 
+%
+% Error1 is for the integral 
+% $\int _{T} x^n + y^n + z^n \, dxdydz$. 
+% It should be numerically exact. 
+%
+% Error2 is for the integral 
+% $\int _{T} \sin(x+y+z) \, dxdydz$.
+% It decays as n increas.
+%
+% See the doc for qudrature rules in <matlab:ifem('quadpts3') quadpts3>.
+
+##### SOURCE END #####
+--></body></html>

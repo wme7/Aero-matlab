@@ -1,0 +1,231 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>computeL2error</title><meta name="generator" content="MATLAB 7.9"><meta name="date" content="2010-01-27"><meta name="m-file" content="computeL2error"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> err = computeL2error(node,elem,uexact,uh,quadOrder)
+<span class="comment">% COMPUTEL2ERROR L2 norm of the approximation error.</span>
+<span class="comment">%</span>
+<span class="comment">%  err = computeL2error(node,elem,@uexact,uh) computes the L2 norm of the</span>
+<span class="comment">%  error between the exact solution uexact and finite element approximation</span>
+<span class="comment">%  uh on a mesh described by node and elem.</span>
+<span class="comment">%</span>
+<span class="comment">%  The input parameter uexact is a function handle and uh is a column array</span>
+<span class="comment">%  with length N representing a piecewise linear function on the mesh.</span>
+<span class="comment">%</span>
+<span class="comment">%  err = computeL2error(node,elem,@uexact,uh,quadOrder) computes error</span>
+<span class="comment">%  using the quadrature rule with order quadOrder (up to 5). The default</span>
+<span class="comment">%  order is 3.</span>
+<span class="comment">%</span>
+<span class="comment">% See also computeH1error, computeL2error3, computeH1error3, getquadpts.</span>
+
+<span class="comment">% Copyright (C) Long Chen. See COPYRIGHT.txt for details.</span>
+
+Nu = length(uh);    N = size(node,1);   NT = size(elem,1);
+<span class="comment">% default orders of quadrature rules</span>
+<span class="keyword">if</span> (nargin&lt;5)
+    <span class="keyword">if</span> Nu == N          <span class="comment">% piecewise linear function</span>
+        quadOrder = 3;
+    <span class="keyword">elseif</span> Nu == NT     <span class="comment">% piecewise constant function</span>
+        quadOrder = 2;
+    <span class="keyword">elseif</span> Nu == N+NT   <span class="comment">% piecewise linear function + constant function</span>
+        quadOrder = 3;
+    <span class="keyword">elseif</span> Nu &gt; N + NT  <span class="comment">% possibly piecewise quadratic function</span>
+        quadOrder = 4;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">% area of triangles</span>
+ve2 = node(elem(:,1),:)-node(elem(:,3),:);
+ve3 = node(elem(:,2),:)-node(elem(:,1),:);
+area = 0.5*abs(-ve3(:,1).*ve2(:,2)+ve3(:,2).*ve2(:,1));
+<span class="comment">% compute L2 error element-wise using quadrature rule with order quadOrder</span>
+[lambda,weight] = getquadpts(quadOrder);
+nQuad = size(lambda,1);
+err = zeros(size(elem,1),1);
+<span class="keyword">if</span> Nu &gt; N+NT
+    elem2dof = dofstructure(elem);
+<span class="keyword">end</span>
+<span class="keyword">for</span> p = 1:nQuad       <span class="comment">% piecewise linear function</span>
+    <span class="keyword">if</span> Nu == N
+        phi = lambda; <span class="comment">% linear bases</span>
+        uhp = uh(elem(:,1)).*phi(p,1) + <span class="keyword">...</span>
+              uh(elem(:,2)).*phi(p,2) + <span class="keyword">...</span>
+              uh(elem(:,3)).*phi(p,3);
+    <span class="keyword">elseif</span> Nu == NT   <span class="comment">% piecewise constant function</span>
+        uhp = uh;
+    <span class="keyword">elseif</span> Nu == N+NT
+        phi = lambda; <span class="comment">% linear bases</span>
+        uhp = uh(elem(:,1)).*phi(p,1) + <span class="keyword">...</span>
+              uh(elem(:,2)).*phi(p,2) + <span class="keyword">...</span>
+              uh(elem(:,3)).*phi(p,3);
+        uhp = uhp + uh(N+1:end);
+    <span class="keyword">elseif</span> Nu == max(elem2dof(:)) <span class="comment">% piecewise quadratic function</span>
+        phi(:,1) = lambda(:,1).*(2*lambda(:,1)-1);
+        phi(:,2) = lambda(:,2).*(2*lambda(:,2)-1);
+        phi(:,3) = lambda(:,3).*(2*lambda(:,3)-1);
+        phi(:,4) = 4*lambda(:,2).*lambda(:,3);
+        phi(:,5) = 4*lambda(:,3).*lambda(:,1);
+        phi(:,6) = 4*lambda(:,1).*lambda(:,2);
+        uhp = uh(elem2dof(:,1)).*phi(p,1) + <span class="keyword">...</span>
+              uh(elem2dof(:,2)).*phi(p,2) + <span class="keyword">...</span>
+              uh(elem2dof(:,3)).*phi(p,3) + <span class="keyword">...</span>
+              uh(elem2dof(:,4)).*phi(p,4) + <span class="keyword">...</span>
+              uh(elem2dof(:,5)).*phi(p,5) + <span class="keyword">...</span>
+              uh(elem2dof(:,6)).*phi(p,6);
+    <span class="keyword">end</span>
+    <span class="comment">% quadrature points in the x-y coordinate</span>
+    pxy = lambda(p,1)*node(elem(:,1),:) <span class="keyword">...</span>
+        + lambda(p,2)*node(elem(:,2),:) <span class="keyword">...</span>
+        + lambda(p,3)*node(elem(:,3),:);
+    err = err + weight(p)*(uexact(pxy) - uhp).^2;
+<span class="keyword">end</span>
+err = area.*err;
+err(isnan(err)) = 0; <span class="comment">% singular values are excluded</span>
+err = sqrt(sum(err));
+</pre><pre class="codeoutput">Input argument "uh" is undefined.
+
+Error in ==&gt; computeL2error at 19
+Nu = length(uh);    N = size(node,1);   NT = size(elem,1);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.9<br></p></div><!--
+##### SOURCE BEGIN #####
+function err = computeL2error(node,elem,uexact,uh,quadOrder)
+% COMPUTEL2ERROR L2 norm of the approximation error.
+%
+%  err = computeL2error(node,elem,@uexact,uh) computes the L2 norm of the
+%  error between the exact solution uexact and finite element approximation
+%  uh on a mesh described by node and elem. 
+%
+%  The input parameter uexact is a function handle and uh is a column array
+%  with length N representing a piecewise linear function on the mesh.
+%
+%  err = computeL2error(node,elem,@uexact,uh,quadOrder) computes error
+%  using the quadrature rule with order quadOrder (up to 5). The default
+%  order is 3.
+%
+% See also computeH1error, computeL2error3, computeH1error3, getquadpts.
+
+% Copyright (C) Long Chen. See COPYRIGHT.txt for details.
+
+Nu = length(uh);    N = size(node,1);   NT = size(elem,1);
+% default orders of quadrature rules
+if (nargin<5)
+    if Nu == N          % piecewise linear function
+        quadOrder = 3; 
+    elseif Nu == NT     % piecewise constant function
+        quadOrder = 2;
+    elseif Nu == N+NT   % piecewise linear function + constant function
+        quadOrder = 3;        
+    elseif Nu > N + NT  % possibly piecewise quadratic function
+        quadOrder = 4;
+    end
+end
+% area of triangles
+ve2 = node(elem(:,1),:)-node(elem(:,3),:);
+ve3 = node(elem(:,2),:)-node(elem(:,1),:);
+area = 0.5*abs(-ve3(:,1).*ve2(:,2)+ve3(:,2).*ve2(:,1));
+% compute L2 error element-wise using quadrature rule with order quadOrder
+[lambda,weight] = getquadpts(quadOrder);
+nQuad = size(lambda,1);
+err = zeros(size(elem,1),1);
+if Nu > N+NT
+    elem2dof = dofstructure(elem);
+end
+for p = 1:nQuad       % piecewise linear function
+    if Nu == N
+        phi = lambda; % linear bases
+        uhp = uh(elem(:,1)).*phi(p,1) + ...
+              uh(elem(:,2)).*phi(p,2) + ...
+              uh(elem(:,3)).*phi(p,3);
+    elseif Nu == NT   % piecewise constant function
+        uhp = uh;
+    elseif Nu == N+NT
+        phi = lambda; % linear bases
+        uhp = uh(elem(:,1)).*phi(p,1) + ...
+              uh(elem(:,2)).*phi(p,2) + ...
+              uh(elem(:,3)).*phi(p,3);
+        uhp = uhp + uh(N+1:end);        
+    elseif Nu == max(elem2dof(:)) % piecewise quadratic function
+        phi(:,1) = lambda(:,1).*(2*lambda(:,1)-1);
+        phi(:,2) = lambda(:,2).*(2*lambda(:,2)-1);
+        phi(:,3) = lambda(:,3).*(2*lambda(:,3)-1);
+        phi(:,4) = 4*lambda(:,2).*lambda(:,3);
+        phi(:,5) = 4*lambda(:,3).*lambda(:,1);
+        phi(:,6) = 4*lambda(:,1).*lambda(:,2);
+        uhp = uh(elem2dof(:,1)).*phi(p,1) + ...
+              uh(elem2dof(:,2)).*phi(p,2) + ...
+              uh(elem2dof(:,3)).*phi(p,3) + ...        
+              uh(elem2dof(:,4)).*phi(p,4) + ...
+              uh(elem2dof(:,5)).*phi(p,5) + ...
+              uh(elem2dof(:,6)).*phi(p,6);
+    end
+    % quadrature points in the x-y coordinate
+    pxy = lambda(p,1)*node(elem(:,1),:) ...
+        + lambda(p,2)*node(elem(:,2),:) ...
+        + lambda(p,3)*node(elem(:,3),:);
+    err = err + weight(p)*(uexact(pxy) - uhp).^2;
+end
+err = area.*err;
+err(isnan(err)) = 0; % singular values are excluded
+err = sqrt(sum(err));
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,239 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Dofedge in Two Dimensions</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-13"><meta name="DC.source" content="dofedgedoc.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Dofedge in Two Dimensions</h1><!--introduction--><p>We describe general idea of the data structures generated in subroutine dofedge for two dimensional triangular grids, suppose <img src="dofedgedoc_eq56627.png" alt="$N,NE,NT$"> represents the number of vertices, edges and element respectively.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Input</a></li><li><a href="#2">Output</a></li><li><a href="#3">Example</a></li><li><a href="#4">Detail explaination of the code</a></li></ul></div><h2>Input<a name="1"></a></h2><p><tt>elem</tt> is <img src="dofedgedoc_eq88521.png" alt="$NT\times 3$"> matrix with <img src="dofedgedoc_eq09428.png" alt="$NT$"> be the number of the triangles.  <tt>elem(i,:)</tt> contain the global index of the vertex of the <tt>i-th</tt> triangle.</p><h2>Output<a name="2"></a></h2><div><ul><li><tt>elem2dof</tt>, a <img src="dofedgedoc_eq88521.png" alt="$NT\times 3$"> matrix, is the elementwise pointer from elem to dof indices. <tt>elem2dof(i,:)</tt> stores the global indices of edges for triangle <tt>i</tt>.</li><li><tt>dofsign</tt>, <img src="dofedgedoc_eq88521.png" alt="$NT\times 3$"> matrix with element 1 or -1, records the consistency of the local and global edge orientation. value 1 means the global and local direction is the same while -1 means the oposite.</li><li><tt>edge</tt> is the edge matrix and edge(:,1)&lt;edge(:,2). The orientation of edge is from the node with smaller global index to bigger one. In each triangle, the local edge orientated as [2 3; 3 1; 1 2].</li><li><tt>edgeSign</tt>, <img src="dofedgedoc_eq02448.png" alt="$NE\times 1$">, indicates the consistence between the global orientation of an edge and the local orientation of the first element containing this edge.It mainly used to deal with the boudary condition. When the global direction of the boudary edge is the same with the domain direction,we set the value 1, otherwise, -1.</li></ul></div><h2>Example<a name="3"></a></h2><pre class="codeinput"><span class="comment">%Generate edge and elem2dof</span>
+elem = [1,2,8; 3,8,2; 8,3,5; 4,5,3; 5,6,8; 7,8,6];
+node = [1,0; 1,1; 0,1; -1,1; -1,0; -1,-1;0,-1;0,0];
+T = auxstructure(elem);
+elem2dof = T.elem2edge;
+edge = T.edge;
+edge2elem = T.edge2elem;
+
+showmesh(node,elem);
+findnode(node,[],<span class="string">'index'</span>);
+findelem(node,elem,[],<span class="string">'index'</span>);
+findedge(node,edge);
+
+display(elem);
+display(elem2dof);
+display(edge);
+
+
+<span class="comment">% Consistency of oritentation of edges</span>
+NT = size(elem,1); NE = size(edge,1);
+edgeSign = -ones(NE,1);
+isConsistentEdge = (elem(edge2elem(:,1)+NT*mod(edge2elem(:,3),3))== edge(:,1));
+edgeSign(isConsistentEdge) = 1;
+
+<span class="comment">% The sign of dof</span>
+isbdEdge = (edge2elem(:,1) == edge2elem(:,2));
+dofSign = zeros(NT,3,<span class="string">'int8'</span>);
+dofSign(edge2elem(:,1) + NT*(edge2elem(:,3)-1)) = edgeSign;
+dofSign(edge2elem(~isbdEdge,2)+NT*(edge2elem(~isbdEdge,4)-1)) = -edgeSign(~isbdEdge);
+
+display(edgeSign);
+display(dofSign);
+</pre><pre class="codeoutput">
+elem =
+
+     1     2     8
+     3     8     2
+     8     3     5
+     4     5     3
+     5     6     8
+     7     8     6
+
+
+elem2dof =
+
+           4           2           1
+           4           3           7
+           6          10           7
+           6           5           8
+          12          10           9
+          12          11          13
+
+
+edge =
+
+           1           2
+           1           8
+           2           3
+           2           8
+           3           4
+           3           5
+           3           8
+           4           5
+           5           6
+           5           8
+           6           7
+           6           8
+           7           8
+
+
+edgeSign =
+
+     1
+    -1
+     1
+     1
+     1
+     1
+     1
+     1
+     1
+     1
+     1
+     1
+     1
+
+
+dofSign =
+
+    1   -1    1
+   -1    1    1
+    1    1   -1
+   -1    1    1
+    1   -1    1
+   -1    1    1
+
+</pre><img vspace="5" hspace="5" src="dofedgedoc_01.png" alt=""> <h2>Detail explaination of the code<a name="4"></a></h2><p>Matrix <tt>isConsistentEdge</tt> indicates the consistent direction of the edges. We treat structure <tt>elem</tt> here as the <img src="dofedgedoc_eq84185.png" alt="$3NT\times 1$"> column vector. <tt>t = edge2elem(e,1)</tt> means that <tt>t</tt> is the first triangle containing <tt>e</tt>.</p><p><tt>k = edge2elem(e,3)</tt> means the <tt>k-th</tt> edge of <tt>t</tt> is <tt>e</tt>.</p><p><tt>elem(edge2elem(:,1) + NT*mod(edge2elem(:,3),3))</tt> is the first node of the <tt>k</tt>-th edge of <tt>t</tt>.</p><p><tt>elem(edge2elem(:,1)+NT*mod(edge2elem(:,3),3))==edge(:,1)</tt> means when the first node of the <tt>k-th</tt> edge of <tt>t</tt> is the same as that in the global index, then, the local and global directions of the edge is consistent. <tt>edgeSign</tt> equals 1 if the global direction of edge is consistent with the local direction of edge in its first element, equals -1 otherwise.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Dofedge in Two Dimensions
+% We describe general idea of the data structures generated in subroutine 
+% dofedge for two dimensional triangular grids, suppose $N,NE,NT$ represents
+% the number of vertices, edges and element respectively. 
+
+%% Input
+% |elem| is $NT\times 3$ matrix with $NT$ be the number of
+% the triangles.  |elem(i,:)| contain the global index of the vertex of the
+% |i-th| triangle.
+
+%% Output
+% * |elem2dof|, a $NT\times 3$ matrix, is the elementwise pointer from elem 
+% to dof indices. |elem2dof(i,:)| stores the global indices of edges for triangle |i|.
+% * |dofsign|, $NT\times 3$ matrix with element 1 or -1, records the consistency of the local and global
+% edge orientation. value 1 means the global and local direction is the
+% same while -1 means the oposite.
+% * |edge| is the edge matrix and edge(:,1)<edge(:,2). The orientation of
+% edge is from the node with smaller global index to bigger one. In each
+% triangle, the local edge orientated as [2 3; 3 1; 1 2].
+% * |edgeSign|, $NE\times 1$, indicates the consistence between the global orientation of an
+% edge and the local orientation of the first element containing this
+% edge.It mainly used to deal with the boudary condition. When the global
+% direction of the boudary edge is the same with the domain direction,we set the value
+% 1, otherwise, -1.
+
+%% Example
+%Generate edge and elem2dof
+elem = [1,2,8; 3,8,2; 8,3,5; 4,5,3; 5,6,8; 7,8,6];
+node = [1,0; 1,1; 0,1; -1,1; -1,0; -1,-1;0,-1;0,0];
+T = auxstructure(elem);
+elem2dof = T.elem2edge;
+edge = T.edge;
+edge2elem = T.edge2elem;
+
+showmesh(node,elem);
+findnode(node,[],'index');
+findelem(node,elem,[],'index');
+findedge(node,edge);
+
+display(elem);
+display(elem2dof);
+display(edge);
+
+
+% Consistency of oritentation of edges
+NT = size(elem,1); NE = size(edge,1);
+edgeSign = -ones(NE,1); 
+isConsistentEdge = (elem(edge2elem(:,1)+NT*mod(edge2elem(:,3),3))== edge(:,1)); 
+edgeSign(isConsistentEdge) = 1;
+
+% The sign of dof
+isbdEdge = (edge2elem(:,1) == edge2elem(:,2));
+dofSign = zeros(NT,3,'int8');
+dofSign(edge2elem(:,1) + NT*(edge2elem(:,3)-1)) = edgeSign;
+dofSign(edge2elem(~isbdEdge,2)+NT*(edge2elem(~isbdEdge,4)-1)) = -edgeSign(~isbdEdge);
+
+display(edgeSign);
+display(dofSign);
+
+%% Detail explaination of the code
+% Matrix |isConsistentEdge| indicates the consistent direction of the edges. We
+% treat structure |elem| here as the $3NT\times 1$ column vector.
+% |t = edge2elem(e,1)| means that |t| is the first triangle containing |e|.
+%
+% |k = edge2elem(e,3)| means the |k-th| edge of |t| is |e|.
+%
+% |elem(edge2elem(:,1) + NT*mod(edge2elem(:,3),3))| is the first node of
+% the |k|-th edge of |t|. 
+%
+% |elem(edge2elem(:,1)+NT*mod(edge2elem(:,3),3))==edge(:,1)| means when the 
+% first node of the |k-th| edge of |t| is the same as
+% that in the global index, then, the local and global directions of the edge
+% is consistent. |edgeSign| equals 1 if the global direction of edge is 
+% consistent with the local direction of edge in its first element, equals -1 otherwise.
+##### SOURCE END #####
+--></body></html>

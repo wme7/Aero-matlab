@@ -1,0 +1,172 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Bisection in Three Dimensions</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-07-10"><meta name="DC.source" content="bisect3doc.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Bisection in Three Dimensions</h1><!--introduction--><p>We describe implementation of the longest edge bisection algorithm for three dimensional tetrahedral grids.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Bisection method</a></li><li><a href="#2">Longest edge bisection</a></li><li><a href="#3">Completion</a></li><li><a href="#4">Bisection of marked elements</a></li></ul></div><h2>Bisection method<a name="1"></a></h2><p>In short, the bisection method will divide one tetrahedron into two children tetrahedron by connecting vertices to the middle point of its opposite edge.</p><p>There are two main issues in designing a good bisection method.</p><div><ul><li>(B1) Shape regularity.</li><li>(B2) Conformity.</li></ul></div><h2>Longest edge bisection<a name="2"></a></h2><p>The refinement edge is always chosen the longest edge. label3(node,elem) will compute edge lengths and switch the indices such that elem(:,1:2) is the longest edge.</p><h2>Completion<a name="3"></a></h2><p>The completion process consists of two steps: refine the marked elements and find the elements containing hanging nodes</p><p>while M is not empty 	bisect each element in M; 	let now M be the set of all non-conforming elements. end</p><h2>Bisection of marked elements<a name="4"></a></h2><p>For each element in the marked set M, we can get its refinement edge by finding its longest edge. If the refinement edge is not cut before, we add its middle point as a new node. Otherwise, we need to find out the index of this already added middle point.</p><p><tt>elem = label3(node,elem,markedElem); p1 = elem(markedElem,1); p2 = elem(markedElem,2); ncEdge = find(~isConforming(1:Ncut)); nv2v = sparse([cutEdge(ncEdge,3);cutEdge(ncEdge,3)],...               [cutEdge(ncEdge,1);cutEdge(ncEdge,2)],1,N,N); [i,j] = find(nv2v(:,p1).*nv2v(:,p2)); isNewCutEdge = true(NM,1); isNewCutEdge(j) = false; ix = find(isNewCutEdge);</tt></p><p>In line 1, the subroutine \mc{label3} is similar to \mc{label} in 2-D. It will compute edge lengths of each tetrahedron and switch the index such that the refinement edge of \mc{t} is given by \mc{[elem(t,1),elem(t,2)]}. Note that for the longest edge bisection, the labeling is called inside \mc{bisect3}.</p><p>In line 3, we use the logical vector \mc{isConforming} to find out which edge is nonconforming and restrict the computation to the set of nonconforming edges. In line 4-5, we form a sparse matrix \mc{nv2v} representing the indices matrix of new vertices and vertices such that \mc{nv2v(m,i)=1} and \mc{nv2v(m,j)=1} if \mc{m} is the middle point of \mc{i,j}. Here the value \mc{cutEdge(:,3)} stores the index of new nodes and \mc{cutEdge(:,1:2)} are two parent nodes.</p><p>We perform the Hadamard product of \mc{nv2v(:,p1(t)).*nv2v(:,p2(t))} and use \mc{find} to locate all non zeros. If the result is zero, then the middle point of \mc{p1(t)} and \mc{p2(t)} is not added before and thus the refinement edge of \mc{t} is a new cut edge. Otherwise the <img src="bisect3doc_eq28128.png" alt="$i$">-th index of the nonzero value is the index of the already added point.</p><p>After the new cut edges are added to \mc{cutEdge} and the middle points are added to \mc{node}, we can form the sparse matrix \mc{nv2v} again and use the same procedure to find out the indices of middle points of refinement edges for all marked elements. The bisection of marked element and the update of boundary faces is then straightforward. \begin{lstlisting} elem(markedElem,:) = [p1 p5 p3 p4]; elem(NT+1:NT+NM,:) = [p5 p2 p3 p4]; bdFace(NT+1:NT+NM,[1 3 4]) = bdFace(markedElem, [1 3 4]); bdFace(markedElem,[2 3 4]) = bdFace(markedElem, [2 3 4]); bdFace(markedElem,1) = 0; \end{lstlisting}</p><p>\subsubsection{Finding elements containing hanging nodes} We now discuss how to find elements containing hanging nodes in the second step of \mc{completion(T,M)}.</p><p>\begin{lstlisting} t2v = sparse([1:NT,1:NT,1:NT,1:NT], elem(1:NT,:), 1, NT, N); suspect = find(~isConforming(1:Ncut)); [i,j] = find(t2v(:,cutEdge(suspect,1)).*t2v(:,cutEdge(suspect,2))); markedElem = unique(i); isConforming(suspect) = true; isConforming(suspect(j)) = false; \end{lstlisting}</p><p>In line 1, we first construct the incidence matrix between tetrahedron and vertices such that \mc{t2v(t,v)=1} if \mc{v} is a vertex of \mc{t}. The nonzero in the <img src="bisect3doc_eq28128.png" alt="$i$">-th column is the indices of elements use <img src="bisect3doc_eq28128.png" alt="$i$"> as a vertex.  Let us take a bisected edge with ending nodes <img src="bisect3doc_eq28128.png" alt="$i$"> and <img src="bisect3doc_eq31413.png" alt="$j$">. The middle point of <img src="bisect3doc_eq28128.png" alt="$i$"> and <img src="bisect3doc_eq31413.png" alt="$j$"> is added as a new node. We compute the intersection of their stars. If the middle point of <img src="bisect3doc_eq28128.png" alt="$i$"> and <img src="bisect3doc_eq31413.png" alt="$j$"> is not a hanging node, then <img src="bisect3doc_eq28128.png" alt="$i$"> and <img src="bisect3doc_eq31413.png" alt="$j$"> are separated and thus the intersection is empty. Otherwise the intersection contains elements using both <img src="bisect3doc_eq28128.png" alt="$i$"> and <img src="bisect3doc_eq31413.png" alt="$j$"> as vertexes and thus containing the middle point of <img src="bisect3doc_eq28128.png" alt="$i$"> and <img src="bisect3doc_eq31413.png" alt="$j$"> as a hanging node. We then put these elements into the marked elements. Again the intersection is found by the Hadamard product of two sparse matrices and \mc{find} command. In Line 3, the index vector <img src="bisect3doc_eq28128.png" alt="$i$"> contains row indices of nonzero values which are indices of elements containing hanging nodes. The index vector <img src="bisect3doc_eq31413.png" alt="$j$"> records the non-conforming edges. We then set \mc{isConforming(j)=false} to indicate that we still need to check these edges next time. The computation is restricted to non-conforming edges only. An example of this procedure is illustrated by Figure \ref{fig:3Dbisection} and Table \ref{table:findM}.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Bisection in Three Dimensions
+% We describe implementation of the longest edge bisection algorithm for
+% three dimensional tetrahedral grids.
+
+%% Bisection method
+% In short, the bisection method will divide one tetrahedron into two
+% children tetrahedron by connecting vertices to the middle point of its
+% opposite edge.
+%
+% There are two main issues in designing a good bisection method.
+% 
+% * (B1) Shape regularity.
+% * (B2) Conformity. 
+ 
+%% Longest edge bisection
+% The refinement edge is always chosen the longest edge. label3(node,elem)
+% will compute edge lengths and switch the indices such that elem(:,1:2) is
+% the longest edge.
+
+%% Completion
+% The completion process consists of two steps: refine the marked elements
+% and find the elements containing hanging nodes
+%
+% while M is not empty
+% 	bisect each element in M;
+% 	let now M be the set of all non-conforming elements.
+% end
+%
+%% Bisection of marked elements
+% For each element in the marked set M, we can get its refinement edge by
+% finding its longest edge. If the refinement edge is not cut before, we
+% add its middle point as a new node. Otherwise, we need to find out the
+% index of this already added middle point. 
+%
+% |elem = label3(node,elem,markedElem);
+% p1 = elem(markedElem,1); p2 = elem(markedElem,2);
+% ncEdge = find(~isConforming(1:Ncut));
+% nv2v = sparse([cutEdge(ncEdge,3);cutEdge(ncEdge,3)],...
+%               [cutEdge(ncEdge,1);cutEdge(ncEdge,2)],1,N,N);
+% [i,j] = find(nv2v(:,p1).*nv2v(:,p2));
+% isNewCutEdge = true(NM,1); isNewCutEdge(j) = false;
+% ix = find(isNewCutEdge);|        
+%
+% In line 1, the subroutine \mc{label3} is similar to \mc{label} in 2-D. It
+% will compute edge lengths of each tetrahedron and switch the index such
+% that the refinement edge of \mc{t} is given by
+% \mc{[elem(t,1),elem(t,2)]}. Note that for the longest edge bisection, the
+% labeling is called inside \mc{bisect3}.
+% 
+% In line 3, we use the logical vector \mc{isConforming} to find out which
+% edge is nonconforming and restrict the computation to the set of
+% nonconforming edges. In line 4-5, we form a sparse matrix \mc{nv2v}
+% representing the indices matrix of new vertices and vertices such that
+% \mc{nv2v(m,i)=1} and \mc{nv2v(m,j)=1} if \mc{m} is the middle point of
+% \mc{i,j}. Here the value \mc{cutEdge(:,3)} stores the index of new nodes
+% and \mc{cutEdge(:,1:2)} are two parent nodes.
+% 
+% We perform the Hadamard product of \mc{nv2v(:,p1(t)).*nv2v(:,p2(t))} and
+% use \mc{find} to locate all non zeros. If the result is zero, then the
+% middle point of \mc{p1(t)} and \mc{p2(t)} is not added before and thus
+% the refinement edge of \mc{t} is a new cut edge. Otherwise the $i$-th
+% index of the nonzero value is the index of the already added point.
+% 
+% After the new cut edges are added to \mc{cutEdge} and the middle points
+% are added to \mc{node}, we can form the sparse matrix \mc{nv2v} again
+% and use the same procedure to find out the indices of middle points of
+% refinement edges for all marked elements. The bisection of marked element
+% and the update of boundary faces is then straightforward.
+% \begin{lstlisting} elem(markedElem,:) = [p1 p5 p3 p4]; elem(NT+1:NT+NM,:)
+% = [p5 p2 p3 p4]; bdFace(NT+1:NT+NM,[1 3 4]) = bdFace(markedElem, [1 3
+% 4]); bdFace(markedElem,[2 3 4]) = bdFace(markedElem, [2 3 4]);
+% bdFace(markedElem,1) = 0; \end{lstlisting}
+% 
+% \subsubsection{Finding elements containing hanging nodes} We now discuss
+% how to find elements containing hanging nodes in the second step of
+% \mc{completion(T,M)}.
+% 
+% \begin{lstlisting} t2v = sparse([1:NT,1:NT,1:NT,1:NT], elem(1:NT,:), 1,
+% NT, N); suspect = find(~isConforming(1:Ncut)); [i,j] =
+% find(t2v(:,cutEdge(suspect,1)).*t2v(:,cutEdge(suspect,2))); markedElem =
+% unique(i); isConforming(suspect) = true; isConforming(suspect(j)) =
+% false; \end{lstlisting}
+% 
+% In line 1, we first construct the incidence matrix between tetrahedron
+% and vertices such that \mc{t2v(t,v)=1} if \mc{v} is a vertex of \mc{t}.
+% The nonzero in the $i$-th column is the indices of elements use $i$ as a
+% vertex.  Let us take a bisected edge with ending nodes $i$ and $j$. The
+% middle point of $i$ and $j$ is added as a new node. We compute the
+% intersection of their stars. If the middle point of $i$ and $j$ is not a
+% hanging node, then $i$ and $j$ are separated and thus the intersection is
+% empty. Otherwise the intersection contains elements using both $i$ and
+% $j$ as vertexes and thus containing the middle point of $i$ and $j$ as a
+% hanging node. We then put these elements into the marked elements. Again
+% the intersection is found by the Hadamard product of two sparse matrices
+% and \mc{find} command. In Line 3, the index vector $i$ contains row
+% indices of nonzero values which are indices of elements containing
+% hanging nodes. The index vector $j$ records the non-conforming edges. We
+% then set \mc{isConforming(j)=false} to indicate that we still need to
+% check these edges next time. The computation is restricted to
+% non-conforming edges only. An example of this procedure is illustrated by
+% Figure \ref{fig:3Dbisection} and Table \ref{table:findM}.
+
+
+##### SOURCE END #####
+--></body></html>

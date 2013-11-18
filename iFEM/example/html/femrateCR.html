@@ -1,0 +1,192 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>RATE OF CONVERGENCE OF CR NONCONFORMING LINEAR FINITE ELEMENT METHOD</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-11-06"><meta name="DC.source" content="femrateCR.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>RATE OF CONVERGENCE OF CR NONCONFORMING LINEAR FINITE ELEMENT METHOD</h1><!--introduction--><p>This example is to show the rate of convergence of CR nonconforming linear finite element approximation of the Poisson equation on the unit square:</p><p><img src="femrateCR_eq43355.png" alt="$$- \Delta u = f \; \hbox{in } (0,1)^2$$"></p><p>for the following boundary condition:</p><div><ol><li>Non-empty Dirichlet boundary condition. <img src="femrateCR_eq34764.png" alt="$u=g_D \hbox{ on }\Gamma_D, \quad \nabla u\cdot n=g_N \hbox{ on }\Gamma_N. \Gamma _D = \{(x,y): x=0, y\in [0,1]\}, \; \Gamma _N = \partial \Omega \backslash \Gamma _D$">.</li><li>Pure Neumann boundary condition. <img src="femrateCR_eq28233.png" alt="$\Gamma _N = \partial \Omega$">.</li><li>Robin boundary condition. <img src="femrateCR_eq04234.png" alt="$g_R u + \nabla u\cdot n=g_N \hbox{ on }\partial \Omega$"></li></ol></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Non-empty Dirichlet boundary condition.</a></li><li><a href="#5">Pure Neumann boundary condition.</a></li><li><a href="#8">Pure Robin boundary condition.</a></li><li><a href="#10">Conclusion</a></li></ul></div><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+[node,elem] = squaremesh([0,1,0,1],0.25);
+option.L0 = 2;
+option.maxIt = 4;
+option.printlevel = 1;
+option.elemType = <span class="string">'CR'</span>;
+option.plotflag = 0;
+</pre><h2>Non-empty Dirichlet boundary condition.<a name="2"></a></h2><pre class="codeinput">pde = sincosdata;
+bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>,<span class="string">'~(x==0)'</span>,<span class="string">'Neumann'</span>,<span class="string">'x==0'</span>);
+err = femPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:     3136,  #nnz:    11040, iter: 12,   err = 2.7213e-09,   time = 0.55 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    12416,  #nnz:    44608, iter: 12,   err = 2.9967e-09,   time = 0.63 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    49408,  #nnz:   179328, iter: 12,   err = 3.0008e-09,   time =  1.4 s
+</pre><img vspace="5" hspace="5" src="femrateCR_01.png" alt=""> <pre class="codeinput">display(<span class="string">'   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}'</span>);
+format <span class="string">shorte</span>
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+</pre><pre class="codeoutput">   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}
+
+ans =
+
+   1.2023e-03   1.6230e-01   3.6442e-02   1.5574e-03
+   3.0135e-04   8.1245e-02   1.8186e-02   3.9766e-04
+   7.5387e-05   4.0635e-02   9.0885e-03   1.0010e-04
+   1.8850e-05   2.0319e-02   4.5437e-03   2.5078e-05
+
+</pre><h2>Pure Neumann boundary condition.<a name="5"></a></h2><pre class="codeinput">pde = sincosNeumanndata;
+<span class="comment">% bdFlag = setboundary(node,elem,'Dirichlet','(x==0)','Neumann','~(x==0)');</span>
+bdFlag = setboundary(node,elem,<span class="string">'Neumann'</span>);
+err = femPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:     3136,  #nnz:    11325, iter: 12,   err = 6.1850e-09,   time =  1.1 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    12416,  #nnz:    45181, iter: 12,   err = 6.4875e-09,   time = 0.68 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    49408,  #nnz:   180477, iter: 12,   err = 7.9346e-09,   time = 0.84 s
+</pre><img vspace="5" hspace="5" src="femrateCR_02.png" alt=""> <pre class="codeinput">display(<span class="string">'   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}'</span>);
+format <span class="string">shorte</span>
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+</pre><pre class="codeoutput">   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}
+
+ans =
+
+   5.1879e-03   6.4764e-01   1.4905e-01   6.3315e-03
+   1.3079e-03   3.2478e-01   7.3152e-02   1.6004e-03
+   3.2767e-04   1.6251e-01   3.6405e-02   4.0122e-04
+   8.1961e-05   8.1272e-02   1.8181e-02   1.0037e-04
+
+</pre><h2>Pure Robin boundary condition.<a name="8"></a></h2><pre class="codeinput">pdeRobin = sincosRobindata;
+bdFlag = setboundary(node,elem,<span class="string">'Robin'</span>);
+err = femPoisson(node,elem,pdeRobin,bdFlag,option);
+</pre><pre class="codeoutput">Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:     3136,  #nnz:    11328, iter: 11,   err = 5.8994e-09,   time = 0.43 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    12416,  #nnz:    45184, iter: 11,   err = 5.4425e-09,   time = 0.66 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    49408,  #nnz:   180480, iter: 11,   err = 5.7198e-09,   time = 0.78 s
+</pre><img vspace="5" hspace="5" src="femrateCR_03.png" alt=""> <pre class="codeinput">display(<span class="string">'   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}'</span>);
+format <span class="string">shorte</span>
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+</pre><pre class="codeoutput">   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}
+
+ans =
+
+   5.1482e-03   6.4745e-01   1.4874e-01   6.9711e-03
+   1.2978e-03   3.2476e-01   7.3113e-02   1.7533e-03
+   3.2513e-04   1.6251e-01   3.6400e-02   4.3861e-04
+   8.1324e-05   8.1272e-02   1.8181e-02   1.0962e-04
+
+</pre><h2>Conclusion<a name="10"></a></h2><p>The optimal rate of convergence of the H1-norm (1st order) and L2-norm (2nd order) is observed. No superconvergence for <tt>|DuI-Duh</tt>|.</p><p>MGCG converges uniformly in all cases.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% RATE OF CONVERGENCE OF CR NONCONFORMING LINEAR FINITE ELEMENT METHOD
+%
+% This example is to show the rate of convergence of CR nonconforming
+% linear finite element approximation of the Poisson equation on the unit
+% square:
+%
+% $$- \Delta u = f \; \hbox{in } (0,1)^2$$
+%
+% for the following boundary condition:
+%
+% # Non-empty Dirichlet boundary condition. $u=g_D \hbox{ on }\Gamma_D, \quad \nabla u\cdot n=g_N \hbox{ on }\Gamma_N. \Gamma _D = \{(x,y): x=0, y\in [0,1]\}, \; \Gamma _N = \partial \Omega \backslash \Gamma _D$. 
+% # Pure Neumann boundary condition. $\Gamma _N = \partial \Omega$.
+% # Robin boundary condition. $g_R u + \nabla u\cdot n=g_N \hbox{ on }\partial \Omega$
+
+%% 
+clear all; close all;
+[node,elem] = squaremesh([0,1,0,1],0.25); 
+option.L0 = 2;
+option.maxIt = 4;
+option.printlevel = 1;
+option.elemType = 'CR';
+option.plotflag = 0;
+
+%% Non-empty Dirichlet boundary condition.
+pde = sincosdata;
+bdFlag = setboundary(node,elem,'Dirichlet','~(x==0)','Neumann','x==0');
+err = femPoisson(node,elem,pde,bdFlag,option);
+%%
+display('   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}');
+format shorte
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+%%
+
+%% Pure Neumann boundary condition.
+pde = sincosNeumanndata;
+% bdFlag = setboundary(node,elem,'Dirichlet','(x==0)','Neumann','~(x==0)');
+bdFlag = setboundary(node,elem,'Neumann');
+err = femPoisson(node,elem,pde,bdFlag,option);
+%%
+display('   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}');
+format shorte
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+%%
+
+%% Pure Robin boundary condition.
+pdeRobin = sincosRobindata;
+bdFlag = setboundary(node,elem,'Robin');
+err = femPoisson(node,elem,pdeRobin,bdFlag,option);
+%%
+display('   ||u-u_h||   ||Du-Du_h||  ||DuI-Du_h||  ||uI-u_h||_{max}');
+format shorte
+display([err.L2 err.H1 err.uIuhH1 err.uIuhMax]);
+
+%% Conclusion
+%
+% The optimal rate of convergence of the H1-norm (1st order) and L2-norm
+% (2nd order) is observed. No superconvergence for ||DuI-Duh||.
+%
+% MGCG converges uniformly in all cases.
+##### SOURCE END #####
+--></body></html>

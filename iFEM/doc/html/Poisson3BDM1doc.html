@@ -1,0 +1,198 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Equation: Poisson Equation Discretized by  Element in 3D</title><meta name="generator" content="MATLAB 7.9"><meta name="date" content="2011-01-05"><meta name="m-file" content="Poisson3BDM1doc"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Equation: Poisson Equation Discretized by <img src="Poisson3BDM1doc_eq11446.png" alt="$BDM_1$"> Element in 3D</h1><!--introduction--><p>We explain the assembling of the matrix equation for the lowest order BDM element discretization of Poisson equation.</p><p>[u,sigma] = Poisson3BDM1(node,elem,bdEdge,f,g_D,varargin)</p><p>Created by Ming Wang at Dec 30. 2010.</p><p>Copyright (C) Long Chen. See COPYRIGHT.txt for details.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Data Structure</a></li><li><a href="#2">Local Bases</a></li><li><a href="#3">Mass Matrix</a></li><li><a href="#6">Matrix for Differential Operator</a></li><li><a href="#7">Right hand side</a></li></ul></div><h2>Data Structure<a name="1"></a></h2><pre> [elem2dof,dofSign,face] = dof3BDM1(elem);</pre><p>will construct local to global index map; see ifem dof3BDM1doc for details.</p><h2>Local Bases<a name="2"></a></h2><p>Suppose <img src="Poisson3BDM1doc_eq00237.png" alt="$i,j,k$"> is the vertices of the <img src="Poisson3BDM1doc_eq45221.png" alt="$l$">-th face. The basis along with their div are given by</p><p><img src="Poisson3BDM1doc_eq12864.png" alt="$$ \phi_l^1 = \lambda_i\nabla \lambda_j \times \nabla\lambda_k,\quad&#xA;   \phi_l^2 = \lambda_j\nabla \lambda_k \times \nabla\lambda_i,\quad&#xA;   \phi_l^3 = \lambda_k\nabla \lambda_i \times \nabla\lambda_j.$$"></p><p><img src="Poisson3BDM1doc_eq58964.png" alt="$$ \nabla \cdot\phi_l^1 = \nabla \cdot\phi_l^2 = \nabla \cdot\phi_l^3 = det(\nabla\lambda_i,\nabla\lambda_j,\nabla\lambda_k).$$"></p><p>Inside one tetrahedron, the 12 bases functions along with their div corresponding to 4 local faces [2 3 4; 1 4 3; 1 2 4; 1 3 2] are:(<img src="Poisson3BDM1doc_eq30407.png" alt="$i=1,2,3.$">)</p><p><img src="Poisson3BDM1doc_eq09756.png" alt="$$ \phi_1^1 = \lambda_2\nabla \lambda_3 \times \nabla\lambda_4,\quad&#xA;   \phi_1^2 = \lambda_3\nabla \lambda_4 \times \nabla\lambda_2,\quad&#xA;   \phi_1^3 = \lambda_4\nabla \lambda_2 \times \nabla\lambda_3,\quad&#xA;   \nabla \cdot\phi_1^i = det(\nabla\lambda_2,\nabla\lambda_3,\nabla\lambda_4). $$"></p><p><img src="Poisson3BDM1doc_eq36707.png" alt="$$ \phi_2^1 = \lambda_1\nabla \lambda_4 \times \nabla\lambda_3,\quad&#xA;   \phi_2^2 = \lambda_4\nabla \lambda_3 \times \nabla\lambda_1,\quad&#xA;   \phi_2^3 = \lambda_3\nabla \lambda_1 \times \nabla\lambda_4,\quad&#xA;   \nabla \cdot\phi_2^i = det(\nabla\lambda_1,\nabla\lambda_4,\nabla\lambda_3).$$"></p><p><img src="Poisson3BDM1doc_eq33740.png" alt="$$ \phi_3^1 = \lambda_1\nabla \lambda_2 \times \nabla\lambda_4,\quad&#xA;   \phi_3^2 = \lambda_2\nabla \lambda_4 \times \nabla\lambda_1,\quad&#xA;   \phi_3^3 = \lambda_4\nabla \lambda_1 \times \nabla\lambda_2,\quad&#xA;   \nabla \cdot\phi_3^i = det(\nabla\lambda_1,\nabla\lambda_2,\nabla\lambda_4).$$"></p><p><img src="Poisson3BDM1doc_eq02507.png" alt="$$ \phi_4^1 = \lambda_1\nabla \lambda_3 \times \nabla\lambda_2,\quad&#xA;   \phi_4^2 = \lambda_3\nabla \lambda_2 \times \nabla\lambda_1,\quad&#xA;   \phi_4^3 = \lambda_2\nabla \lambda_1 \times \nabla\lambda_3,\quad&#xA;   \nabla \cdot\phi_4^i = det(\nabla\lambda_1,\nabla\lambda_3,\nabla\lambda_2).$$"></p><p>Locally, we order the local bases in the following way:</p><p><img src="Poisson3BDM1doc_eq76216.png" alt="$$\{\phi_1^1,~\,\phi_2^1,~\,\phi_3^1,~\,\phi_4^1,~\,\phi_1^2,~\,\phi_2^2,~\,&#xA;  \phi_3^2,~\,\phi_4^2,~\,\phi_1^3,~\,\phi_2^3,~\,\phi_3^3,~\,\phi_4^3.\}$$"></p><p>and rewrite the local bases as:</p><p><img src="Poisson3BDM1doc_eq23039.png" alt="$$\{\phi_1,~\,\phi_2,~\,\phi_3,~\,\phi_4,~\,\phi_5,~\,\phi_6,~\,&#xA;  \phi_7,~\,\phi_8,~\,\phi_9,~\,\phi_{10},~\,\phi_{11},~\,\phi_{12}.\}$$"></p><p>Because of the different oritentation of local and global faces, from local bases to the global one, the direction should be corrected. That is</p><pre>  phiGlobal(elem2dof(t,1),:) = phi(t,1)*dofSign(t,1);</pre><h2>Mass Matrix<a name="3"></a></h2><p>We use the integral formula</p><p><img src="Poisson3BDM1doc_eq20350.png" alt="$$ \int_T&#xA;\lambda_1^{\alpha_1}\lambda_2^{\alpha_2}\lambda_3^{\alpha_3}\lambda_4^{\alpha_4}&#xA;dx = \frac{\alpha_1!\alpha_2!\alpha_3!\alpha_4!3!}{(\sum _{i=1}^4\alpha_i&#xA;+ 3)!}\;|T|,$$"></p><p>to get</p><p><img src="Poisson3BDM1doc_eq94909.png" alt="$$ \int _T\lambda_i\lambda_j dx = (1+(i==j))|T|/20. $$"></p><p>In order to calculate the mass matrix, we need to construct a matrix, say, locBasesIdx, to calculate the local index used in the bases. For example, for basis <img src="Poisson3BDM1doc_eq68799.png" alt="$\phi_i =\lambda_{i_1}(\nabla \lambda_{i_2}\times\nabla\lambda_{i_3})$">, we compute <img src="Poisson3BDM1doc_eq96322.png" alt="$i_1,i_2,i_3$"> in the way:</p><p><img src="Poisson3BDM1doc_eq16636.png" alt="$i1$"> = locBasesIdx(i,1); <img src="Poisson3BDM1doc_eq76743.png" alt="$i2$"> = locBasesIdx(i,2); <img src="Poisson3BDM1doc_eq62358.png" alt="$i3$"> = locBasesIdx(i,3);</p><p>where locBasesIdx are constructed as:</p><pre class="codeinput">locFace = [2 3 4; 1 4 3; 1 2 4; 1 3 2];
+locBasesIdx = [locFace(:,[1 2 3]);locFace(:,[2 3 1]);locFace(:,[3 1 2])];
+</pre><p>For two local bases <img src="Poisson3BDM1doc_eq91270.png" alt="$\phi_i$"> and <img src="Poisson3BDM1doc_eq93485.png" alt="$\phi_j$">, <img src="Poisson3BDM1doc_eq27490.png" alt="$i, j = 1,...,12.$"> <img src="Poisson3BDM1doc_eq93068.png" alt="$$ \int_T \phi_i \phi_j dx = \int_T ( \lambda_{i_1}\nabla \lambda_{i_2}\times\nabla\lambda_{i_3})\cdot (\lambda_{j_1}\nabla \lambda_{j_2}\times\nabla\lambda_{j_3}) dx. $$"></p><h2>Matrix for Differential Operator<a name="6"></a></h2><p>We record <img src="Poisson3BDM1doc_eq22132.png" alt="$\nabla \cdot \phi_i$"> and then the computation <img src="Poisson3BDM1doc_eq69364.png" alt="$\int _T \nabla \cdot \phi_i dx$"> is straightforward. Just remember to correct the direction.</p><h2>Right hand side<a name="7"></a></h2><p>We use 5-points quadrature which is exact for cubic polynomials. In the barycentric coordinate, the 5-points are</p><p><img src="Poisson3BDM1doc_eq74336.png" alt="$$ p_1 = [1/4, 1/4, 1/4, 1/4], \quad  w_1 = -4/5 $$"></p><p><img src="Poisson3BDM1doc_eq82295.png" alt="$$ p_2 = [1/2, 1/6, 1/6, 1/6], \quad  w_2 = 9/20 $$"></p><p><img src="Poisson3BDM1doc_eq94827.png" alt="$$ p_3 = [1/6, 1/2, 1/6, 1/6], \quad  w_3 = 9/20 $$"></p><p><img src="Poisson3BDM1doc_eq60463.png" alt="$$ p_4 = [1/6, 1/6, 1/2, 1/6], \quad  w_4 = 9/20 $$"></p><p><img src="Poisson3BDM1doc_eq63061.png" alt="$$ p_5 = [1/6, 1/6, 1/6, 1/2], \quad  w_5 = 9/20 $$"></p><p>Note that the two for loops are nested in such a way that the point pxy and the evulation Jp is just computed once.</p><p>The local to global assembling is computed using accumarray</p><pre> b = accumarray(elem2dof(:),bt(:),[Ndof 1]);</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.9<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Equation: Poisson Equation Discretized by $BDM_1$ Element in 3D
+% We explain the assembling of the matrix equation for the lowest order BDM element
+% discretization of Poisson equation. 
+%
+% [u,sigma] = Poisson3BDM1(node,elem,bdEdge,f,g_D,varargin)
+%
+% Created by Ming Wang at Dec 30. 2010.
+%
+% Copyright (C) Long Chen. See COPYRIGHT.txt for details. 
+
+%% Data Structure
+%   [elem2dof,dofSign,face] = dof3BDM1(elem);
+%
+% will construct local to global index map; see ifem dof3BDM1doc for
+% details.
+%
+%% Local Bases
+% Suppose $i,j,k$ is the vertices of the $l$-th face. The basis along with
+% their div are given by
+% 
+% $$ \phi_l^1 = \lambda_i\nabla \lambda_j \times \nabla\lambda_k,\quad
+%    \phi_l^2 = \lambda_j\nabla \lambda_k \times \nabla\lambda_i,\quad
+%    \phi_l^3 = \lambda_k\nabla \lambda_i \times \nabla\lambda_j.$$
+%
+% $$ \nabla \cdot\phi_l^1 = \nabla \cdot\phi_l^2 = \nabla \cdot\phi_l^3 = det(\nabla\lambda_i,\nabla\lambda_j,\nabla\lambda_k).$$
+%
+% Inside one tetrahedron, the 12 bases functions along with their div
+% corresponding to 4 local faces [2 3 4; 1 4 3; 1 2 4; 1 3 2] are:($i=1,2,3.$)
+%
+% $$ \phi_1^1 = \lambda_2\nabla \lambda_3 \times \nabla\lambda_4,\quad
+%    \phi_1^2 = \lambda_3\nabla \lambda_4 \times \nabla\lambda_2,\quad
+%    \phi_1^3 = \lambda_4\nabla \lambda_2 \times \nabla\lambda_3,\quad
+%    \nabla \cdot\phi_1^i = det(\nabla\lambda_2,\nabla\lambda_3,\nabla\lambda_4). $$
+%
+% $$ \phi_2^1 = \lambda_1\nabla \lambda_4 \times \nabla\lambda_3,\quad
+%    \phi_2^2 = \lambda_4\nabla \lambda_3 \times \nabla\lambda_1,\quad
+%    \phi_2^3 = \lambda_3\nabla \lambda_1 \times \nabla\lambda_4,\quad
+%    \nabla \cdot\phi_2^i = det(\nabla\lambda_1,\nabla\lambda_4,\nabla\lambda_3).$$
+%
+% $$ \phi_3^1 = \lambda_1\nabla \lambda_2 \times \nabla\lambda_4,\quad
+%    \phi_3^2 = \lambda_2\nabla \lambda_4 \times \nabla\lambda_1,\quad
+%    \phi_3^3 = \lambda_4\nabla \lambda_1 \times \nabla\lambda_2,\quad
+%    \nabla \cdot\phi_3^i = det(\nabla\lambda_1,\nabla\lambda_2,\nabla\lambda_4).$$
+%
+% $$ \phi_4^1 = \lambda_1\nabla \lambda_3 \times \nabla\lambda_2,\quad
+%    \phi_4^2 = \lambda_3\nabla \lambda_2 \times \nabla\lambda_1,\quad
+%    \phi_4^3 = \lambda_2\nabla \lambda_1 \times \nabla\lambda_3,\quad
+%    \nabla \cdot\phi_4^i = det(\nabla\lambda_1,\nabla\lambda_3,\nabla\lambda_2).$$
+%
+% Locally, we order the local bases in the following way: 
+% 
+% $$\{\phi_1^1,~\,\phi_2^1,~\,\phi_3^1,~\,\phi_4^1,~\,\phi_1^2,~\,\phi_2^2,~\,
+%   \phi_3^2,~\,\phi_4^2,~\,\phi_1^3,~\,\phi_2^3,~\,\phi_3^3,~\,\phi_4^3.\}$$
+%
+% and rewrite the local bases as: 
+%
+% $$\{\phi_1,~\,\phi_2,~\,\phi_3,~\,\phi_4,~\,\phi_5,~\,\phi_6,~\,
+%   \phi_7,~\,\phi_8,~\,\phi_9,~\,\phi_{10},~\,\phi_{11},~\,\phi_{12}.\}$$
+%
+% Because of the different oritentation of local and global faces, from
+% local bases to the global one, the direction should be corrected. That is
+%
+%    phiGlobal(elem2dof(t,1),:) = phi(t,1)*dofSign(t,1);
+
+%% Mass Matrix
+% We use the integral formula 
+%  
+% $$ \int_T
+% \lambda_1^{\alpha_1}\lambda_2^{\alpha_2}\lambda_3^{\alpha_3}\lambda_4^{\alpha_4}
+% dx = \frac{\alpha_1!\alpha_2!\alpha_3!\alpha_4!3!}{(\sum _{i=1}^4\alpha_i
+% + 3)!}\;|T|,$$
+%
+% to get 
+%
+% $$ \int _T\lambda_i\lambda_j dx = (1+(i==j))|T|/20. $$
+%
+% In order to calculate the mass matrix, we need to construct a matrix,
+% say, locBasesIdx, to calculate the local index used in the bases.
+% For example, for basis
+% $\phi_i =\lambda_{i_1}(\nabla \lambda_{i_2}\times\nabla\lambda_{i_3})$,
+% we compute $i_1,i_2,i_3$ in the way:
+%
+% $i1$ = locBasesIdx(i,1); $i2$ = locBasesIdx(i,2); $i3$ = locBasesIdx(i,3);
+% 
+% where locBasesIdx are constructed as:
+%%
+locFace = [2 3 4; 1 4 3; 1 2 4; 1 3 2];
+locBasesIdx = [locFace(:,[1 2 3]);locFace(:,[2 3 1]);locFace(:,[3 1 2])];
+%%
+%
+% For two local bases $\phi_i$ and $\phi_j$, $i, j = 1,...,12.$
+% $$ \int_T \phi_i \phi_j dx = \int_T (
+% \lambda_{i_1}\nabla \lambda_{i_2}\times\nabla\lambda_{i_3})\cdot
+% (\lambda_{j_1}\nabla \lambda_{j_2}\times\nabla\lambda_{j_3})
+% dx. $$
+
+%% Matrix for Differential Operator
+% We record $\nabla \cdot \phi_i$ and then the computation $\int _T \nabla
+% \cdot \phi_i dx$ is straightforward. Just remember to correct the direction.
+
+%% Right hand side
+% We use 5-points quadrature which is exact for cubic polynomials. In the
+% barycentric coordinate, the 5-points are
+%
+% $$ p_1 = [1/4, 1/4, 1/4, 1/4], \quad  w_1 = -4/5 $$
+%
+% $$ p_2 = [1/2, 1/6, 1/6, 1/6], \quad  w_2 = 9/20 $$
+%
+% $$ p_3 = [1/6, 1/2, 1/6, 1/6], \quad  w_3 = 9/20 $$
+%
+% $$ p_4 = [1/6, 1/6, 1/2, 1/6], \quad  w_4 = 9/20 $$
+%
+% $$ p_5 = [1/6, 1/6, 1/6, 1/2], \quad  w_5 = 9/20 $$
+
+%%
+% Note that the two for loops are nested in such a way that the point pxy
+% and the evulation Jp is just computed once.
+%
+% The local to global assembling is computed using accumarray
+%
+%   b = accumarray(elem2dof(:),bt(:),[Ndof 1]);
+
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>

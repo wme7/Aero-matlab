@@ -1,0 +1,20 @@
+iFEM is a collection of MATLAB functions for adaptive finite element methods in two and three dimensions. iFEM is Copyright (C) Long Chen.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, see <http://www.gnu.org/licenses/> or GPL.pdf in this directory.
+
+Please note that although iFEM is freely available, it is copyrighted by the author and may not be sold or included in commercial products without a license.
+
+If you use iFEM in any program or publication, please acknowledge
+its author by adding a reference to: 
+Long Chen. iFEM: an integrated finite element methods package in MATLAB, Technical Report, University of California at Irvine, 2008.

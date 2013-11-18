@@ -1,0 +1,145 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Mesh Smoothing and Optimization</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-06-27"><meta name="m-file" content="meshoptdoc"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Mesh Smoothing and Optimization</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Improve geometric mesh quality</a></li><li><a href="#3">ODT-based mesh smoothing</a></li></ul></div><h2>Improve geometric mesh quality<a name="1"></a></h2><p>The function [node,elem] = optmesh(node,elem) will optimize the shape regularity of triangles in the input mesh (node,elem) and outputs a better mesh (node,elem).</p><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+load <span class="string">airfoilperturb</span>
+figure(1); subplot(1,2,1);
+showmesh(node,elem); title(<span class="string">'original mesh'</span>);
+figure(2); subplot(1,2,1);
+showmeshquality(node,elem); axis([0 1 0 2700]);
+[node,elem] = optmesh(node,elem);
+figure(1); subplot(1,2,2);
+showmesh(node,elem); title(<span class="string">'smoothed mesh'</span>);
+figure(2); subplot(1,2,2);
+showmeshquality(node,elem); axis([0 1 0 2700]);
+</pre><pre class="codeoutput">Mesh quality before optimization 
+ - Min quality 0.37 - Mean quality 0.91 
+Mesh quality after optimization 
+ - Min quality 0.67 - Mean quality 0.95 
+</pre><img vspace="5" hspace="5" src="meshoptdoc_01.png" alt=""> <img vspace="5" hspace="5" src="meshoptdoc_02.png" alt=""> <p>We explain algorithms implemented in optimesh.m in the following.</p><h2>ODT-based mesh smoothing<a name="3"></a></h2><p>In the function <a href="../../../mesh/html/meshsmoothing.html">meshsmoothing</a>, we move one node at a time inside its patch, which consists of all triangles surrounding this node, such that the interpolation error to a quadratic function is minimized. The function <tt>meshsmoothing</tt> will keep the topology of the input mesh, i.e., the node index and connectivity of nodes are unchanged.</p><p>In the simplest case, the scheme is to move the node to the average of circumenters of triangles in the local patch. Details can be found in the paper <a href="http://math.uci.edu/~chenlong/CH2008.html">ODTmesh</a>.</p><pre class="codeinput">theta = [-2*pi/3 -pi/3 0 pi/3 2*pi/3 pi]';
+node = [cos(theta), sin(theta)];
+node(end+1,:) = 0;
+elem = delaunayn(node);
+node(end,:) = rand(1,2)*0.4;
+figure(1); subplot(1,2,1);
+showmesh(node,elem); findnode(node,<span class="string">'all'</span>,<span class="string">'noindex'</span>);
+c = circumcenter(node,elem);
+hold <span class="string">on</span>; plot(c(:,1),c(:,2),<span class="string">'r.'</span>,<span class="string">'MarkerSize'</span>,16)
+node(end,:) = mean(c);
+plot(node(end,1),node(end,2),<span class="string">'b.'</span>,<span class="string">'MarkerSize'</span>,16)
+figure(1); subplot(1,2,2);
+showmesh(node,elem); findnode(node,<span class="string">'all'</span>,<span class="string">'noindex'</span>);
+</pre><img vspace="5" hspace="5" src="meshoptdoc_03.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Mesh Smoothing and Optimization
+% 
+%% Improve geometric mesh quality
+% 
+% The function [node,elem] = optmesh(node,elem) will optimize the shape
+% regularity of triangles in the input mesh (node,elem) and outputs a
+% better mesh (node,elem). 
+
+clear all; close all;
+load airfoilperturb
+figure(1); subplot(1,2,1); 
+showmesh(node,elem); title('original mesh');
+figure(2); subplot(1,2,1); 
+showmeshquality(node,elem); axis([0 1 0 2700]);
+[node,elem] = optmesh(node,elem);
+figure(1); subplot(1,2,2); 
+showmesh(node,elem); title('smoothed mesh');
+figure(2); subplot(1,2,2); 
+showmeshquality(node,elem); axis([0 1 0 2700]);
+%%
+% We explain algorithms implemented in optimesh.m in the following.
+
+%% ODT-based mesh smoothing
+%
+% In the function <../../../mesh/html/meshsmoothing.html meshsmoothing>, we move one node at a time inside its
+% patch, which consists of all triangles surrounding this node, such that
+% the interpolation error to a quadratic function is minimized. The
+% function |meshsmoothing| will keep the topology of the input mesh, i.e.,
+% the node index and connectivity of nodes are unchanged.
+%
+% In the simplest case, the scheme is to move the node to the average of
+% circumenters of triangles in the local patch. Details can be found in the
+% paper <http://math.uci.edu/~chenlong/CH2008.html ODTmesh>. 
+theta = [-2*pi/3 -pi/3 0 pi/3 2*pi/3 pi]';
+node = [cos(theta), sin(theta)];
+node(end+1,:) = 0;
+elem = delaunayn(node);
+node(end,:) = rand(1,2)*0.4;
+figure(1); subplot(1,2,1);
+showmesh(node,elem); findnode(node,'all','noindex');
+c = circumcenter(node,elem);
+hold on; plot(c(:,1),c(:,2),'r.','MarkerSize',16)
+node(end,:) = mean(c);
+plot(node(end,1),node(end,2),'b.','MarkerSize',16)
+figure(1); subplot(1,2,2);
+showmesh(node,elem); findnode(node,'all','noindex');
+
+
+##### SOURCE END #####
+--></body></html>

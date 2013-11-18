@@ -1,0 +1,172 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Equation: Poisson Equation Discretized by  Element in 2D</title><meta name="generator" content="MATLAB 7.9"><meta name="date" content="2011-01-05"><meta name="m-file" content="PoissonBDM1doc"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Equation: Poisson Equation Discretized by <img src="PoissonBDM1doc_eq11446.png" alt="$BDM_1$"> Element in 2D</h1><!--introduction--><p>We explain the assembling of the matrix equation for the lowest order BDM element discretization of Poisson equation.</p><p>[u,sigma] = PoissonBDM1(node,elem,bdEdge,f,g_D,varargin)</p><p>Created by Ming Wang at Jan 2. 2011.</p><p>Copyright (C) Long Chen. See COPYRIGHT.txt for details.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Data Structure</a></li><li><a href="#2">Local Bases</a></li><li><a href="#3">Mass Matrix</a></li><li><a href="#4">Matrix for Differential Operator</a></li><li><a href="#5">Right hand side</a></li></ul></div><h2>Data Structure<a name="1"></a></h2><pre> [elem2dof,dofSign,edge] = dofBDM1(elem);</pre><p>will construct local to global index map; see ifem dofBDM1doc for details.</p><h2>Local Bases<a name="2"></a></h2><p>Suppose [i,j] is the k-th edge. The hierarchic basis along with their div are given by</p><p><img src="PoissonBDM1doc_eq76579.png" alt="$$ \phi_k = \lambda_i rot \lambda_j - \lambda_j rot \lambda_i,\quad&#xA;   \psi_k = \lambda_i rot \lambda_j + \lambda_j rot \lambda_i. $$"></p><p><img src="PoissonBDM1doc_eq32187.png" alt="$$ div \phi_k = 2 \nabla \lambda_i \cdot rot \lambda_j, \quad div \psi_k = 0.$$"></p><p>Inside one triangular, the 6 bases functions along with their div corresponding to 3 local edges [2 3; 3 1; 1 2] are:</p><p><img src="PoissonBDM1doc_eq26287.png" alt="$$ \phi_1 = \lambda_2 rot \lambda_3 - \lambda_3 rot \lambda_2,\quad&#xA;   \psi_1 = \lambda_2 rot \lambda_3 + \lambda_3 rot \lambda_2,\quad&#xA;   div\phi_1 = 2 \nabla \lambda_2 \cdot rot \lambda_3, \quad div \psi_1 = 0. $$"></p><p><img src="PoissonBDM1doc_eq06304.png" alt="$$ \phi_2 = \lambda_3 rot \lambda_1 - \lambda_1 rot \lambda_3,\quad&#xA;   \psi_2 = \lambda_3 rot \lambda_1 + \lambda_1 rot \lambda_3,\quad&#xA;   div\phi_2 = 2 \nabla \lambda_3 \cdot rot \lambda_1, \quad div \psi_2 = 0. $$"></p><p><img src="PoissonBDM1doc_eq31568.png" alt="$$ \phi_3 = \lambda_1 rot \lambda_2 - \lambda_2 rot \lambda_1,\quad&#xA;   \psi_3 = \lambda_1 rot \lambda_2 + \lambda_2 rot \lambda_1,\quad&#xA;   div\phi_3 = 2 \nabla \lambda_1 \cdot rot \lambda_2, \quad div \psi_3 = 0. $$"></p><p>Locally, we order the local bases in the following way:</p><p><img src="PoissonBDM1doc_eq31793.png" alt="$$\{\phi_1,~\,\phi_2,~\,\phi_3,~\,\psi_1,~\,\psi_2,~\, \psi_3.\}$$"></p><p>Note that <img src="PoissonBDM1doc_eq91134.png" alt="$RT_0 \subset BDM_1$">, and <img src="PoissonBDM1doc_eq80695.png" alt="$\{ \phi_1,~\,\phi_2,~\,\phi_3 \}$"> is the local bases for <img src="PoissonBDM1doc_eq16779.png" alt="$RT_0$">.</p><p>Because of the different oritentation of local and global faces, from local bases to the global one, the direction should be corrected. That is</p><pre>  phiGlobal(elem2dof(t,1),:) = phi(t,1)*dofSign(t,1);</pre><h2>Mass Matrix<a name="3"></a></h2><p>We use the integral formula</p><p><img src="PoissonBDM1doc_eq12878.png" alt="$$ \int_T&#xA;\lambda_1^{\alpha_1}\lambda_2^{\alpha_2}\lambda_3^{\alpha_3}&#xA;dx = \frac{\alpha_1!\alpha_2!\alpha_3!2!}{(\sum _{i=1}^3\alpha_i&#xA;+ 2)!}\;|T|,$$"></p><p>to get</p><p><img src="PoissonBDM1doc_eq21079.png" alt="$$ \int _T\lambda_i\lambda_j dx = (1+(i==j))|T|/12. $$"></p><p>For two local bases <img src="PoissonBDM1doc_eq91270.png" alt="$\phi_i$"> and <img src="PoissonBDM1doc_eq93485.png" alt="$\phi_j$"> corresponding to the ith and jth local edges, suppose i = [i1 i2], j = [j1 j2]. <img src="PoissonBDM1doc_eq28119.png" alt="$$\int_T \phi_i \phi_j dx = \int_T (  \lambda_{i1} rot \lambda_{i2}\cdot\lambda_{j1} rot \lambda_{j2} -\lambda_{i2} rot \lambda_{i1}\cdot\lambda_{j1} rot \lambda_{j2} -\lambda_{i1} rot \lambda_{i2}\cdot\lambda_{j2} rot \lambda_{j1} +\lambda_{i2} rot \lambda_{i1}\cdot\lambda_{j2} rot \lambda_{j1})dx $$"></p><p><img src="PoissonBDM1doc_eq56674.png" alt="$\int_T \psi_i \psi_j dx$"> and <img src="PoissonBDM1doc_eq35758.png" alt="$\int_T \psi_i \phi_j dx$"> can be computed similarly.</p><h2>Matrix for Differential Operator<a name="4"></a></h2><p>Note that <img src="PoissonBDM1doc_eq64543.png" alt="$\nabla \cdot \psi = 0$">, We only need to record <img src="PoissonBDM1doc_eq22132.png" alt="$\nabla \cdot \phi_i$"> and then the computation <img src="PoissonBDM1doc_eq69364.png" alt="$\int _T \nabla \cdot \phi_i dx$"> is straightforward. Just remember to correct the direction.</p><h2>Right hand side<a name="5"></a></h2><p>We use 5-points quadrature which is exact for cubic polynomials. In the barycentric coordinate, the 5-points are</p><p><img src="PoissonBDM1doc_eq24417.png" alt="$$ p_1 = [2/3, 1/6, 1/6], \quad  w_1 = 1/3 $$"></p><p><img src="PoissonBDM1doc_eq22308.png" alt="$$ p_2 = [1/6, 2/3, 1/6], \quad  w_2 = 1/3 $$"></p><p><img src="PoissonBDM1doc_eq62361.png" alt="$$ p_3 = [1/6, 1/6, 2/3], \quad  w_3 = 1/3 $$"></p><p>Note that the two for loops are nested in such a way that the point pxy and the evulation Jp is just computed once.</p><p>The local to global assembling is computed using accumarray</p><pre> b = accumarray(elem2dof(:),bt(:),[Ndof 1]);</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.9<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Equation: Poisson Equation Discretized by $BDM_1$ Element in 2D
+% We explain the assembling of the matrix equation for the lowest order BDM element
+% discretization of Poisson equation. 
+%
+% [u,sigma] = PoissonBDM1(node,elem,bdEdge,f,g_D,varargin)
+%
+% Created by Ming Wang at Jan 2. 2011.
+%
+% Copyright (C) Long Chen. See COPYRIGHT.txt for details. 
+
+%% Data Structure
+%   [elem2dof,dofSign,edge] = dofBDM1(elem);
+%
+% will construct local to global index map; see ifem dofBDM1doc for
+% details.
+%
+%% Local Bases
+% Suppose [i,j] is the k-th edge. The hierarchic basis along with
+% their div are given by
+% 
+% $$ \phi_k = \lambda_i rot \lambda_j - \lambda_j rot \lambda_i,\quad
+%    \psi_k = \lambda_i rot \lambda_j + \lambda_j rot \lambda_i. $$
+%
+% $$ div \phi_k = 2 \nabla \lambda_i \cdot rot \lambda_j, \quad div \psi_k = 0.$$
+%
+% Inside one triangular, the 6 bases functions along with their div
+% corresponding to 3 local edges [2 3; 3 1; 1 2] are:
+%
+% $$ \phi_1 = \lambda_2 rot \lambda_3 - \lambda_3 rot \lambda_2,\quad
+%    \psi_1 = \lambda_2 rot \lambda_3 + \lambda_3 rot \lambda_2,\quad
+%    div\phi_1 = 2 \nabla \lambda_2 \cdot rot \lambda_3, \quad div \psi_1 = 0. $$
+%
+% $$ \phi_2 = \lambda_3 rot \lambda_1 - \lambda_1 rot \lambda_3,\quad
+%    \psi_2 = \lambda_3 rot \lambda_1 + \lambda_1 rot \lambda_3,\quad
+%    div\phi_2 = 2 \nabla \lambda_3 \cdot rot \lambda_1, \quad div \psi_2 = 0. $$
+%
+% $$ \phi_3 = \lambda_1 rot \lambda_2 - \lambda_2 rot \lambda_1,\quad
+%    \psi_3 = \lambda_1 rot \lambda_2 + \lambda_2 rot \lambda_1,\quad
+%    div\phi_3 = 2 \nabla \lambda_1 \cdot rot \lambda_2, \quad div \psi_3 = 0. $$
+%
+% Locally, we order the local bases in the following way: 
+% 
+% $$\{\phi_1,~\,\phi_2,~\,\phi_3,~\,\psi_1,~\,\psi_2,~\, \psi_3.\}$$
+%
+% Note that $RT_0 \subset BDM_1$, and $\{ \phi_1,~\,\phi_2,~\,\phi_3 \}$ is the 
+% local bases for $RT_0$.
+%
+% Because of the different oritentation of local and global faces, from
+% local bases to the global one, the direction should be corrected. That is
+%
+%    phiGlobal(elem2dof(t,1),:) = phi(t,1)*dofSign(t,1);
+
+%% Mass Matrix
+% We use the integral formula 
+%  
+% $$ \int_T
+% \lambda_1^{\alpha_1}\lambda_2^{\alpha_2}\lambda_3^{\alpha_3}
+% dx = \frac{\alpha_1!\alpha_2!\alpha_3!2!}{(\sum _{i=1}^3\alpha_i
+% + 2)!}\;|T|,$$
+%
+% to get 
+%
+% $$ \int _T\lambda_i\lambda_j dx = (1+(i==j))|T|/12. $$
+%
+% For two local bases $\phi_i$ and $\phi_j$ corresponding to the ith and
+% jth local edges, suppose i = [i1 i2], j = [j1 j2].
+% $$\int_T \phi_i \phi_j dx = \int_T (
+%  \lambda_{i1} rot \lambda_{i2}\cdot\lambda_{j1} rot \lambda_{j2}
+% -\lambda_{i2} rot \lambda_{i1}\cdot\lambda_{j1} rot \lambda_{j2}
+% -\lambda_{i1} rot \lambda_{i2}\cdot\lambda_{j2} rot \lambda_{j1}
+% +\lambda_{i2} rot \lambda_{i1}\cdot\lambda_{j2} rot \lambda_{j1})dx
+% $$
+%
+% $\int_T \psi_i \psi_j dx$ and $\int_T \psi_i \phi_j dx$ can be computed similarly.
+%
+%% Matrix for Differential Operator
+% Note that $\nabla \cdot \psi = 0$, We only need to record $\nabla \cdot \phi_i$ and 
+% then the computation $\int _T \nabla
+% \cdot \phi_i dx$ is straightforward. Just remember to correct the direction.
+
+%% Right hand side
+% We use 5-points quadrature which is exact for cubic polynomials. In the
+% barycentric coordinate, the 5-points are
+%
+% $$ p_1 = [2/3, 1/6, 1/6], \quad  w_1 = 1/3 $$
+%
+% $$ p_2 = [1/6, 2/3, 1/6], \quad  w_2 = 1/3 $$
+%
+% $$ p_3 = [1/6, 1/6, 2/3], \quad  w_3 = 1/3 $$
+%
+%%
+% Note that the two for loops are nested in such a way that the point pxy
+% and the evulation Jp is just computed once.
+%
+% The local to global assembling is computed using accumarray
+%
+%   b = accumarray(elem2dof(:),bt(:),[Ndof 1]);
+
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>

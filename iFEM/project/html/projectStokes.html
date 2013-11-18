@@ -1,0 +1,180 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Project: Finite Element for Stokes Equations</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-10-26"><meta name="DC.source" content="projectStokes.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Project: Finite Element for Stokes Equations</h1><!--introduction--><p>The purpose of this project is to implement simple and popular finite element methods for solving Stokes equations in two dimensions.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1"><b>Part I: Finite Element Methods: isoP2-P0 element</b></a></li><li><a href="#2">Step 1: Data Structure</a></li><li><a href="#4">Step 2: Form matrices and right hand side for Laplacian</a></li><li><a href="#5">Step 3: Form matrices for divergence operator</a></li><li><a href="#7">Step 4: Modify equations to include boundary conditions</a></li><li><a href="#8">Step 5: Solve the linear system</a></li><li><a href="#9"><b>Part II: Finite Element Methods: nonforming P1-P0 element</b></a></li><li><a href="#10">Step 1: Data Structure</a></li><li><a href="#11">Step 2: Form matrices and right hand side</a></li><li><a href="#12">Step 3: Modify equations to include boundary conditions</a></li><li><a href="#14">Step 4: Solve the linear system</a></li><li><a href="#15"><b>Part III: Test Example</b></a></li></ul></div><h2><b>Part I: Finite Element Methods: isoP2-P0 element</b><a name="1"></a></h2><p>Given a triangulation (node,elem), the velocity space is the linear finite element space on the uniform refinement of (node,elem) and the pressure is piecewise constant space on the current mesh.</p><h2>Step 1: Data Structure<a name="2"></a></h2><p>Given mesh will be refered as a coarse grid</p><pre class="codeinput">[node,elem] = squaremesh([-1,1,-1,1],0.25);
+NTc = size(elem,1);
+
+<span class="comment">% Uniform refinement to a fine grid</span>
+[node,elem] = uniformrefine(node,elem);
+</pre><p>In the uniformrefine, the new elements are added in such an order that triangles (t, NTc + t, 2*NTc + t, 3*NTc + t) are refined from the same parent, where NTc is the number of triangles in the coarse grid.</p><h2>Step 2: Form matrices and right hand side for Laplacian<a name="4"></a></h2><p>Call your code for linear finite element methods. You can merge two copies of Laplacian using <tt>blkdiag</tt>.</p><h2>Step 3: Form matrices for divergence operator<a name="5"></a></h2><p>Compute <img src="projectStokes_eq37658.png" alt="$\nabla \lambda_i$"> on the fine grid</p><pre class="codeinput">[Dlambda,area] = gradbasis(node,elem);
+</pre><p>Assemble sparse matrices for divergence operator on the fine grid by computing <img src="projectStokes_eq46183.png" alt="$\int_t \nabla \lambda_i dx$">.</p><p>Merge four terms in the above matrix to compute the divergence operator on the coarse grid <img src="projectStokes_eq19903.png" alt="$\int_{t, NTc + t, 2*NTc + t, 3*NTc + t} \,  \nabla \lambda_i\, dx$">.</p><h2>Step 4: Modify equations to include boundary conditions<a name="7"></a></h2><p>Modify the right hand side to include Dirichlet or Neumann boundary conditions. It is the same as the Poisson equation. Just repeat for each component. For non-homogenous Dirichlet boundary condition, you need to modify the continunity equation too. Recoard freeDof.</p><h2>Step 5: Solve the linear system<a name="8"></a></h2><p>Form a big matrix <tt>bigA = [A B'; B sparse(Np,Np)]</tt> and use the direct solver to solve <tt>bigA(bigFreeDof,bigFreeDof)\bigF(bigFreeDof)</tt></p><p>Since the pressure is unique up to a constant, you need to eliminate the constant kernel by not including one component of pressure vector in the <tt>bigFreeDof</tt>. After you get the solution, you need to modify p such that its weighted mean value is zero.</p><h2><b>Part II: Finite Element Methods: nonforming P1-P0 element</b><a name="9"></a></h2><h2>Step 1: Data Structure<a name="10"></a></h2><p>Since the unknowns are associated to edges, you need to generate edges and more importantly the indices map from a triangle to global indices of its three edges.  The edges are labled such that the i-th edge is opposite to the i-th vertex for i=1,2,3.</p><pre class="codeinput">[elem2edge,edge] = dofedge(elem);
+</pre><h2>Step 2: Form matrices and right hand side<a name="11"></a></h2><p>Figure out the basis of CR element. <i>Hint: use barycenteric coordinates it can be writeen as <img src="projectStokes_eq17939.png" alt="$1-2\lambda_i$"></i></p><p>Call your code for linear finite element methods in Part I with the correct scaling.</p><p>Compute the righ hand side using three middle point rule. It is even simplier than linear element case.</p><h2>Step 3: Modify equations to include boundary conditions<a name="12"></a></h2><p>Similar as in the linear element case. Just be careful on the Dirichlet boundary condition, you need to evaluate g_D at middle points of boundary edges.</p><p>To find out the boundary edges, use</p><pre class="codeinput">s = accumarray(elem2edge(:), 1, [size(edge,1) 1]);
+</pre><p>Then idx = (s==1) is the index of boundary edges and (s==2) is interiori (free) edges.</p><h2>Step 4: Solve the linear system<a name="14"></a></h2><p>Same as the first Part.</p><h2><b>Part III: Test Example</b><a name="15"></a></h2><p>We use a simple model of colliding flow with analytic solutions to test the code. The domain is [-1,1]^2 and the analytic solution is:</p><p><img src="projectStokes_eq16397.png" alt="$$u = 20xy^3; v = 5x^4 - 5y^4; p = 60x^2y - 20y^3 + constant.$$"></p><p>Compute the data f and Dirichlet boundary condition g_D and solve Stokes equation on the unit square using methods in Part I,II,II and check the rate of convergence.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Project: Finite Element for Stokes Equations
+%
+% The purpose of this project is to implement simple and popular finite
+% element methods for solving Stokes equations in two dimensions.
+
+
+%% *Part I: Finite Element Methods: isoP2-P0 element*
+%
+% Given a triangulation (node,elem), the velocity space is the linear
+% finite element space on the uniform refinement of (node,elem) and the pressure
+% is piecewise constant space on the current mesh.
+
+%% Step 1: Data Structure
+% Given mesh will be refered as a coarse grid
+[node,elem] = squaremesh([-1,1,-1,1],0.25);
+NTc = size(elem,1);
+
+% Uniform refinement to a fine grid
+[node,elem] = uniformrefine(node,elem);
+
+%%
+% In the uniformrefine, the new elements are added in such an order that
+% triangles (t, NTc + t, 2*NTc + t, 3*NTc + t) are refined from the same
+% parent, where NTc is the number of triangles in the coarse grid.
+
+%% Step 2: Form matrices and right hand side for Laplacian
+%
+% Call your code for linear finite element methods. You can merge two
+% copies of Laplacian using |blkdiag|.
+
+%% Step 3: Form matrices for divergence operator
+%
+% Compute $\nabla \lambda_i$ on the fine grid 
+[Dlambda,area] = gradbasis(node,elem);
+
+%%
+% Assemble sparse matrices for divergence operator on the fine grid by
+% computing $\int_t \nabla \lambda_i dx$.
+%
+% Merge four terms in the above matrix to compute the divergence operator
+% on the coarse grid
+% $\int_{t, NTc + t, 2*NTc + t, 3*NTc + t} \,  \nabla \lambda_i\, dx$.
+
+%% Step 4: Modify equations to include boundary conditions
+%
+% Modify the right hand side to include Dirichlet or Neumann boundary
+% conditions. It is the same as the Poisson equation. Just repeat for each
+% component. For non-homogenous Dirichlet boundary condition, you need to
+% modify the continunity equation too. Recoard freeDof.
+
+%% Step 5: Solve the linear system
+%
+% Form a big matrix |bigA = [A B'; B sparse(Np,Np)]| and use the
+% direct solver to solve |bigA(bigFreeDof,bigFreeDof)\bigF(bigFreeDof)|
+%
+% Since the pressure is unique up to a constant, you need to eliminate the
+% constant kernel by not including one component of pressure vector in the
+% |bigFreeDof|. After you get the solution, you need to modify p such that
+% its weighted mean value is zero.
+
+%% *Part II: Finite Element Methods: nonforming P1-P0 element*
+%
+
+%% Step 1: Data Structure
+% Since the unknowns are associated to edges, you need to generate edges
+% and more importantly the indices map from a triangle to global indices of
+% its three edges.  The edges are labled such that the i-th edge is
+% opposite to the i-th vertex for i=1,2,3.
+
+[elem2edge,edge] = dofedge(elem);
+
+%% Step 2: Form matrices and right hand side
+%
+% Figure out the basis of CR element. _Hint: use barycenteric coordinates
+% it can be writeen as $1-2\lambda_i$_ 
+%
+% Call your code for linear finite element methods in Part I with the
+% correct scaling.
+%
+% Compute the righ hand side using three middle point rule. It is even
+% simplier than linear element case.
+
+%% Step 3: Modify equations to include boundary conditions
+%
+% Similar as in the linear element case. Just be careful on the Dirichlet
+% boundary condition, you need to evaluate g_D at middle points of boundary
+% edges.
+%
+% To find out the boundary edges, use
+
+s = accumarray(elem2edge(:), 1, [size(edge,1) 1]);
+
+%%
+% Then idx = (s==1) is the index of boundary edges and (s==2) is interiori
+% (free) edges.
+
+%% Step 4: Solve the linear system
+%
+% Same as the first Part.
+
+%% *Part III: Test Example*
+%
+% We use a simple model of colliding flow with analytic solutions to test
+% the code. The domain is [-1,1]^2 and the analytic solution is:
+%
+% $$u = 20xy^3; v = 5x^4 - 5y^4; p = 60x^2y - 20y^3 + constant.$$
+%
+% Compute the data f and Dirichlet boundary condition g_D and solve Stokes
+% equation on the unit square using methods in Part I,II,II and check the
+% rate of convergence.
+##### SOURCE END #####
+--></body></html>

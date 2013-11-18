@@ -1,0 +1,237 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>crack</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2010-12-29"><meta name="DC.source" content="crack.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">CRACK Problem</a></li><li><a href="#3">Arguments and Parameters</a></li><li><a href="#4">Generate an initial mesh</a></li><li><a href="#6">Get a fine mesh by uniform bisection</a></li><li><a href="#7">Set up PDE data</a></li><li><a href="#8">Adaptive Finite Element Method</a></li><li><a href="#9">Plot convergence rates</a></li><li><a href="#12">Data of CRACK</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> crack
+</pre><h2>CRACK Problem<a name="2"></a></h2><p>CRACK solves the Poisson equation <img src="crack_eq26437.png" alt="$-\Delta u =f$"> in <img src="crack_eq17683.png" alt="$\Omega$"> and <img src="crack_eq44336.png" alt="$u = g_D$"> on <img src="crack_eq02795.png" alt="$\partial \Omega$"> in a crack domain <img src="crack_eq05666.png" alt="$\Omega=\{|x|+|y|<1\}\backslash \{0<= x <=1, y=0\}$">  using adaptive finite element method (AFEM). We choose f=1 and g_D such  that the exact solution is <img src="crack_eq64204.png" alt="$u = r^{\beta}\sin(\beta\theta)-0.25r^2,  \beta = 1/2$"> in the polar coordinate.</p><p>To see the improvement using AFEM, see TODO: an example on AFEM vs FEM.</p><p>In CRACK_PERFORMANCE, to speed up the computation, the graphic output is skipped and the computational cost is plotted which shows the optimal linear complexity.</p><p>EXAMPLE    crack</p><p>See also  crack_performance, Lshape</p><p>Copyright (C)  Long Chen. See COPYRIGHT.txt for details.</p><pre class="codeinput">close <span class="string">all</span>
+</pre><h2>Arguments and Parameters<a name="3"></a></h2><pre class="codeinput">maxN = 2e3;     theta = 0.5;    maxIt = 50;
+N = zeros(maxIt,1);     errL2 = zeros(maxIt,1);     errH1 = zeros(maxIt,1);
+</pre><h2>Generate an initial mesh<a name="4"></a></h2><pre class="codeinput">node = [1,0; 0,1; -1,0; 0,-1; 0,0; 1,0];        <span class="comment">% nodes</span>
+elem = [5,1,2; 5,2,3; 5,3,4; 5,4,6];            <span class="comment">% elements</span>
+elem = label(node,elem);                        <span class="comment">% label the mesh</span>
+bdEdge = setboundary(node,elem,<span class="string">'Dirichlet'</span>);    <span class="comment">% Dirichlet boundary condition</span>
+showmesh(node,elem);                            <span class="comment">% plot mesh</span>
+findelem(node,elem);                            <span class="comment">% plot element indices</span>
+findnode(node,1:5);                             <span class="comment">% plot node indices</span>
+findedge(node,[1 5; 5 6],1);                    <span class="comment">% plot the crack edge</span>
+text(node(6,1)+0.05,node(6,2)+0.075,int2str(6), <span class="keyword">...</span>
+     <span class="string">'FontSize'</span>,14,<span class="string">'FontWeight'</span>,<span class="string">'bold'</span>);
+</pre><img vspace="5" hspace="5" src="crack_01.png" alt=""> <p>node 1 and node 6 are the same point (1,0)</p><h2>Get a fine mesh by uniform bisection<a name="6"></a></h2><pre class="codeinput"><span class="keyword">for</span> k = 1:2
+    [node,elem,bdEdge] = uniformbisect(node,elem,bdEdge);
+<span class="keyword">end</span>
+clf; showmesh(node,elem);
+</pre><img vspace="5" hspace="5" src="crack_02.png" alt=""> <h2>Set up PDE data<a name="7"></a></h2><pre class="codeinput">pde.f = @f;
+pde.g_D = @exactu;
+</pre><h2>Adaptive Finite Element Method<a name="8"></a></h2><p><b>SOLVE</b> -&gt; <b>ESTIMATE</b> -&gt; <b>MARK</b> -&gt; <b>REFINE</b></p><pre class="codeinput"><span class="keyword">for</span> k = 1:maxIt
+    <span class="comment">% Step 1: SOLVE</span>
+    u = Poisson(node,elem,bdEdge,pde);
+    <span class="comment">% Plot mesh and solution</span>
+    figure(1);  showresult(node,elem,u,[-7,12]);
+    <span class="comment">% Step 2: ESTIMATE</span>
+    eta = estimaterecovery(node,elem,u);            <span class="comment">% recovery type</span>
+<span class="comment">%     eta = estimateresidual(node,elem,u,@f);    % residual type</span>
+    <span class="comment">% Record error and number of vertices</span>
+    errL2(k) = getL2error(node,elem,@exactu,u);
+    errH1(k) = getH1error(node,elem,@Du,u);
+    N(k) = size(node,1);
+    <span class="keyword">if</span> (N(k)&gt;maxN), <span class="keyword">break</span>; <span class="keyword">end</span>
+    <span class="comment">% Step 3: MARK</span>
+    markedElem = mark(elem,eta,theta);
+    <span class="comment">% Step 4: REFINE</span>
+    [node,elem,bdEdge] = bisect(node,elem,markedElem,bdEdge);
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="crack_03.png" alt=""> <h2>Plot convergence rates<a name="9"></a></h2><pre class="codeinput">N= N(1:k);  errH1 = errH1(1:k);     errL2 = errL2(1:k);
+figure(2);
+r1 = showrate(N,errH1,3,<span class="string">'-*'</span>);
+hold <span class="string">on</span>;
+r2 = showrate(N,errL2,3,<span class="string">'k-+'</span>);
+legend(<span class="string">'||Du-Du_h||'</span>,[<span class="string">'N^{'</span> num2str(r1) <span class="string">'}'</span>], <span class="keyword">...</span>
+       <span class="string">'||u-u_h||'</span>,[<span class="string">'N^{'</span> num2str(r2) <span class="string">'}'</span>], <span class="keyword">...</span>
+       <span class="string">'LOCATION'</span>,<span class="string">'Best'</span>);
+</pre><img vspace="5" hspace="5" src="crack_04.png" alt=""> <p>Using AFEM, we obtain optimal rate of convergence the error in the energy norm (<img src="crack_eq25678.png" alt="$N^{-0.5}$">) and in the <img src="crack_eq30040.png" alt="$L^2$"> norm (<img src="crack_eq10041.png" alt="$N^{-1}$">).</p><pre class="codeinput"><span class="keyword">end</span> <span class="comment">% End of function CRACK</span>
+</pre><h2>Data of CRACK<a name="12"></a></h2><pre class="codeinput"><span class="keyword">function</span> z = f(p)   <span class="comment">% load data (right hand side function)</span>
+z = ones(size(p,1),1);
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> z = exactu(p) <span class="comment">% exact solution</span>
+r = sqrt(sum(p.^2,2));
+z = sqrt(0.5*(r-p(:,1)))-0.25*r.^2;
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> z = Du(p) <span class="comment">% derivative of the exact solution</span>
+r = sqrt(sum(p.^2,2));
+z(:,1) = (p(:,1)./r-1)./sqrt(8*(r-p(:,1)))-0.5*p(:,1); <span class="comment">% u_x</span>
+z(:,2) = p(:,2)./r./sqrt(8*(r-p(:,1)))-0.5*p(:,2);     <span class="comment">% u_y</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">#dof:     2339; level  4; coarse grid 554
+#dof:     2339, MGCG iter:  8, err = 3.7152186e-11
+ 
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+function crack
+%% CRACK Problem
+%
+% CRACK solves the Poisson equation $-\Delta u =f$ in $\Omega$ and $u =
+% g_D$ on $\partial \Omega$ in a crack domain
+% $\Omega=\{|x|+|y|<1\}\backslash \{0<= x <=1, y=0\}$
+%  using adaptive finite element method (AFEM). We choose f=1 and g_D such
+%  that the exact solution is $u = r^{\beta}\sin(\beta\theta)-0.25r^2,
+%  \beta = 1/2$ in the polar coordinate.
+%
+% To see the improvement using AFEM, see 
+% TODO: an example on AFEM vs FEM.
+%
+% In CRACK_PERFORMANCE, to speed up the computation, the graphic output is
+% skipped and the computational cost is plotted which shows the optimal
+% linear complexity.
+%
+% EXAMPLE
+%    crack 
+%
+% See also  crack_performance, Lshape
+%
+% Copyright (C)  Long Chen. See COPYRIGHT.txt for details.
+
+close all
+%% Arguments and Parameters
+maxN = 2e3;     theta = 0.5;    maxIt = 50; 
+N = zeros(maxIt,1);     errL2 = zeros(maxIt,1);     errH1 = zeros(maxIt,1);
+
+%%  Generate an initial mesh
+node = [1,0; 0,1; -1,0; 0,-1; 0,0; 1,0];        % nodes
+elem = [5,1,2; 5,2,3; 5,3,4; 5,4,6];            % elements
+elem = label(node,elem);                        % label the mesh
+bdEdge = setboundary(node,elem,'Dirichlet');    % Dirichlet boundary condition
+showmesh(node,elem);                            % plot mesh
+findelem(node,elem);                            % plot element indices
+findnode(node,1:5);                             % plot node indices
+findedge(node,[1 5; 5 6],1);                    % plot the crack edge
+text(node(6,1)+0.05,node(6,2)+0.075,int2str(6), ...
+     'FontSize',14,'FontWeight','bold');
+%% 
+% node 1 and node 6 are the same point (1,0)
+
+%%  Get a fine mesh by uniform bisection
+for k = 1:2
+    [node,elem,bdEdge] = uniformbisect(node,elem,bdEdge);
+end
+clf; showmesh(node,elem);
+
+%% Set up PDE data
+pde.f = @f;
+pde.g_D = @exactu;
+
+%%  Adaptive Finite Element Method
+% *SOLVE* -> *ESTIMATE* -> *MARK* -> *REFINE*
+for k = 1:maxIt
+    % Step 1: SOLVE
+    u = Poisson(node,elem,bdEdge,pde);
+    % Plot mesh and solution
+    figure(1);  showresult(node,elem,u,[-7,12]);    
+    % Step 2: ESTIMATE
+    eta = estimaterecovery(node,elem,u);            % recovery type
+%     eta = estimateresidual(node,elem,u,@f);    % residual type
+    % Record error and number of vertices
+    errL2(k) = getL2error(node,elem,@exactu,u);
+    errH1(k) = getH1error(node,elem,@Du,u);
+    N(k) = size(node,1);
+    if (N(k)>maxN), break; end        
+    % Step 3: MARK
+    markedElem = mark(elem,eta,theta);
+    % Step 4: REFINE
+    [node,elem,bdEdge] = bisect(node,elem,markedElem,bdEdge);
+end
+
+%% Plot convergence rates
+N= N(1:k);  errH1 = errH1(1:k);     errL2 = errL2(1:k); 
+figure(2);
+r1 = showrate(N,errH1,3,'-*');
+hold on;
+r2 = showrate(N,errL2,3,'k-+');
+legend('||Du-Du_h||',['N^{' num2str(r1) '}'], ...
+       '||u-u_h||',['N^{' num2str(r2) '}'], ...
+       'LOCATION','Best');
+%%
+% Using AFEM, we obtain optimal rate of convergence the error in the energy
+% norm ($N^{-0.5}$) and in the $L^2$ norm ($N^{-1}$).
+end % End of function CRACK
+
+
+%%  Data of CRACK
+function z = f(p)   % load data (right hand side function)
+z = ones(size(p,1),1);
+end
+
+function z = exactu(p) % exact solution
+r = sqrt(sum(p.^2,2));
+z = sqrt(0.5*(r-p(:,1)))-0.25*r.^2;
+end
+
+function z = Du(p) % derivative of the exact solution
+r = sqrt(sum(p.^2,2));
+z(:,1) = (p(:,1)./r-1)./sqrt(8*(r-p(:,1)))-0.5*p(:,1); % u_x
+z(:,2) = p(:,2)./r./sqrt(8*(r-p(:,1)))-0.5*p(:,2);     % u_y
+end
+##### SOURCE END #####
+--></body></html>

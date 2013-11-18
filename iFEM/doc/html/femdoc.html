@@ -1,0 +1,180 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Finite Element Methods</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-10-17"><meta name="DC.source" content="femdoc.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Finite Element Methods</h1><!--introduction--><pre>We use the linear finite element method for solving the Poisson equation
+as an example to illustrate the main ingredients of finite element
+methods.</pre><p>Reference:</p><div><ul><li><a href="http://www.math.uci.edu/~chenlong/226/Ch2FEM.pdf">Introduction to Finite Element Methods</a></li><li><a href="http://www.math.uci.edu/~chenlong/226/Ch3FEMcode.pdf">Progamming of Finite Element Methods</a></li></ul></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Variational formulation</a></li><li><a href="#2">Finite element space</a></li><li><a href="#5">Matrix assembeling</a></li><li><a href="#6">Right hand side</a></li><li><a href="#7">Boundary condition</a></li></ul></div><h2>Variational formulation<a name="1"></a></h2><p>The classic formulation of the Poisson equation reads as</p><p><img src="femdoc_eq59254.png" alt="$$ - \Delta u = f  \hbox{ in }  \Omega, \qquad u  = g_D  \hbox{ on }&#xA;\Gamma _D,  \qquad  \nabla u\cdot n = g_N  \hbox{ on } \Gamma _N, $$"></p><p>where <img src="femdoc_eq43513.png" alt="$\partial \Omega = \Gamma _D\cup \Gamma _N$"> and <img src="femdoc_eq83431.png" alt="$\Gamma _D\cap \Gamma _N=\emptyset$">. We assume <img src="femdoc_eq06316.png" alt="$\Gamma _D$"> is closed and <img src="femdoc_eq86897.png" alt="$\Gamma _N$"> open.</p><p>Denoted by <img src="femdoc_eq82076.png" alt="$H_{g_D}^1(\Omega)=\{v\in L^2(\Omega), \nabla v\in L^2(\Omega) \hbox{ and } v|_{\Gamma _D} = g_D\}$">. Multiplying the Poisson equation by a test function <img src="femdoc_eq77996.png" alt="$v$"> and using integration by parts, we obtain the weak formulation of the Poisson equation: find <img src="femdoc_eq76493.png" alt="$u\in H_{g_D}^1(\Omega)$"> such that for all <img src="femdoc_eq68010.png" alt="$v\in H_{0_D}^1$">:</p><p><img src="femdoc_eq75660.png" alt="$$ a(u,v) := \int _{\Omega} \nabla u\cdot \nabla v\, {\rm dxdy} = \int _{\Omega} fv \, {\rm dxdy} + \int _{\Gamma _N} g_N v \,{dS}.$$"></p><p>Let <img src="femdoc_eq12063.png" alt="$\mathcal T$"> be a triangulation of <img src="femdoc_eq17683.png" alt="$\Omega$">. We define the linear finite element space on <img src="femdoc_eq12063.png" alt="$\mathcal T$"> as</p><p><img src="femdoc_eq93084.png" alt="$$&#xA;\mathcal V_{\mathcal T} = \{v\in C(\bar \Omega) : v|_{\tau}\in \mathcal P_k, \forall \tau \in \mathcal T\}.&#xA;$$"></p><p>where <img src="femdoc_eq42368.png" alt="$\mathcal P_k$"> is the polynomial space with degree <img src="femdoc_eq30994.png" alt="$\leq k$">.</p><p>The finite element method for solving the Poisson equation is to find <img src="femdoc_eq88798.png" alt="$u\in \mathcal V_{\mathcal T}\cap H_{g_D}^1(\Omega)$"> such that for all <img src="femdoc_eq08824.png" alt="$v\in \mathcal V_{\mathcal T}\cap H_{0_D}^1(\Omega)$">:</p><p><img src="femdoc_eq99525.png" alt="$$ a(u,v) = \int _{\Omega} fv \, {\rm dxdy} + \int _{\Gamma _N} g_N v \,{dS}.$$"></p><h2>Finite element space<a name="2"></a></h2><p>We take linear finite element spaces as an example. For each vertex <img src="femdoc_eq00599.png" alt="$v_i$"> of <img src="femdoc_eq12063.png" alt="$\mathcal T$">, let <img src="femdoc_eq38194.png" alt="$\phi _i$"> be the piecewise linear function such that <img src="femdoc_eq29681.png" alt="$\phi _i(v_i)=1$"> and <img src="femdoc_eq65865.png" alt="$\phi _i(v_j)=0$"> when <img src="femdoc_eq89282.png" alt="$j\neq i$">. The basis function in 1-D and 2-D is illustrated below. It is also called hat function named after the shape of its graph.</p><pre class="codeinput">clf;
+x = 0:1/5:1;
+u = zeros(length(x),1);
+u(2) = 1;
+figure(1)
+set(gcf,<span class="string">'Units'</span>,<span class="string">'normal'</span>); set(gcf,<span class="string">'Position'</span>,[0,0,0.4,0.3]);
+subplot(1,2,1); hold <span class="string">on</span>;
+plot(x,0,<span class="string">'k.'</span>,<span class="string">'MarkerSize'</span>,18);
+plot(x,u,<span class="string">'-'</span>,<span class="string">'linewidth'</span>,1.2);
+subplot(1,2,2); hold <span class="string">on</span>;
+<span class="keyword">for</span> k = 1:length(x)
+    u = zeros(length(x),1); u(k) = 1;
+    plot(x,0,<span class="string">'k.'</span>,<span class="string">'MarkerSize'</span>,18);
+    plot(x,u,<span class="string">'-'</span>,<span class="string">'linewidth'</span>,1.2);
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="femdoc_01.png" alt=""> <p>2-D hat basis</p><pre class="codeinput">clf; set(gcf,<span class="string">'Units'</span>,<span class="string">'normal'</span>); set(gcf,<span class="string">'Position'</span>,[0,0,0.4,0.4]);
+node = [0,0; 1,0; 1,1; 0,1];
+elem = [2 3 1; 4 1 3];
+[node,elem] = uniformrefine(node,elem);
+[node,elem] = uniformrefine(node,elem);
+u = zeros(size(node,1),1);
+u(6) = 1;
+showmesh(node,elem,<span class="string">'facecolor'</span>,<span class="string">'none'</span>); hold <span class="string">on</span>;
+showsolution(node,elem,u,[30,26],<span class="string">'facecolor'</span>,<span class="string">'g'</span>,<span class="string">'facealpha'</span>,0.5,<span class="string">'edgecolor'</span>,<span class="string">'k'</span>);
+</pre><img vspace="5" hspace="5" src="femdoc_02.png" alt=""> <p>Then it is easy to see <img src="femdoc_eq97037.png" alt="$\mathcal V_{\mathcal T}$"> is spanned by <img src="femdoc_eq94620.png" alt="$\{\phi _i\}_{i=1}^{N}$"> and thus for a finite element function <img src="femdoc_eq19390.png" alt="$v=\sum _{i=1}^Nv_i\phi _i$">.</p><h2>Matrix assembeling<a name="5"></a></h2><h2>Right hand side<a name="6"></a></h2><h2>Boundary condition<a name="7"></a></h2><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Finite Element Methods
+%
+%  We use the linear finite element method for solving the Poisson equation
+%  as an example to illustrate the main ingredients of finite element
+%  methods.
+%
+% Reference: 
+%
+% * <http://www.math.uci.edu/~chenlong/226/Ch2FEM.pdf Introduction to Finite Element Methods>
+% * <http://www.math.uci.edu/~chenlong/226/Ch3FEMcode.pdf Progamming of Finite Element Methods>
+
+%% Variational formulation
+%
+% The classic formulation of the Poisson equation reads as
+%
+% $$ - \Delta u = f  \hbox{ in }  \Omega, \qquad u  = g_D  \hbox{ on }
+% \Gamma _D,  \qquad  \nabla u\cdot n = g_N  \hbox{ on } \Gamma _N, $$
+%
+% where $\partial \Omega = \Gamma _D\cup \Gamma _N$ and $\Gamma _D\cap \Gamma _N=\emptyset$. 
+% We assume $\Gamma _D$ is closed and $\Gamma _N$ open.
+% 
+% Denoted by $H_{g_D}^1(\Omega)=\{v\in L^2(\Omega), \nabla v\in L^2(\Omega)
+% \hbox{ and } v|_{\Gamma _D} = g_D\}$. Multiplying the Poisson equation by
+% a test function $v$ and using integration by parts, we obtain the weak
+% formulation of the Poisson equation: find $u\in H_{g_D}^1(\Omega)$ such
+% that for all $v\in H_{0_D}^1$:
+%
+% $$ a(u,v) := \int _{\Omega} \nabla u\cdot \nabla v\, {\rm dxdy} = \int _{\Omega} fv \, {\rm dxdy} + \int _{\Gamma _N} g_N v \,{dS}.$$
+%
+% Let $\mathcal T$ be a triangulation of $\Omega$. We define the linear
+% finite element space on $\mathcal T$ as 
+% 
+% $$
+% \mathcal V_{\mathcal T} = \{v\in C(\bar \Omega) : v|_{\tau}\in \mathcal P_k, \forall \tau \in \mathcal T\}. 
+% $$
+%
+% where $\mathcal P_k$ is the polynomial space with degree $\leq k$. 
+%
+% The finite element method for solving the Poisson
+% equation is to find $u\in \mathcal V_{\mathcal T}\cap H_{g_D}^1(\Omega)$ 
+% such that for all $v\in \mathcal V_{\mathcal T}\cap H_{0_D}^1(\Omega)$:
+%
+% $$ a(u,v) = \int _{\Omega} fv \, {\rm dxdy} + \int _{\Gamma _N} g_N v \,{dS}.$$
+%
+%
+%% Finite element space
+%
+% We take linear finite element spaces as an example. For each vertex $v_i$
+% of $\mathcal T$, let $\phi _i$ be the piecewise linear function such that
+% $\phi _i(v_i)=1$ and $\phi _i(v_j)=0$ when $j\neq i$. The basis function
+% in 1-D and 2-D is illustrated below. It is also called hat function named
+% after the shape of its graph.
+% 
+clf;
+x = 0:1/5:1;
+u = zeros(length(x),1);
+u(2) = 1;
+figure(1)
+set(gcf,'Units','normal'); set(gcf,'Position',[0,0,0.4,0.3]);
+subplot(1,2,1); hold on; 
+plot(x,0,'k.','MarkerSize',18); 
+plot(x,u,'-','linewidth',1.2);
+subplot(1,2,2); hold on;
+for k = 1:length(x)
+    u = zeros(length(x),1); u(k) = 1;
+    plot(x,0,'k.','MarkerSize',18); 
+    plot(x,u,'-','linewidth',1.2);
+end
+%%
+% 2-D hat basis
+clf; set(gcf,'Units','normal'); set(gcf,'Position',[0,0,0.4,0.4]);
+node = [0,0; 1,0; 1,1; 0,1];
+elem = [2 3 1; 4 1 3];
+[node,elem] = uniformrefine(node,elem);
+[node,elem] = uniformrefine(node,elem);
+u = zeros(size(node,1),1);
+u(6) = 1;
+showmesh(node,elem,'facecolor','none'); hold on;
+showsolution(node,elem,u,[30,26],'facecolor','g','facealpha',0.5,'edgecolor','k');
+%%
+% Then it is easy to see $\mathcal V_{\mathcal T}$ is spanned by $\{\phi
+% _i\}_{i=1}^{N}$ and thus for a finite element function $v=\sum
+% _{i=1}^Nv_i\phi _i$.  
+
+
+%% Matrix assembeling
+
+
+%% Right hand side
+
+%% Boundary condition
+
+##### SOURCE END #####
+--></body></html>

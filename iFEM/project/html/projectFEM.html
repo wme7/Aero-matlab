@@ -1,0 +1,144 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Project: Linear Finite Element Methods</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-10-26"><meta name="DC.source" content="projectFEM.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Project: Linear Finite Element Methods</h1><!--introduction--><p>The purpose of this project is to write a finite element code for solving the Poisson equation in a general polygonal domain using piecewise linear finite elements.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Step 1: Download and Install iFEM</a></li><li><a href="#2">Step 2: Mesh</a></li><li><a href="#5">Step 3: Assembling</a></li><li><a href="#7">Step 4: Right hand side</a></li><li><a href="#8">Step 5: Boundary conditions</a></li><li><a href="#9">Step 6: Convergence</a></li></ul></div><h2>Step 1: Download and Install iFEM<a name="1"></a></h2><div><ul><li>Download <a href="https://bitbucket.org/ifem/ifem/get/tip.zip">iFEM</a></li><li>Unzip the file to where you like</li><li>In MATLAB, go to the iFEM folder</li><li>Run <tt>setpath.m</tt></li></ul></div><h2>Step 2: Mesh<a name="2"></a></h2><div><ul><li>Generate mesh for square and disk domains</li></ul></div><pre class="codeinput">[node,elem] = squaremesh([0,1,0,1],0.25);
+showmesh(node,elem);
+</pre><img vspace="5" hspace="5" src="projectFEM_01.png" alt=""> <pre class="codeinput">[node,elem] = circlemesh(0,0,1,0.2);
+showmesh(node,elem);
+</pre><img vspace="5" hspace="5" src="projectFEM_02.png" alt=""> <div><ul><li>Uniform refine to get a finer mesh</li></ul></div><pre class="codeinput">[node,elem] = uniformrefine(node,elem);
+showmesh(node,elem);
+</pre><img vspace="5" hspace="5" src="projectFEM_03.png" alt=""> <h2>Step 3: Assembling<a name="5"></a></h2><p>Compare three ways of assembling stiffness matrix discussed in <a href="http://math.uci.edu/~chenlong/226/Ch3FEMCode.pdf">Programming of FEM</a>.</p><pre>   profile on
+   tic; assemblingstandard; toc;
+   tic; assemblingsparse; toc;
+   tic; assembling; toc;
+   profile viewer</pre><p>Compare the computational time for different N (by uniform refinement of the initial mesh).</p><h2>Step 4: Right hand side<a name="7"></a></h2><p>Using three points quadrature (i.e. 3 middle points of a triangle) to compute the right hand side vector.</p><h2>Step 5: Boundary conditions<a name="8"></a></h2><div><ul><li>Use <tt>findboundary.m</tt> to get all boundary nodes and edges</li><li>Code pure Dirichlet boundary condition</li><li>Code pure Neumann boundary condition</li><li>(<b>optional</b>) Code pure Robin boundary condition        <img src="projectFEM_eq75195.png" alt="$u + d\nabla u\cdot n = g_R$"> on the boundary</li></ul></div><h2>Step 6: Convergence<a name="9"></a></h2><div><ul><li>Choose a smooth solution, say <img src="projectFEM_eq66904.png" alt="$u = \sin(2\pi x)\cos(2\pi y)$">, calculate the right hand side f and boundary conditions for the unit square.</li><li>Use your subroutine to get an approximation and use <tt>showresult</tt> to plot the mesh and the solution.</li><li>Use <tt>uniformrefine.m</tt> to refine the grid and compute a sequence of solutions.</li><li>Compute the error in H1 norm and L2 norm using <tt>getH1error</tt> and <tt>getL2error</tt>.</li><li>Compute the error | <tt>|D u_I - D u_h</tt>| |, where |u_I |  is the nodal interpolation, using the stiffness matrix.</li><li>Use <tt>showrate</tt> to plot the error and the rate of convergence.</li></ul></div><p>Code your subroutine in a general way such that you can solve the Poisson equation on a different mesh by changing the input arguments. After you get the desireable results for the unit square, try to solve <img src="projectFEM_eq15562.png" alt="$-\Delta u = 1$"> with homogenous Neumann boundary conditions on the unit disk. The exact solution can be found using the polar coordinate.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Project: Linear Finite Element Methods
+%
+% The purpose of this project is to write a finite element code for
+% solving the Poisson equation in a general polygonal domain using
+% piecewise linear finite elements. 
+
+%% Step 1: Download and Install iFEM
+%
+% * Download <https://bitbucket.org/ifem/ifem/get/tip.zip iFEM>
+% * Unzip the file to where you like
+% * In MATLAB, go to the iFEM folder  
+% * Run |setpath.m|
+
+%% Step 2: Mesh
+%
+% * Generate mesh for square and disk domains
+[node,elem] = squaremesh([0,1,0,1],0.25);
+showmesh(node,elem);
+%%
+[node,elem] = circlemesh(0,0,1,0.2);
+showmesh(node,elem);
+%%
+% * Uniform refine to get a finer mesh
+[node,elem] = uniformrefine(node,elem);
+showmesh(node,elem);
+
+%% Step 3: Assembling 
+%
+% Compare three ways of assembling stiffness matrix discussed in <http://math.uci.edu/~chenlong/226/Ch3FEMCode.pdf Programming of FEM>.
+% 
+%     profile on
+%     tic; assemblingstandard; toc;
+%     tic; assemblingsparse; toc;
+%     tic; assembling; toc;
+%     profile viewer
+
+%%
+% Compare the computational time for different N (by uniform refinement of
+% the initial mesh).
+
+%% Step 4: Right hand side
+%
+% Using three points quadrature (i.e. 3 middle points of a triangle) to
+% compute the right hand side vector.
+
+%% Step 5: Boundary conditions
+%
+% * Use |findboundary.m| to get all boundary nodes and edges
+% * Code pure Dirichlet boundary condition 
+% * Code pure Neumann boundary condition
+% * (*optional*) Code pure Robin boundary condition
+%        $u + d\nabla u\cdot n = g_R$ on the boundary
+
+%% Step 6: Convergence
+%
+% * Choose a smooth solution, say $u = \sin(2\pi x)\cos(2\pi y)$, calculate the
+% right hand side f and boundary conditions for the unit square. 
+% * Use your subroutine to get an approximation and use |showresult| to plot
+% the mesh and the solution.
+% * Use |uniformrefine.m| to refine the grid and compute a sequence of
+% solutions.
+% * Compute the error in H1 norm and L2 norm using |getH1error| and
+% |getL2error|.
+% * Compute the error | ||D u_I - D u_h|| |, where |u_I |  is the nodal
+% interpolation, using the stiffness matrix.
+% * Use |showrate| to plot the error and the rate of convergence.
+%
+% Code your subroutine in a general way such that you can solve the Poisson
+% equation on a different mesh by changing the input arguments. After you
+% get the desireable results for the unit square, try to solve $-\Delta u =
+% 1$ with homogenous Neumann boundary conditions on the unit disk. The
+% exact solution can be found using the polar coordinate.
+##### SOURCE END #####
+--></body></html>

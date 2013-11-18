@@ -1,0 +1,619 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Simplicial Complex in Two Dimensions</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-02-09"><meta name="DC.source" content="scdoc.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Simplicial Complex in Two Dimensions</h1><!--introduction--><p>We dsecribe the data structure of the simplicial complex associated to a two dimensional trianglulation give by <tt>node,elem</tt> . The <tt>node</tt> records the coordinates of vertices and <tt>elem</tt> is the pointer from local to global incices of vertices. See <a href="meshdoc.html">meshdoc</a> for details.</p><p>A brief summary of ordering and orientation</p><div><ul><li>edge: asecond ordering, i.e. edge(:,1)&lt;edge(:,2)</li></ul></div><div><ul><li>elem: positive ordering or ascend ordering. The default one is positive ordering and the asecond ordering is used for edge elements.</li></ul></div><div><ul><li>local edge:   consistent orientation [2 3; 3 1; 1 2];   asecond orientation    [2 3; 1 3; 1 2]; The default one is the consistent orientation which will be counter-clockwise if elem is positive ordered. The asecond orientation will be used for edge elements.</li></ul></div><div><ul><li>elem2edgeSign: records the inconsistency of the edge  orientation and the induced orientation.</li></ul></div><p>Local edge is the induced orientation [2 3; 3 1; 1 2].  elem2edgeSign(1:NT,1:4) records the elementwise inconsistency of local  edge orientation and global edge orientation. It can be obtained from  <tt>dofedge</tt>. This is used to correct the consistency of the local basis  with the global basis.</p><p>Both elem and local edges are ascend ordering. Then elem2edgeSign =  [1 -1 1] records the inconsistency of the edge orientation and the  induced orientation. This is used to construct differential operators.</p><p>Function to call</p><pre>[elem2edge,edge,elem2edgeSign,edgeSign] = dofedge(elem);</pre><p>Functions to read on the usage</p><pre>PoissonRT0;</pre><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#4">Indexing of Simplexes</a></li><li><a href="#8">Ordering of Vertices</a></li><li><a href="#15">Orientation of Simplexes</a></li><li><a href="#21">Positive Ordering and Orientation</a></li><li><a href="#22">Ascend Ordering and Orientation</a></li><li><a href="#23">An Example</a></li></ul></div><p>The basic data structure of a mesh consists of node and elem:</p><pre class="codeinput">node = [0,0; 1,0; 1,1; 0,1];    <span class="comment">% nodes</span>
+elem = [2,3,1; 4,1,3];          <span class="comment">% elements</span>
+</pre><p>In iFEM, <tt>N, NE, NT</tt> represents the muber of vertice, edges, triangles respectively.</p><pre class="codeinput">N = size(node,1); NT = size(elem,1); <span class="comment">% NE = size(edge,1);</span>
+</pre><p>The corresponding simplicial complex consists of vertices, edges and triangles. We shall discuss the following three issues:</p><div><ul><li><b>Indexing</b> of simplexes</li><li><b>Ordering</b> of vertices of simplexes</li><li><b>Orientatoin</b> of simplexes</li></ul></div><p>The indexing and ordering are related and the ordering and orientation are mixed together. However the indexing has nothing to do with the orientation. The indexing and ordering are the combinarotry structure, i.e. only <tt>elem</tt> is needed, while the orientation also depends on <tt>node</tt>, the geometry emembdding of vertices.</p><p>For indexing, ordering and orientation, there are always local and global version. The relation between the local and global version is the most complicated issue.</p><h2>Indexing of Simplexes<a name="4"></a></h2><p>The indexing refers to the numbering of simplexes, e.g., which edge is numbered as the first one. There are two types of the indexing: local and global. Each simplex in the simplicial complex has a unique index which is called the global index. In one triangle, the three vertices and three edges have their local index from 1:3.</p><p>In the assembling procedure of finite element methods, an element-wise matrix using local indexing is first computed and then assembled to get a big matrix using global indexing. Thus the pointer from the local indexing to the global indexing is indispensible. For bases independent of the ordering and orientation, e.g., <tt>P1</tt> and <tt>P2</tt> elements, the pointer is sufficient, otherwise, the inconsistency of local ordering/orientation and global ordering/orientation should be taken into account.</p><p><b>Indexing pointers of vertices</b></p><p>The <tt>NT</tt> by 3 matrix <tt>elem</tt> is indeed the pointer from the local to the global indices of vertices of triangles. For example <tt>elem(t,1)=25</tt> means the first vertex of the triangle t is the 25-th vertex.</p><p>Similiary, the <tt>NE</tt> by 2 matrix <tt>edge</tt> records the pointer from the local to the global indices of vertices of edges.</p><p><b>Local indexing of edges</b></p><p>The triangle constists of three vertices indexed as [1,2,3]. Each triangle contains three edges. There are two indexing schemes for edges.</p><div><ul><li>Opposite indexing     <tt>locEdge = [2,3; 3,1; 1,2]</tt></li></ul></div><p>In <tt>locEdge</tt>, the <tt>i-th</tt> edge is opposite to the <tt>i-th</tt> verices and thus called <i>opposite indexing</i>.</p><div><ul><li>Lexicogrphic indexing <tt>locEdgel = [1,2; 1,3; 2,3]</tt></li></ul></div><p>In <tt>locEdgel</tt>, the indexing is induced from the lexicographic ordering of the three edges.</p><p>For 2-D triangulations, <b>we shall always chose opposite indexing</b>. The lexicographic indexing is mainly used in the construction of <tt>face2edge</tt> of 3-D triangulations; see <a href="sc3doc.html">Simplicial Complex in Three Dimensions</a> for details. Note that the ordering of vertices of each edge will not change the indexing. For example, <tt>locEdge = [2,3; 1,3; 1,2]</tt> use the same opposite indexing but different ordering. Chosing <tt>[1 3]</tt> or <tt>[3 1]</tt> for the second edge will depend on the consideration of orientation and ordering.</p><p><b>Global indexing of edges</b></p><p>One can easily collect all edges elementwise. The issue is the duplication. For example, each interior edge will be counted twice. The <tt>unique</tt> funciton is applied such that each edge has a unique global index.</p><pre class="codeinput">totalEdge = uint32([elem(:,[2,3]); elem(:,[3,1]); elem(:,[1,2])]);
+sortedTotalEdge = sort(totalEdge,2);
+[edge,tempvar,je] = unique(sortedTotalEdge,<span class="string">'rows'</span>);
+NE = size(edge,1);
+</pre><p><b>Edge pointer</b></p><p><tt>elem2edge(1:NT,1:3)</tt> records the pointer from the local index to the global index of edges. For example, <tt>elem2edge(t,1)</tt> = 10 means the first edge of triangle <tt>t</tt> (which is formed by [2 3] vertices of <tt>t</tt>) is the <tt>10-th</tt> one in the <tt>edge</tt> array.</p><p>Such information is stored in the third output of <tt>unique</tt> function.</p><pre class="codeinput">elem2edge = uint32(reshape(je,NT,3));
+</pre><p>Note that the pointer <tt>elem2edge</tt> depends on the local indexing of edges used in the generation of <tt>totalEdge</tt>. Here the opposite indexing of three local edges is used.</p><h2>Ordering of Vertices<a name="8"></a></h2><p>We discuss the ordering of vertices of simplexes. Again there are local ordering and global ordering. They may not be consistent and a sign array is used to record the inconsistency if any.</p><p>The local ordering refers to the ordering of local veritces of a simplex. The local ordering could be used in the formulation of the local basis and thus the ordering does matter.</p><p>The global ordering refers to the ordering of the global index of vertices of a simplex.</p><p><b>elem</b>. The local ordering is always [1,2,3]. Any permutation of three veritces of a triangle still represents the same triangle. Such freedom provide a room to record more information like:</p><div><ul><li>global ordering of vertices</li><li>orientation of triangles</li><li>refinement rule</li></ul></div><p>Two types of ordering of <tt>elem</tt> is of particular importance</p><div><ul><li>Positive ordering</li><li>Ascend ordering</li></ul></div><p>In the positive ordering, the three vertices are ordered such that the signed area, det(v12,v13), is positive. If <tt>elem</tt> is not positive ordered, <tt>elem = fixorder(node,elem)</tt> will compute the signed area by <tt>simplexvolume(node,elem)</tt> and switch the vertices for triangles with negative areas.</p><p>For 2-D triangulations, three vertices of a triangle in 2-D is sorted counter-cloclwise and the first vertex is chosen as the newest vertex. Such ordering enables the efficient implementation of local refinement and coarsening in 2-D; see <a href="bisectdoc.html">Bisection in Two Dimensions</a> and <a href="coarsendoc.html">Coarsening in Two Dimensions</a>. <b>Such ordering scheme is the default choice and used in most places</b>.</p><p>In ascend ordering, the vertices of <tt>elem</tt> is sorted such that <tt>elem(t,1)&lt;elem(t,2)&lt;elem(t,3)</tt>. This can be easily achieved by <tt>elem = sort(elem,2)</tt>. Howevery, one has to rotate the boundary flag accordingly using <tt>sortelem</tt>.</p><pre class="codeinput">bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+display(<span class="string">'Before rotation'</span>); display(elem); display(bdFlag);
+
+[elem,bdFlag] = sortelem(elem,bdFlag);
+display(<span class="string">'After rotation'</span>); display(elem); display(bdFlag);
+</pre><pre class="codeoutput">Before rotation
+
+elem =
+
+     2     3     1
+     4     1     3
+
+
+bdFlag =
+
+    0    1    1
+    0    1    1
+
+After rotation
+
+elem =
+
+     1     2     3
+     1     3     4
+
+
+bdFlag =
+
+    1    0    1
+    1    1    0
+
+</pre><p>Ascend ordering will benefit the construction of local bases for high order basis or basis with orientation.</p><p>We may switch the default positive ordering of <tt>elem</tt> to ascend ordering when generating data structure for finite element basis. However such sorting is always hidden in the subroutines when a finite element basis requiring ordering is generated; see <tt>PoissonRT0</tt> and <tt>PoissonBDM1</tt>.</p><p><b>edge</b>. The global ordering of edges is always ascended, i.e.</p><pre class="codeinput">edge(:,1) &lt; edge(:,2);
+</pre><p>Indeed in the generation of <tt>edge</tt>, the <tt>totalEdge</tt> is sorted to the ascend ordering such that <tt>unique</tt> can be applied.</p><p>Recall that we always use the opposite indexing of edges. We could use <i>ascend ordering</i> , i.e.</p><pre class="codeinput">locEdge = [2 3; 1 3; 1 2]; <span class="comment">% Ascend ordering of local edges</span>
+</pre><p>or the <i>consistent (orientation) ordering</i></p><pre class="codeinput">locEdge = [2 3; 3 1; 1 2]; <span class="comment">% Consistent ordering of local edges</span>
+</pre><p>It is consistent since the local ordering orientation of edges is consistent with the induced orientation of the three edges; see the discussion on the orientation.</p><p>There might be an inconsistency between the local and global ordering (even for the consistent orientation ordering). That is <tt>edge(elem2edge(t,1),1)</tt> may not be smaller than <tt>edge(elem2edge(t,1),2)</tt>. It will be more clear from the discussion of the corresponding orientation.</p><h2>Orientation of Simplexes<a name="15"></a></h2><p>The orientation of a triangle is either positive or negative, the orientation of an edge is given by a tangential or normal vector. A normal vector is obtained by rotate a given tangential vector by 90 degree clockwise. For example, when edges are given counter clockwise orientation, the corresponding normal vector is the outwards normal vector.</p><p>The orientation of a d-simplex will induce an orientation of its d-1 subcomplex and is called <i>induced orientation</i>. For example, a positive orientated triangle will induce the counter clockwise orientation of its three edges.</p><p>The ordering of vertices will naturally introduce an orientation and will be called <i>ordering orientation</i>. More specifically</p><div><ul><li>The vector from <tt>edge(:,1)</tt> to <tt>edge(:,2)</tt> defines an orientation of edges.</li><li>The sign of det(v12,v13) defines an orientation of the triangle.</li></ul></div><p>The orientation of a simplex in the simplicial complex should be uniquely determined which will be called <i>global orientation</i>. It can be chosen as the global ordering orientation but not always the case.</p><p>Inside one triangle, the local orientation of three edges is more involved. The local ordering of edges will introduce a local ordering orientation. The orientation of the triangle will also induce an induced orientation. The local ordering orientation is used in the computing of local bases and the induced orientation is used when computing the differential operator locally. They may or may not be consisitent with the global orientation of edges.</p><p>In general, there will be an inconsistency of the following types of orientation and apporipate data structure should be constructured to record such inconsistency.</p><div><ul><li>a global orientation</li><li>the global ordering orientation</li><li>the local ordering orientation</li><li>the local induced orientation</li></ul></div><p><b>elem</b>. The orientation of a triangle is either positive or negative. For the global ordering orientation, it is the sign of the signed area (output of <tt>simplexvolume</tt>).</p><pre class="codeinput">[Dlambda,area,elemSign] = gradbasis(node,elem);
+</pre><p>In the output of <tt>gradbasis</tt>, <tt>area</tt> is always positive and an additional array <tt>elemSign</tt> is used to record the sign of the signed area.</p><p><tt>Dlambda(t,:,k)</tt> is the gradient of <img src="scdoc_eq26110.png" alt="$\lambda_k$">. Therefore the outward normal direction of the kth face can be obtained by <tt>-Dlambda(t,:,k)</tt> which is independent of the ordering and orientation.</p><p><b>edge</b>. For 2-D triangulations, <b>we shall always chose global ordering orientation</b>, i.e., from the lower index to the bigger index.</p><p>The local ordering orientation is implicitly used when computing finite element basis in each element. For example, the edge element on edge <tt>[i j]</tt> in <tt>locEdge</tt> is defined as</p><p><img src="scdoc_eq06943.png" alt="$$\phi_{i,j} = 2(\lambda_i \nabla \lambda_j - \lambda_j \nabla \lambda_i).$$"></p><p>Permutation of <tt>[i j]</tt> to <tt>[j i]</tt> will change the sign of the basis. Note that this is locally, i.e., element by element.</p><p>The global basis associated to an edge, however, depends only on the global orientation of this edge. We introduce <tt>elem2edgeSign(1:NT, 1:3)</tt> to record the inconsistency of a local ordering orientation and a global orientation.</p><p>For the consistent local ordering [2 3; 3 1; 1 2] and global ascend ordering orientation, the elem2edgeSign can be generated as follows:</p><pre class="codeinput">elem2edgeSign = ones(NT,3,<span class="string">'int8'</span>);
+totalEdge = uint32([elem(:,[2,3]); elem(:,[3,1]); elem(:,[1,2])]);
+idx = (totalEdge(:,1)&gt;totalEdge(:,2));
+elem2edgeSign(idx) = -1;
+</pre><p>There is one more inconsistency between the induced orientation and the global orientation of edges. If a triangle is positive orientated, the induced edge orientation should be given by the outwards (relative to a triangle) normal vector. This induced orientation may not be consistent with the global orientation of edges.</p><p>It depends on the ordering of <tt>elem</tt> and <tt>locEdge</tt>. When <tt>elem</tt> is positive ordered and <tt>locEdge</tt> is consistently ordered, it is.</p><p>For ascend ordering of <tt>elem</tt> and <tt>edge</tt>, we denote the direction as +1 if the direction of an edge is the same with the induced direction in a certain elem, and -1 otherwise. Then the consistency is given by</p><pre class="codeinput">elem2edgeSign = [+1 -1 +1];
+</pre><p>The second sign is -1 because the local edge in ascend ordering is [1 3] not [3 1].</p><p>The <tt>elem2edgeSign</tt> will be used when assembling differential operators. For example, when computing <tt>div</tt> operators on a positive orientated triangle, the edge should have outwards normal direction or equivalently the counter clockwise orientation.</p><p>We summarize the two popular ordering and orientation schemes below.</p><h2>Positive Ordering and Orientation<a name="21"></a></h2><p>The vertice of the <tt>eleme</tt> is sorted such that the area is always positive. i.e. the three vertices of the elem are ordered counter-clockwisely. Furthermore the first vertex is always the newest vertex of the triangle for the easy of local mesh refinement and coarsening.</p><p>The local edge is using opposite indexing and consistent ordering</p><p><tt>locEdge = [2,3; 3,1; 1,2]</tt></p><p>The ascend ordering is used for global edges, i.e., <tt>edge</tt> is sorted s.t.</p><p><tt>edge(:,1) &lt; edge(:,2)</tt></p><p>The inconsistency of the orientation is recorded in|elem2edgeSign|.</p><p><b>Where to use</b>: This is the default ordering and orientation scheme.</p><h2>Ascend Ordering and Orientation<a name="22"></a></h2><p><b>Ascend ordering</b>. The vertices of <tt>elem</tt> is sorted such that</p><p><tt>elem(t,1)&lt;elem(t,2)&lt;elem(t,3)</tt></p><p>The local edge is also in the ascend ordering</p><p><tt>locEdge = [2,3; 1,3; 1,2]</tt></p><p>The ascend ordering is used for edges, i.e., <tt>edge</tt> is sorted s.t.</p><p><tt>edge(:,1) &lt; edge(:,2)</tt></p><p>It is easy to see the benefit of ascend ordering: the ordering of local edges is consistent with the global ones and so is the corresponding orientation.</p><p><b>Orientation</b>. We choose the ordering orientation.</p><p><tt>elem: sign(det(v12,v13))</tt></p><p><tt>edge: from the node with smaller global index to bigger one</tt></p><p>For <tt>edge</tt>, the orientation of the global ordering and the local ordering is consistent. But they are not consistent with the induced orientation inside one triangle. Such inconsistency is recorded in</p><p><tt>elem2edgeSign = [+1 -1 +1]</tt></p><p><b>Where to use</b>: for H(curl) and H(div) elements and high order (cubic and above) H(grad) elements.</p><h2>An Example<a name="23"></a></h2><pre class="codeinput">node = [0,0; 1,0; 1,1; 0,1];    <span class="comment">% nodes</span>
+elem = [2,3,1; 4,1,3];          <span class="comment">% elements</span>
+<span class="comment">% [node,elem] = uniformrefine(node,elem);</span>
+</pre><p>Poistive ordering and orientation</p><pre class="codeinput">[elem2edge,edge,elem2edgeSign] = dofedge(elem);
+<span class="comment">% plot</span>
+set(gcf,<span class="string">'Units'</span>,<span class="string">'normal'</span>);
+set(gcf,<span class="string">'Position'</span>,[0,0.25,0.25,0.25]);
+showmesh(node,elem);
+findnode(node);
+findelem(node,elem);
+findedge(node,edge);
+</pre><img vspace="5" hspace="5" src="scdoc_01.png" alt=""> <pre class="codeinput">display(elem);
+display(edge);
+display(elem2edge);
+display(elem2edgeSign);
+</pre><pre class="codeoutput">
+elem =
+
+     2     3     1
+     4     1     3
+
+
+edge =
+
+           1           2
+           1           3
+           1           4
+           2           3
+           3           4
+
+
+elem2edge =
+
+           2           1           4
+           2           5           3
+
+
+elem2edgeSign =
+
+   -1    1    1
+    1    1   -1
+
+</pre><p>Ascend Ordering and Orientation</p><pre class="codeinput">bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+[elem,bdFlag] = sortelem(elem,bdFlag);
+[elem2edge,edge,elem2edgeSign] = dofedge(elem);
+display(elem);
+display(edge);
+display(elem2edge);
+display(elem2edgeSign);
+elem2edgeSign = [1,-1,1];
+</pre><pre class="codeoutput">
+elem =
+
+     1     2     3
+     1     3     4
+
+
+edge =
+
+           1           2
+           1           3
+           1           4
+           2           3
+           3           4
+
+
+elem2edge =
+
+           4           2           1
+           5           3           2
+
+
+elem2edgeSign =
+
+    1   -1    1
+    1   -1    1
+
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Simplicial Complex in Two Dimensions
+%
+% We dsecribe the data structure of the simplicial complex associated to a
+% two dimensional trianglulation give by |node,elem| . The |node| records
+% the coordinates of vertices and |elem| is the pointer from local to
+% global incices of vertices. See <meshdoc.html meshdoc> for details.
+%
+% A brief summary of ordering and orientation
+%
+% * edge: asecond ordering, i.e. edge(:,1)<edge(:,2)
+%
+% * elem: positive ordering or ascend ordering. The default one is positive
+% ordering and the asecond ordering is used for edge elements.
+%
+% * local edge: 
+%   consistent orientation [2 3; 3 1; 1 2];
+%   asecond orientation    [2 3; 1 3; 1 2]; 
+% The default one is the consistent orientation which will be
+% counter-clockwise if elem is positive ordered. The asecond orientation
+% will be used for edge elements.
+%
+% * elem2edgeSign: records the inconsistency of the edge
+%  orientation and the induced orientation.
+%
+% Local edge is the induced orientation [2 3; 3 1; 1 2].
+%  elem2edgeSign(1:NT,1:4) records the elementwise inconsistency of local
+%  edge orientation and global edge orientation. It can be obtained from
+%  |dofedge|. This is used to correct the consistency of the local basis
+%  with the global basis.
+%
+% Both elem and local edges are ascend ordering. Then elem2edgeSign =
+%  [1 -1 1] records the inconsistency of the edge orientation and the
+%  induced orientation. This is used to construct differential operators.
+%
+% Function to call 
+%
+%  [elem2edge,edge,elem2edgeSign,edgeSign] = dofedge(elem);
+%
+% Functions to read on the usage
+%
+%  PoissonRT0;
+
+%%
+% The basic data structure of a mesh consists of node and elem:
+node = [0,0; 1,0; 1,1; 0,1];    % nodes
+elem = [2,3,1; 4,1,3];          % elements
+%%
+% In iFEM, |N, NE, NT| represents the muber of vertice, edges, triangles
+% respectively.
+%
+N = size(node,1); NT = size(elem,1); % NE = size(edge,1); 
+
+%%
+% The corresponding simplicial complex consists of vertices, edges and
+% triangles. We shall discuss the following three issues:
+%
+% * *Indexing* of simplexes
+% * *Ordering* of vertices of simplexes
+% * *Orientatoin* of simplexes
+%
+% The indexing and ordering are related and the ordering and orientation
+% are mixed together. However the indexing has nothing to do with the
+% orientation. The indexing and ordering are the combinarotry structure,
+% i.e. only |elem| is needed, while the orientation also depends on |node|,
+% the geometry emembdding of vertices.
+%
+% For indexing, ordering and orientation, there are always local and global
+% version. The relation between the local and global version is the most
+% complicated issue.
+
+%% Indexing of Simplexes
+%
+% The indexing refers to the numbering of simplexes, e.g., which edge is
+% numbered as the first one. There are two types of the indexing: local and
+% global. Each simplex in the simplicial complex has a unique index which
+% is called the global index. In one triangle, the three vertices and three
+% edges have their local index from 1:3. 
+%
+% In the assembling procedure of finite element methods, an element-wise
+% matrix using local indexing is first computed and then assembled to get a
+% big matrix using global indexing. Thus the pointer from the local
+% indexing to the global indexing is indispensible. For bases independent of
+% the ordering and orientation, e.g., |P1| and |P2| elements, the pointer
+% is sufficient, otherwise, the inconsistency of local ordering/orientation
+% and global ordering/orientation should be taken into account.
+%
+% *Indexing pointers of vertices*
+%
+% The |NT| by 3 matrix |elem| is indeed the pointer from the local to the
+% global indices of vertices of triangles. For example |elem(t,1)=25| means
+% the first vertex of the triangle t is the 25-th vertex.
+%
+% Similiary, the |NE| by 2 matrix |edge| records the pointer from the local
+% to the global indices of vertices of edges.
+%
+% *Local indexing of edges*
+%
+% The triangle constists of three vertices indexed as [1,2,3]. Each
+% triangle contains three edges. There are two indexing schemes for edges.
+%
+% * Opposite indexing     |locEdge = [2,3; 3,1; 1,2]|
+%
+% In |locEdge|, the |i-th| edge is opposite to the |i-th| verices and thus
+% called _opposite indexing_.
+%
+% * Lexicogrphic indexing |locEdgel = [1,2; 1,3; 2,3]|
+%
+% In |locEdgel|, the indexing is induced from the lexicographic ordering of
+% the three edges.
+%
+% For 2-D triangulations, *we shall always chose opposite indexing*. The
+% lexicographic indexing is mainly used in the construction of |face2edge|
+% of 3-D triangulations; see <sc3doc.html Simplicial Complex in Three
+% Dimensions> for details. Note that the ordering of vertices of each edge
+% will not change the indexing. For example, |locEdge = [2,3; 1,3; 1,2]|
+% use the same opposite indexing but different ordering. Chosing |[1 3]| or
+% |[3 1]| for the second edge will depend on the consideration of
+% orientation and ordering.
+%
+% *Global indexing of edges*
+%
+% One can easily collect all edges elementwise. The issue is the
+% duplication. For example, each interior edge will be counted twice. The
+% |unique| funciton is applied such that each edge has a unique global
+% index.
+%
+totalEdge = uint32([elem(:,[2,3]); elem(:,[3,1]); elem(:,[1,2])]);
+sortedTotalEdge = sort(totalEdge,2);
+[edge,tempvar,je] = unique(sortedTotalEdge,'rows');
+NE = size(edge,1); 
+%%
+% *Edge pointer*
+%
+% |elem2edge(1:NT,1:3)| records the pointer from the local index to the
+% global index of edges. For example, |elem2edge(t,1)| = 10 means the first
+% edge of triangle |t| (which is formed by [2 3] vertices of |t|) is the
+% |10-th| one in the |edge| array.
+%
+% Such information is stored in the third output of |unique| function.
+%%
+elem2edge = uint32(reshape(je,NT,3));
+%%
+% Note that the pointer |elem2edge| depends on the local indexing of edges
+% used in the generation of |totalEdge|. Here the opposite indexing of
+% three local edges is used.
+
+%% Ordering of Vertices
+%
+% We discuss the ordering of vertices of simplexes. Again there are local
+% ordering and global ordering. They may not be consistent and a sign array
+% is used to record the inconsistency if any.
+%
+% The local ordering refers to the ordering of local veritces of a simplex.
+% The local ordering could be used in the formulation of the local basis
+% and thus the ordering does matter.
+%
+% The global ordering refers to the ordering of the global index of
+% vertices of a simplex.
+%
+% *elem*. The local ordering is always [1,2,3]. Any permutation of three
+% veritces of a triangle still represents the same triangle. Such
+% freedom provide a room to record more information like:
+% 
+% * global ordering of vertices
+% * orientation of triangles
+% * refinement rule
+%
+% Two types of ordering of |elem| is of particular importance
+%
+% * Positive ordering
+% * Ascend ordering
+%
+% In the positive ordering, the three vertices are ordered such that the
+% signed area, det(v12,v13), is positive. If |elem| is not positive
+% ordered, |elem = fixorder(node,elem)| will compute the signed area by
+% |simplexvolume(node,elem)| and switch the vertices for triangles with
+% negative areas.
+%
+% For 2-D triangulations, three vertices of a triangle in 2-D is sorted
+% counter-cloclwise and the first vertex is chosen as the newest vertex.
+% Such ordering enables the efficient implementation of local refinement
+% and coarsening in 2-D; see <bisectdoc.html Bisection in Two Dimensions>
+% and <coarsendoc.html Coarsening in Two Dimensions>. *Such ordering scheme
+% is the default choice and used in most places*.
+%
+%
+% In ascend ordering, the vertices of |elem| is sorted such that
+% |elem(t,1)<elem(t,2)<elem(t,3)|. This can be easily achieved by |elem =
+% sort(elem,2)|. Howevery, one has to rotate the boundary flag
+% accordingly using |sortelem|.
+bdFlag = setboundary(node,elem,'Dirichlet');
+display('Before rotation'); display(elem); display(bdFlag);
+
+[elem,bdFlag] = sortelem(elem,bdFlag);
+display('After rotation'); display(elem); display(bdFlag);
+
+%%
+% Ascend ordering will benefit the construction of local bases for high
+% order basis or basis with orientation.
+%
+% We may switch the default positive ordering of |elem| to ascend ordering
+% when generating data structure for finite element basis. However such
+% sorting is always hidden in the subroutines when a finite element basis
+% requiring ordering is generated; see |PoissonRT0| and |PoissonBDM1|.
+
+%%
+% *edge*. The global ordering of edges is always ascended, i.e.
+edge(:,1) < edge(:,2);
+%% 
+% Indeed in the generation of |edge|, the |totalEdge| is sorted to the
+% ascend ordering such that |unique| can be applied.
+%%
+%
+% Recall that we always use the opposite indexing of edges. We could use
+% _ascend ordering_ , i.e.
+locEdge = [2 3; 1 3; 1 2]; % Ascend ordering of local edges
+%%
+% or the _consistent (orientation) ordering_ 
+locEdge = [2 3; 3 1; 1 2]; % Consistent ordering of local edges
+%%
+% It is consistent since the local ordering orientation of edges is
+% consistent with the induced orientation of the three edges; see the
+% discussion on the orientation.
+%
+% There might be an inconsistency between the local and global ordering
+% (even for the consistent orientation ordering). That is
+% |edge(elem2edge(t,1),1)| may not be smaller than
+% |edge(elem2edge(t,1),2)|. It will be more clear from the discussion of
+% the corresponding orientation.
+
+%% Orientation of Simplexes
+% 
+% The orientation of a triangle is either positive or negative, the
+% orientation of an edge is given by a tangential or normal vector. A
+% normal vector is obtained by rotate a given tangential vector by 90
+% degree clockwise. For example, when edges are given counter clockwise
+% orientation, the corresponding normal vector is the outwards normal
+% vector.
+%
+% The orientation of a d-simplex will induce an orientation of its d-1
+% subcomplex and is called _induced orientation_. For example, a positive
+% orientated triangle will induce the counter clockwise orientation of its
+% three edges.
+%
+% The ordering of vertices will naturally introduce an orientation and will
+% be called _ordering orientation_. More specifically
+% 
+% * The vector from |edge(:,1)| to |edge(:,2)| defines an orientation of
+% edges.
+% * The sign of det(v12,v13) defines an orientation of the triangle.
+%
+% The orientation of a simplex in the simplicial complex should be
+% uniquely determined which will be called _global orientation_. It can be
+% chosen as the global ordering orientation but not always the case.
+%
+% Inside one triangle, the local orientation of three edges is more
+% involved. The local ordering of edges will introduce a local ordering
+% orientation. The orientation of the triangle will also induce an induced
+% orientation. The local ordering orientation is used in the computing of
+% local bases and the induced orientation is used when computing the
+% differential operator locally. They may or may not be consisitent with
+% the global orientation of edges.
+%
+% In general, there will be an inconsistency of the following types of
+% orientation and apporipate data structure should be constructured to
+% record such inconsistency.
+%
+% * a global orientation
+% * the global ordering orientation
+% * the local ordering orientation
+% * the local induced orientation
+%
+% *elem*. The orientation of a triangle is either positive or negative. For
+% the global ordering orientation, it is the sign of the signed area
+% (output of |simplexvolume|). 
+%
+[Dlambda,area,elemSign] = gradbasis(node,elem);
+%%
+% In the output of |gradbasis|, |area| is always positive and an additional
+% array |elemSign| is used to record the sign of the signed area.
+%
+% |Dlambda(t,:,k)| is the gradient of $\lambda_k$. Therefore the outward
+% normal direction of the kth face can be obtained by |-Dlambda(t,:,k)|
+% which is independent of the ordering and orientation.
+%
+% *edge*. For 2-D triangulations, *we shall always chose global ordering
+% orientation*, i.e., from the lower index to the bigger index. 
+%
+% The local ordering orientation is implicitly used when computing finite
+% element basis in each element. For example, the edge element on edge |[i j]|
+% in |locEdge| is defined as
+%
+% $$\phi_{i,j} = 2(\lambda_i \nabla \lambda_j - \lambda_j \nabla \lambda_i).$$ 
+%
+% Permutation of |[i j]| to |[j i]| will change the sign of the basis. Note
+% that this is locally, i.e., element by element.
+%
+% The global basis associated to an edge, however, depends only on the
+% global orientation of this edge. We introduce |elem2edgeSign(1:NT, 1:3)|
+% to record the inconsistency of a local ordering orientation and a global
+% orientation.
+%
+% For the consistent local ordering [2 3; 3 1; 1 2] and global ascend
+% ordering orientation, the elem2edgeSign can be generated as follows:
+
+elem2edgeSign = ones(NT,3,'int8');
+totalEdge = uint32([elem(:,[2,3]); elem(:,[3,1]); elem(:,[1,2])]);
+idx = (totalEdge(:,1)>totalEdge(:,2));
+elem2edgeSign(idx) = -1;
+
+%%
+% There is one more inconsistency between the induced orientation and the
+% global orientation of edges. If a triangle is positive orientated, the
+% induced edge orientation should be given by the outwards (relative to a
+% triangle) normal vector. This induced orientation may not be consistent
+% with the global orientation of edges.
+%
+% It depends on the ordering of |elem| and |locEdge|. When |elem| is
+% positive ordered and |locEdge| is consistently ordered, it is.
+%
+% For ascend ordering of |elem| and |edge|, we denote the direction as +1
+% if the direction of an edge is the same with the induced direction in a
+% certain elem, and -1 otherwise. Then the consistency is given by
+elem2edgeSign = [+1 -1 +1];
+
+%%
+% The second sign is -1 because the local edge in ascend ordering is [1
+% 3] not [3 1].
+%%
+% The |elem2edgeSign| will be used when assembling differential operators.
+% For example, when computing |div| operators on a positive orientated
+% triangle, the edge should have outwards normal direction or equivalently
+% the counter clockwise orientation.
+%%
+% We summarize the two popular ordering and orientation schemes below.
+
+%% Positive Ordering and Orientation
+%
+% The vertice of the |eleme| is sorted such that the area is always
+% positive. i.e. the three vertices of the elem are ordered
+% counter-clockwisely. Furthermore the first vertex is always the newest
+% vertex of the triangle for the easy of local mesh refinement and
+% coarsening.
+%
+% The local edge is using opposite indexing and consistent ordering
+%
+% |locEdge = [2,3; 3,1; 1,2]|
+%
+% The ascend ordering is used for global edges, i.e., |edge| is sorted s.t.
+%
+% |edge(:,1) < edge(:,2)|
+%
+% The inconsistency of the orientation is recorded in|elem2edgeSign|.
+%
+% *Where to use*: This is the default ordering and orientation scheme. 
+%
+%% Ascend Ordering and Orientation
+%
+% *Ascend ordering*. The vertices of |elem| is sorted such that
+%
+% |elem(t,1)<elem(t,2)<elem(t,3)|
+%
+% The local edge is also in the ascend ordering
+%
+% |locEdge = [2,3; 1,3; 1,2]|
+%
+% The ascend ordering is used for edges, i.e., |edge| is sorted s.t.
+%
+% |edge(:,1) < edge(:,2)|
+%
+% It is easy to see the benefit of ascend ordering: the ordering of local
+% edges is consistent with the global ones and so is the corresponding
+% orientation.
+%
+% *Orientation*. We choose the ordering orientation.
+%
+% |elem: sign(det(v12,v13))|
+%
+% |edge: from the node with smaller global index to bigger one|
+% 
+% For |edge|, the orientation of the global ordering and the local
+% ordering is consistent. But they are not consistent with the induced
+% orientation inside one triangle. Such inconsistency is recorded in 
+%
+% |elem2edgeSign = [+1 -1 +1]|
+%
+%
+% *Where to use*: for H(curl) and H(div) elements and high order (cubic and
+% above) H(grad) elements.
+
+%% An Example
+%
+node = [0,0; 1,0; 1,1; 0,1];    % nodes
+elem = [2,3,1; 4,1,3];          % elements
+% [node,elem] = uniformrefine(node,elem);
+%%
+% Poistive ordering and orientation
+[elem2edge,edge,elem2edgeSign] = dofedge(elem);
+% plot
+set(gcf,'Units','normal'); 
+set(gcf,'Position',[0,0.25,0.25,0.25]);
+showmesh(node,elem);
+findnode(node);
+findelem(node,elem);
+findedge(node,edge);
+%%
+display(elem);
+display(edge);
+display(elem2edge);
+display(elem2edgeSign);
+
+%%
+% Ascend Ordering and Orientation
+bdFlag = setboundary(node,elem,'Dirichlet');
+[elem,bdFlag] = sortelem(elem,bdFlag);
+[elem2edge,edge,elem2edgeSign] = dofedge(elem);
+display(elem);
+display(edge);
+display(elem2edge);
+display(elem2edgeSign);
+elem2edgeSign = [1,-1,1];
+
+
+
+
+
+
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>

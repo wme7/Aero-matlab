@@ -1,0 +1,154 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>RATE OF CONVERGENCE OF LINEAR FINITE ELEMENT METHOD FOR HELMHOLTZ EQUATION</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-06-06"><meta name="DC.source" content="femrateHelmholtz.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>RATE OF CONVERGENCE OF LINEAR FINITE ELEMENT METHOD FOR HELMHOLTZ EQUATION</h1><!--introduction--><p>This example is to show the rate of convergence of linear finite element approximation of the Helmholtz equation on the unit square:</p><p><img src="femrateHelmholtz_eq41911.png" alt="$$- \Delta u + k^2 u = f \; \hbox{in } (0,1)^2.$$"></p><p>for the following boundary condition:</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Options</a></li><li><a href="#3">Dirichlet boundary condition.</a></li></ul></div><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+<span class="keyword">global</span> k        <span class="comment">% wave number</span>
+[node,elem] = squaremesh([0,1,0,1],0.5);
+<span class="comment">%[node,elem]  =  PMLdomain(node,h);</span>
+<span class="comment">% pde = Helmholtzdata2; %sommerfeld radiation condition</span>
+</pre><h2>Options<a name="2"></a></h2><pre class="codeinput">option.L0 = 2;
+option.printlevel = 1;
+option.maxIt = 4;
+option.plotflag = 1;
+option.solver = <span class="string">'direct'</span>;
+</pre><h2>Dirichlet boundary condition.<a name="3"></a></h2><pre class="codeinput">bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+pde = Helmholtzdata1;
+wavenumberlist = [1 5 10 20 40 50 100];
+<span class="keyword">for</span> i = 1:length(wavenumberlist)
+</pre><pre class="codeinput">    k = wavenumberlist(i);
+    femHelmholtz(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput"> #Dof   ||u-u_h||     ||Du-Du_h||   ||DuI-Du_h||  ||uI-u_h||_{max} iter solvetime
+  81   4.36519e-02   1.00311e+00   8.03458e-02   2.00264e-02         0   0.00025687
+ 289   1.13481e-02   5.08946e-01   2.12081e-02   5.27971e-03         0   0.00044402
+1089   2.86564e-03   2.55416e-01   5.37622e-03   1.33469e-03         0    0.0019329
+4225   7.18224e-04   1.27827e-01   1.34878e-03   3.34425e-04         0     0.012052
+</pre><img vspace="5" hspace="5" src="femrateHelmholtz_01.png" alt=""> <img vspace="5" hspace="5" src="femrateHelmholtz_02.png" alt=""> <pre class="codeoutput"> #Dof   ||u-u_h||     ||Du-Du_h||   ||DuI-Du_h||  ||uI-u_h||_{max} iter solvetime
+  81   2.55403e-02   1.01651e+00   1.01299e-01   2.82435e-02         0   0.00033251
+ 289   6.62817e-03   5.10512e-01   2.40383e-02   6.54711e-03         0    0.0011213
+1089   1.67329e-03   2.55609e-01   5.93583e-03   1.62989e-03         0    0.0047537
+4225   4.19357e-04   1.27851e-01   1.47945e-03   4.05671e-04         0      0.02389
+</pre><img vspace="5" hspace="5" src="femrateHelmholtz_03.png" alt=""> <img vspace="5" hspace="5" src="femrateHelmholtz_04.png" alt=""> <pre class="codeoutput"> #Dof   ||u-u_h||     ||Du-Du_h||   ||DuI-Du_h||  ||uI-u_h||_{max} iter solvetime
+  81   7.98764e-02   1.07335e+00   4.15794e-01   1.18042e-01         0   0.00032861
+ 289   2.12346e-02   5.17194e-01   1.02641e-01   2.93127e-02         0     0.001049
+1089   5.39898e-03   2.56455e-01   2.58142e-02   7.42793e-03         0     0.004604
+4225   1.35553e-03   1.27957e-01   6.46541e-03   1.85953e-03         0     0.021729
+</pre><img vspace="5" hspace="5" src="femrateHelmholtz_05.png" alt=""> <img vspace="5" hspace="5" src="femrateHelmholtz_06.png" alt=""> <pre class="codeoutput"> #Dof   ||u-u_h||     ||Du-Du_h||   ||DuI-Du_h||  ||uI-u_h||_{max} iter solvetime
+  81   6.75569e-02   1.11069e+00   5.14155e-01   7.89203e-02         0   0.0002374
+ 289   6.17670e-02   1.46997e+00   1.37886e+00   1.56785e-01         0   0.0010536
+1089   1.28908e-02   3.55895e-01   2.48335e-01   2.82246e-02         0   0.0047254
+4225   2.70279e-03   1.37384e-01   5.03920e-02   6.47684e-03         0    0.021846
+</pre><img vspace="5" hspace="5" src="femrateHelmholtz_07.png" alt=""> <img vspace="5" hspace="5" src="femrateHelmholtz_08.png" alt=""> <pre class="codeoutput"> #Dof   ||u-u_h||     ||Du-Du_h||   ||DuI-Du_h||  ||uI-u_h||_{max} iter solvetime
+  81   6.37809e-02   1.01604e+00   2.41253e-01   6.32818e-02         0   0.00022435
+ 289   1.72920e-02   5.41961e-01   1.92631e-01   2.01405e-02         0   0.00078113
+1089   5.62288e-03   3.04657e-01   1.66524e-01   1.28585e-02         0     0.004671
+4225   1.27418e-03   1.30825e-01   2.80155e-02   2.57876e-03         0      0.02005
+</pre><img vspace="5" hspace="5" src="femrateHelmholtz_09.png" alt=""> <img vspace="5" hspace="5" src="femrateHelmholtz_10.png" alt=""> <pre class="codeoutput"> #Dof   ||u-u_h||     ||Du-Du_h||   ||DuI-Du_h||  ||uI-u_h||_{max} iter solvetime
+  81   6.35413e-02   1.01562e+00   2.38689e-01   6.28132e-02         0   0.00022096
+ 289   1.69907e-02   5.11679e-01   7.16828e-02   1.61362e-02         0   0.00073815
+1089   5.00253e-03   3.01759e-01   1.61168e-01   1.26697e-02         0    0.0044903
+4225   2.55910e-03   1.76100e-01   1.21180e-01   6.21555e-03         0     0.021072
+</pre><img vspace="5" hspace="5" src="femrateHelmholtz_11.png" alt=""> <img vspace="5" hspace="5" src="femrateHelmholtz_12.png" alt=""> <pre class="codeoutput"> #Dof   ||u-u_h||     ||Du-Du_h||   ||DuI-Du_h||  ||uI-u_h||_{max} iter solvetime
+  81   6.32329e-02   1.01511e+00   2.35502e-01   6.22039e-02         0   0.00021902
+ 289   1.68746e-02   5.11256e-01   6.81574e-02   1.59739e-02         0   0.00074117
+1089   4.31017e-03   2.55966e-01   2.08529e-02   4.02046e-03         0    0.0031612
+4225   1.29023e-03   1.55824e-01   8.91717e-02   3.10449e-03         0     0.020785
+</pre><img vspace="5" hspace="5" src="femrateHelmholtz_13.png" alt=""> <img vspace="5" hspace="5" src="femrateHelmholtz_14.png" alt=""> <pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% RATE OF CONVERGENCE OF LINEAR FINITE ELEMENT METHOD FOR HELMHOLTZ EQUATION
+%
+% This example is to show the rate of convergence of linear finite element
+% approximation of the Helmholtz equation on the unit square:
+%
+% $$- \Delta u + k^2 u = f \; \hbox{in } (0,1)^2.$$
+%
+% for the following boundary condition:
+%
+
+%% 
+clear all; close all;
+global k        % wave number
+[node,elem] = squaremesh([0,1,0,1],0.5);
+%[node,elem]  =  PMLdomain(node,h);
+% pde = Helmholtzdata2; %sommerfeld radiation condition
+
+%% Options
+option.L0 = 2;
+option.printlevel = 1;
+option.maxIt = 4;
+option.plotflag = 1;
+option.solver = 'direct';
+
+%% Dirichlet boundary condition.
+bdFlag = setboundary(node,elem,'Dirichlet');
+pde = Helmholtzdata1;
+wavenumberlist = [1 5 10 20 40 50 100];
+for i = 1:length(wavenumberlist)
+    k = wavenumberlist(i); 
+    femHelmholtz(node,elem,pde,bdFlag,option);
+    %%
+end
+##### SOURCE END #####
+--></body></html>

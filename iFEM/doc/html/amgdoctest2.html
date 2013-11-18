@@ -1,0 +1,159 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>AMG TEST II: Different boundary conditions</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-27"><meta name="DC.source" content="amgdoctest2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>AMG TEST II: Different boundary conditions</h1><!--introduction--><p>We consider the linear finite element discretization of Poisson equation on the unstructured mesh with Dirichlet or Neumann boundary conditions.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Dirichlet problem</a></li><li><a href="#5">Neumann problem</a></li></ul></div><pre class="codeinput">load <span class="string">lakemesh</span>
+</pre><h2>Dirichlet problem<a name="2"></a></h2><pre class="codeinput">close <span class="string">all</span>;
+[N,itStep,time,err] = amgtest(node,elem,1);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.08,   level:  2,   coarse grid 434,   nnz/Nc 6.21
+#dof:    1770,    iter: 11,   err = 3.5524e-09,   time = 0.105 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.59,   level:  2,   coarse grid 1866,   nnz/Nc 6.95
+#dof:    7876,    iter: 12,   err = 2.7907e-09,   time = 0.701 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.81,   level:  3,   coarse grid 1778,   nnz/Nc 7.93
+#dof:   33081,    iter: 15,   err = 9.1124e-09,   time = 1.92 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.91,   level:  4,   coarse grid 1573,   nnz/Nc 8.39
+#dof:  135463,    iter: 16,   err = 8.9484e-09,   time = 5.55 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.95,   level:  5,   coarse grid 1372,   nnz/Nc 8.50
+#dof:  548115,    iter: 19,   err = 7.6833e-09,   time = 21.3 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1770</td><td>11</td><td>0.104823</td><td>3.55242e-09</td></tr>
+<tr><td>7876</td><td>12</td><td>0.701491</td><td>2.79074e-09</td></tr>
+<tr><td>33081</td><td>15</td><td>1.92003</td><td>9.11242e-09</td></tr>
+<tr><td>135463</td><td>16</td><td>5.55355</td><td>8.94844e-09</td></tr>
+<tr><td>548115</td><td>19</td><td>21.293</td><td>7.68333e-09</td></tr>
+</table><pre class="codeinput">r = showrate(N,time,2);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r) <span class="string">'}'</span>] ,<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest2_01.png" alt=""> <h2>Neumann problem<a name="5"></a></h2><pre class="codeinput">close <span class="string">all</span>;
+[N,itStep,time,err] = amgtest(node,elem,0);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.08,   level:  2,   coarse grid 428,   nnz/Nc 6.20
+#dof:    1770,    iter: 11,   err = 3.4971e-09,   time = 0.119 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.59,   level:  2,   coarse grid 1861,   nnz/Nc 6.99
+#dof:    7876,    iter: 12,   err = 4.2550e-09,   time = 0.791 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.81,   level:  3,   coarse grid 1778,   nnz/Nc 7.94
+#dof:   33081,    iter: 15,   err = 4.0780e-09,   time = 1.77 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.91,   level:  4,   coarse grid 1594,   nnz/Nc 8.35
+#dof:  135463,    iter: 18,   err = 3.1605e-09,   time = 5.95 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.95,   level:  5,   coarse grid 1360,   nnz/Nc 8.43
+#dof:  548115,    iter: 19,   err = 9.2185e-09,   time = 21.5 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1770</td><td>11</td><td>0.118842</td><td>3.49711e-09</td></tr>
+<tr><td>7876</td><td>12</td><td>0.790716</td><td>4.255e-09</td></tr>
+<tr><td>33081</td><td>15</td><td>1.76985</td><td>4.07802e-09</td></tr>
+<tr><td>135463</td><td>18</td><td>5.94973</td><td>3.16049e-09</td></tr>
+<tr><td>548115</td><td>19</td><td>21.4668</td><td>9.21849e-09</td></tr>
+</table><pre class="codeinput">r = showrate(N,time,2);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r) <span class="string">'}'</span>] ,<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest2_02.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% AMG TEST II: Different boundary conditions
+%
+% We consider the linear finite element discretization of Poisson equation
+% on the unstructured mesh with Dirichlet or Neumann boundary conditions. 
+
+%%
+load lakemesh
+%% Dirichlet problem
+close all;
+[N,itStep,time,err] = amgtest(node,elem,1);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+r = showrate(N,time,2);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r) '}'] ,'Fontsize', 14);
+
+%% Neumann problem
+close all;
+[N,itStep,time,err] = amgtest(node,elem,0);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+r = showrate(N,time,2);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r) '}'] ,'Fontsize', 14);
+##### SOURCE END #####
+--></body></html>

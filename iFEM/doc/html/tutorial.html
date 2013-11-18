@@ -1,0 +1,213 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Tutorial of iFEM</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-04-18"><meta name="m-file" content="tutorial"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial of iFEM</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Features of iFEM</a></li><li><a href="#2">Basic Data Stucture</a></li><li><a href="#6">Finite Element Method</a></li><li><a href="#8">Adaptive Finite Element Method</a></li><li><a href="#10">Time-dependent Problems</a></li></ul></div><h2>Features of iFEM<a name="1"></a></h2><div><ul><li>Simple data structures</li><li>Mesh adaptation in two- and three-dimensions</li><li>Fast solvers of algebraic equations</li><li>Easy to use, Easy to code, Easy to debug</li><li>Efficient programming</li></ul></div><h2>Basic Data Stucture<a name="2"></a></h2><p><b>Mesh: node and elem.</b></p><p>Two matrices <tt>node(1:N,1:d)</tt> and <tt>elem(1:NT,1:d+1)</tt> are used to represent a d-dimensional triangulation embedded in <img src="tutorial_eq29739.png" alt="$R^d$">, where <tt>N</tt> is the number of vertices and <tt>NT</tt> is the number of elements.</p><p><tt>node(k,1)</tt> and <tt>node(k,2)</tt> are the x- and y-coordinates of the k-th node for points in 2-D. In 3-D, <tt>node(k,3)</tt> gives the additional z-coordinates of the k-th node.</p><p><tt>elem(t,1:d+1)</tt> are the global indices of <tt>d+1</tt> vertices which form the abstract <img src="tutorial_eq51528.png" alt="$d$">-simplex <tt>t</tt>. By convention, the vertices of a simplex is ordered such that the signed volume is positive. Therefore in 2-D, three vertices of a triangle is ordered counterclockwise and in 3-D, the ordering of vertices follows the right-hand rule.</p><p>Related functions: <a href="matlab:doc('fixorientation')">fixorientation</a>, <a href="matlab:doc('label')">label</a>, <a href="matlab:doc('label3')">label3</a></p><p>Documentation: <a href="matlab:ifemdoc('meshdoc')">meshdoc</a></p><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+</pre><p><b>Example: L-shape domain in 2-D.</b></p><pre class="codeinput">node = [1,0; 1,1; 0,1; -1,1; -1,0; -1,-1; 0,-1; 0,0];
+elem = [1,2,8; 3,8,2; 8,3,5; 4,5,3; 7,8,6; 5,6,8];
+figure(1)
+showmesh(node,elem)
+axis <span class="string">on</span>
+findnode(node)
+findelem(node,elem)
+</pre><img vspace="5" hspace="5" src="tutorial_01.png" alt=""> <p><b>Example: Cube in 3-D.</b></p><pre class="codeinput">node = [-1,-1,-1; 1,-1,-1; 1,1,-1; -1,1,-1; -1,-1,1; 1,-1,1; 1,1,1; -1,1,1];
+elem = [1,2,3,7; 1,6,2,7; 1,5,6,7; 1,8,5,7; 1,4,8,7; 1,3,4,7];
+figure(2)
+showmesh3(node,elem,[],<span class="string">'FaceAlpha'</span>,0.25);
+view([-53,8]);
+axis <span class="string">on</span>
+findnode3(node)
+findelem3(node,elem)
+</pre><img vspace="5" hspace="5" src="tutorial_02.png" alt=""> <p><b>Boundary: bdEdge or bdFace.</b></p><p>For 2-D triangulations, we use <tt>bdEdge(1:NT,1:3)</tt> to record the type of three edges of each element. Similarly in 3-D, we use <tt>bdFace(1:NT,1:4)</tt> to record the type of four faces of each element. The value is the type of boundary condition listed as follows.</p><div><ul><li>0: non-boundary, i.e., an interior edge or face.</li><li>1: first type, i.e., a Dirichlet boundary edge or face.</li><li>2: second type, i.e., a Neumann boundary edge or face.</li><li>3: third type, i.e., a Robin boundary edge or face.</li></ul></div><p>We label three edges of a triangle such that <tt>bdEdge(t,i)</tt> is the edge opposite to the i-th vertex. Similarly <tt>bdFace(t,i)</tt> is the face opposite to the i-th vertex.</p><p>Related functions: <a href="matlab:doc('findboundary')">findboundary</a>, <a href="matlab:doc('setboundary')">setboundary</a>, <a href="matlab:doc('findboundary3')">findboundary3</a> <a href="matlab:doc('setboundary3')">setboundary3</a>.</p><p>Documentation: <a href="matlab:ifemdoc('bddoc')">bddoc</a></p><pre class="codeinput">node = [1,0; 1,1; 0,0];
+elem = [1 2 3];
+edge = [2 3; 1 3; 1 2];
+subplot(1,2,1);
+showmesh(node,elem);
+findedge(node,edge);
+findnode(node);
+node = [1,1,1; 0,0,0; 1,1,0; 1,0,0];
+elem = [1,2,3,4];
+subplot(1,2,2);
+showmesh3(node,elem,[],<span class="string">'FaceAlpha'</span>,0.35); view([-10,18]);
+findnode3(node);
+findelem3(node,[2,3,4; 1,3,4; 1,2,4; 1,2,3])
+</pre><img vspace="5" hspace="5" src="tutorial_03.png" alt=""> <h2>Finite Element Method<a name="6"></a></h2><div><ul><li>Example 1: The Poisson equation in 2-D</li><li>Example 2: The Poisson equation: complex domains</li><li>Example 2: The Poisson equation in 3-D with multigrid solvers</li></ul></div><h2>Adaptive Finite Element Method<a name="8"></a></h2><div><ul><li>Example 1: The Poisson equation on a 2-D L-shaped domain</li><li>Example 2: The Poisson equation in 3-D with jump diffusion coefficients</li></ul></div><h2>Time-dependent Problems<a name="10"></a></h2><div><ul><li>Example 1: Heat equation</li><li>Example 2: Moving interface</li></ul></div><p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial of iFEM 
+
+%% Features of iFEM
+% 
+% * Simple data structures
+% * Mesh adaptation in two- and three-dimensions
+% * Fast solvers of algebraic equations
+% * Easy to use, Easy to code, Easy to debug
+% * Efficient programming
+
+%% Basic Data Stucture
+%
+% *Mesh: node and elem.* 
+%
+% Two matrices |node(1:N,1:d)| and |elem(1:NT,1:d+1)| are used to represent
+% a d-dimensional triangulation embedded in $R^d$, where |N| is the number
+% of vertices and |NT| is the number of elements. 
+%  
+% |node(k,1)| and |node(k,2)| are the x- and y-coordinates of the k-th node
+% for points in 2-D. In 3-D, |node(k,3)| gives the additional z-coordinates
+% of the k-th node.
+%
+% |elem(t,1:d+1)| are the global indices of |d+1| vertices which form the
+% abstract $d$-simplex |t|. By convention, the vertices of a simplex is ordered
+% such that the signed volume is positive. Therefore in 2-D, three vertices
+% of a triangle is ordered counterclockwise and in 3-D, the ordering of
+% vertices follows the right-hand rule.
+% 
+% Related functions: <matlab:doc('fixorientation') fixorientation>,
+% <matlab:doc('label') label>, <matlab:doc('label3') label3>
+%
+% Documentation: <matlab:ifemdoc('meshdoc') meshdoc> 
+
+clear all; close all;
+
+%%
+% *Example: L-shape domain in 2-D.*
+
+node = [1,0; 1,1; 0,1; -1,1; -1,0; -1,-1; 0,-1; 0,0]; 
+elem = [1,2,8; 3,8,2; 8,3,5; 4,5,3; 7,8,6; 5,6,8];    
+figure(1)
+showmesh(node,elem)
+axis on
+findnode(node)
+findelem(node,elem)
+
+%%
+% *Example: Cube in 3-D.*
+
+node = [-1,-1,-1; 1,-1,-1; 1,1,-1; -1,1,-1; -1,-1,1; 1,-1,1; 1,1,1; -1,1,1]; 
+elem = [1,2,3,7; 1,6,2,7; 1,5,6,7; 1,8,5,7; 1,4,8,7; 1,3,4,7];
+figure(2)
+showmesh3(node,elem,[],'FaceAlpha',0.25);
+view([-53,8]);
+axis on
+findnode3(node)
+findelem3(node,elem)
+
+%%
+% *Boundary: bdEdge or bdFace.* 
+%
+% For 2-D triangulations, we use |bdEdge(1:NT,1:3)| to record the type of
+% three edges of each element. Similarly in 3-D, we use |bdFace(1:NT,1:4)|
+% to record the type of four faces of each element. 
+% The value is the type of boundary condition listed as follows.
+%
+% * 0: non-boundary, i.e., an interior edge or face.
+% * 1: first type, i.e., a Dirichlet boundary edge or face. 
+% * 2: second type, i.e., a Neumann boundary edge or face. 
+% * 3: third type, i.e., a Robin boundary edge or face.
+%
+% We label three edges of a triangle such that |bdEdge(t,i)| is the edge
+% opposite to the i-th vertex. Similarly |bdFace(t,i)| is the face opposite
+% to the i-th vertex.
+%
+% Related functions: <matlab:doc('findboundary') findboundary>,
+% <matlab:doc('setboundary') setboundary>, <matlab:doc('findboundary3') findboundary3>
+% <matlab:doc('setboundary3') setboundary3>.
+%
+% Documentation: <matlab:ifemdoc('bddoc') bddoc> 
+
+node = [1,0; 1,1; 0,0];
+elem = [1 2 3];
+edge = [2 3; 1 3; 1 2];
+subplot(1,2,1);
+showmesh(node,elem);
+findedge(node,edge);
+findnode(node);
+node = [1,1,1; 0,0,0; 1,1,0; 1,0,0];
+elem = [1,2,3,4];
+subplot(1,2,2);
+showmesh3(node,elem,[],'FaceAlpha',0.35); view([-10,18]);
+findnode3(node);
+findelem3(node,[2,3,4; 1,3,4; 1,2,4; 1,2,3])
+
+%% Finite Element Method
+%
+%
+%% 
+% * Example 1: The Poisson equation in 2-D
+% * Example 2: The Poisson equation: complex domains
+% * Example 2: The Poisson equation in 3-D with multigrid solvers
+
+%% Adaptive Finite Element Method
+%
+%
+%% 
+% * Example 1: The Poisson equation on a 2-D L-shaped domain
+% * Example 2: The Poisson equation in 3-D with jump diffusion coefficients
+
+%% Time-dependent Problems
+%% 
+% * Example 1: Heat equation
+% * Example 2: Moving interface
+
+##### SOURCE END #####
+--></body></html>

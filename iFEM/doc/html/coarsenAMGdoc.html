@@ -1,0 +1,278 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Coarsening for Algebraic Multigrid</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-11"><meta name="DC.source" content="coarsenAMGdoc.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Coarsening for Algebraic Multigrid</h1><!--introduction--><p>Given a SPD matrix A, we describe an algebraic coarsening of a graph of A based on the concept of strong connectness. The measure of strong connectness is slightly different with the standard definition. The parameter theta is used to define strong connectness and the default value is 0.025.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Usage of the function</a></li><li><a href="#2">Generate a test matrix</a></li><li><a href="#3">Parameters</a></li><li><a href="#4">Generate strong connectness matrix</a></li><li><a href="#5">Compute degree of vertex</a></li><li><a href="#6">Find an approximate maximal independent set and put to C set</a></li></ul></div><h2>Usage of the function<a name="1"></a></h2><pre class="codeinput">clear <span class="string">all</span>
+help <span class="string">coarsenAMGc</span>
+</pre><pre class="codeoutput">  COARSENAMGC coarsen the graph of A.
+ 
+  isC = coarsenAMGc(A) terturns a logical array to make a set of nodes as
+  the coarse ndoes based on As, a strong connectness matrix modified from
+  A. The strong connectness is slightly different with the standard
+  definition.
+ 
+  [isC,As] = coarsenAMGc(A,theta) accepts the parameter theta to define the
+  strong connectness. The default setting is theta = 0.025. It also outputs
+  the strong connectness matrix As which could be used in the constrction
+  of prolongation and restriction.
+ 
+  Example
+    load lakemesh
+    A = assemblematrix(node,elem);
+    [isC,As] = coarsenAMGc(A);
+ 
+  See also: coarsenAMGrs, interpolationAMGs, amg
+ 
+  Reference page in Help browser
+        &lt;a href="matlab:ifem coarseAMGdoc"&gt;coarsenAMGdoc&lt;/a&gt; 
+ 
+  Copyright (C) Long Chen. See COPYRIGHT.txt for details. 
+
+</pre><h2>Generate a test matrix<a name="2"></a></h2><pre class="codeinput">[node,elem] = squaremesh([0,1,0,1],1/8);
+<span class="comment">% [node,elem] = uniformrefine(node,elem);</span>
+<span class="comment">% load lakemesh</span>
+[A,M] = assemblematrix(node,elem);
+<span class="comment">% A = M;  % test mass matrix. No coarsening is needed.</span>
+</pre><h2>Parameters<a name="3"></a></h2><pre class="codeinput">theta = 0.025;
+N = size(A,1);
+N0 = min(sqrt(N),50);       <span class="comment">% number of the coarest nodes</span>
+</pre><h2>Generate strong connectness matrix<a name="4"></a></h2><pre class="codeinput">D = spdiags(1./sqrt(diag(A)),0,N,N);
+Am = D*A*D;  <span class="comment">% normalize diagonal of A</span>
+[im,jm,sm] = find(Am);
+idx = (-sm &gt; theta);   <span class="comment">% delete weakly connect off-diagonal and diagonal</span>
+As = sparse(im(idx),jm(idx),sm(idx),N,N); <span class="comment">% matrix for strong connectness</span>
+<span class="comment">% The diagonal of Am is 1. The negative off-diagonal measures the</span>
+<span class="comment">% diffusivity. The positive off-diagonal is filtered.</span>
+</pre><h2>Compute degree of vertex<a name="5"></a></h2><pre class="codeinput">deg = sum(spones(As)); <span class="comment">% number of strongly connected neighbors</span>
+deg = full(deg');
+<span class="comment">% deg = deg + rand(N,1); % break the equal degree case but deteriorate performance</span>
+<span class="keyword">if</span> sum(deg&gt;0) &lt; 0.1*sqrt(N)   <span class="comment">% too few connected nodes e.g. A is mass matrix</span>
+    isC(round(rand(N0,1)*N)) = true; <span class="comment">% randomly chose N0 nodes</span>
+    <span class="keyword">return</span>                    <span class="comment">% smoother is a good preconditioner</span>
+<span class="keyword">end</span>
+idx = (deg&gt;0);
+deg(idx) = deg(idx) + 0.1*rand(sum(idx),1); <span class="comment">% break the equal degree case</span>
+</pre><h2>Find an approximate maximal independent set and put to C set<a name="6"></a></h2><pre class="codeinput">isC = false(N,1);       <span class="comment">% C: coarse node</span>
+isF = false(N,1);       <span class="comment">% F: fine node</span>
+isU = true(N,1);        <span class="comment">% S: selected set</span>
+isF(deg == 0) = true;   <span class="comment">% isolated nodes are added into F set</span>
+<span class="comment">% debug</span>
+close <span class="string">all</span>;
+</pre><div><ul><li>magneta dots: indepedent nodes in U</li><li>yellow dots: F (fine) nodes</li><li>red dots: C (coarse) nodes</li><li>black dots: U (undecided) nodes</li></ul></div><pre class="codeinput">set(gcf,<span class="string">'Units'</span>,<span class="string">'normal'</span>);
+set(gcf,<span class="string">'Position'</span>,[0.5,0.5,0.5,0.5]);
+showmesh(node,elem);
+findnode(node,isU,<span class="string">'noindex'</span>,<span class="string">'Color'</span>,<span class="string">'k'</span>,<span class="string">'MarkerSize'</span>,32)
+<span class="keyword">while</span> sum(isC) &lt; N/2 &amp;&amp; sum(isU) &gt;N0
+    <span class="comment">% Mark all undecided nodes</span>
+    isS = false(N,1);  <span class="comment">% S: selected set, changing in the coarsening</span>
+    isS(deg&gt;0) = true;
+    S = find(isS);
+    <span class="comment">% debug</span>
+    fprintf(<span class="string">'Coarsening ... \n'</span>);
+
+    <span class="comment">% Find marked nodes with local maximum degree</span>
+    [i,j] = find(triu(As(S,S),1));    <span class="comment">% i,j: index for S</span>
+    idx = deg(S(i)) &gt;= deg(S(j));     <span class="comment">% compare degree of vertices</span>
+    isS(S(j(idx))) = false;  <span class="comment">% remove vertices with smaller degree</span>
+    isS(S(i(~idx))) = false;
+    isC(isS) = true;
+    findnode(node,isS,<span class="string">'noindex'</span>,<span class="string">'Color'</span>,<span class="string">'m'</span>);
+    fprintf(<span class="string">'Number of chosen points: %6.0u\n'</span>,sum(isS));
+    snapnow
+
+    <span class="comment">% Remove coarse nodes and neighboring nodes from undecided set</span>
+    [i,j] = find(As(:,isC)); <span class="comment">%#ok&lt;*NASGU&gt;</span>
+    isF(i) = true;        <span class="comment">% neighbor of C nodes are F nodes</span>
+    isU = ~(isF | isC);   <span class="comment">% U: undecided set</span>
+    deg(~isU) = 0;        <span class="comment">% remove current C and F from the graph</span>
+    <span class="comment">% -- No improvement by adding weight to nodes connected to F nodes --</span>
+<span class="comment">%     degFin = sum(spones(As(isF,isU)));</span>
+<span class="comment">%     degFin = full(degFin'); % degrer of strong connected with F points</span>
+<span class="comment">%     deg(isU) = deg(isU) + degFin; % add weight to nodes connected to F</span>
+
+    <span class="keyword">if</span> sum(isU) &lt;= N0   <span class="comment">% add small undecided nodes into C nodes</span>
+        isC(isU) = true;
+        isU = [];       <span class="comment">% to exit the while loop;</span>
+    <span class="keyword">end</span>
+    <span class="comment">% debug</span>
+    showmesh(node,elem);
+    findnode(node,isU,<span class="string">'noindex'</span>,<span class="string">'Color'</span>,<span class="string">'k'</span>,<span class="string">'MarkerSize'</span>,32)
+    findnode(node,isC,<span class="string">'noindex'</span>,<span class="string">'Color'</span>,<span class="string">'r'</span>,<span class="string">'MarkerSize'</span>,36);
+    findnode(node,isF,<span class="string">'noindex'</span>,<span class="string">'Color'</span>,<span class="string">'y'</span>,<span class="string">'MarkerSize'</span>,32)
+    snapnow
+<span class="keyword">end</span>
+fprintf(<span class="string">'Number of Coarse Nodes: %6.0u\n'</span>,sum(isC));
+</pre><pre class="codeoutput">Coarsening ... 
+Number of chosen points:     11
+</pre><img vspace="5" hspace="5" src="coarsenAMGdoc_01.png" alt=""> <img vspace="5" hspace="5" src="coarsenAMGdoc_02.png" alt=""> <pre class="codeoutput">Coarsening ... 
+Number of chosen points:     17
+</pre><img vspace="5" hspace="5" src="coarsenAMGdoc_03.png" alt=""> <img vspace="5" hspace="5" src="coarsenAMGdoc_04.png" alt=""> <pre class="codeoutput">Number of Coarse Nodes:     30
+</pre><p>Note that the red nodes are connected in the grid but not connected in the graph of the 5-point stencil.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Coarsening for Algebraic Multigrid
+%
+% Given a SPD matrix A, we describe an algebraic coarsening of a graph of A
+% based on the concept of strong connectness. The measure of strong
+% connectness is slightly different with the standard definition. The
+% parameter theta is used to define strong connectness and the default
+% value is 0.025.
+
+%% Usage of the function
+clear all
+help coarsenAMGc
+
+%% Generate a test matrix
+[node,elem] = squaremesh([0,1,0,1],1/8);
+% [node,elem] = uniformrefine(node,elem);
+% load lakemesh
+[A,M] = assemblematrix(node,elem);
+% A = M;  % test mass matrix. No coarsening is needed.
+
+%% Parameters
+theta = 0.025;
+N = size(A,1);
+N0 = min(sqrt(N),50);       % number of the coarest nodes
+
+%% Generate strong connectness matrix
+D = spdiags(1./sqrt(diag(A)),0,N,N);
+Am = D*A*D;  % normalize diagonal of A
+[im,jm,sm] = find(Am); 
+idx = (-sm > theta);   % delete weakly connect off-diagonal and diagonal
+As = sparse(im(idx),jm(idx),sm(idx),N,N); % matrix for strong connectness
+% The diagonal of Am is 1. The negative off-diagonal measures the
+% diffusivity. The positive off-diagonal is filtered. 
+
+%% Compute degree of vertex
+deg = sum(spones(As)); % number of strongly connected neighbors
+deg = full(deg');
+% deg = deg + rand(N,1); % break the equal degree case but deteriorate performance
+if sum(deg>0) < 0.1*sqrt(N)   % too few connected nodes e.g. A is mass matrix
+    isC(round(rand(N0,1)*N)) = true; % randomly chose N0 nodes
+    return                    % smoother is a good preconditioner
+end           
+idx = (deg>0);
+deg(idx) = deg(idx) + 0.1*rand(sum(idx),1); % break the equal degree case
+
+%% Find an approximate maximal independent set and put to C set
+isC = false(N,1);       % C: coarse node
+isF = false(N,1);       % F: fine node
+isU = true(N,1);        % S: selected set
+isF(deg == 0) = true;   % isolated nodes are added into F set
+% debug
+close all;
+%%
+% * magneta dots: indepedent nodes in U
+% * yellow dots: F (fine) nodes
+% * red dots: C (coarse) nodes
+% * black dots: U (undecided) nodes
+set(gcf,'Units','normal'); 
+set(gcf,'Position',[0.5,0.5,0.5,0.5]);
+showmesh(node,elem); 
+findnode(node,isU,'noindex','Color','k','MarkerSize',32)
+while sum(isC) < N/2 && sum(isU) >N0 
+    % Mark all undecided nodes
+    isS = false(N,1);  % S: selected set, changing in the coarsening
+    isS(deg>0) = true;
+    S = find(isS); 
+    % debug
+    fprintf('Coarsening ... \n');
+    
+    % Find marked nodes with local maximum degree
+    [i,j] = find(triu(As(S,S),1));    % i,j: index for S
+    idx = deg(S(i)) >= deg(S(j));     % compare degree of vertices
+    isS(S(j(idx))) = false;  % remove vertices with smaller degree 
+    isS(S(i(~idx))) = false; 
+    isC(isS) = true;
+    findnode(node,isS,'noindex','Color','m');
+    fprintf('Number of chosen points: %6.0u\n',sum(isS));
+    snapnow
+    
+    % Remove coarse nodes and neighboring nodes from undecided set
+    [i,j] = find(As(:,isC)); %#ok<*NASGU>
+    isF(i) = true;        % neighbor of C nodes are F nodes
+    isU = ~(isF | isC);   % U: undecided set
+    deg(~isU) = 0;        % remove current C and F from the graph
+    % REPLACE_WITH_DASH_DASH No improvement by adding weight to nodes connected to F nodes REPLACE_WITH_DASH_DASH
+%     degFin = sum(spones(As(isF,isU)));
+%     degFin = full(degFin'); % degrer of strong connected with F points
+%     deg(isU) = deg(isU) + degFin; % add weight to nodes connected to F
+    
+    if sum(isU) <= N0   % add small undecided nodes into C nodes
+        isC(isU) = true;
+        isU = [];       % to exit the while loop;
+    end
+    % debug
+    showmesh(node,elem); 
+    findnode(node,isU,'noindex','Color','k','MarkerSize',32)
+    findnode(node,isC,'noindex','Color','r','MarkerSize',36); 
+    findnode(node,isF,'noindex','Color','y','MarkerSize',32)
+    snapnow
+end
+fprintf('Number of Coarse Nodes: %6.0u\n',sum(isC));
+
+%%
+% Note that the red nodes are connected in the grid but not connected in
+% the graph of the 5-point stencil.
+##### SOURCE END #####
+--></body></html>

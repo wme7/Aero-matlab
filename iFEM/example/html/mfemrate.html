@@ -1,0 +1,174 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>RATE OF CONVERGENCE OF MIXED FINITE ELEMENT METHOD</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-11-29"><meta name="DC.source" content="mfemrate.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>RATE OF CONVERGENCE OF MIXED FINITE ELEMENT METHOD</h1><!--introduction--><p>This example is to show the rate of convergence of mixed finite element (RT0-P0) approximation of the Poisson equation on the unit square:</p><p><img src="mfemrate_eq43355.png" alt="$$- \Delta u = f \; \hbox{in } (0,1)^2$$"></p><p>for the following boundary condition:</p><div><ol><li>Pure Dirichlet boundary condition. <img src="mfemrate_eq03377.png" alt="$\Gamma _D = \partial \Omega$">.</li><li>Pure Neumann boundary condition. <img src="mfemrate_eq28233.png" alt="$\Gamma _N = \partial \Omega$">.</li><li>Mix Dirichlet and Neumann boundary condition. <img src="mfemrate_eq39127.png" alt="$u=g_D \hbox{ on }\Gamma_D, \quad \nabla u\cdot n=g_N \hbox{ on }\Gamma_N. \Gamma _N = \{(x,y): x=0, y\in [0,1]\}, \; \Gamma _D = \partial \Omega \backslash \Gamma _N$">.</li></ol></div><p>Written by Ming Wang.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Pure Dirichlet boundary condition.</a></li><li><a href="#3">Pure Neumann boundary condition.</a></li><li><a href="#4">Mix Dirichlet and Neumann boundary condition.</a></li><li><a href="#5">Conclusion</a></li></ul></div><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+[node,elem] = squaremesh([0,1,0,1],0.25);
+pde = mixBCdata;
+option.L0 = 2;
+option.maxIt = 4;
+option.printlevel = 1;
+option.elemType = <span class="string">'RT0-P0'</span>;
+<span class="comment">% option.solver = 'uzawapcg';</span>
+option.solver = <span class="string">'dmg'</span>;
+</pre><h2>Pure Dirichlet boundary condition.<a name="2"></a></h2><p>option.plotflag = 0;</p><pre class="codeinput">bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+mfemPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">Distributive MG #dof:     1312   gmres(20) converged at outer iteration 1 (inner iteration 13) to a solution with relative residual 3e-09.
+Elapsed time is 0.011485 seconds.
+Distributive MG #dof:     5184   gmres(20) converged at outer iteration 1 (inner iteration 13) to a solution with relative residual 2.4e-09.
+Elapsed time is 0.018245 seconds.
+Distributive MG #dof:    20608   gmres(20) converged at outer iteration 1 (inner iteration 13) to a solution with relative residual 2.2e-09.
+Elapsed time is 0.011486 seconds.
+Distributive MG #dof:    82176   gmres(20) converged at outer iteration 1 (inner iteration 13) to a solution with relative residual 2.3e-09.
+Elapsed time is 0.020399 seconds.
+ #Dof       ||u-u_h||       ||u_I-u_h||    ||sigma-sigma_h||  ||sigma-sigma_h||_{div}
+  289      1.06443e-02      6.59402e-05      1.85585e-02        2.12889e-02
+ 1089      5.32176e-03      1.65020e-05      9.27909e-03        1.06436e-02
+ 4225      2.66083e-03      4.12662e-06      4.63952e-03        5.32167e-03
+16641      1.33041e-03      1.03172e-06      2.31976e-03        2.66095e-03
+ ================================================================================= 
+</pre><img vspace="5" hspace="5" src="mfemrate_01.png" alt=""> <img vspace="5" hspace="5" src="mfemrate_02.png" alt=""> <h2>Pure Neumann boundary condition.<a name="3"></a></h2><p>option.plotflag = 0;</p><pre class="codeinput">bdFlag = setboundary(node,elem,<span class="string">'Neumann'</span>);
+mfemPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">Distributive MG #dof:     1312   gmres(20) converged at outer iteration 1 (inner iteration 12) to a solution with relative residual 3.5e-09.
+Elapsed time is 0.004546 seconds.
+Distributive MG #dof:     5184   gmres(20) converged at outer iteration 1 (inner iteration 11) to a solution with relative residual 7.2e-09.
+Elapsed time is 0.015637 seconds.
+Distributive MG #dof:    20608   gmres(20) converged at outer iteration 1 (inner iteration 11) to a solution with relative residual 4.8e-09.
+Elapsed time is 0.011776 seconds.
+Distributive MG #dof:    82176   gmres(20) converged at outer iteration 1 (inner iteration 11) to a solution with relative residual 5.1e-09.
+Elapsed time is 0.024856 seconds.
+ #Dof       ||u-u_h||       ||u_I-u_h||    ||sigma-sigma_h||  ||sigma-sigma_h||_{div}
+  289      1.06446e-02      9.76390e-05      1.85590e-02        2.14941e-02
+ 1089      5.32178e-03      1.74477e-05      9.27915e-03        1.07459e-02
+ 4225      2.66083e-03      4.01374e-06      4.63953e-03        5.37283e-03
+16641      1.33041e-03      1.06743e-06      2.31976e-03        2.68661e-03
+ ================================================================================= 
+</pre><img vspace="5" hspace="5" src="mfemrate_03.png" alt=""> <img vspace="5" hspace="5" src="mfemrate_04.png" alt=""> <h2>Mix Dirichlet and Neumann boundary condition.<a name="4"></a></h2><pre class="codeinput">option.plotflag = 1;
+option.solver = <span class="string">'uzawapcg'</span>;
+bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>,<span class="string">'~(x==0)'</span>,<span class="string">'Neumann'</span>,<span class="string">'x==0'</span>);
+mfemPoisson(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">#dof:     1312, Uzawa PCG iter: 17, err = 5.2025752e-09
+Elapsed time is 0.009504 seconds.
+#dof:     5184, Uzawa PCG iter: 17, err = 4.7620847e-09
+Elapsed time is 0.031995 seconds.
+#dof:    20608, Uzawa PCG iter: 17, err = 4.4470723e-09
+Elapsed time is 0.040003 seconds.
+#dof:    82176, Uzawa PCG iter: 17, err = 4.1139541e-09
+Elapsed time is 0.118156 seconds.
+ #Dof       ||u-u_h||       ||u_I-u_h||    ||sigma-sigma_h||  ||sigma-sigma_h||_{div}
+  289      1.06443e-02      6.87552e-05      1.85585e-02        2.12889e-02
+ 1089      5.32176e-03      1.72065e-05      9.27909e-03        1.06436e-02
+ 4225      2.66083e-03      4.30303e-06      4.63952e-03        5.32167e-03
+16641      1.33041e-03      1.07612e-06      2.31976e-03        2.66083e-03
+ ================================================================================= 
+</pre><img vspace="5" hspace="5" src="mfemrate_05.png" alt=""> <img vspace="5" hspace="5" src="mfemrate_06.png" alt=""> <h2>Conclusion<a name="5"></a></h2><p>The optimal rates of convergence for u and sigma are observed, namely, 1st order for L2 norm of u, L2 norm of sigma and H(div) norm of sigma. The 2nd order convergent rates between two discrete functions <tt>|uI-uh</tt>| and <tt>|sigmaI-sigmah</tt>| are known as superconvergence.</p><p>dmg and uzawapcg converges uniformly in all cases. Distributive MG is two times faster than uzawapcg.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% RATE OF CONVERGENCE OF MIXED FINITE ELEMENT METHOD
+%
+% This example is to show the rate of convergence of mixed finite element
+% (RT0-P0) approximation of the Poisson equation on the unit square:
+%
+% $$- \Delta u = f \; \hbox{in } (0,1)^2$$
+%
+% for the following boundary condition:
+%
+% # Pure Dirichlet boundary condition. $\Gamma _D = \partial \Omega$. 
+% # Pure Neumann boundary condition. $\Gamma _N = \partial \Omega$.
+% # Mix Dirichlet and Neumann boundary condition. $u=g_D \hbox{ on }\Gamma_D, 
+% \quad \nabla u\cdot n=g_N \hbox{ on }\Gamma_N. \Gamma _N = \{(x,y): x=0, 
+% y\in [0,1]\}, \; \Gamma _D = \partial \Omega \backslash \Gamma _N$. 
+%
+% Written by Ming Wang.
+
+%% 
+clear all; close all;
+[node,elem] = squaremesh([0,1,0,1],0.25); 
+pde = mixBCdata;
+option.L0 = 2;
+option.maxIt = 4;
+option.printlevel = 1;
+option.elemType = 'RT0-P0';
+% option.solver = 'uzawapcg';
+option.solver = 'dmg';
+
+%% Pure Dirichlet boundary condition.
+% option.plotflag = 0;
+bdFlag = setboundary(node,elem,'Dirichlet');
+mfemPoisson(node,elem,pde,bdFlag,option);
+
+%% Pure Neumann boundary condition.
+% option.plotflag = 0;
+bdFlag = setboundary(node,elem,'Neumann');
+mfemPoisson(node,elem,pde,bdFlag,option);
+
+%% Mix Dirichlet and Neumann boundary condition.
+option.plotflag = 1;
+option.solver = 'uzawapcg';
+bdFlag = setboundary(node,elem,'Dirichlet','~(x==0)','Neumann','x==0');
+mfemPoisson(node,elem,pde,bdFlag,option);
+
+%% Conclusion
+%
+% The optimal rates of convergence for u and sigma are observed, namely,
+% 1st order for L2 norm of u, L2 norm of sigma and H(div) norm of sigma. 
+% The 2nd order convergent rates between two discrete functions ||uI-uh|| 
+% and ||sigmaI-sigmah|| are known as superconvergence.
+%
+% dmg and uzawapcg converges uniformly in all cases. Distributive MG is two
+% times faster than uzawapcg.
+##### SOURCE END #####
+--></body></html>

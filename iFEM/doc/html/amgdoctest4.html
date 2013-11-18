@@ -1,0 +1,160 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>AMG TEST IV: Three Dimensional Problem</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-27"><meta name="DC.source" content="amgdoctest4.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>AMG TEST IV: Three Dimensional Problem</h1><!--introduction--><p>We consider the linear finite element discretization of Poisson equation in three dimensions with Dirichlet boundary conditions and compare geometric multigrid and algebraic multigrid.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Conclusion</a></li><li><a href="#2">Uniform Mesh: Geometric Multigrid</a></li><li><a href="#3">Uniform Mesh: Algebraic Multigrid</a></li><li><a href="#4">Unstructured Mesh</a></li></ul></div><h2>Conclusion<a name="1"></a></h2><p>The algebraic multigrid is robust to the size of the matrix. The iteration steps increases slightly. The preformance is better on structure grids than unstructure grids. The sparsity of the coarse grid is increased.</p><h2>Uniform Mesh: Geometric Multigrid<a name="2"></a></h2><pre class="codeinput">clear <span class="string">all</span>
+option.solver = <span class="string">'mg'</span>;
+cubePoisson;
+</pre><pre class="codeoutput">Time to assemble matrix equation  0.2 s
+Direct solver 
+#dof:      729,  #nnz:     2493,  iter:   ,  err = 3.6427e-16,  time = 0.46 s
+No coarsening of the grid. 
+Time to compute the error 0.17 s 
+ H1 err  2.6    L2err 0.21 
+Time to assemble matrix equation  0.4 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:     4913,  #nnz:    23813, iter: 10,   err = 1.9593e-09,   time = 0.84 s
+Time to compute the error 0.31 s 
+ H1 err  1.4    L2err 0.061 
+Time to assemble matrix equation  4.8 s
+Multigrid V-cycle Preconditioner with Conjugate Gradient Method
+#dof:    35937,  #nnz:   208917, iter: 10,   err = 5.1707e-09,   time =  1.1 s
+Time to compute the error  2.5 s 
+ H1 err 0.69    L2err 0.016 
+</pre><img vspace="5" hspace="5" src="amgdoctest4_01.png" alt=""> <h2>Uniform Mesh: Algebraic Multigrid<a name="3"></a></h2><pre class="codeinput">clear <span class="string">all</span>
+option.solver = <span class="string">'amg'</span>;
+cubePoisson;
+</pre><pre class="codeoutput">Time to assemble matrix equation 0.22 s
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.14,   level:  2,   coarse grid 141,   nnz/Nc 11.71
+#dof:     343,    iter:  9,   err = 3.1527e-09,   time = 0.122 s
+ 
+Time to compute the error 0.053 s 
+ H1 err  2.6    L2err 0.21 
+Time to assemble matrix equation 0.33 s
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.60,   level:  2,   coarse grid 1151,   nnz/Nc 14.37
+#dof:    3375,    iter: 11,   err = 2.4172e-09,   time = 0.43 s
+ 
+Time to compute the error 0.19 s 
+ H1 err  1.4    L2err 0.061 
+Time to assemble matrix equation  3.9 s
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.81,   level:  3,   coarse grid 1752,   nnz/Nc 26.91
+#dof:   29791,    iter: 12,   err = 8.7948e-09,   time = 8.33 s
+ 
+Time to compute the error  2.1 s 
+ H1 err 0.69    L2err 0.016 
+</pre><img vspace="5" hspace="5" src="amgdoctest4_02.png" alt=""> <h2>Unstructured Mesh<a name="4"></a></h2><pre class="codeinput">clear <span class="string">all</span>;
+load <span class="string">oilpump</span>;
+showboundary3(node,elem);
+option.solver = <span class="string">'amg'</span>;
+cubePoisson;
+</pre><pre class="codeoutput">Time to assemble matrix equation  1.1 s
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 7.96,   level:  2,   coarse grid 877,   nnz/Nc 9.81
+#dof:    3392,    iter: 12,   err = 2.7210e-09,   time = 0.94 s
+ 
+Time to compute the error 0.35 s 
+ H1 err 0.035    L2err 0.00034 
+Time to assemble matrix equation  6.2 s
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 12.35,   level:  3,   coarse grid 1875,   nnz/Nc 19.39
+#dof:   40121,    iter: 16,   err = 4.2506e-09,   time =  6.5 s
+ 
+Time to compute the error  3.6 s 
+ H1 err 0.019    L2err 0.00014 
+Time to assemble matrix equation   93 s
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 13.85,   level:  5,   coarse grid 653,   nnz/Nc 22.68
+#dof:  373751,    iter: 20,   err = 6.9171e-09,   time = 42.5 s
+ 
+Time to compute the error   47 s 
+ H1 err 0.01    L2err 4.6e-05 
+</pre><img vspace="5" hspace="5" src="amgdoctest4_03.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% AMG TEST IV: Three Dimensional Problem
+%
+% We consider the linear finite element discretization of Poisson equation
+% in three dimensions with Dirichlet boundary conditions and compare
+% geometric multigrid and algebraic multigrid.
+
+%% Conclusion
+%
+% The algebraic multigrid is robust to the size of the matrix. The
+% iteration steps increases slightly. The preformance is better on
+% structure grids than unstructure grids. The sparsity of the coarse grid
+% is increased.
+
+%% Uniform Mesh: Geometric Multigrid
+clear all
+option.solver = 'mg';
+cubePoisson;
+
+%% Uniform Mesh: Algebraic Multigrid
+clear all
+option.solver = 'amg';
+cubePoisson;
+
+%% Unstructured Mesh
+clear all;
+load oilpump;
+showboundary3(node,elem);
+option.solver = 'amg';
+cubePoisson;
+##### SOURCE END #####
+--></body></html>

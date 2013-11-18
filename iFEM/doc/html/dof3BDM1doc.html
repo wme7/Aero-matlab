@@ -1,0 +1,181 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Data Structure: Lowest Order BDM Element</title><meta name="generator" content="MATLAB 7.9"><meta name="date" content="2011-01-05"><meta name="m-file" content="dof3BDM1doc"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Data Structure: Lowest Order BDM Element</h1><!--introduction--><p>We explain degree of freedoms for the lowest order BDM element on tetrahedrons. The required data structure can be constructured by</p><pre>  [elem2dof,dofSign,face] = dof3BDM1(elem)</pre><p>Created by Ming Wang, at Dec 31, 2010.</p><p>TODO: Modify dof3BDM1docscript1 and dof3BDM1docscript2 to suit for BDM1 element.</p><p>Copyright (C) Long Chen. See COPYRIGHT.txt for details.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Local Labeling of DOFs</a></li><li><a href="#3">Orientation of Edges</a></li><li><a href="#5">An Example</a></li></ul></div><h2>Local Labeling of DOFs<a name="1"></a></h2><pre class="codeinput">dof3BDM1docscript1
+</pre><img vspace="5" hspace="5" src="dof3BDM1doc_01.png" alt=""> <p>There are 3 dofs on each face, hence 12 dofs on the tetrahedral. Here [1 2 3 4] are local indices of vertices.</p><p>For a triangulation consisting of several tetrahedrons, all local faces are collected and the duplication is eliminated to form faces of the triangulation. Therefore the global indices of faces is different with the local one. elem2dof(:,1:12) records the mapping from local to global indices.</p><pre class="codeinput">display(elem2dof)
+</pre><pre class="codeoutput">
+elem2dof =
+
+     1    12     5    20    11     4
+
+</pre><h2>Orientation of Edges<a name="3"></a></h2><pre class="codeinput">dof3BDM1docscript2
+</pre><img vspace="5" hspace="5" src="dof3BDM1doc_02.png" alt=""> <p>The face [i,j,k] is orientated in the direction such that i&lt;j&lt;k, where i,j,k are <b>global</b> indices. The faces formed by local indices may not be consistent with this orientation. Therefore dofSign is used to indicate the consistency.</p><p>The nodal indices in the left figure is local while that in the right is the global one. The local direction and global direction of edges is also indicated by different edge vectors.</p><pre class="codeinput">display(elem2dof)
+display(dofSign)
+</pre><pre class="codeoutput">
+elem2dof =
+
+     1     2     3     4     5     6
+
+
+dofSign =
+
+     1     1    -1    -1    -1    -1
+
+</pre><h2>An Example<a name="5"></a></h2><pre class="codeinput">node = [-1,-1,-1; 1,-1,-1; 1,1,-1; -1,1,-1; -1,-1,1; 1,-1,1; 1,1,1; -1,1,1];
+elem = [1,2,3,7; 1,6,2,7; 1,5,6,7; 1,8,5,7; 1,4,8,7; 1,3,4,7];
+[elem2dof,dofSign,face] = dof3BDM1(elem);
+figure(1); clf;
+showmesh3(node,elem,[],<span class="string">'FaceAlpha'</span>,0.25);
+view(-30,10);
+findedge3(node,edge);
+findelem3(node,elem,[1 3]');
+display(elem2dof);
+display(dofSign);
+</pre><pre class="codeoutput">
+elem2dof =
+
+  Columns 1 through 9
+
+          13           5           3           1          31          41          21          37          49
+          32           3          11           2          14          39          29          20          50
+          17          11           9           8          35          47          27          44          53
+          54           9          12          10          18          45          48          28          36
+          16          12           6           7          52          30          24          43          34
+          15           6           5           4          33          42          23          40          51
+
+  Columns 10 through 12
+
+          23          39          19
+          21          47          38
+          29          45          26
+          27          30          46
+          48          42          25
+          24          41          22
+
+
+dofSign =
+
+    1    1   -1    1    1    1   -1    1    1    1   -1    1
+    1    1   -1    1    1    1   -1    1    1    1   -1    1
+    1    1   -1    1    1    1   -1    1    1    1   -1    1
+    1    1   -1    1    1    1   -1    1    1    1   -1    1
+    1    1   -1    1    1    1   -1    1    1    1   -1    1
+    1    1   -1    1    1    1   -1    1    1    1   -1    1
+
+</pre><img vspace="5" hspace="5" src="dof3BDM1doc_03.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.9<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Data Structure: Lowest Order BDM Element
+% We explain degree of freedoms for the lowest order BDM element on
+% tetrahedrons. The required data structure can be constructured by
+%
+%    [elem2dof,dofSign,face] = dof3BDM1(elem)
+%
+% Created by Ming Wang, at Dec 31, 2010.
+% 
+% TODO: Modify dof3BDM1docscript1 and dof3BDM1docscript2 to suit for BDM1 element. 
+%
+% Copyright (C) Long Chen. See COPYRIGHT.txt for details. 
+
+%% Local Labeling of DOFs
+dof3BDM1docscript1
+%%
+% There are 3 dofs on each face, hence 12 dofs on the tetrahedral.
+% Here [1 2 3 4] are local indices
+% of vertices.
+%
+% For a triangulation consisting of several tetrahedrons, all local faces
+% are collected and the duplication is eliminated to form faces of the
+% triangulation. Therefore the global indices of faces is different with
+% the local one. elem2dof(:,1:12) records the mapping from local to global
+% indices.
+display(elem2dof)
+
+%% Orientation of Edges
+dof3BDM1docscript2
+%%
+% The face [i,j,k] is orientated in the direction such that i<j<k, where
+% i,j,k are *global* indices. The faces formed by local indices may not be
+% consistent with this orientation. Therefore dofSign is used to indicate
+% the consistency.
+%
+% The nodal indices in the left figure is local while that in the right is
+% the global one. The local direction and global direction of edges is also
+% indicated by different edge vectors.
+display(elem2dof)
+display(dofSign)
+
+%% An Example
+node = [-1,-1,-1; 1,-1,-1; 1,1,-1; -1,1,-1; -1,-1,1; 1,-1,1; 1,1,1; -1,1,1]; 
+elem = [1,2,3,7; 1,6,2,7; 1,5,6,7; 1,8,5,7; 1,4,8,7; 1,3,4,7];
+[elem2dof,dofSign,face] = dof3BDM1(elem);
+figure(1); clf;
+showmesh3(node,elem,[],'FaceAlpha',0.25);
+view(-30,10);
+findedge3(node,edge);
+findelem3(node,elem,[1 3]');
+display(elem2dof);
+display(dofSign);
+##### SOURCE END #####
+--></body></html>

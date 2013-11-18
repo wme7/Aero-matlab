@@ -1,0 +1,380 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>AMG TEST V: DIFFERENT INTERPOLATION OPERATORS</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-29"><meta name="DC.source" content="amgdoctest5.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>AMG TEST V: DIFFERENT INTERPOLATION OPERATORS</h1><!--introduction--><p>We consider the effect of using different interpolation operators to interpolate fine grid values by coarse grid values. It is tested through the following choices in option.interpolation</p><div><ul><li>'s' standard interpolation. Use the matrix A_fc as a weighted average of all connected coarse nodes.</li><li>'t' two-points interpolation. Use at most two connected coarse nodes.</li><li>'a' aggegration (one-point) interpolation. Use the strongest connected coarse node.</li></ul></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Unstructured mesh in 2-D</a></li><li><a href="#12">Unstructured mesh in 3-D</a></li><li><a href="#22">Conclusion</a></li></ul></div><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+</pre><h2>Unstructured mesh in 2-D<a name="2"></a></h2><pre class="codeinput">load <span class="string">lakemesh</span>
+showmesh(node,elem);
+</pre><img vspace="5" hspace="5" src="amgdoctest5_01.png" alt=""> <p>Standard interpolation</p><pre class="codeinput">option.interpolation = <span class="string">'s'</span>;
+[N,itStep,time,err] = amgtest(node,elem,[],option);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.08,   level:  2,   coarse grid 436,   nnz/Nc 6.61
+#dof:    1770,    iter: 11,   err = 2.0585e-09,   time = 0.241 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.59,   level:  2,   coarse grid 1867,   nnz/Nc 7.21
+#dof:    7876,    iter: 12,   err = 1.7884e-09,   time = 0.621 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.81,   level:  3,   coarse grid 1747,   nnz/Nc 8.40
+#dof:   33081,    iter: 15,   err = 2.8533e-09,   time = 1.82 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.91,   level:  4,   coarse grid 1535,   nnz/Nc 8.87
+#dof:  135463,    iter: 16,   err = 6.3006e-09,   time = 5.86 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.95,   level:  5,   coarse grid 1303,   nnz/Nc 8.97
+#dof:  548115,    iter: 19,   err = 9.4267e-09,   time = 21.7 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1770</td><td>11</td><td>0.241211</td><td>2.05852e-09</td></tr>
+<tr><td>7876</td><td>12</td><td>0.620939</td><td>1.78841e-09</td></tr>
+<tr><td>33081</td><td>15</td><td>1.82143</td><td>2.85331e-09</td></tr>
+<tr><td>135463</td><td>16</td><td>5.86299</td><td>6.30063e-09</td></tr>
+<tr><td>548115</td><td>19</td><td>21.6747</td><td>9.42668e-09</td></tr>
+</table><pre class="codeinput">clf;
+r = showrate(N,time,1);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r) <span class="string">'}'</span>],<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest5_02.png" alt=""> <p>Two-points interpolation</p><pre class="codeinput">load <span class="string">lakemesh</span>
+option.interpolation = <span class="string">'t'</span>;
+[N,itStep,time,err] = amgtest(node,elem,[],option);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.08,   level:  2,   coarse grid 431,   nnz/Nc 6.20
+#dof:    1770,    iter: 11,   err = 4.6800e-09,   time = 0.131 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.59,   level:  2,   coarse grid 1861,   nnz/Nc 6.98
+#dof:    7876,    iter: 12,   err = 3.7825e-09,   time = 0.559 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.81,   level:  3,   coarse grid 1776,   nnz/Nc 7.88
+#dof:   33081,    iter: 15,   err = 2.6135e-09,   time = 1.76 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.91,   level:  4,   coarse grid 1623,   nnz/Nc 8.44
+#dof:  135463,    iter: 17,   err = 2.9484e-09,   time = 5.82 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.95,   level:  5,   coarse grid 1378,   nnz/Nc 8.50
+#dof:  548115,    iter: 19,   err = 5.2303e-09,   time = 21.5 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1770</td><td>11</td><td>0.131337</td><td>4.68e-09</td></tr>
+<tr><td>7876</td><td>12</td><td>0.559053</td><td>3.78254e-09</td></tr>
+<tr><td>33081</td><td>15</td><td>1.76004</td><td>2.61352e-09</td></tr>
+<tr><td>135463</td><td>17</td><td>5.82258</td><td>2.94844e-09</td></tr>
+<tr><td>548115</td><td>19</td><td>21.5056</td><td>5.2303e-09</td></tr>
+</table><pre class="codeinput">clf;
+r = showrate(N,time,1);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r) <span class="string">'}'</span>],<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest5_03.png" alt=""> <p>One point interpolation</p><pre class="codeinput">load <span class="string">lakemesh</span>
+option.interpolation = <span class="string">'a'</span>;
+[N,itStep,time,err] = amgtest(node,elem,[],option);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.08,   level:  2,   coarse grid 423,   nnz/Nc 5.32
+#dof:    1770,    iter: 13,   err = 5.8151e-09,   time = 0.114 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.59,   level:  2,   coarse grid 1855,   nnz/Nc 6.11
+#dof:    7876,    iter: 15,   err = 4.9432e-09,   time = 0.646 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.81,   level:  3,   coarse grid 1930,   nnz/Nc 6.11
+#dof:   33081,    iter: 20,   err = 6.6521e-09,   time = 2.24 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.91,   level:  4,   coarse grid 1815,   nnz/Nc 6.06
+#dof:  135463,    iter: 26,   err = 4.5700e-09,   time = 7.41 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 6.95,   level:  5,   coarse grid 1595,   nnz/Nc 6.00
+#dof:  548115,    iter: 32,   err = 6.4277e-09,   time =   29 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>1770</td><td>13</td><td>0.114392</td><td>5.81514e-09</td></tr>
+<tr><td>7876</td><td>15</td><td>0.64611</td><td>4.94315e-09</td></tr>
+<tr><td>33081</td><td>20</td><td>2.23913</td><td>6.65211e-09</td></tr>
+<tr><td>135463</td><td>26</td><td>7.41027</td><td>4.56998e-09</td></tr>
+<tr><td>548115</td><td>32</td><td>29.0089</td><td>6.42767e-09</td></tr>
+</table><pre class="codeinput">clf;
+r = showrate(N,time,1);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r) <span class="string">'}'</span>],<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest5_04.png" alt=""> <h2>Unstructured mesh in 3-D<a name="12"></a></h2><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>
+load <span class="string">bunny</span>;
+showboundary3(node,elem);
+view([-179 74]);
+</pre><img vspace="5" hspace="5" src="amgdoctest5_05.png" alt=""> <p>Standard interpolation</p><pre class="codeinput">option.interpolation = <span class="string">'s'</span>;
+[N,itStep,time,err] = amgtest3(node,elem,1,option);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 10.93,   level:  2,   coarse grid 79,   nnz/Nc 14.39
+#dof:     347,    iter: 10,   err = 4.4639e-09,   time = 0.102 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 11.83,   level:  2,   coarse grid 1036,   nnz/Nc 20.15
+#dof:    5043,    iter: 12,   err = 5.8168e-09,   time = 0.797 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 13.48,   level:  3,   coarse grid 1872,   nnz/Nc 34.20
+#dof:   50163,    iter: 15,   err = 3.5706e-09,   time = 6.56 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 14.27,   level:  5,   coarse grid 627,   nnz/Nc 45.55
+#dof:  442103,    iter: 19,   err = 5.3823e-09,   time = 31.4 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>347</td><td>10</td><td>0.102492</td><td>4.4639e-09</td></tr>
+<tr><td>5043</td><td>12</td><td>0.797498</td><td>5.81678e-09</td></tr>
+<tr><td>50163</td><td>15</td><td>6.55949</td><td>3.57058e-09</td></tr>
+<tr><td>442103</td><td>19</td><td>31.3612</td><td>5.38233e-09</td></tr>
+</table><pre class="codeinput">clf;
+r = showrate(N,time,1);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r) <span class="string">'}'</span>],<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest5_06.png" alt=""> <p>Two-points interpolation</p><pre class="codeinput">load <span class="string">bunny</span>
+option.interpolation = <span class="string">'t'</span>;
+[N,itStep,time,err] = amgtest3(node,elem,1,option);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 10.93,   level:  2,   coarse grid 86,   nnz/Nc 12.51
+#dof:     347,    iter: 10,   err = 8.1679e-09,   time = 0.0424 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 11.83,   level:  2,   coarse grid 1060,   nnz/Nc 16.62
+#dof:    5043,    iter: 13,   err = 1.9583e-09,   time = 0.766 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 13.48,   level:  3,   coarse grid 1907,   nnz/Nc 25.60
+#dof:   50163,    iter: 16,   err = 4.4884e-09,   time =  6.2 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 14.27,   level:  5,   coarse grid 559,   nnz/Nc 28.51
+#dof:  442103,    iter: 20,   err = 3.8065e-09,   time = 27.8 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>347</td><td>10</td><td>0.0424485</td><td>8.16793e-09</td></tr>
+<tr><td>5043</td><td>13</td><td>0.765731</td><td>1.95829e-09</td></tr>
+<tr><td>50163</td><td>16</td><td>6.198</td><td>4.48845e-09</td></tr>
+<tr><td>442103</td><td>20</td><td>27.7941</td><td>3.8065e-09</td></tr>
+</table><pre class="codeinput">clf;
+r = showrate(N,time,1);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r) <span class="string">'}'</span>],<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest5_07.png" alt=""> <p>One point interpolation</p><pre class="codeinput">load <span class="string">bunny</span>
+option.interpolation = <span class="string">'a'</span>;
+[N,itStep,time,err] = amgtest3(node,elem,1,option);
+</pre><pre class="codeoutput">Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 10.93,   level:  2,   coarse grid 86,   nnz/Nc 9.21
+#dof:     347,    iter: 11,   err = 1.6815e-09,   time = 0.0381 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 11.83,   level:  2,   coarse grid 1040,   nnz/Nc 11.69
+#dof:    5043,    iter: 14,   err = 5.7428e-09,   time = 0.781 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 13.48,   level:  3,   coarse grid 1892,   nnz/Nc 14.20
+#dof:   50163,    iter: 19,   err = 5.9968e-09,   time = 5.21 s
+ 
+Multigrid W-cycle Preconditioner with Conjugate Gradient Method
+  nnz/N: 14.27,   level:  5,   coarse grid 463,   nnz/Nc 12.83
+#dof:  442103,    iter: 25,   err = 7.7846e-09,   time = 24.8 s
+ 
+</pre><pre class="codeinput">colHeaders = {<span class="string">'Unknowns'</span>,<span class="string">'Iterations'</span>,<span class="string">'Time (sec)'</span>,<span class="string">'Error'</span>};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td>Unknowns</td><td>Iterations</td><td>Time (sec)</td><td>Error</td></tr>
+<tr><td>347</td><td>11</td><td>0.0381267</td><td>1.68146e-09</td></tr>
+<tr><td>5043</td><td>14</td><td>0.781297</td><td>5.74279e-09</td></tr>
+<tr><td>50163</td><td>19</td><td>5.21371</td><td>5.99679e-09</td></tr>
+<tr><td>442103</td><td>25</td><td>24.8248</td><td>7.78456e-09</td></tr>
+</table><pre class="codeinput">clf;
+r = showrate(N,time,1);
+xlabel(<span class="string">'N'</span>); ylabel(<span class="string">'Time'</span>);
+title([<span class="string">'Complexity is N^{'</span> num2str(r) <span class="string">'}'</span>],<span class="string">'Fontsize'</span>, 14);
+</pre><img vspace="5" hspace="5" src="amgdoctest5_08.png" alt=""> <h2>Conclusion<a name="22"></a></h2><p>In general, if we use more coarse grids, we get more accurate interpolation and require less iteration steps. But the matrix on coarse level becomes denser, see nnz/Nc, which requires, indeed, more computational time in both smoother and coarse grid solver. In the extremly case, the one-point interpolation almost keeps the sparsity but iteration steps increase as level increases in the speed of J. The average using all neighboring points keeps the iteration steps but the sparsity increase a lot, especially in 3-D. The two-points interpolation seems a good balance.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% AMG TEST V: DIFFERENT INTERPOLATION OPERATORS
+% 
+% We consider the effect of using different interpolation operators to
+% interpolate fine grid values by coarse grid values. It is tested through
+% the following choices in option.interpolation
+%
+% * 's' standard interpolation. Use the matrix A_fc as a weighted average
+% of all connected coarse nodes.
+% * 't' two-points interpolation. Use at most two connected coarse
+% nodes.
+% * 'a' aggegration (one-point) interpolation. Use the strongest connected
+% coarse node.
+
+%%
+clear all; close all;
+%% Unstructured mesh in 2-D
+load lakemesh
+showmesh(node,elem);
+%%
+% Standard interpolation
+option.interpolation = 's';
+[N,itStep,time,err] = amgtest(node,elem,[],option);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+clf;
+r = showrate(N,time,1);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r) '}'],'Fontsize', 14);
+%%
+% Two-points interpolation
+load lakemesh
+option.interpolation = 't';
+[N,itStep,time,err] = amgtest(node,elem,[],option);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+clf;
+r = showrate(N,time,1);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r) '}'],'Fontsize', 14);
+%%
+% One point interpolation
+load lakemesh
+option.interpolation = 'a';
+[N,itStep,time,err] = amgtest(node,elem,[],option);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+clf;
+r = showrate(N,time,1);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r) '}'],'Fontsize', 14);
+
+%% Unstructured mesh in 3-D
+clear all; close all
+load bunny;
+showboundary3(node,elem);
+view([-179 74]);
+%%
+% Standard interpolation
+option.interpolation = 's';
+[N,itStep,time,err] = amgtest3(node,elem,1,option);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+clf;
+r = showrate(N,time,1);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r) '}'],'Fontsize', 14);
+%%
+% Two-points interpolation
+load bunny
+option.interpolation = 't';
+[N,itStep,time,err] = amgtest3(node,elem,1,option);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+clf;
+r = showrate(N,time,1);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r) '}'],'Fontsize', 14);
+%%
+% One point interpolation
+load bunny
+option.interpolation = 'a';
+[N,itStep,time,err] = amgtest3(node,elem,1,option);
+%% 
+colHeaders = {'Unknowns','Iterations','Time (sec)','Error'};
+makeHtmlTable([N itStep time err],[],[],colHeaders,[],6);
+%%
+clf;
+r = showrate(N,time,1);
+xlabel('N'); ylabel('Time');
+title(['Complexity is N^{' num2str(r) '}'],'Fontsize', 14);
+
+%% Conclusion
+% In general, if we use more coarse grids, we get more accurate
+% interpolation and require less iteration steps. But the matrix on coarse
+% level becomes denser, see nnz/Nc, which requires, indeed, more
+% computational time in both smoother and coarse grid solver. In the
+% extremly case, the one-point interpolation almost keeps the sparsity but
+% iteration steps increase as level increases in the speed of J. The
+% average using all neighboring points keeps the iteration steps but the
+% sparsity increase a lot, especially in 3-D. The two-points interpolation
+% seems a good balance.
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,255 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>mgrateStokes</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-04-22"><meta name="DC.source" content="mgrateStokes.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">MULTIGRID OF FOR THE STOKES EQNS IN 2D</a></li><li><a href="#2">Setting</a></li><li><a href="#3">RT0-P0</a></li><li><a href="#4">CR-P0 element</a></li><li><a href="#5">P2-P0 element</a></li><li><a href="#6">P2-P1 element</a></li><li><a href="#7">isoP2-P0 element</a></li><li><a href="#8">isoP2-P1 element</a></li><li><a href="#9">P1b-P1 element</a></li><li><a href="#10">Conclusion</a></li></ul></div><h2>MULTIGRID OF FOR THE STOKES EQNS IN 2D<a name="1"></a></h2><p>This example is to show the convergence of multigrid methods for various finite element approximation of the Stokes equation on the unit square:</p><pre>     -div(mu*grad u) + grad p = f in \Omega,
+                      - div u = 0  in \Omega,
+                            u = g_D  on \Gamma.</pre><p>with the pure Dirichlet boundary condition.</p><pre class="codeinput">clear <span class="string">all</span>; close <span class="string">all</span>;
+</pre><h2>Setting<a name="2"></a></h2><pre class="codeinput">[node,elem] = squaremesh([0,1,0,1],0.25);
+pde = Stokesdata1;
+<span class="comment">% pde = StokesZulehnerdata;</span>
+bdFlag = setboundary(node,elem,<span class="string">'Dirichlet'</span>);
+option.L0 = 2;
+option.maxIt = 4;
+option.printlevel = 1;
+option.plotflag = 0;
+option.rateflag = 0;
+</pre><h2>RT0-P0<a name="3"></a></h2><pre class="codeinput">option.elemType = <span class="string">'RT0-P0'</span>;
+option.solver = <span class="string">'mg'</span>;
+option.refType = <span class="string">'red'</span>;
+femStokesHdiv(node,elem,pde,bdFlag,option);
+<span class="comment">%</span>
+<span class="comment">% %% BDM1B-P0</span>
+<span class="comment">% % option.elemType = 'BDM1B-P0';</span>
+<span class="comment">% % option.solver = 'mg';</span>
+<span class="comment">% % option.refType = 'red';</span>
+<span class="comment">% % femStokesHdiv(node,elem,pde,bdFlag,option);</span>
+<span class="comment">%</span>
+</pre><pre class="codeoutput">#dof:   1248,  #nnz:  17210, level:  3  MG WCYCLE iter:  7,  err = 7.0387e-09,  time = 0.044 s
+#dof:   5056,  #nnz:  73754, level:  4  MG WCYCLE iter:  7,  err = 7.1478e-09,  time = 0.12 s
+#dof:  20352,  #nnz: 305114, level:  5  MG WCYCLE iter:  7,  err = 6.3611e-09,  time = 0.45 s
+#dof:  81664,  #nnz: 1240922, level:  6  MG WCYCLE iter:  7,  err = 5.5209e-09,  time =  1.9 s
+===========================================================
+   N   ||u_I-u_h||_1  ||u-u_h||   ||u_I-u_h||_{max}
+  289   2.49107e-01   4.68316e-01   2.15672e-03
+ 1089   1.04102e-01   2.34417e-01   3.60124e-04
+ 4225   4.04527e-02   1.17239e-01   5.36428e-05
+16641   1.51016e-02   5.86235e-02   7.50065e-06
+===========================================================
+   N   ||p_I-p_h||   ||p-p_h||    ||p_I-p_h||_{max}
+  289   5.01835e-01   8.58964e-01   9.07722e+00
+ 1089   1.99327e-01   4.01565e-01   7.26445e+00
+ 4225   8.63987e-02   1.94542e-01   6.19933e+00
+16641   4.04824e-02   9.60953e-02   5.61892e+00
+===========================================================
+   N   ||w_I-w_h||   ||w-w_h|
+  289   1.51963e+00   1.08270e+00
+ 1089   7.55491e-01   5.35842e-01
+ 4225   3.77219e-01   2.67015e-01
+16641   1.88591e-01   1.33398e-01
+===========================================================
+</pre><h2>CR-P0 element<a name="4"></a></h2><pre class="codeinput">option.elemType = <span class="string">'CRP0'</span>;
+option.solver = <span class="string">'asmg'</span>;
+femStokes(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">#dof:   2112,  #nnz:     9280, iter:  9,   err = 1.1600e-09,   time = 0.14 s
+#dof:   8320,  #nnz:    38016, iter:  9,   err = 1.1316e-09,   time = 0.55 s
+#dof:  33024,  #nnz:   153856, iter:  8,   err = 8.8069e-09,   time =  1.8 s
+#dof: 131584,  #nnz:   619008, iter:  8,   err = 6.4575e-09,   time =    7 s
+ #Dof       |u_I-u_h|_1       ||p-p_h||  
+  289      1.39953e+00      9.42925e-01
+ 1089      7.18220e-01      4.10772e-01
+ 4225      3.62378e-01      1.90168e-01
+16641      1.81727e-01      9.20441e-02
+</pre><h2>P2-P0 element<a name="5"></a></h2><pre class="codeinput">option.elemType = <span class="string">'P2P0'</span>;
+option.solver = <span class="string">'asmg'</span>;
+femStokes(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">#dof:   2690,  #nnz:    25570, iter:  9,   err = 7.1899e-09,   time = 0.11 s
+#dof:  10498,  #nnz:   108386, iter:  9,   err = 3.9324e-09,   time =  0.6 s
+#dof:  41474,  #nnz:   446050, iter:  9,   err = 3.8784e-09,   time =  2.4 s
+#dof: 164866,  #nnz:  1809506, iter:  9,   err = 3.9459e-09,   time =   10 s
+ #Dof       |u_I-u_h|_1       ||p-p_h||  
+  289      6.64680e-01      7.05209e-01
+ 1089      3.40775e-01      3.50301e-01
+ 4225      1.72404e-01      1.74622e-01
+16641      8.66869e-02      8.72085e-02
+</pre><h2>P2-P1 element<a name="6"></a></h2><pre class="codeinput">option.elemType = <span class="string">'P2P1'</span>;
+option.solver = <span class="string">'asmg'</span>;
+femStokes(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">#dof:   2467,  #nnz:    33258, iter: 10,   err = 8.9844e-09,   time = 0.13 s
+#dof:   9539,  #nnz:   140138, iter: 10,   err = 5.0661e-09,   time = 0.68 s
+#dof:  37507,  #nnz:   575082, iter: 10,   err = 3.7629e-09,   time =  2.6 s
+#dof: 148739,  #nnz:  2329706, iter: 10,   err = 2.7591e-09,   time =   11 s
+ #Dof       |u_I-u_h|_1       ||p-p_h||  
+  289      1.43294e-03      1.65715e-02
+ 1089      1.80999e-04      4.08541e-03
+ 4225      2.27518e-05      1.01768e-03
+16641      2.86788e-06      2.54192e-04
+</pre><h2>isoP2-P0 element<a name="7"></a></h2><pre class="codeinput">option.elemType = <span class="string">'isoP2P0'</span>;
+option.solver = <span class="string">'asmg'</span>;
+femStokes(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">#dof:   2690,  #nnz:    16930, iter:  9,   err = 6.9571e-09,   time = 0.11 s
+#dof:  10498,  #nnz:    70690, iter: 10,   err = 2.8978e-09,   time = 0.65 s
+#dof:  41474,  #nnz:   288802, iter: 10,   err = 2.9985e-09,   time =  2.5 s
+#dof: 164866,  #nnz:  1167394, iter: 10,   err = 2.4319e-09,   time =   10 s
+ #Dof       |u_I-u_h|_1       ||p-p_h||  
+  289      6.25359e-01      7.56862e-01
+ 1089      3.19111e-01      3.76809e-01
+ 4225      1.61122e-01      1.88036e-01
+16641      8.09430e-02      9.39433e-02
+</pre><h2>isoP2-P1 element<a name="8"></a></h2><pre class="codeinput">option.elemType = <span class="string">'isoP2P1'</span>;
+option.solver = <span class="string">'asmg'</span>;
+femStokes(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">#dof:   2467,  #nnz:    24940, iter: 13,   err = 9.3418e-09,   time = 0.15 s
+#dof:   9539,  #nnz:   103788, iter: 13,   err = 5.9652e-09,   time = 0.81 s
+#dof:  37507,  #nnz:   423276, iter: 13,   err = 5.6200e-09,   time =  3.1 s
+#dof: 148739,  #nnz:  1709420, iter: 13,   err = 4.2891e-09,   time =   12 s
+ #Dof       |u_I-u_h|_1       ||p-p_h||  
+  289      6.44312e-02      1.55529e-01
+ 1089      2.02371e-02      4.26261e-02
+ 4225      6.56641e-03      1.18215e-02
+16641      2.19661e-03      3.38913e-03
+</pre><h2>P1b-P1 element<a name="9"></a></h2><pre class="codeinput">option.elemType = <span class="string">'P1bP1'</span>;
+option.solver = <span class="string">'asmg'</span>;
+femStokes(node,elem,pde,bdFlag,option);
+</pre><pre class="codeoutput">#dof:   1891,  #nnz:    12650, iter: 10,   err = 9.4828e-09,   time = 0.11 s
+#dof:   7363,  #nnz:    52906, iter: 11,   err = 1.7517e-09,   time = 0.63 s
+#dof:  29059,  #nnz:   216362, iter: 10,   err = 9.0995e-09,   time =  2.6 s
+#dof: 115459,  #nnz:   875050, iter: 10,   err = 7.2911e-09,   time =  8.6 s
+ #Dof       |u_I-u_h|_1       ||p-p_h||  
+  289      1.80268e-01      7.11564e-01
+ 1089      6.32875e-02      2.20345e-01
+ 4225      2.21618e-02      7.02701e-02
+16641      7.77048e-03      2.31884e-02
+</pre><h2>Conclusion<a name="10"></a></h2><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% MULTIGRID OF FOR THE STOKES EQNS IN 2D
+%
+% This example is to show the convergence of multigrid methods for various
+% finite element approximation of the Stokes equation on the unit square:
+%
+%       -div(mu*grad u) + grad p = f in \Omega,
+%                        - div u = 0  in \Omega,
+%                              u = g_D  on \Gamma.
+%
+% with the pure Dirichlet boundary condition.
+%
+
+clear all; close all;
+%% Setting
+[node,elem] = squaremesh([0,1,0,1],0.25); 
+pde = Stokesdata1; 
+% pde = StokesZulehnerdata;
+bdFlag = setboundary(node,elem,'Dirichlet');
+option.L0 = 2;
+option.maxIt = 4;
+option.printlevel = 1;
+option.plotflag = 0;
+option.rateflag = 0;
+
+%% RT0-P0
+option.elemType = 'RT0-P0';
+option.solver = 'mg';
+option.refType = 'red';
+femStokesHdiv(node,elem,pde,bdFlag,option);
+% 
+% %% BDM1B-P0
+% % option.elemType = 'BDM1B-P0';
+% % option.solver = 'mg';
+% % option.refType = 'red';
+% % femStokesHdiv(node,elem,pde,bdFlag,option);
+% 
+%% CR-P0 element
+option.elemType = 'CRP0';
+option.solver = 'asmg';
+femStokes(node,elem,pde,bdFlag,option);
+
+%% P2-P0 element
+option.elemType = 'P2P0';
+option.solver = 'asmg';
+femStokes(node,elem,pde,bdFlag,option);
+
+%% P2-P1 element
+option.elemType = 'P2P1';
+option.solver = 'asmg';
+femStokes(node,elem,pde,bdFlag,option);
+
+%% isoP2-P0 element
+option.elemType = 'isoP2P0';
+option.solver = 'asmg';
+femStokes(node,elem,pde,bdFlag,option);
+
+%% isoP2-P1 element
+option.elemType = 'isoP2P1';
+option.solver = 'asmg';
+femStokes(node,elem,pde,bdFlag,option);
+
+%% P1b-P1 element
+option.elemType = 'P1bP1';
+option.solver = 'asmg';
+femStokes(node,elem,pde,bdFlag,option);
+
+%% Conclusion
+% 
+##### SOURCE END #####
+--></body></html>
