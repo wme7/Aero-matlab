@@ -19,7 +19,7 @@ vanleer  = (theta+abs(theta))./(1+abs(theta));
 % vertices of polygonal bounding region (truncated at x=10) 
 figure(1)
 x = [0 10 10 1];
-y = [0   0   2 2];
+y = [0  0  2 2];
 fill(x,y,[.9 .9 .9]); % fill region with grey
 
 hold on;
