@@ -7,7 +7,7 @@ saveframes=1;
 % du_m/dt = c*(u_{m+1}-u_m)/dt
 
 % number of data points
- M = 100;
+M = 100;
 
 % periodic interval dimensions (i.e. x \in [a,b))
 a = 0; b =  2;
