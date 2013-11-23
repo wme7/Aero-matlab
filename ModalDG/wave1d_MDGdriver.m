@@ -14,7 +14,7 @@ clear all; close all; %clc;
 
 %% Parameters
 fluxfun = 'linear'; % select flux function
-cfl = 0.005; % CFL condition
+cfl = 0.02; % CFL condition
 tEnd = 2*pi; % final time
 K = 3; % degree of accuaracy
 nE = 20; % number of elements
@@ -80,7 +80,7 @@ while t < tEnd
     u_bar = w*u/2;
     
     % Plot u
-    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid on; 
+    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid off; 
     subplot(1,2,2); plot(xc,u_bar,'ro'); axis(plotrange); grid off; 
     
     %if rem(it,10) == 0

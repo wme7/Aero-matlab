@@ -21,7 +21,7 @@ tEnd = 2*pi; % final time
 K = 3; % degree of accuaracy
 nE = 20; % number of elements
 includeS = 0; %{0}no sourcer term, {1}add source term
-flux_type = 2; %{1}Roe, {2}LF, {3}LLF, {4}Upwind
+flux_type = 4; %{1}Roe, {2}LF, {3}LLF, {4}Upwind
 
 %% PreProcess
 % Define our Flux function
