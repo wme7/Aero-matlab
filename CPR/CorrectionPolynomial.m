@@ -18,7 +18,7 @@ classdef CorrectionPolynomial
     end
     
     methods (Static)
-        function legP = LegendreP(kDeg)
+        function legP = LegendreP(l)
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Legendre Polynomials
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -26,33 +26,8 @@ classdef CorrectionPolynomial
             %  Input : kDeg: Polynomial Degree requested
             % Output : legP: symbolic Legendre polynomial
             %
-            x = sym('x');
-            switch kDeg
-                case(0)
-                    legP = x^0; % = 1
-                case(1)
-                    legP = x;
-                case(2)
-                    legP = 1/2*(-1+3*x^2);
-                case(3)
-                    legP = 1/2*(-3*x+5*x^3);
-                case(4)
-                    legP = 1/8*(3-30*x^2+35*x^4);
-                case(5)
-                    legP = 1/8*(63*x^5-70*x^3+15*x);
-                case(6)
-                    legP = 1/16*(231*x^6-315*x^4+105*x^2-5);
-                case(7)
-                    legP = 1/16*(-35*x + 315*x^3 - 693*x^5 + 429*x^7);
-                case(8)
-                    legP = 1/128*(-35 + 1260*x^2 - 6930*x^4 + 12012*x^6 - 6435*x^8);
-                case(9)
-                    legP = 1/128*(315*x - 4620*x^3 + 18018*x^5 - 25740*x^7 + 12155*x^9);
-                case(10)
-                    legP = 1/256*(63 - 3465*x^2 + 30030*x^4 - 90090*x^6 + 109395*x^8 - 46189*x^10);
-                otherwise
-                    error('Legendre Polynomial not available');
-            end
+            x = sym('x'); 
+            legP = simplify(1/(2^l*factorial(l))*diff((x^2-1)^l,x,l));
         end
                    
     end % Methods

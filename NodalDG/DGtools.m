@@ -22,27 +22,26 @@ classdef DGtools
     end
     
     methods (Static)
-        function legP = legendreP(x,k)
+        function legP = legendreP(xi,l)
             % Construct Legendre Polynomials
             %**************************************************************
             % Compute the value of the legendre polinomial of degree 'kDeg'
             % for every column value 'xi'
             %**************************************************************
-            switch k
-                case {0} % when k = 0
-                    legP = ones(size(x));
-                case {1} % when k = 1
-                    legP = x;
-                otherwise % k >= 2
-                    legP0 = ones(size(x));
-                    legP1 = x;
-                    for m = 1:k-1
-                        legPX = ((2*m+1)*x.*legP1 - m*legP0)./(m+1);
-                        legP0 = legP1;
-                        legP1 = legPX;
-                    end
-                    legP = legPX;
-            end
+            x = sym('x'); 
+            temp = simplify(1/(2^l*factorial(l))*diff((x^2-1)^l,x,l));
+            legP = subs(temp,xi);
+        end
+        
+        function dlegP = dlegendreP(xi,l)
+            % Construct derivatives of Legendre Polynomials
+            %**************************************************************
+            % Compute the derivative value of the legendre polinomial of
+            % degree 'kDeg' for every column value 'xi'
+            %**************************************************************
+            x = sym('x'); 
+            legP = simplify(1/(2^l*factorial(l))*diff((x^2-1)^l,x,l));
+            dlegP = subs(diff(legP,x),xi);
         end
         
         function h = DGnflux(f,df,u,strategy)
@@ -95,8 +94,12 @@ classdef DGtools
             obj.kDeg = length(localNodes)-1;
             obj.xi = localNodes;
         end
+
+        %%%%%%%%%%%%%%%
+        %  MAIN TOOL: %
+        %%%%%%%%%%%%%%%
         
-        function V = get.Vadermonde(obj)
+        function V = get.Vadermonde(obj) % Legendre Vadermonde Matrix
             % Construct Legendre Vandermonde Matrix, V,
             %**************************************************************
             % V is a matrix array in which each element is a Legendre
@@ -113,6 +116,10 @@ classdef DGtools
                 end
             end
         end
+        
+        %%%%%%%%%%%%%%%
+        % MODAL TOOLS %
+        %%%%%%%%%%%%%%%
         
         function legL = get.legLeftEnd(obj)
             % Scaled Legendre polynomials of degree 'l', l=0:kDeg,
@@ -160,7 +167,7 @@ classdef DGtools
                 end
             end
         end
-                
+        
         % transform u(x,t) to degress of freedom u(t)_{l,i} for each i-Cell/Element
         % ut = zeros(np,nx);
         % for l = 0:k             % for all degress of freedom
@@ -200,6 +207,32 @@ classdef DGtools
         % end
         % % 2. Cell Integral volume by Prof T.W. method
         % v_term2 = D'*ft;
+        
+        %%%%%%%%%%%%%%%
+        % NODAL TOOLS %
+        %%%%%%%%%%%%%%%
+        
+        function nM = get.nodalMassMatrix(obj)
+            nM = inv(obj.Vadermonde*obj.Vadermonde');
+        end
+        
+        function ninvM = get.nodalInvMassMatrix(obj)
+            ninvM = inv(obj.nodalMassMatrix);
+        end
+        
+        function Vr = get.GradVadermonde(obj)
+            Vr = zeros(obj.kDeg);% Allocate
+            for l = 0:obj.kDeg 	% All Polynomial Degrees up to kDeg
+                j = l + 1;      % Dummy index
+                for i = 1:obj.nNodes  % All Element Points in xi
+                    Vr(i,j) = obj.dlegendreP(obj.xi(i),l);
+                end
+            end
+        end
+        
+        function nDr = get.nodalCoefDiffMatrix(obj)
+            nDr = obj.GradVadermonde/obj.Vadermonde;
+        end
         
     end % Methods
 end % Class

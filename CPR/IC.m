@@ -1,5 +1,3 @@
-(* ::Package:: *)
-
 function u0 = IC(x,ICcase)
 % Create vector u0 with an Initial Condition. 6 cases are available.
 %**************************************************************************

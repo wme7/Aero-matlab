@@ -8,7 +8,7 @@
 %                               
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ref: J.S. Hestaven & T. Warburton; Nodal Discontinuous Galerkin Methods,
-% Algorithms, Analysis and Applications; Springer 2008.
+% Algorithms, Analysis and Applications. Springer 2008.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Notes: Basic Scheme Implementation without RK intergration scheeme.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -18,7 +18,7 @@ clear all; close all; %clc;
 fluxfun = 'linear'; % select flux function
 cfl = 0.02; % CFL condition
 tEnd = 2*pi; % final time
-K = 3; % degree of accuaracy
+K = 8; % degree of accuaracy
 nE = 20; % number of elements
 
 %% PreProcess
@@ -38,7 +38,8 @@ dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
 
 % Load DG tools
 tool = DGtools(xgrid.solutionPoints);
-V = tool.Vadermonde; 
+V = tool.Vadermonde; invM = tool.nodalInvMassMatrix;
+Dr = tool.nodalCoefDiffMatrix;
 
 % IC
 u0 = IC(x,2);
@@ -93,11 +94,8 @@ while t < tEnd
     nflux = 0.5*(flux(u_nface)+flux(u_pface)-alpha*(u_pface-u_nface));
     nfluxL = nflux(1:end-1); nfluxR = nflux(2:end);
 
-    % flux derivate
-    df = L.dcoef*f;
-    
     % Compute the derivate: F = f + gL*(nfluxL-f_bdL) + gR*(nfluxR-f_bdR)
-    dF = df + dg.RR*(nfluxL - f_lbd) + dg.RL*(nfluxR - f_rbd);
+    dF = -Dr*f; + (nfluxL - f_lbd) + (nfluxR - f_rbd);
 
     % next time info!
     ut_next = ut + dt*dF/J;
