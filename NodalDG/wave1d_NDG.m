@@ -18,7 +18,7 @@ clear all; close all; %clc;
 fluxfun = 'linear'; % select flux function
 cfl = 0.02; % CFL condition
 tEnd = 2*pi; % final time
-K = 8; % degree of accuaracy
+K = 4; % degree of accuaracy
 nE = 20; % number of elements
 
 %% PreProcess
@@ -70,11 +70,11 @@ while t < tEnd
             u_rbd = u(end,:);
             f_lbd = f(1,:);
             f_rbd = f(end,:);
-        otherwise
-            u_lbd = L.lcoef*u;
-            u_rbd = L.rcoef*u;
-            f_lbd = L.lcoef*f;
-            f_rbd = L.rcoef*f;
+        otherwise % use Interpolation
+            %u_lbd = L.lcoef*u;
+            %u_rbd = L.rcoef*u;
+            %f_lbd = L.lcoef*f;
+            %f_rbd = L.rcoef*f;
     end
     
     % Build Numerical fluxes across faces
@@ -94,8 +94,11 @@ while t < tEnd
     nflux = 0.5*(flux(u_nface)+flux(u_pface)-alpha*(u_pface-u_nface));
     nfluxL = nflux(1:end-1); nfluxR = nflux(2:end);
 
+    % Lift operator
+    Lift = (nfluxL - f_lbd) + (nfluxR - f_rbd);
+    
     % Compute the derivate: F = f + gL*(nfluxL-f_bdL) + gR*(nfluxR-f_bdR)
-    dF = -Dr*f; + (nfluxL - f_lbd) + (nfluxR - f_rbd);
+    dF = -Dr*f + invM*Lift;
 
     % next time info!
     ut_next = ut + dt*dF/J;
