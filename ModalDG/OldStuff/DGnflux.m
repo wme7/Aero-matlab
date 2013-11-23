@@ -1,11 +1,9 @@
-function h = DGflux1d(f,df,u,strategy)
+function h = DGnflux(f,df,u,strategy)
 % General flux subroutine 
 % We use 1 of 4 flux strategies/algorithms optimized for matlab.
 % coded by Manuel Diaz, 2012.12.21 (the end of the world)
 
 %% Parameters
-nx = length(u); % Grid Size
-%x = 1:nx-1;    % Indexes of the flux at the boundary cells (i.e. middle point in my domain)
 flx = f(u);     % flux value at every point of the domain
 dflx = df(u);   % flux slope at every point of the domain
 

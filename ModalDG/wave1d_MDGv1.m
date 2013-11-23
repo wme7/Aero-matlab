@@ -81,11 +81,11 @@ while t < tEnd
     up = lL*ut; % u_{i-1/2}^(+) -> Left u
     un = lR*ut; % u_{i+1/2}^(-) -> Right u
     uc = [un(1:end-1);up(2:end)];
-    h  = DGnflux(flux,dflux,uc,flux_type); % Evaluate fluxes
+    h  = tool.DGnflux(flux,dflux,uc,flux_type); % Evaluate fluxes
     
     % Compute fluxes for periodic BC - boundary cells
     ub = [un(end);up(1)];
-    hb = DGnflux(flux,dflux,ub,flux_type);
+    hb = tool.DGnflux(flux,dflux,ub,flux_type);
     
     % Just for comparison with mathematica
     %totalh = [hb,h,hb];

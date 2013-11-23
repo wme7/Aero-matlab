@@ -1,0 +1,115 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%              Solving 1-D wave equation with Nodal DG
+%
+%               du/dt + df/dx = 0,  for x \in [a,b]
+%                 where f = f(u): linear/nonlinear
+%
+%              coded by Manuel Diaz, NTU, 2012.12.05
+%                               
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Ref: J.S. Hestaven & T. Warburton; Nodal Discontinuous Galerkin Methods,
+% Algorithms, Analysis and Applications; Springer 2008.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Notes: Basic Scheme Implementation without RK intergration scheeme.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clear all; close all; %clc;
+
+%% Parameters
+fluxfun = 'linear'; % select flux function
+cfl = 0.02; % CFL condition
+tEnd = 2*pi; % final time
+K = 3; % degree of accuaracy
+nE = 20; % number of elements
+
+%% PreProcess
+% Define our Flux function
+switch fluxfun
+    case 'linear'
+        a=+1; flux = @(w) a*w; 
+        dflux = @(w) a*ones(size(w));
+    case 'nonlinear' % Burgers
+        flux = @(w) w.^2/2; 
+        dflux = @(w) w; 
+end
+
+% Build 1d mesh
+xgrid = mesh1d([0 2*pi],nE,'ChebyshevMod',K);
+dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
+
+% Load DG tools
+tool = DGtools(xgrid.solutionPoints);
+V = tool.Vadermonde; 
+
+% IC
+u0 = IC(x,2);
+
+% Set plot range
+plotrange = [xgrid.range(1),xgrid.range(2),...
+    min(min(min(0.9*u0)),min(min(1.1*u0))),1.1*max(max(u0))];
+
+%% Solver Loop
+
+% Set initial time & load IC
+t = 0; u = u0; it = 0;
+
+while t < tEnd
+    % update time
+    dt = cfl*dx/max(max(abs(dflux(u)))); t = t+dt;
+    
+    % iteration counter
+    it = it+1; 
+    
+    % compute fluxes in node coordinates
+    f = flux(u); 
+
+    % Interpolate u and flux values at the boundaries of Ij
+    switch xgrid.quadratureType
+        case {'LGL','ChebyshevMod'}
+            u_lbd = u(1,:);
+            u_rbd = u(end,:);
+            f_lbd = f(1,:);
+            f_rbd = f(end,:);
+        otherwise
+            u_lbd = L.lcoef*u;
+            u_rbd = L.rcoef*u;
+            f_lbd = L.lcoef*f;
+            f_rbd = L.rcoef*f;
+    end
+    
+    % Build Numerical fluxes across faces
+    u_pface = [u_lbd,0]; % + side 
+    u_nface = [0,u_rbd]; % - side 
+
+    % Apply Periodic BCs
+    u_nface(1) = u_nface(end); % left BD
+    u_pface(end) = u_pface(1); % right BD
+
+    % Apply Neumann BCs
+    %u_nface(1) = u_pface(1); % left BD
+    %u_pface(end) = u_nface(end);% u_pface(end); % right BD
+
+    % LF numerical flux
+    alpha = max(max(abs(dflux(u)))); 
+    nflux = 0.5*(flux(u_nface)+flux(u_pface)-alpha*(u_pface-u_nface));
+    nfluxL = nflux(1:end-1); nfluxR = nflux(2:end);
+
+    % flux derivate
+    df = L.dcoef*f;
+    
+    % Compute the derivate: F = f + gL*(nfluxL-f_bdL) + gR*(nfluxR-f_bdR)
+    dF = df + dg.RR*(nfluxL - f_lbd) + dg.RL*(nfluxR - f_rbd);
+
+    % next time info!
+    ut_next = ut + dt*dF/J;
+    
+    % UPDATE info
+    ut = ut_next;
+       
+    % Plot u
+    %if rem(it,10) == 0
+        plot(x,u0,'-x',x,u,'-'); axis(plotrange); grid on; 
+        xlabel('x'); ylabel('u'); title('DG-FEM')
+        drawnow;
+    %end
+    
+end

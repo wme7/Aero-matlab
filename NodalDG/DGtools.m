@@ -10,11 +10,15 @@ classdef DGtools
     
     properties (Dependent = true, SetAccess = private)
         Vadermonde
+        GradVadermonde
         MassMatrix
         invMassMatrix
         CoefDiffMatrix
         legLeftEnd
         legRightEnd
+        nodalMassMatrix
+        nodalInvMassMatrix
+        nodalCoefDiffMatrix
     end
     
     methods (Static)
@@ -24,9 +28,6 @@ classdef DGtools
             % Compute the value of the legendre polinomial of degree 'kDeg'
             % for every column value 'xi'
             %**************************************************************
-            
-            %number of points
-            p = k+1;
             switch k
                 case {0} % when k = 0
                     legP = ones(size(x));

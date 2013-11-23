@@ -19,7 +19,7 @@ fluxfun = 'linear'; % select flux function
 cfl = 0.02; % CFL condition
 tEnd = 2*pi; % final time
 K = 7; % degree of accuaracy
-nE = 80; % number of elements
+nE = 20; % number of elements
 
 %% PreProcess
 % Define our Flux function
@@ -33,7 +33,7 @@ switch fluxfun
 end
 
 % Build 1d mesh
-xgrid = mesh1d([0 2*pi],nE,'ChebyshevMod',K);
+xgrid = mesh1d([0 2*pi],nE,'Radau',K);
 dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
 
 % Load DG tools
@@ -43,7 +43,7 @@ M = tool.MassMatrix; invM = tool.invMassMatrix; Dr = tool.CoefDiffMatrix;
 S = M*Dr;
 
 % IC
-u0 = IC(x,5);
+u0 = IC(x,1);
 
 % Set plot range
 plotrange = [xgrid.range(1),xgrid.range(2),...
