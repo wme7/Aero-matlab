@@ -9,8 +9,8 @@ classdef DGtools
     end
     
     properties (Dependent = true, SetAccess = private)
-        Vadermonde
-        GradVadermonde
+        Vandermonde
+        GradVandermonde
         MassMatrix
         invMassMatrix
         CoefDiffMatrix
@@ -99,7 +99,7 @@ classdef DGtools
         %  MAIN TOOL: %
         %%%%%%%%%%%%%%%
         
-        function V = get.Vadermonde(obj) % Legendre Vadermonde Matrix
+        function V = get.Vandermonde(obj) % Legendre Vandermonde Matrix
             % Construct Legendre Vandermonde Matrix, V,
             %**************************************************************
             % V is a matrix array in which each element is a Legendre
@@ -213,14 +213,14 @@ classdef DGtools
         %%%%%%%%%%%%%%%
         
         function nM = get.nodalMassMatrix(obj)
-            nM = inv(obj.Vadermonde*obj.Vadermonde');
+            nM = inv(obj.Vandermonde*obj.Vandermonde');
         end
         
         function ninvM = get.nodalInvMassMatrix(obj)
             ninvM = inv(obj.nodalMassMatrix);
         end
         
-        function Vr = get.GradVadermonde(obj)
+        function Vr = get.GradVandermonde(obj)
             Vr = zeros(obj.kDeg);% Allocate
             for l = 0:obj.kDeg 	% All Polynomial Degrees up to kDeg
                 j = l + 1;      % Dummy index
@@ -231,7 +231,7 @@ classdef DGtools
         end
         
         function nDr = get.nodalCoefDiffMatrix(obj)
-            nDr = obj.GradVadermonde/obj.Vadermonde;
+            nDr = obj.GradVandermonde/obj.Vandermonde;
         end
         
     end % Methods

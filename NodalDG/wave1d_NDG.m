@@ -38,7 +38,7 @@ dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
 
 % Load DG tools
 tool = DGtools(xgrid.solutionPoints);
-V = tool.Vadermonde; invM = tool.nodalInvMassMatrix;
+V = tool.Vandermonde; invM = tool.nodalInvMassMatrix;
 Dr = tool.nodalCoefDiffMatrix;
 
 % IC
