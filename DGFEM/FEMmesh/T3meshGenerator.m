@@ -15,7 +15,11 @@ function [VX VY EtoV nV nE]=T3meshGenerator(Lx,Ly,xE,yE)
     %   EtoV	=   vertices connectivity
     %   nV      =   Number of Vertices
     %   nE      =   Number of elements
-
+    
+    % Define mesh status function
+    fstats=@(p,t) fprintf('%d nodes, %d elements, min quality %.2f\n\n', ...
+                      size(p,1),size(t,1),min(simpqual(p,t)));
+    
     %% ELEMENT TO VERTICES CONNECTIVITY 
     % Build EtoV matrix
     nE = 2*xE*yE;   % total number of elements
@@ -45,3 +49,6 @@ function [VX VY EtoV nV nE]=T3meshGenerator(Lx,Ly,xE,yE)
             e = e+1; % element counter
         end
     end
+    
+    % MESH STATUS
+    fstats([VX,VY],EtoV);

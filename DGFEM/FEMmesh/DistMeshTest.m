@@ -4,7 +4,7 @@
     clear all; close all; cla(gcf);
     
     % Generate mesh
-    [VX VY EtoV nV nE] = DistMeshGenerator();
+    [VX VY EtoV nV nE] = DistMeshGenerator(2);
     
     % Display data arrays
     fprintf('Number of elements = %1.0f\n', nE );
@@ -39,12 +39,11 @@
     Area = 0.5*det([ax bx cx;ay by cy;1 1 1]);
         if Area>0
             patch([ax bx cx],[ay by cy],'b'); hold on;
-            pause(0.01)
         else
             patch([ax bx cx],[ay by cy],'r'); hold on;
-            pause(0.01)
         end
     end
+    pause(1)
     
     % Correct elements
    	ax = VX(EtoV(:,1)); ay = VY(EtoV(:,1));
@@ -63,9 +62,7 @@
     Area = 0.5*det([ax bx cx;ay by cy;1 1 1]);
         if Area>0
             patch([ax bx cx],[ay by cy],'g'); hold on;
-            pause(0.01)
         else
             patch([ax bx cx],[ay by cy],'r'); hold on;
-            pause(0.01)
         end
     end

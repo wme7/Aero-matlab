@@ -1,5 +1,6 @@
 %% 2D grid
 clear all; close all; clc;
+addpath('E:\Documents\Matlab\aero-matlab\DGFEM\FEMmesh')
 
 % Select mesh case
 meshcase = 'Distmesh';
@@ -16,9 +17,9 @@ switch meshcase
         [VX VY EtoV nV nE] = AGmeshGenerator([0,1],[0,1],Ex,Ey,'EllipticCylinderCoordinates');
         %[VX VY EtoV nV nE] = AGmeshGenerator([0,1],[0,1],Ex,Ey,'PolarCoordinates');
     case 'Distmesh' % DistMesh
-        [VX VY EtoV nV nE] = DistMeshGenerator();
+        [VX VY EtoV nV nE] = DistMeshGenerator(2);
     case 'mesh2d' % Mesh2D
-        [VX VY EtoV nV nE] = M2DmeshGenerator();
+        [VX VY EtoV nV nE] = M2DmeshGenerator(1);
 end
 
 % Correct Table EToV

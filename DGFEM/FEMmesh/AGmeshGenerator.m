@@ -17,6 +17,10 @@ function [VX VY EtoV nV nE]=AGmeshGenerator(Lx,Ly,xE,yE,coordinate)
     %   nV      =   Number of Vertices
     %   nE      =   Number of elements
     
+    % Define mesh status function
+    fstats=@(p,t) fprintf('%d nodes, %d elements %.2f\n\n', ...
+                      size(p,1),size(t,1));
+    
     %% ELEMENT TO VERTICES CONNECTIVITY 
 	% Build EtoV matrix
     nE = xE*yE;   % total number of elements
@@ -56,6 +60,8 @@ function [VX VY EtoV nV nE]=AGmeshGenerator(Lx,Ly,xE,yE,coordinate)
             VY(e) = Y(j,i);
             e = e+1; % element counter
         end
-    end  
-       
+    end
+    
+    %% MESH STATUS
+    fstats([VX,VY],EtoV);
 end
