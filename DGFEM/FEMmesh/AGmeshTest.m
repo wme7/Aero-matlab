@@ -6,8 +6,8 @@
     N=10;        M=8;
     
     % Generate mesh
-    %[VX VY EtoV nV nE] = AGmeshGenerator(Lx,Ly,N,M,'Horseshoe');
-    [VX VY EtoV nV nE] = AGmeshGenerator(Lx,Ly,N,M,'PolarCoordinates');
+    [VX VY EtoV nV nE] = AGmeshGenerator(Lx,Ly,N,M,'Horseshoe');
+    %[VX VY EtoV nV nE] = AGmeshGenerator(Lx,Ly,N,M,'PolarCoordinates');
     
     % Display data arrays
     fprintf('Number of elements = %1.0f\n', nE );

@@ -4,7 +4,7 @@
     clear all; close all; cla(gcf);
     
     % Generate mesh
-    [VX VY EtoV nV nE] = M2DmeshGenerator();
+    [VX VY EtoV nV nE] = M2DmeshGenerator(1);
     
     % Display data arrays
     fprintf('Number of elements = %1.0f\n', nE );

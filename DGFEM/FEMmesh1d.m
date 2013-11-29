@@ -39,7 +39,7 @@ TotalFaces = nF*nE;
 % local face to local node connections
 FtoN = [1,2];
 
-FtoV = spalloc(TotalFaces,nV,2*TotalFaces);
+%FtoV = spalloc(TotalFaces,nV,2*TotalFaces);
 se=1; % element surface
 for e = 1:nE
     for f = 1:nF

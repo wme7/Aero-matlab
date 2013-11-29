@@ -4,7 +4,6 @@ function h = Generalflux(f,df,u,strategy)
 
 %% Parameters
 nx = length(u); % Grid Size
-x = 1:nx-1;     % Indexes of the flux at the boundary cells (i.e. middle point in my domain)
 flx = f(u);     % flux value at every point of the domain
 dflx = df(u);   % flux slope at every point of the domain
 

@@ -2,8 +2,8 @@ function [hn,hp] = WENO3_1d_flux(v,u)
 % Compute numerical fluxes at cell 'i' interfaces.
 % Input:  v(1:6) = positive fluxes - cells average values
 %         u(1:6) = negative fluxes - cells average values
-% Output: un(1)  = Numerical flux @ x_{i+1/2}^(-) | right flux
-%         up(1)  = Numerical flux @ x_{i-1/2}^(+) | left flux
+% Output: hn(1)  = Numerical flux @ x_{i+1/2}^{-} | right flux
+%         hp(1)  = Numerical flux @ x_{i-1/2}^{+} | left flux
 %
 %                |           |   u(i)    |           |
 %                |  u(i-1)   |___________|           |
@@ -11,7 +11,7 @@ function [hn,hp] = WENO3_1d_flux(v,u)
 %                |           |           |___________|
 %             ...|-----0-----|-----0-----|-----0-----|...
 %                |    i-1    |     i     |    i+1    |
-%                |           |h-       h+|           |
+%                |           |h+       h-|           |
 %                          i-1/2       i+1/2
 
 %% Right Flux
@@ -79,7 +79,7 @@ B1p = 13/12*(u(i-1)-2*u( i )+u(i+1))^2 + 1/4*(u(i-1)-u(i+1))^2;
 B2p = 13/12*(u( i )-2*u(i+1)+u(i+2))^2 + 1/4*(3*u(i)-4*u(i+1)+u(i+2))^2;
 
 % Constants
-d0p = 1/10; d1p = 6/10; d2p = 3/10;
+d0p = 3/10; d1p = 6/10; d2p = 1/10;
 epsilon = 1E-7;
 
 % Alpha weights 
