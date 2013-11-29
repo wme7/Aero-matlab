@@ -5,7 +5,7 @@ Globals1D;
 N = 4;
 
 % Generate simple mesh
-[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 40);
+[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 50);
 
 % Initialize solver and construct grid and metric
 StartUp1D;
@@ -16,7 +16,7 @@ MassMatrix = inv(V')/V;
 
 %u = ones(Np,K).*( sin(2*pi*cx) );
 u = sin(2*pi*x);
-FinalTime = 1.4;
+FinalTime = 0.12;
 
 % Solve Problem
 [u] = iBurgers1D(u,FinalTime);

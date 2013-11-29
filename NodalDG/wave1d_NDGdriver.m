@@ -15,26 +15,28 @@
 clear all; close all; %clc;
 
 %% Parameters
-fluxfun = 'linear'; % select flux function
-cfl = 0.02; % CFL condition
-tEnd = 2*pi; % final time
-K = 3; % degree of accuaracy
-nE = 20; % number of elements
+fluxfun = 'nonlinear'; % select flux function
+cfl = 0.001; % CFL condition
+tEnd = 2; % final time
+K = 5; % degree of accuaracy
+nE = 10; % number of elements
 
 %% PreProcess
 % Define our Flux function
 switch fluxfun
     case 'linear'
-        a=+1; flux = @(w) a*w; 
+        a=2*pi; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
     case 'nonlinear' % Burgers
         flux = @(w) w.^2/2; 
         dflux = @(w) w; 
 end
 
-% Build 1d mesh (LGL or ChebyshebMod only!)
+% Build 1d mesh
 xgrid = mesh1d([0 2*pi],nE,'LGL',K);
-dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
+dx = xgrid.elementSize; J = xgrid.Jacobian; 
+x = xgrid.nodeCoordinates; w = xgrid.weights';
+xc = xgrid.elementCenter;
 
 % Load DG tools
 tool = DGtools(xgrid.solutionPoints);
@@ -59,52 +61,36 @@ plotrange = [xgrid.range(1),xgrid.range(2),...
 % Set initial time & load IC
 t = 0; u = u0; it = 0;
 
+% Using a 3-stage TVD Runge Kutta time integration
 while t < tEnd
+    uo = u;
+    
     % update time
     dt = cfl*dx/max(max(abs(dflux(u)))); t = t+dt;
-
+    
     % iteration counter
     it = it+1; 
+           
+    % 1st stage
+    dF = residual(u,flux,dflux,Lift,Dr);
+    u = uo-dt*dF/J;
 
-    % compute fluxes in node coordinates
-    f = flux(u); 
+    % 2nd Stage
+    dF = residual(u,flux,dflux,Lift,Dr); 
+    u = 0.75*uo+0.25*(u-dt*dF/J);
 
-    % u and flux values at the boundaries of Ij
-    u_lbd = u(1,:);
-    u_rbd = u(end,:);
-    f_lbd = f(1,:);
-    f_rbd = f(end,:);
-
-    % Build Numerical fluxes across faces
-    u_pface = [u_lbd,0]; % + side 
-    u_nface = [0,u_rbd]; % - side 
-
-    % Apply Periodic BCs
-    u_nface(1) = u_nface(end); % left BD
-    u_pface(end) = u_pface(1); % right BD
-
-    % Apply Neumann BCs
-    %u_nface(1) = u_pface(1); % left BD
-    %u_pface(end) = u_nface(end);% u_pface(end); % right BD
-
-    % LF numerical flux
-    alpha = max(max(abs(dflux(u)))); 
-    nflux = 0.5*(flux(u_nface)+flux(u_pface)-alpha*(u_pface-u_nface));
-    nfluxL = nflux(1:end-1); nfluxR = nflux(2:end);
-
-    % Compute the derivate: F = f + gL*(nfluxL-f_bdL) + gR*(nfluxR-f_bdR)
-    dF = -Dr*f + Lift*[(nfluxL-f_lbd);(nfluxR-f_rbd)];
-
-    % next time info!
-    ut_next = u + dt*dF/J;
-
-    % UPDATE info
-    u = ut_next;
-
+    % 3rd stage
+    dF = residual(u,flux,dflux,Lift,Dr); 
+    u = (uo+2*(u-dt*dF/J))/3;
+    
+    % build cell averages
+    u_bar = w*u/2;
+    
     % Plot u
+    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid off; 
+    subplot(1,2,2); plot(xc,u_bar,'ro'); axis(plotrange); grid off; 
+    
     %if rem(it,10) == 0
-        plot(x,u0,'-x',x,u,'-'); axis(plotrange); grid on; 
-        xlabel('x'); ylabel('u'); title('DG-FEM')
         drawnow;
     %end
 end

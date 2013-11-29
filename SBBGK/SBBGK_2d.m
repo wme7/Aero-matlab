@@ -16,7 +16,7 @@ clc;  clear all;  close all;
     tEnd   = 0.30;      % Out time
     theta  = 0;         % {-1} BE, {0} MB, {1} FD.
    fmodel  = 1;         % {1} UU. model, {2} ES model.
-    quad   = 2;         % {1} NC , {2} GH
+    quad   = 1;         % {1} NC , {2} GH
     method = 1;         % {1} TVD, {2} WENO3, {3} WENO5
    IC_case = 5;         % Reimann cases: 1~17
  plot_figs = 0;         % 0: no, 1: yes please!
@@ -26,6 +26,7 @@ clc;  clear all;  close all;
     Pp 	   = P_deg+1;   % Polinomials Points
 % Using RK integration time step
 RK_stages  = 4;         % Number of RK stages
+f_case = 1;
 
 %% Space Discretization
 nx = 200; ny = 200;
@@ -33,7 +34,7 @@ nx = 200; ny = 200;
 [x,y] = meshgrid(X,Y);
 
 %% Define a ID name for results file
-[ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,r_time,IC_case);
+[ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,r_time,IC_case,fmodel,f_case,method);
 
 %% Open a Files to store the Results
 if write_ans == 1
