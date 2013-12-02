@@ -1,6 +1,5 @@
-function h = Generalflux(f,df,u,strategy)
-% General flux Spliting subroutine 
-% We use 1 of 4 flux strategies/algorithms optimized for matlab.
+function h = numericalFlux(f,df,u,strategy)
+% Monotone Riemann fluxes
 
 %% Parameters
 nx = length(u); % Grid Size

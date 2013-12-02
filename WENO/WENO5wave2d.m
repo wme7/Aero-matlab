@@ -54,7 +54,7 @@ u_next = zeros(ny,nx);
 
 for kk = t
     % Compute WENO Fluxes:
-    [F_l,F_r,G_l,G_r] = WENOflux2d(u,a,b);
+    [F_l,F_r,G_l,G_r] = WENOflux2d(u,a,b); % is underconstruction!
     
     % Compute new Step:
     u_next = u - dtdx*(F_r - F_l) - dtdy*(G_r - G_l);

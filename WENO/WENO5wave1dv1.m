@@ -11,25 +11,24 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ref: Jiang & Shu JCP. vol 126, 202-228 (1996)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Notes: Basic Scheme Implementation without RK integration method.
+% Notes: Finite Difference Scheme without RK integration method.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear all; clc; close all;
 
 %% Parameters
-    cfl = 0.30;  % Courant Number
-     nx = 50;    % number of cells
- tStart = 0.00;  % Start time
-   tEnd = 3.15;  % End time
-	 ic = 1;     % {1} Gaussian, {2} SquareJump, {3} Riemann, {4} Sine 
-BC_type = 2;     % {1} Dirichlet, {2} Neumann, {3} Periodic
-fluxsplit = 2;   % {1} Godunov, {2} Global LF, {3} Local LF
-fluxtype = 'linear';
+      cfl = 0.30;   % Courant Number
+       nx = 80;     % number of cells
+     tEnd = 2*pi;   % End time
+  BC_type = 2;      % {1} Dirichlet, {2} Neumann, {3} Periodic
+fluxsplit = 2;      % {1} Godunov, {2} Global LF, {3} Local LF
 
 %% Define our Flux function
+fluxtype = 'linear';
+
 switch fluxtype
     case 'linear'
-        a = -0.5; flux = @(w) a*w; % scalar advection speed
-        dflux = @(w) a*ones(size(w));
+        i = 1; flux = @(w) i*w; % scalar advection speed
+        dflux = @(w) i*ones(size(w));
     case 'nonlinear'
         flux = @(w) w.^2/2;
         dflux = @(w) w;
@@ -38,22 +37,16 @@ end
 %% Discretization of Domain
 % Depending on the size of the degree of the WENO stencil we are using then
 % 2 or more ghost cells have to be introduced
-a=0; b=1; x=linspace(a,b,nx); dx=(b-a)/nx; 
+a=0; b=2*pi; x=linspace(a,b,nx); dx=(b-a)/nx; 
 
 %% Initial Condition
-u0 = IC(x,ic); 
+u0 = IC(x,5); % IC: {1}Gaussian, {2}Sine, {3}CSine, {4}Riemann, {5}Tanh
           
 %% Solver Loop
 % Beause the max slope, f'(u) = u, may change as the time steps progress
 % we cannot fix the size of the time steps. Therefore we need to recompute
 % the size the next time step, dt, at the beginning of each iteration to
 % ensure stability.
-
-% Build arrays
-u_next = zeros(1,nx);   % u in next time step
-%h = zeros(2,nx-1);      % Flux values at the cell boundaries
-hn = zeros(1,nx-1);     % Flux values at x_i+1/2 (-)
-hp = zeros(1,nx-1);     % Flux values at x_i-1/2 (+)
 
 % load initial conditions
 t=0; it=0; u=u0;
@@ -67,22 +60,21 @@ while t < tEnd
     
     % Plot solution
     plotrange = 3:nx-2;
-    plot(x(plotrange),u(plotrange),'.'); 
-    axis([x(1),x(end),min(u0)-0.1,max(u0)+0.1])
-    xlabel('X-Coordinate [-]'); ylabel('U-state [-]'); 
-    title 'Invicid Burgers using WENO scheme';
+    plot(x,u0,'-x',x(plotrange),u(plotrange),'.'); 
+    axis([a,b,min(u0)-0.1,max(u0)+0.1])
+    xlabel('X [-]'); ylabel('U [-]'); title 'Invicid Burgers using WENO';
     
     % Flux Spliting
-    [vp,vn] = WENO_fluxsplit(u,flux,dflux,fluxsplit);
+    [vp,vn] = fluxSplit(u,flux,dflux,fluxsplit);
 
     % Reconstruct Fluxes values at cells interfaces
-    [h_left,h_right] = WENO3_1d_driver(vp,vn);
+    [h_left,h_right] = WENO5_1d_driver(vp,vn);
     
     % Update Next time step
     u_next = u - dtdx *(h_right - h_left);
 
     % Apply BCs
-    u_next = WENO3_1d_BCs(u_next,BC_type,nx);
+    u_next = WENO5_1d_BCs(u_next,BC_type,nx);
         
     % Update Info
     u = u_next;

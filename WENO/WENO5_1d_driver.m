@@ -9,12 +9,12 @@ hn = zeros(size(vn));
 hp = zeros(size(vp));
 
 % Reconstruc h+ and h- fluxes
-for i = 4:nx-3
-    xr = i-3:i+3;   % x-range of cells
+for i = 3:nx-2
+    xr = i-2:i+2;   % x-range of cells
     [hn(i),hp(i-1)] = WENO5_1d_flux(vp(xr),vn(xr));    
 end
 h = sum([hn;hp]); 
 
 % Formulate Left and Right fluxes, equiv: %h(i) - h(i-1)
-h_right = [h(1:end-3),0,0,0];
-h_left = [0,0,0,h(3:end-1)];
+h_right = [h(1:end-2),0,0];
+h_left = [0,0,h(2:end-1)];

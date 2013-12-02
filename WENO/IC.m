@@ -19,15 +19,18 @@ switch ICcase
         
     case 2 % sinusoidal wave
         u0 = 0.5 + sin(x);
-    case 3 % Riemann problem
+        
+    case 3 % centered sinusoidal wave
+        u0 = sin(x);
+        
+    case 4 % Riemann problem
              % u = 1 for x <  x_mid
              % u = 0 for x >= x_mid
         u0 = ones(size(x));
         xmid = (x(end)-x(1))/2;
         rhs = find(x<=xmid);
         u0(rhs) = 0.1;
-    case 4 % centered sinusoidal wave
-        u0 = sin(x);
+    
     case 5 % Tanh
         a = x(1); b = x(end);
         xi = (4-(-4))/(b-a)*(x - a) - 4;

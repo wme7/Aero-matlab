@@ -56,7 +56,7 @@ for kk = t
         % Upwinding WENO flux
         for i = 3:nx-2
             fu = f(u(i-2:i+2));
-            h(i) = WENO_upwind(fu);
+            h(i) = WENO5_upwind(fu);
         end
 
         % Compute solution of next time step using WENO Upwind
@@ -68,7 +68,7 @@ for kk = t
         % Downwinding WENO flux
         for i = 3:nx-2
             fu = f(u(i-2:i+2));
-            h(i) = WENO_downwind(fu);
+            h(i) = WENO5_downwind(fu);
         end
 
         % Compute solution of next time step using WENO Upwind
@@ -78,7 +78,7 @@ for kk = t
     end
 
     % Update BCs: All Neumann BC's
-   	u_next = WENO3_1d_BCs(u_next,2,nx); % 2: Neumann BC
+   	u_next = WENO5_1d_BCs(u_next,2,nx); % 2: Neumann BC
     
     % UPDATE info
     u = u_next;
