@@ -16,18 +16,18 @@
 clear all; clc; close all;
 
 %% Parameters
-      cfl = 0.30;   % Courant Number
+      cfl = 0.10;   % Courant Number
        nx = 80;     % number of cells
      tEnd = 2*pi;   % End time
   BC_type = 2;      % {1} Dirichlet, {2} Neumann, {3} Periodic
 fluxsplit = 2;      % {1} Godunov, {2} Global LF, {3} Local LF
 
 %% Define our Flux function
-fluxtype = 'linear';
+fluxtype = 'nonlinear';
 
 switch fluxtype
     case 'linear'
-        i = 1; flux = @(w) i*w; % scalar advection speed
+        i = 4; flux = @(w) i*w; % scalar advection speed
         dflux = @(w) i*ones(size(w));
     case 'nonlinear'
         flux = @(w) w.^2/2;

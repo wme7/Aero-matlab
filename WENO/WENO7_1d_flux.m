@@ -1,4 +1,4 @@
-function [hn,hp] = WENO5_1d_flux(v,u)
+function [hn,hp] = WENO7_1d_flux(v,u)
 % Compute numerical fluxes at cell 'i' interfaces.
 % Input:  v(1:7) = positive fluxes - cells average values
 %         u(1:7) = negative fluxes - cells average values
@@ -23,11 +23,6 @@ function [hn,hp] = WENO5_1d_flux(v,u)
 
 % Polynomial coefcients (Taken from table)
 % $c_{rj}$ for $u_{i+1/2}^{-}$
-% C00 =  1/4; C01 =13/12; C02 =-5/12; C03 = 1/12;
-% C10 =-1/12; C11 = 7/12; C12 = 7/12; C13 =-1/12;
-% C20 = 1/12; C21 = -5/6; C22 =13/12; C23 = 1/4 ;
-% C30 = -1/4; C31 =13/12; C32=-23/12; C33 =25/12;
-
 C00 = -1/4; C31 =13/12; C32=-23/12; C33 =25/12;
 C10 = 1/12; C21 = -5/6; C22 =13/12; C23 = 1/4 ;
 C20 =-1/12; C11 = 7/12; C12 = 7/12; C13 =-1/12;
@@ -86,11 +81,6 @@ hn = w0n*p0n + w1n*p1n + w2n*p2n + w3n*p3n;
 
 % Polynomial coefcients (Taken from table)
 % $\tilde c_{rj}$ = c_{r-1,j}$ for $x_{i+1/2}^{+}$
-% c00 =25/12; c01=-23/12; c02 =13/12; c03 = -1/4; 
-% c10 =  1/4; c11 =13/12; c12 =-5/12; c13 = 1/12;
-% c20 =-1/12; c21 = 7/12; c22 = 7/12; c23 =-1/12;
-% c30 = 1/12; c31 = -5/6; c32 =13/12; c33 =  1/4;
-
 c00 = 1/12; c31 = -5/6; c32 =13/12; c33 =  1/4;
 c10 =-1/12; c21 = 7/12; c22 = 7/12; c23 =-1/12;
 c20 =  1/4; c11 =13/12; c12 =-5/12; c13 = 1/12;

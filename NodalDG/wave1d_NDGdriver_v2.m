@@ -10,14 +10,14 @@
 % Ref: J.S. Hestaven & T. Warburton; Nodal Discontinuous Galerkin Methods,
 % Algorithms, Analysis and Applications. Springer 2008.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Notes: Basic Scheme Implementation with SSP-RK33 intergration scheeme.
+% Notes: Basic Scheme Implementation with SSP-RK45 intergration scheeme.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear all; close all; %clc;
 
 %% Parameters
 fluxfun = 'linear'; % select flux function
 cfl = 0.02; % CFL condition
-tEnd = 2; % final time
+tEnd = 2*pi; % final time
 K = 5; % degree of accuaracy
 nE = 10; % number of elements
 
@@ -25,7 +25,7 @@ nE = 10; % number of elements
 % Define our Flux function
 switch fluxfun
     case 'linear'
-        a=2*pi; flux = @(w) a*w; 
+        a=1; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
     case 'nonlinear' % Burgers
         flux = @(w) w.^2/2; 
@@ -58,31 +58,47 @@ plotrange = [xgrid.range(1),xgrid.range(2),...
 
 %% Solver Loop
 
+% Low storage Runge-Kutta coefficients
+rk4a = [            0.0 ...
+        -567301805773.0/1357537059087.0 ...
+        -2404267990393.0/2016746695238.0 ...
+        -3550918686646.0/2091501179385.0  ...
+        -1275806237668.0/842570457699.0];
+rk4b = [ 1432997174477.0/9575080441755.0 ...
+         5161836677717.0/13612068292357.0 ...
+         1720146321549.0/2090206949498.0  ...
+         3134564353537.0/4481467310338.0  ...
+         2277821191437.0/14882151754819.0];
+rk4c = [             0.0  ...
+         1432997174477.0/9575080441755.0 ...
+         2526269341429.0/6820363962896.0 ...
+         2006345519317.0/3224310063776.0 ...
+         2802321613138.0/2924317926251.0];
+
 % Set initial time & load IC
 t=0; u=u0; it=0;
 
-% Using a 3rd Order 3-stage SSPRK time integration
+% Using a 4rd Order 5-stage SSPRK time integration
+res_u = zeros(K+1,nE); % Runge-Kutta residual storage
+
 while t < tEnd
-    uo = u;
-    
     % update time
-    dt = cfl*dx/max(max(abs(dflux(u)))); t = t+dt;
-    
+    dt = cfl*dx/max(max(abs(dflux(u)))); t=t+dt;
+
+    % Fixed time steps
+    %t = 0:dt:tEnd;
+    %for steps = t
+
     % iteration counter
     it = it+1; 
-           
-    % 1st stage
-    dF = residual(u,flux,dflux,Lift,Dr);
-    u = uo-dt*dF/J;
 
-    % 2nd Stage
-    dF = residual(u,flux,dflux,Lift,Dr); 
-    u = 0.75*uo+0.25*(u-dt*dF/J);
-
-    % 3rd stage
-    dF = residual(u,flux,dflux,Lift,Dr); 
-    u = (uo+2*(u-dt*dF/J))/3;
-    
+    for RKs = 1:5
+        t_local = t + rk4c(RKs)*dt;
+        dF = residual(u,flux,dflux,Lift,Dr);
+        res_u = rk4a(RKs)*res_u + dt*dF/J;
+        u = u - rk4b(RKs)*res_u;
+    end
+      
     % build cell averages
     u_bar = w*u/2;
     

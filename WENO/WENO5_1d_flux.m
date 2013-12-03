@@ -1,4 +1,4 @@
-function [hn,hp] = WENO3_1d_flux(v,u)
+function [hn,hp] = WENO5_1d_flux(v,u)
 % Compute numerical fluxes at cell 'i' interfaces.
 % Input:  v(1:6) = positive fluxes - cells average values
 %         u(1:6) = negative fluxes - cells average values

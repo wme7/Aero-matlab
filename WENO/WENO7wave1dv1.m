@@ -59,8 +59,7 @@ while t < tEnd
     it = it+1;  % iteration counter
     
     % Plot solution
-    plotrange = 3:nx-2;
-    plot(x,u0,'-x',x(plotrange),u(plotrange),'.'); 
+    plotrange = 3:nx-2; plot(x,u0,'-x',x(plotrange),u(plotrange),'.'); 
     axis([a,b,min(u0)-0.1,max(u0)+0.1])
     xlabel('X [-]'); ylabel('U [-]'); title 'Invicid Burgers using WENO';
     

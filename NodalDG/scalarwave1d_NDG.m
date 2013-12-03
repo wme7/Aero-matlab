@@ -10,14 +10,14 @@
 % Ref: J.S. Hestaven & T. Warburton; Nodal Discontinuous Galerkin Methods,
 % Algorithms, Analysis and Applications. Springer 2008.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Notes: Basic Scheme Implementation with SSP-RK33 intergration scheeme.
+% Notes: Basic Scheme Implementation without RK intergration scheeme.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear all; close all; %clc;
 
 %% Parameters
 fluxfun = 'linear'; % select flux function
 cfl = 0.02; % CFL condition
-tEnd = 2; % final time
+tEnd = 2*pi; % final time
 K = 5; % degree of accuaracy
 nE = 10; % number of elements
 
@@ -25,22 +25,20 @@ nE = 10; % number of elements
 % Define our Flux function
 switch fluxfun
     case 'linear'
-        a=2*pi; flux = @(w) a*w; 
+        a=+1; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
     case 'nonlinear' % Burgers
         flux = @(w) w.^2/2; 
         dflux = @(w) w; 
 end
 
-% Build 1d mesh
+% Build 1d mesh (LGL or ChebyshebMod only!)
 xgrid = mesh1d([0 2*pi],nE,'LGL',K);
-dx = xgrid.elementSize; J = xgrid.Jacobian; 
-x = xgrid.nodeCoordinates; w = xgrid.weights';
-xc = xgrid.elementCenter;
+dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
 
 % Load DG tools
 tool = DGtools(xgrid.solutionPoints);
-V = tool.Vandermonde; 
+V = tool.Vandermonde2; 
 invM = tool.nodalInvMassMatrix;
 Dr = tool.nodalCoefDiffMatrix;
 
@@ -61,36 +59,47 @@ plotrange = [xgrid.range(1),xgrid.range(2),...
 % Set initial time & load IC
 t=0; u=u0; it=0;
 
-% Using a 3rd Order 3-stage SSPRK time integration
 while t < tEnd
-    uo = u;
-    
     % update time
     dt = cfl*dx/max(max(abs(dflux(u)))); t = t+dt;
-    
+
     % iteration counter
     it = it+1; 
-           
-    % 1st stage
-    dF = residual(u,flux,dflux,Lift,Dr);
-    u = uo-dt*dF/J;
 
-    % 2nd Stage
-    dF = residual(u,flux,dflux,Lift,Dr); 
-    u = 0.75*uo+0.25*(u-dt*dF/J);
+    % compute fluxes in node coordinates
+    f = flux(u); 
 
-    % 3rd stage
-    dF = residual(u,flux,dflux,Lift,Dr); 
-    u = (uo+2*(u-dt*dF/J))/3;
+    % u and flux values at the boundaries of Ij
+    u_lbd = u(1,:);
+    u_rbd = u(end,:);
+    f_lbd = f(1,:);
+    f_rbd = f(end,:);
+
+    % Build Numerical fluxes across faces
+    u_pface = [u_lbd,0]; % + side 
+    u_nface = [0,u_rbd]; % - side 
+
+    % Apply Periodic BCs
+    u_nface(1) = u_nface(end); % left BD
+    u_pface(end) = u_pface(1); % right BD
     
-    % build cell averages
-    u_bar = w*u/2;
+    % Upwind flux
+    nflux = 0.5*(flux(u_pface)+flux(u_nface)+abs(flux(u_pface)-flux(u_nface)));
+    nfluxR = nflux(2:end); nfluxL = nflux(1:end-1);
     
+    % Compute the derivate: F = f + gL*(nfluxL-f_bdL) + gR*(nfluxR-f_bdR)
+    dF = -Dr*f + Lift*[(f_rbd+nfluxR);(f_lbd+nfluxL)];
+    
+    % next time info!
+    ut_next = u + dt*dF/J;
+
+    % UPDATE info
+    u = ut_next;
+
     % Plot u
-    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid off; 
-    subplot(1,2,2); plot(xc,u_bar,'ro'); axis(plotrange); grid off; 
-    
     %if rem(it,10) == 0
+        plot(x,u0,'-x',x,u,'-'); axis(plotrange); grid on; 
+        xlabel('x'); ylabel('u'); title('DG-FEM')
         drawnow;
     %end
 end

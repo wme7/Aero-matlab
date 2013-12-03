@@ -35,6 +35,14 @@ switch ICcase
         a = x(1); b = x(end);
         xi = (4-(-4))/(b-a)*(x - a) - 4;
         u0 = 1/2*(tanh(-4*xi)+1);
+        
+    case 6 % Square Jump
+        nx = length(x);
+        u0 = ones(1,nx);
+        x_1 = ceil(2*nx/5);
+        x_2 = ceil(3*nx/5);
+        u0(x_1:x_2) = 2;
+        
     otherwise
         error('case not in the list')
 end

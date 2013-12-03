@@ -24,8 +24,9 @@ switch ICcase
              % u = 0 for x >= x_mid
         u0 = ones(size(x));
         xmid = (x(end)-x(1))/2;
-        rhs = find(x<=xmid);
-        u0(rhs) = 1.1;
+        rhs = find(x<=0.45);
+        %rhs = find(x<=xmid);
+        u0(rhs) = 2;
     case 4 % centered sinusoidal wave
         u0 = sin(x);
     case 5 % Tanh

@@ -28,7 +28,7 @@ J = (x(:,2:end)-x(:,1:end-1))/2;
 
 % Compute outward pointing normals at element faces
 nx = zeros(nFp*nF,nE); %nFp number of Nodes on Face
-nx(1,:)=-1; nx(2,:)= 1;
+nx(1,:)=-1; nx(2,:)=1;
 
 % Correct Table EToV
     %no needed in 1D

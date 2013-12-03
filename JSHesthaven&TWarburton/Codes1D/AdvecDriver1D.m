@@ -2,10 +2,10 @@
 Globals1D;
 
 %% Order of polymomials used for approximation 
-N = 5;
+N = 3;
 
 %% Generate simple mesh
-[Nv, VX, K, EToV] = MeshGen1D(0.0,4.0,10);
+[Nv, VX, K, EToV] = MeshGen1D(0,1,10);
 
 %% Initialize solver and construct grid and metric
 StartUp1D;
@@ -13,20 +13,8 @@ StartUp1D;
 %% Set initial conditions
 u = sin(2*pi*x);
 
-% u_0 = zeros(1,K*Np);
-% jump = [0.9 1.1];
-% for i = 1:K*Np
-%     if jump(1) <= x(i) && x(i) <= jump(2)
-%         u_0(i) = 2;
-%     else
-%         u_0(i) = 0;
-%     end
-% end
-% Load Initial Condition
-%u = reshape(u_0,Np,K);
-
 %% Solve Problem
-FinalTime = 0.12;
+FinalTime = 8*pi;
 [u] = Advec1D(u,FinalTime);
 
 plot(x,u);

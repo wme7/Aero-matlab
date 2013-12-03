@@ -12,7 +12,7 @@ clear all; close all; clc;
 
 %% Parameters
      nx = 100;  % Spatial step size
-    cfl = 0.3;	% Courant Number
+    cfl = 0.1;	% Courant Number
    tEnd = 0.2;	% End time
 
 %% Define our Flux function
@@ -46,25 +46,25 @@ tic
 for kk = t
     if c > 0;
         % Upwinding WENO flux
-        for i = 3:nx-2
-            su = u(i-2:i+2);
-            ur(i) = WENO5_upwind(su);
+        for i = 4:nx-3
+            su = u(i-3:i+3);
+            ur(i) = WENO7_upwind(su);
         end
 
         % Compute solution of next time step using WENO Upwind
-        for i = 3:nx-2
+        for i = 4:nx-3
             u_next(i) = u(i) - c*dtdx*(ur(i) - ur(i-1));
         end
 
     else % c < 0;
         % Downwinding WENO flux
-        for i = 3:nx-2
-            su = u(i-2:i+2);
-            ul(i) = WENO5_downwind(su);
+        for i = 4:nx-3
+            su = u(i-3:i+3);
+            ul(i) = WENO7_downwind(su);
         end
 
         % Compute solution of next time step using WENO Upwind
-        for i = 3:nx-2
+        for i = 4:nx-3
             u_next(i) = u(i) - c*dtdx*(ul(i+1) - ul(i));
         end
     end
