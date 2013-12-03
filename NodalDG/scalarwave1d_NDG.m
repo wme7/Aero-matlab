@@ -25,7 +25,7 @@ nE = 10; % number of elements
 % Define our Flux function
 switch fluxfun
     case 'linear'
-        a=+1; flux = @(w) a*w; 
+        a=1; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
     case 'nonlinear' % Burgers
         flux = @(w) w.^2/2; 
@@ -88,7 +88,7 @@ while t < tEnd
     nfluxR = nflux(2:end); nfluxL = nflux(1:end-1);
     
     % Compute the derivate: F = f + gL*(nfluxL-f_bdL) + gR*(nfluxR-f_bdR)
-    dF = -Dr*f + Lift*[(f_rbd+nfluxR);(f_lbd+nfluxL)];
+    dF = -Dr*f + Lift*[(f_rbd-nfluxR);(f_lbd-nfluxL)];
     
     % next time info!
     ut_next = u + dt*dF/J;

@@ -40,7 +40,7 @@ xc = xgrid.elementCenter;
 
 % Load DG tools
 tool = DGtools(xgrid.solutionPoints);
-V = tool.Vandermonde; 
+V = tool.Vandermonde2; 
 invM = tool.nodalInvMassMatrix;
 Dr = tool.nodalCoefDiffMatrix;
 

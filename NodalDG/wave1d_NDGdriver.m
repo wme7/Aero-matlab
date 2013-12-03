@@ -17,7 +17,7 @@ clear all; close all; %clc;
 %% Parameters
 fluxfun = 'linear'; % select flux function
 cfl = 0.02; % CFL condition
-tEnd = 2; % final time
+tEnd = 2*pi; % final time
 K = 5; % degree of accuaracy
 nE = 10; % number of elements
 
@@ -25,7 +25,7 @@ nE = 10; % number of elements
 % Define our Flux function
 switch fluxfun
     case 'linear'
-        a=2*pi; flux = @(w) a*w; 
+        a=1; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
     case 'nonlinear' % Burgers
         flux = @(w) w.^2/2; 
@@ -40,7 +40,7 @@ xc = xgrid.elementCenter;
 
 % Load DG tools
 tool = DGtools(xgrid.solutionPoints);
-V = tool.Vandermonde; 
+V = tool.Vandermonde2; 
 invM = tool.nodalInvMassMatrix;
 Dr = tool.nodalCoefDiffMatrix;
 
