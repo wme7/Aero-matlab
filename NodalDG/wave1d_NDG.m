@@ -15,17 +15,17 @@
 clear all; close all; %clc;
 
 %% Parameters
-fluxfun = 'linear'; % select flux function
+fluxfun = 'nonlinear'; % select flux function
 cfl = 0.02; % CFL condition
-tEnd = 2*pi; % final time
+tEnd = 6*pi; % final time
 K = 5; % degree of accuaracy
-nE = 8; % number of elements
+nE = 10; % number of elements
 
 %% PreProcess
 % Define our Flux function
 switch fluxfun
     case 'linear'
-        a=-1; flux = @(w) a*w; 
+        a=1; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
     case 'nonlinear' % Burgers
         flux = @(w) w.^2/2; 
@@ -38,7 +38,7 @@ dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
 
 % Load DG tools
 tool = DGtools(xgrid.solutionPoints);
-V = tool.Vandermonde; 
+V = tool.Vandermonde2; 
 invM = tool.nodalInvMassMatrix;
 Dr = tool.nodalCoefDiffMatrix;
 
@@ -48,7 +48,7 @@ Emat(1,1)=1; Emat(K+1,2)=1;
 Lift = V*(V'*Emat);
 
 % IC
-u0 = IC(x,4);
+u0 = IC(x,2);
 
 % Set plot range
 plotrange = [xgrid.range(1),xgrid.range(2),...
@@ -57,7 +57,7 @@ plotrange = [xgrid.range(1),xgrid.range(2),...
 %% Solver Loop
 
 % Set initial time & load IC
-t = 0; u = u0; it = 0;
+t=0; u=u0; it=0;
 
 while t < tEnd
     % update time
@@ -82,23 +82,15 @@ while t < tEnd
     % Apply Periodic BCs
     u_nface(1) = u_nface(end); % left BD
     u_pface(end) = u_pface(1); % right BD
-
-    % Apply Neumann BCs
-    %u_nface(1) = u_pface(1); % left BD
-    %u_pface(end) = u_nface(end);% u_pface(end); % right BD
-
-    % Apply Dirichlet BCs
-    %u_nface(1) = u_pface(1); % left BD
-    %u_pface(end) = u_nface(end);% u_pface(end); % right BD
     
     % LF numerical flux
     alpha = max(max(abs(dflux(u)))); 
     nflux = 0.5*(flux(u_nface)+flux(u_pface)-alpha*(u_pface-u_nface));
     nfluxL = nflux(1:end-1); nfluxR = nflux(2:end);
-
-    % Compute the derivate: F = f + gL*(nfluxL-f_bdL) + gR*(nfluxR-f_bdR)
-    dF = -Dr*f + Lift*[(f_rbd-nfluxR);(f_lbd-nfluxL)];
-
+    
+    % Compute the derivate: F = f + lL*(nfluxL-f_bdL) - lR*(nfluxR-f_bdR)
+    dF = -Dr*f + Lift*[(nfluxL-f_lbd);(f_rbd-nfluxR)];
+    
     % next time info!
     ut_next = u + dt*dF/J;
 

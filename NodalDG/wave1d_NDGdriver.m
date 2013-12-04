@@ -15,7 +15,7 @@
 clear all; close all; %clc;
 
 %% Parameters
-fluxfun = 'linear'; % select flux function
+fluxfun = 'nonlinear'; % select flux function
 cfl = 0.02; % CFL condition
 tEnd = 2*pi; % final time
 K = 5; % degree of accuaracy

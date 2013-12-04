@@ -32,15 +32,11 @@ u_pface(end) = u_pface(1); % right BD
 %u_pface(end) = u_nface(end);% u_pface(end); % right BD
 
 % LF numerical flux
-%alpha = max(max(abs(dflux(u)))); 
-%nflux = 0.5*(flux(u_nface)+flux(u_pface)-alpha*(u_pface-u_nface));
-%nfluxL = nflux(1:end-1); nfluxR = nflux(2:end);
+alpha = max(max(abs(dflux(u)))); 
+nflux = 0.5*(flux(u_nface)+flux(u_pface)-alpha*(u_pface-u_nface));
+nfluxL = nflux(1:end-1); nfluxR = nflux(2:end);
 
-% Upwind flux
-nflux = 0.5*(flux(u_pface)+flux(u_nface)+abs(flux(u_pface)-flux(u_nface)));
-nfluxR = nflux(2:end); nfluxL = nflux(1:end-1);
-    
-% Compute the derivate: F = f + gL*(nfluxL-f_bdL) + gR*(nfluxR-f_bdR)
-dF = -Dr*f + Lift*[(f_rbd-nfluxR);(f_lbd-nfluxL)];
+% Compute the derivate: F = f + lL*(nfluxL-f_bdL) - lR*(nfluxR-f_bdR)
+dF = -Dr*f + Lift*[(nfluxL-f_lbd);(f_rbd-nfluxR)];
 
 dF = -dF;
