@@ -1,0 +1,42 @@
+Elapsed time is 3.361642 seconds.
+Elapsed time is 6.723706 seconds.
+Elapsed time is 13.569713 seconds.
+Elapsed time is 27.411852 seconds.
+Elapsed time is 56.483539 seconds.
+Elapsed time is 44.207037 seconds.
+Elapsed time is 88.706689 seconds.
+Elapsed time is 179.849086 seconds.
+Elapsed time is 366.415265 seconds.
+Elapsed time is 760.455421 seconds.
+Elapsed time is 582.341785 seconds.
+Elapsed time is 1165.506856 seconds.
+Elapsed time is 2340.194618 seconds.
+Elapsed time is 4768.704864 seconds.
+Elapsed time is 9667.267886 seconds.
+***************************************************************
+ Degree 3
+***************************************************************
+ nE 	 L1-Norm 	 Degree 	 Linf-Norm 	 Degree
+ 20 	 5.40e-01 	 2.17 		 1.14e-02 	 1.94 
+ 40 	 5.35e-01 	 2.48 		 5.61e-03 	 2.25 
+ 80 	 5.33e-01 	 2.78 		 2.77e-03 	 2.56 
+160 	 5.32e-01 	 3.08 		 1.38e-03 	 2.86 
+320 	 5.31e-01 	 3.38 		 6.87e-04 	 3.16 
+***************************************************************
+ Degree 4
+***************************************************************
+ nE 	 L1-Norm 	 Degree 	 Linf-Norm 	 Degree
+ 20 	 6.50e-02 	 3.19 		 1.08e-03 	 2.97 
+ 40 	 6.50e-02 	 3.49 		 5.33e-04 	 3.27 
+ 80 	 6.52e-02 	 3.79 		 2.65e-04 	 3.58 
+160 	 6.53e-02 	 4.09 		 1.33e-04 	 3.88 
+320 	 6.53e-02 	 4.39 		 6.62e-05 	 4.18 
+***************************************************************
+ Degree 5
+***************************************************************
+ nE 	 L1-Norm 	 Degree 	 Linf-Norm 	 Degree
+ 20 	 8.01e-03 	 4.18 		 1.13e-04 	 3.95 
+ 40 	 7.97e-03 	 4.48 		 5.58e-05 	 4.25 
+ 80 	 7.96e-03 	 4.78 		 2.76e-05 	 4.56 
+160 	 7.95e-03 	 5.08 		 1.37e-05 	 4.86 
+320 	 7.95e-03 	 5.38 		 6.86e-06 	 5.16 

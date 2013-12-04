@@ -16,7 +16,7 @@ clc; clear all; close all;
 
 %% Parameters
 fluxfun = 'linear'; % select flux function
-cfl = 0.01; % CFL condition
+cfl = 0.02; % CFL condition
 tEnd = 2*pi; % final time
 K = 5; % degree of accuaracy
 nE = 20; % number of elements
@@ -25,7 +25,7 @@ nE = 20; % number of elements
 % Define our Flux function
 switch fluxfun
     case 'linear'
-        a=+1; flux = @(w) a*w; 
+        a=1; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
     case 'nonlinear' %Burgers
         flux = @(w) w.^2/2; 
@@ -113,7 +113,7 @@ while t < tEnd
     % update info
     u = u_next;
     
-    if rem(it,10) == 0
+    %if rem(it,10) == 0
         drawnow;
-    end
+    %end
 end

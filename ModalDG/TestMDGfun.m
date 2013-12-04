@@ -89,9 +89,9 @@ for s = time
     %subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid off; 
     %subplot(1,2,2); plot(xc,u_bar,'ro'); axis(plotrange); grid off; 
     
-    if rem(it,10) == 0
+    %if rem(it,10) == 0
     %    drawnow;
-    end
+    %end
 end
 
 %% Build Cell averages for every E_j

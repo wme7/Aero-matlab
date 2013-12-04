@@ -7,10 +7,19 @@
 %              coded by Manuel Diaz, NTU, 2013.02.25
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Ref: A flux reconstruction approach to high-order schemes including
-% Discontinuous Galerkin methods. H.T. Huynh, AIAA 2007.
+% Refs:
+% 1. Yang, J.Y.; Numerical solutions of ideal quantum gas dynamical flows
+%    governed by semiclassical ellipsoidal-statistical distribution. DOI:
+%    10.1098/rspa.2013.0413 
+% 2. H.T. Huynh; A flux reconstruction approach to high-order schemes
+%    including Discontinuous Galerkin methods. AIAA 2007.
+% 3. J.S. Hestaven & T. Warburton; Nodal Discontinuous Galerkin Methods,
+%    Algorithms, Analysis and Applications. Springer 2008.
+% 4. Cockburn & Shu; TVB Runge-Kutta Local Projection Discontinuous
+%    Galerkin Finite Element Method for conservation laws II: General
+%    Framework. 1989.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clear all;  close all; clc;
+    clear all;  close all; clc;
 
 %% Parameters
     parameter.name      = 'SBBGK1d';% Simulation Name
@@ -20,17 +29,17 @@ clear all;  close all; clc;
     parameter.tEnd  	= 0.05;     % End time - Parameter part of ICs
     parameter.theta 	= 0;        % {-1}BE, {0}MB, {1}FD.
     parameter.feq_model = 1;        % {1}UU.  {2}ES.
-    parameter.quad   	= 1;        % {1}NC,  {2}GH
-    parameter.method 	= 1;        % {1}CPR, {2}CPR, {3}CPR,
+    parameter.v_discrt  = 1;        % {1}NC,  {2}GH
+    parameter.method 	= 1;        % {1}NDG, {2}MDG, {3}CPR,
     parameter.IC        = 7;        % IC:{1}~{14}. See SBBGK_IC1d.m
-    parameter.P         = 5;        % Polinomial Degree
-    parameter.K         = 100;      % Number of elements
+    parameter.P         = 3;        % Polinomial Degree
+    parameter.K         = 8;      % Number of elements
     parameter.RK_degree	= 3;        % Number of RK stages
     parameter.RK_stages	= 3;        % Number of RK stages
 
 % Ploting conditions
-    plot_figs = 0;        % 0: no, 1: yes please!
-    write_ans = 0;        % 0: no, 1: yes please!  
+    plot_figs = 0;	% 0: no, 1: yes please!
+    write_ans = 0;	% 0: no, 1: yes please!  
 
 % ID filename for results
     [ID, IDn] = ID_name(parameter);
@@ -46,10 +55,12 @@ if write_ans == 1
 end
 
 %% Preprocessing
+% Domain discretization for Spectral methods
+    xgrid = mesh1d([0 1],parameter.K,'LGL',parameter.P);
+    x  = xgrid.nodeCoordinates;
+    dx = xgrid.elementSize; J = xgrid.Jacobian;
+    xc = xgrid.elementCenter; wx = xgrid.weights;
 
-% IC in physical Space
-% Semiclassical ICs: Fugacity[z], Velocity[u] and Temperature[t] 
-    [z0,u0,t0,p0,rho0,E0,~,~] = SBBGK_IC1d(x,parameter);
 
 %% Microscopic Velocity Discretization (using Discrete Ordinate Method)
 % that is to make coincide discrete values of microscopic velocities with
@@ -59,15 +70,15 @@ end
 switch quad
 
     case{1} % Newton Cotes Quadrature:
-    Vv  = [-20,20];  % range: a to b
+    Vv  = [-20,20]; % range: a to b
     nv = 200;       % nodes desired (may not the actual value)
-    [v,w,k] = cotes_xw(Vv(1),Vv(2),nv,5); % Using Netwon Cotes Degree 5
+    [v,wv,k] = cotes_xw(Vv(1),Vv(2),nv,5); % Using Netwon Cotes Degree 5
         
     case{2} % Gauss Hermite Quadrature:
-    nv = 80;          % nodes desired (the actual value)
-    [v,w] = GaussHermite(nv); % for integrating range: -inf to inf
-    k = 1;            % quadrature constant.
-    w = w.*exp(v.^2); % weighting function of the Gauss-Hermite quadrature
+    nv = 80;         % nodes desired (the actual value)
+    [v,wv] = GaussHermite(nv); % for integrating range: -inf to inf
+    k = 1;           % quadrature constant.
+    wv = wv.*exp(v.^2);% weighting function of the Gauss-Hermite quadrature
     
     otherwise
         error('Order must be between 1 and 2');
@@ -76,16 +87,19 @@ end
 % The actual nv value will be computed using 'length' vector function:
     nv = length(v);
 % Using D.O.M.
-    v = reshape(v,[1,1,nv]);    w = reshape(w,[1,1,nv]);
-    v = repmat(v,Pp,K);         w = repmat(w,Pp,K);
+    v = reshape(v,[1,1,nv]);    wv = reshape(wv,[1,1,nv]);
+    v = repmat(v,Pp,K);         wv = repmat(wv,Pp,K);
 
-%% Applying Discrete Ordinate Method on ICs:
-[z,ux,t] = apply_DG_DOM(z0,u0,t0,nv);  % Semi-classical IC
-[p,rho,E] = apply_DG_DOM(p0,rho0,E0,nv); % Classical IC
+% IC in physical Space
+% Semiclassical ICs: Fugacity[z], Velocity[u] and Temperature[t] 
+    [z0,u0,t0,p0,rho0,E0,~,~] = SBBGK_IC1d(x,parameter.IC);
+    
+% Applying Discrete Ordinate Method on ICs:
+    [z,ux,t] = apply_DG_DOM(z0,u0,t0,nv);  % Semi-classical IC
+    [p,rho,E] = apply_DG_DOM(p0,rho0,E0,nv); % Classical IC
 
-% Compute distribution IC of our mesoscopic method by assuming the equilibrium 
-% state of the macroscopic IC. Using the semiclassical Equilibrium
-% distribuition function:
+% IC for PDF 'f' by assuming the equilibrium state of the macroscopic IC.
+% Using the semiclassical Equilibrium distribuition function:
 switch fmodel 
     case{1} % U.U.
         f0 = f_equilibrium_1d(z,ux,v,t,theta);
