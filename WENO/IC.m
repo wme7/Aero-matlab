@@ -3,10 +3,12 @@ function u0 = IC(x,ICcase)
 %**************************************************************************
 %
 % 4 cases available: 
-% {1} Gaussian Jump
-% {2} Square Jump
-% {3} Sinusoidal
+% {1} Gaussian wave
+% {2} Simusoidal wave
+% {3} Centered Sinusoidal wave
 % {4} Riemann IC
+% {5} HyperTangent
+% {6} Square Jump
 %
 % Coded by Manuel Diaz 2012.12.06
 %**************************************************************************

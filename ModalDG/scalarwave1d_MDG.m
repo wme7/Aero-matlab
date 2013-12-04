@@ -15,7 +15,6 @@
 clear all; close all; %clc;
 
 %% Parameters
-fluxfun = 'linear'; % select flux function
 cfl = 0.02; % CFL condition
 tEnd = 2*pi; % final time
 K = 7; % degree of accuaracy
@@ -23,14 +22,8 @@ nE = 20; % number of elements
 
 %% PreProcess
 % Define our Flux function
-switch fluxfun
-    case 'linear'
-        a=1; flux = @(w) a*w; 
-        dflux = @(w) a*ones(size(w));
-    case 'nonlinear' % Burgers
-        %flux = @(w) w.^2/2; 
-        %dflux = @(w) w; 
-end
+a=-1; flux = @(w) a*w; 
+dflux = @(w) a*ones(size(w));
 
 % Build 1d mesh
 xgrid = mesh1d([0 2*pi],nE,'Radau',K);

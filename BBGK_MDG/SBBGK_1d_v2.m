@@ -1,52 +1,41 @@
-%% 1D Semi-classical Boltzmann-BGK Equation
-% Numerical solution of the Boltzmann-BGK Equation to recover Euler macroscopic
-% continuum solution. Coded by Manuel Diaz 2013.02.25
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 1D Semi-classical Boltzmann-ESBGK Equation to recover Quantum Euler sol.
 %
-% Semi-classical Boltzmann-BGK Transport Equation:
+%  $$\frac{\partial f}{\partial t}+\vec F\cdot \nabla_p f + \vec v
+%  \cdot\nabla_{\vec x} f =\widehat{\Omega}(f)= -\frac{f-f^{eq}}{\tau}$$
 %
-% $$\frac{\partial f}{\partial t}+\vec F\cdot \nabla_p f + \vec v
-% \cdot\nabla_{\vec x} f =\widehat{\Omega } (f) = - \frac{f-f^{eq}}{\tau}$$
+%              coded by Manuel Diaz, NTU, 2013.02.25
 %
-clc;  clear all;  close all;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Ref: A flux reconstruction approach to high-order schemes including
+% Discontinuous Galerkin methods. H.T. Huynh, AIAA 2007.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clear all;  close all; clc;
 
-%% Simulation Parameters
-    name	='SBBGK1d'; % Simulation Name
-    CFL     = 15/100;   % CFL condition
-    f_case  = 1;        % {1} Relaxation model, {2} Euler Limit
-    r_time  = 1/10000;  % Relaxation time
-    tEnd  	= 0.05;     % End time - Parameter part of ICs
-    theta 	= 0;        % {-1} BE, {0} MB, {1} FD.
-    fmodel  = 1;        % {1} UU. model, {2} ES model.
-    quad   	= 1;        % {1} NC , {2} GH
-    method 	= 5;        % {5} Nodal DG only
-    IC_case	= 3;        % IC: {1}~{14}. See SSBGK_IC1d.m
-  plot_figs = 1;        % 0: no, 1: yes please!
-  write_ans = 0;        % 0: no, 1: yes please!
-% Using DG
-    P_deg	= 3;        % Polinomial Degree
-    Pp      = P_deg+1;  % Polinomials Points
-% Using RK integration time step
-  RK_stages	= 3;        % Number of RK stages
+%% Parameters
+    parameter.name      = 'SBBGK1d';% Simulation Name
+    parameter.CFL       = 15/100;   % CFL condition
+    parameter.f_case    = 1;        % {1}Relaxation model, {2}Euler Limit
+    parameter.r_time    = 1/1e5;    % Relaxation time (if f_case = 1)
+    parameter.tEnd  	= 0.05;     % End time - Parameter part of ICs
+    parameter.theta 	= 0;        % {-1}BE, {0}MB, {1}FD.
+    parameter.feq_model = 1;        % {1}UU.  {2}ES.
+    parameter.quad   	= 1;        % {1}NC,  {2}GH
+    parameter.method 	= 1;        % {1}CPR, {2}CPR, {3}CPR,
+    parameter.IC        = 7;        % IC:{1}~{14}. See SBBGK_IC1d.m
+    parameter.P         = 5;        % Polinomial Degree
+    parameter.K         = 100;      % Number of elements
+    parameter.RK_degree	= 3;        % Number of RK stages
+    parameter.RK_stages	= 3;        % Number of RK stages
 
-%% Driver script for solving the 1D BBGK equations
-Globals1D;
+% Ploting conditions
+    plot_figs = 0;        % 0: no, 1: yes please!
+    write_ans = 0;        % 0: no, 1: yes please!  
 
-% Polynomial order used for approximation 
-N = P_deg;
+% ID filename for results
+    [ID, IDn] = ID_name(parameter);
 
-% Generate simple mesh
-[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 100);
-
-% Initialize solver and construct grid and metric
-StartUp1D;
-
-% Set up initial conditions -- Sod's problem
-MassMatrix = inv(V')/V;
-
-%% Define a ID name for results file
-[ID, IDn] = ID_name(name,theta,K,P_deg,RK_stages,r_time,IC_case,fmodel,f_case,method);
-
-%% Open a Files to store the Results
+% Open a Files to store the Results
 if write_ans == 1
     file = fopen(IDn,'w');
     % 'file' gets the handel for the file "case.plt".
@@ -56,9 +45,11 @@ if write_ans == 1
     fprintf(file, 'VARIABLES = "x" "density" "velocity" "energy" "pressure" "temperature" "fugacity"\n');
 end
 
-%% Initial Conditions in physical Space
+%% Preprocessing
+
+% IC in physical Space
 % Semiclassical ICs: Fugacity[z], Velocity[u] and Temperature[t] 
-    [z0,u0,t0,p0,rho0,E0,~,~] = SSBGK_IC1d(x,IC_case);
+    [z0,u0,t0,p0,rho0,E0,~,~] = SBBGK_IC1d(x,parameter);
 
 %% Microscopic Velocity Discretization (using Discrete Ordinate Method)
 % that is to make coincide discrete values of microscopic velocities with
@@ -117,7 +108,7 @@ end
     %[rho,rhoux,E,Wxx] = macromoments_DG_1d(k,w,f0,v,ux); %Just for testing
     %[~,~,~,p] = macroproperties_DG_1d(rho,rhou,E,nx,nv,theta);
     
-%% Marching Scheme
+%% Solver
 % First we need to define how big is our time step. Due to the discrete
 % ordinate method the problem is similar to evolve the same problem for
 % every mesoscopic velocity.

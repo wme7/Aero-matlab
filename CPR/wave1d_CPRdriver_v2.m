@@ -1,14 +1,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%              Solving 1-D wave equation with Nodal DG
+%              Solving 1-D wave equation with CPR/FR
 %
 %               du/dt + df/dx = 0,  for x \in [a,b]
 %                 where f = f(u): linear/nonlinear
 %
-%              coded by Manuel Diaz, NTU, 2012.12.05
-%                               
+%              coded by Manuel Diaz, NTU, 2013.10.29
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Ref: J.S. Hestaven & T. Warburton; Nodal Discontinuous Galerkin Methods,
-% Algorithms, Analysis and Applications. Springer 2008.
+% Ref: A flux reconstruction approach to high-order schemes including
+% Discontinuous Galerkin methods. H.T. Huynh, AIAA 2007.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Notes: Basic Scheme Implementation with SSP-RK45 intergration scheeme.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -18,36 +18,35 @@ clear all; close all; clc;
 fluxfun = 'nonlinear'; % select flux function
 cfl = 0.02; % CFL condition
 tEnd = 1.5; % final time
-K = 3; % degree of accuaracy
+K = 5; % degree of accuaracy %example: K = 6 -> cfl 0.001
 nE = 20; % number of elements
 
 %% PreProcess
 % Define our Flux function
 switch fluxfun
     case 'linear'
-        a=1; flux = @(w) a*w; 
+        a=-1; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
-    case 'nonlinear' % Burgers
+    case 'nonlinear' %Burgers
         flux = @(w) w.^2/2; 
         dflux = @(w) w; 
 end
 
 % Build 1d mesh
-xgrid = mesh1d([0 2*pi],nE,'LGL',K);
+xgrid = mesh1d([0 2*pi],nE,'Legendre',K);
 dx = xgrid.elementSize; J = xgrid.Jacobian; 
-x = xgrid.nodeCoordinates; w = xgrid.weights';
-xc = xgrid.elementCenter;
+x = xgrid.nodeCoordinates; quad = xgrid.quadratureType;
+w = xgrid.weights';	xc = xgrid.elementCenter;
 
-% Load DG tools
-tool = DGtools(xgrid.solutionPoints);
-V = tool.Vandermonde2; 
-invM = tool.nodalInvMassMatrix;
-Dr = tool.nodalCoefDiffMatrix;
+% compute gR'(xi) & gL'(xi)
+RR = CorrectionPolynomial('RadauRight',K+1); % g: one-order higher
+dg.RR = RR.eval_dP(xgrid.solutionPoints); dg.RL = -flipud(dg.RR);
 
-% Build Lift Operator
-Emat = zeros(K+1,2); % array of element's shape function
-Emat(1,1)=1; Emat(K+1,2)=1;
-Lift = V*(V'*Emat);
+% Build Lagrange k-Polynomials
+l = LagrangePolynomial(xgrid.solutionPoints);
+L.lcoef = double(subs(l.lagrangePolynomial,-1));
+L.rcoef = double(subs(l.lagrangePolynomial,1));
+L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 
 % IC
 ic = 2; u0 = IC(x,ic);
@@ -106,7 +105,7 @@ while t < tEnd
 
     for RKs = 1:5
         t_local = t + rk4c(RKs)*dt;
-        dF = residual(u,flux,dflux,Lift,Dr);
+        dF = residual(u,L,dg,flux,dflux,quad);
         res_u = rk4a(RKs)*res_u + dt*dF/J;
         u = u - rk4b(RKs)*res_u;
     end
@@ -125,7 +124,7 @@ end
 %% Final Plot for IC 2
 if ic==2 || ic==3
     subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange);
-    title('Nodal DG','interpreter','latex','FontSize',18);
+    title('CPR/FR','interpreter','latex','FontSize',18);
     xlabel('$\it{x}$','interpreter','latex','FontSize',14);
     ylabel({'$\it{u(x)}$'},'interpreter','latex','FontSize',14);
     subplot(1,2,2); plot(xe,ue,'k-',xc,u_bar,'ro'); axis(plotrange);

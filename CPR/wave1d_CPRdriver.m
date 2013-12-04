@@ -10,14 +10,16 @@
 % Ref: A flux reconstruction approach to high-order schemes including
 % Discontinuous Galerkin methods. H.T. Huynh, AIAA 2007.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clc; clear all; close all;
+% Notes: Basic Scheme Implementation with SSP-RK33 intergration scheeme.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clear all; close all; clc;
 
-%% Simulation Parameters
-fluxfun = 'nonlinear'; % select flux function
-cfl = 0.02; % CFL condition
-tEnd = 1.5; % final time
-K = 6; % degree of accuaracy %example: K = 6 -> cfl 0.001
-nE = 40; % number of elements
+%% Parameters
+fluxfun = 'linear'; % select flux function
+cfl = 0.01; % CFL condition
+tEnd = 2*pi; % final time
+K = 7; % degree of accuaracy %example: K = 6 -> cfl 0.001
+nE = 10; % number of elements
 
 %% PreProcess
 % Define our Flux function
@@ -84,10 +86,19 @@ while t < tEnd
     u_bar = w*u/2;
     
     % Plot u
-    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid on; 
+    subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange); grid off; 
     subplot(1,2,2); plot(xc,u_bar,'ro'); axis(plotrange); grid off; 
     
     %if rem(it,10) == 0
         drawnow;
     %end
 end
+%% Final Plot for IC 2
+subplot(1,2,1); plot(x,u,x,u0,'-+'); axis(plotrange);
+title('CPR/FR','interpreter','latex','FontSize',18);
+xlabel('$\it{x}$','interpreter','latex','FontSize',14);
+ylabel({'$\it{u(x)}$'},'interpreter','latex','FontSize',14);
+subplot(1,2,2); plot(x,u0,'k-',xc,u_bar,'ro'); axis(plotrange);
+title('Cell Averages','interpreter','latex','FontSize',18);
+xlabel('$\it{x}$','interpreter','latex','FontSize',14);
+ylabel({'$\it{u(x)}$'},'interpreter','latex','FontSize',14);

@@ -57,7 +57,6 @@ u0 = IC(x,Ic);
 
 %% Solver Loop
 
-
 % Set initial time & load IC
 t = 0; u = u0; it = 0;
 

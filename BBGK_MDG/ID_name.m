@@ -1,9 +1,21 @@
-function [ID, IDn] = ID_name(name,theta,nx,P_deg,RK_stages,tau,IC_case,fmodel,f_case,method)
+function [ID, IDn] = ID_name(input)
 %% ID name generator 
 % Generates ID and IDn for an specific simulation using the controling 
 % parameters.
 
 %% Read Parameters
+    name    = input.name;           % Simulation Name
+    f_case  = input.f_case;         % {1}Relaxation model, {2}Euler Limit
+    theta   = input.theta;          % {-1}BE, {0}MB, {1}FD.
+    feq_model = input.feq_model;    % {1}UU.  {2}ES.
+    tau     = input.r_time;         % Relaxation time (if f_case = 1)
+    method  = input.method;         % {1}CPR, {2}CPR, {3}CPR,
+    IC_case = input.IC;             % IC:{1}~{14}. See SBBGK_IC1d.m
+    P_deg   = input.P;              % Polinomial Degree
+    nx      = input.K;              % Number of elements
+    RK_degree = input.RK_degree;    % Number of RK stages
+    RK_stages = input.RK_stages;    % Number of RK stages
+
 % Name
 name1 = name(1:2);
 name2 = name(3:end-1);
@@ -21,7 +33,7 @@ switch theta
         error('not a valid theta value')
 end
 % Model of the Equilibrium Distribution
-switch fmodel
+switch feq_model
     case{1} %UU
         feq = '-UU';
     case{2} %ES
@@ -31,20 +43,16 @@ switch fmodel
 end
 % Method
 switch method
-    case{1} % Upwind
-        advec = 'Upwind';
-        P_degree = num2str(1);
-    case{2} % TVD
-        advec = 'TVD';
-        P_degree = num2str(1);
-    case{3} % WENO3
-        advec = 'WENO3';
-        P_degree = num2str(1);
-    case{4} % WENO5
-        advec = 'WENO5';
-        P_degree = num2str(1);
-    case{5} % DG
-        advec = 'DGM';
+    case{1} % NDG
+        advec = 'NDG';
+        % Polinomial Degree
+        P_degree = num2str(P_deg);
+	case{2} % MDG
+        advec = 'MDG';
+        % Polinomial Degree
+        P_degree = num2str(P_deg);
+	case{3} % CPR/FR
+        advec = 'CPR';
         % Polinomial Degree
         P_degree = num2str(P_deg);
     otherwise
@@ -56,6 +64,7 @@ elements  = ['X',num2str(nx)];
 
 % RK stages
 RKs = num2str(RK_stages);
+RKd = num2str(RK_degree);
 
 % Initial Condition Number
 ic = num2str(IC_case);
@@ -77,6 +86,6 @@ f = '.plt';
 
 %% Generate ID
 IDn = [name1,feq,name2,' ',statistic,advec,name3,' ',...
-    elements,'P',P_degree,'RK',RKs,' ',omega,'IC',ic,f];
+    elements,'P',P_degree,'RK',RKd,RKs,' ',omega,'IC',ic,f];
 ID = [name1,feq,name2,'-',statistic,advec,name3,'-',...
-    elements,'P',P_degree,'RK',RKs,'-',omega,'IC',ic];
+    elements,'P',P_degree,'RK',RKd,RKs,'-',omega,'IC',ic];
