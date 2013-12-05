@@ -181,24 +181,24 @@ while t < tEnd
     
     % Plot figure
     if plot_fig == 1;
-        subplot(2,3,1); plot(x,r,'o'); title('Velocity');
-        subplot(2,3,2); plot(x,u,'o'); title('ernal Energy');
-        subplot(2,3,3); plot(x,p,'o'); title('Pressure');
-        subplot(2,3,4); plot(x,m,'o'); title('Mach number');
-        subplot(2,3,5); plot(x,s,'o'); title('Entropy');
-        subplot(2,3,6); plot(x,e,'o'); title('IntDensity');
+        subplot(2,3,1); plot(x,r,'.b'); title('Velocity');
+        subplot(2,3,2); plot(x,u,'.m'); title('Internal Energy');
+        subplot(2,3,3); plot(x,p,'.k'); title('Pressure');
+        subplot(2,3,4); plot(x,m,'.g'); title('Mach number');
+        subplot(2,3,5); plot(x,s,'.c'); title('Entropy');
+        subplot(2,3,6); plot(x,e,'.r'); title('Density');
     end
     drawnow
 end
 
 %% Write Results
 if wrt_sol == 1;
-    subplot(2,3,1); hold on; plot(x,r,'o'); title('Density');
-    subplot(2,3,2); hold on; plot(x,u,'o'); title('Velocity');
-    subplot(2,3,3); hold on; plot(x,p,'o'); title('Pressure');
-    subplot(2,3,4); hold on; plot(x,m,'o'); title('Mach number');
-    subplot(2,3,5); hold on; plot(x,s,'o'); title('Entropy');
-    subplot(2,3,6); hold on; plot(x,e,'o'); title('Internal Energy');
+    subplot(2,3,1); hold on; plot(x,r,'.b'); title('Density');
+    subplot(2,3,2); hold on; plot(x,u,'.m'); title('Velocity');
+    subplot(2,3,3); hold on; plot(x,p,'.k'); title('Pressure');
+    subplot(2,3,4); hold on; plot(x,m,'.g'); title('Mach number');
+    subplot(2,3,5); hold on; plot(x,s,'.c'); title('Entropy');
+    subplot(2,3,6); hold on; plot(x,e,'.r'); title('Internal Energy');
     
     subplot(2,3,1); plot(xx,rhoexact);   hold off;
     subplot(2,3,2); plot(xx,uexact);     hold off;

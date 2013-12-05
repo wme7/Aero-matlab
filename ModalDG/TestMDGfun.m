@@ -39,7 +39,10 @@ dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
 
 % Load DG tools
 tool = DGtools(xgrid.solutionPoints);
-V = tool.Vadermonde;
+V = tool.Vandermonde;
+lR = tool.legRightEnd; lL = tool.legLeftEnd;
+D = tool.MassMatrix*tool.CoefDiffMatrix;
+invM = tool.invMassMatrix;
 
 % IC
 u0 = IC(x,Ic);
@@ -68,15 +71,15 @@ for s = time
     it = it+1; 
     
     % 1st stage
-    dF = residual(u,ut,flux,dflux,tool);
+    dF = residual(u,ut,flux,dflux,lR,lL,D,V,invM); 
     ut = uo-dt*dF/J;
 
     % 2nd Stage
-    dF = residual(u,ut,flux,dflux,tool); 
+    dF = residual(u,ut,flux,dflux,lR,lL,D,V,invM);  
     ut = 0.75*uo+0.25*(ut-dt*dF/J);
 
     % 3rd stage
-    dF = residual(u,ut,flux,dflux,tool); 
+    dF = residual(u,ut,flux,dflux,lR,lL,D,V,invM);  
     ut = (uo+2*(ut-dt*dF/J))/3;
     
     % Transform legendre coefs into nodal values.

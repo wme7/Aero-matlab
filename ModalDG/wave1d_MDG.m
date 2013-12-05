@@ -39,7 +39,7 @@ dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
 
 % Load DG tools
 tool = DGtools(xgrid.solutionPoints);
-V = tool.Vadermonde; lR = tool.legRightEnd; lL = tool.legLeftEnd;
+V = tool.Vandermonde; lR = tool.legRightEnd; lL = tool.legLeftEnd;
 M = tool.MassMatrix; invM = tool.invMassMatrix; Dr = tool.CoefDiffMatrix;
 D = M*Dr;
 

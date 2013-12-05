@@ -17,8 +17,8 @@ clear all; close all; %clc;
 %% Parameters
 fluxfun = 'linear'; % select flux function
 cfl = 0.02; % CFL condition
-tEnd = 2*pi; % final time
-K = 3; % degree of accuaracy
+tEnd = 0.5*pi; % final time
+K = 7; % degree of accuaracy
 nE = 20; % number of elements
 includeS = 0; %{0}no sourcer term, {1}add source term
 flux_type = 4; %{1}Roe, {2}LF, {3}LLF, {4}Upwind
@@ -49,7 +49,7 @@ dx = xgrid.elementSize; J = xgrid.Jacobian; x = xgrid.nodeCoordinates;
 
 % Load DG tools
 tool = DGtools(xgrid.solutionPoints);
-V = tool.Vadermonde; lR = tool.legRightEnd; lL = tool.legLeftEnd;
+V = tool.Vandermonde; lR = tool.legRightEnd; lL = tool.legLeftEnd;
 M = tool.MassMatrix; invM = tool.invMassMatrix; Dr = tool.CoefDiffMatrix;
 D = M*Dr;
 

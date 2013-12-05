@@ -5,11 +5,20 @@ classdef BGKtools
     %   coded by Manuel Diaz, NTU, 2012.05.15
     
     properties
+        quadrature
+        range
+        nc
+        c
+        wc
+        kc
+        K
+        P
     end
     
     methods (Static)
         
-        function [a,b,c] = apply_DG_DOM(a,b,c,nv)            % Repeat arrays 'nv' times
+        function [a,b,c] = apply_DG_DOM(a,b,c,nv)	
+            % Repeat arrays 'nv' times
             a = repmat(a,[1,1,nv]);     
             c = repmat(c,[1,1,nv]);
             b = repmat(b,[1,1,nv]);
@@ -175,7 +184,7 @@ classdef BGKtools
             % symmetrical matrix, guaranteeing that all the eigenvalues (roots)
             % will be real.
             %
-            % � Geert Van Damme
+            % Geert Van Damme
             % geert@vandamme-iliano.be
             % February 21, 2010
             %
@@ -191,7 +200,7 @@ classdef BGKtools
             %   characteristic polynomial, i.d. the eigenvalues of CM;
             % - the weights can be derived from the corresponding eigenvectors.
             %[V L]   = eig(CM);
-            [V L]   = trideigs(diag(CM,0),diag(CM,1),1e-12,100);
+            [V L]   = eig(CM);
             [x ind] = sort(diag(L));
             V       = V(:,ind)';
             w       = sqrt(pi) * V(:,1).^2;
@@ -199,7 +208,40 @@ classdef BGKtools
         
     end
     
-    methods         
+    methods
+        function obj = BGKtools(input)
+            obj.quadrature = input.v_discrt;
+            obj.P = input.P; % polynomial degree
+            obj.K = input.K; % number of elements
+            % Microscopic Velocity Discretization (using Discrete Ordinate Method)
+            % that is to make coincide discrete values of microscopic velocities with
+            % values as the value points for using a quadrature method, so that we can
+            % integrate the velocity probability distribution to recover our
+            % macroscopics properties.
+            % by Manuel Diaz 2012.05.12
+            switch obj.quadrature
+                case{1} % Newton Cotes Quadrature:
+                    Vv  = [-20,20]; % range: a to b
+                    nv = 200;       % nodes desired (may not the actual value)
+                    [v,wv,k] = BGKtools.cotes_xw(Vv(1),Vv(2),nv,5); % Using Netwon Cotes Degree 5
+                case{2} % Gauss Hermite Quadrature:
+                    nv = 80;         % nodes desired (the actual value)
+                    [v,wv] = BGKtools.GaussHermite(nv); % for integrating range: -inf to inf
+                    k = 1;           % quadrature constant.
+                    wv = wv.*exp(v.^2);% weighting function of the Gauss-Hermite quadrature
+                otherwise
+                    error('Order must be between 1 and 2');
+            end
+            obj.range = [v(1),v(end)];
+            % Velocity-Space Grid:
+            % The actual nv value will be computed using 'length' vector function:
+            nv = length(v);
+            obj.nc = nv;
+            % Using D.O.M.
+            v = reshape(v,[1,1,nv]);    wv = reshape(wv,[1,1,nv]);
+            v = repmat(v,obj.P+1,obj.K);         wv = repmat(wv,obj.P+1,obj.K);
+            obj.c = v;      obj.wc = wv;    obj.kc = k;
+        end
     end
         
 end

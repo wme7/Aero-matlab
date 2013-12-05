@@ -14,7 +14,7 @@ clear all; clc; close all;
      dx = 1/1000; % Spatial step size
     cfl = 0.8;  % Courant Number
  tStart = 0.00;  % Start time
-   tEnd = 1.5;   % End time
+   tEnd = 0.95;   % End time
 IC_case = 5;     % {1}Gaussian, {2}Slope, {3}Triangle, {4}Sine, {5}C.Sine
 limiter = 2;     % Options: 1(Vl), 2(Sb), 3(Mm), 4(koren)
 flxtype = 1;     % {1} Roe, {2} LF, {3} LLF, {4} Upwind <-non-conservative!

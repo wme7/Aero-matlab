@@ -16,8 +16,8 @@ clear all; close all; clc;
 
 %% Parameters
 fluxfun = 'nonlinear'; % select flux function
-cfl = 0.02; % CFL condition
-tEnd = 1.5; % final time
+cfl = 0.001; % CFL condition
+tEnd = 0.95; % final time
 K = 5; % degree of accuaracy %example: K = 6 -> cfl 0.001
 nE = 20; % number of elements
 
@@ -25,9 +25,9 @@ nE = 20; % number of elements
 % Define our Flux function
 switch fluxfun
     case 'linear'
-        a=-1; flux = @(w) a*w; 
+        a=1; flux = @(w) a*w; 
         dflux = @(w) a*ones(size(w));
-    case 'nonlinear' %Burgers
+    case 'nonlinear' % Burgers
         flux = @(w) w.^2/2; 
         dflux = @(w) w; 
 end
@@ -52,11 +52,12 @@ L.dcoef = double(subs(l.dlagrangePolynomial,xgrid.solutionPoints));
 ic = 2; u0 = IC(x,ic);
 switch ic
     case 2
-    load('burgersExact.mat');
+    if tEnd==1.50; load('burgersExact.mat'); end;
+    if tEnd==0.95; load('burgersExact3.mat'); end;
     ue = burgersExact(2,:);
     xe = burgersExact(1,:);
     case 3
-    load('burgersExact2.mat');
+    if tEnd==1.50; load('burgersExact2.mat'); end;
     ue = burgersExact(2,:);
     xe = burgersExact(1,:);
     otherwise
@@ -132,3 +133,9 @@ if ic==2 || ic==3
     xlabel('$\it{x}$','interpreter','latex','FontSize',14);
     ylabel({'$\it{u(x)}$'},'interpreter','latex','FontSize',14);
 end
+
+%% Compute L1 Norm
+figure(2); L1=abs(u0-u); semilogy(x,L1,'-');
+title('L1 Error','interpreter','latex','FontSize',18);
+xlabel('$\it{x}$','interpreter','latex','FontSize',14);
+ylabel({'$|\it{u_0(x)-u(x)}|$'},'interpreter','latex','FontSize',14);

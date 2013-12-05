@@ -1,4 +1,4 @@
-function dF = residual(u,ut,flux,dflux,DGtools)
+function dF = residual(u,ut,flux,dflux,lR,lL,D,V,invM)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %       Compute the Residual for 1d wave equation using Modal DG 
 %
@@ -8,11 +8,8 @@ function dF = residual(u,ut,flux,dflux,DGtools)
 %              coded by Manuel Diaz, NTU, 2013.10.29
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-lR = DGtools.legRightEnd; lL = DGtools.legLeftEnd;
-D = DGtools.MassMatrix*DGtools.CoefDiffMatrix;
-
 % compute fluxes in node coordinates
-f = flux(u); ft = DGtools.Vadermonde\f;
+f = flux(u); ft = V\f;
 
 % Interpolate u and flux values at the boundaries of Ij
 u_lbd = lL*ut;
@@ -36,5 +33,5 @@ nflux = 0.5*(flux(u_nface)+flux(u_pface)-alpha*(u_pface-u_nface));
 nfluxL = nflux(1:end-1); nfluxR = nflux(2:end);
 
 % Compute the derivate: F = f - lR*(nfluxR) + lL*(nfluxL)
-dF = DGtools.invMassMatrix*(D'*ft - lR'*nfluxR + lL'*nfluxL);
+dF = invM*(D'*ft - lR'*nfluxR + lL'*nfluxL);
 dF = -dF;

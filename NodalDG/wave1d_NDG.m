@@ -18,7 +18,7 @@ clear all; close all; %clc;
 fluxfun = 'linear'; % select flux function
 cfl = 0.02; % CFL condition
 tEnd = 6*pi; % final time
-K = 5; % degree of accuaracy
+K = 3; % degree of accuaracy
 nE = 10; % number of elements
 
 %% PreProcess
