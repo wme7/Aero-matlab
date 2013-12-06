@@ -7,7 +7,7 @@
 %*
 %* This code solves the Sod's shock tube problem 
 %*
-%* - t=0                               - t=tf
+%* t=0                                 t=tf
 %* Density                             Density
 %*   ****************|                 *********\
 %*                   |                           \
@@ -55,7 +55,7 @@ H = gamma/(gamma-1)*p./r + u.^2/2;
 
 %% Exact Riemann Solution
 [xx,rhoexact,uexact,pexact,machexact,entroexact,energexact] = ...
-   Exact_Riemann(r(1),u(1),p(1),r(nx),u(nx),p(nx),tEnd);
+   EulerExact(r(1),u(1),p(1),r(nx),u(nx),p(nx),tEnd);
 
 % %% Left and right conditions for Dirichlet BC's
 %     r_left  = r(1);  % r_left

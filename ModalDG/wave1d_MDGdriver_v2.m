@@ -16,8 +16,8 @@ clear all; close all; clc;
 
 %% Parameters
 fluxfun = 'nonlinear'; % select flux function
-cfl = 0.001; % CFL condition
-tEnd = 0.95; % final time
+cfl = 0.002; % CFL condition
+tEnd = 1.5; % final time
 K = 5; % degree of accuaracy
 nE = 20; % number of elements
 

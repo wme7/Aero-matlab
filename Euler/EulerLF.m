@@ -7,8 +7,7 @@ close all;
 n=601;              %Number of grid points
 L=10;               %Length of domain
 h=L/(n-1);          %Spatial step size
-CFL=0.2;            %CFL number for stability
-alpha=0.1           %Parameter for artificial viscosity
+CFL=0.34;           %CFL number for stability
 t_final=3.9e-3;     %Final time
 x=0:h:L;
 gamma=1.4;          %Ratio of specific heats for ideal di-atomic gas
@@ -29,7 +28,7 @@ u(1:1:(n+1)/2)=u_l;
 u((n+3)/2:1:n)=u_r;
 E=p./((gamma-1)*rho)+0.5*u.^2;  %Total Energy
 a=sqrt(gamma*p./rho);           %Speed of sound
-dt=CFL*h/max(abs(a));           %Time step based on CFL number
+dt=CFL*h/max(abs(u+a));
 step=0;
 %------------------------------------------------------------------------%
 % Time integration begins
@@ -38,22 +37,8 @@ for t=dt:dt:t_final
     %Define q & F matrix
     q=[rho; rho.*u; rho.*E];
     F=[rho.*u; rho.*u.^2+p; u.*(rho.*E+p)];
-    %Calculate q* and flow parameters
-    q_star(1:3,1:n-1)=0.5*(q(1:3,1:n-1)+q(1:3,2:n))-dt/(2*h)*(F(1:3,2:n)-F(1:3,1:n-1));
-    rho(1:n-1)=q_star(1,1:n-1);
-    u(1:n-1)=q_star(2,1:n-1)./rho(1:n-1);
-    E(1:n-1)=q_star(3,1:n-1)./rho(1:n-1);
-    p(1:n-1)=(gamma-1)*rho(1:n-1).*(E(1:n-1)-0.5*u(1:n-1).^2);
-    %Calculate F*
-    F_star(1:3,1:n-1)=[rho(1:n-1).*u(1:n-1); rho(1:n-1).*u(1:n-1).^2+p(1:n-1); u(1:n-1).*(rho(1:n-1).*E(1:n-1)+p(1:n-1))];
-    mx=[zeros(1,n-1);ones(1,n-1);u(1:n-1)];
-    %Calculate arfiticial viscosity
-    for i=1:3
-        visc(i,1:n-1)=alpha*h^2*rho(1:n-1).*abs((u(2:n)-u(1:n-1))/h).*((u(2:n)-u(1:n-1))/h).*mx(i,1:n-1);
-    end
-    %Update F* and q matrix
-    F_star=F_star-visc;
-    q(1:3,2:n-1)=q(1:3,2:n-1)-dt/h*(F_star(1:3,2:n-1)-F_star(1:3,1:n-2));
+    %Update q matrix and flow parameters
+    q(1:3,2:n-1)=0.5*(q(1:3,3:n)+q(1:3,1:n-2))-dt/(2*h)*(F(1:3,3:n)-F(1:3,1:n-2));
     rho=q(1,1:n);
     u=q(2,1:n)./rho(1:n);
     E=q(3,1:n)./rho;
@@ -77,8 +62,3 @@ subplot(235);plot(x,rho,'k');xlabel('X-Coordinate (m)');ylabel('Density (kg/m^3)
 subplot(236);plot(x,Q,'k');xlabel('X-Coordinate (m)');ylabel('Mass Flow (kg/m^2s)');ylim([min(Q)-(offset)*max(Q) (1+offset)*max(Q)]);
 %------------------------------------------------------------------------%
 %END ;D
-
-%%
-% 
-% $$e^{\pi i} + 1 = 0$$
-% 

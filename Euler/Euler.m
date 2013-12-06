@@ -1,12 +1,12 @@
-%---------------------------------------------
-% Riemann Solver for solving shoc-tube problem
+%----------------------_-----------------------
+% Riemann Solver for solving shock-tube problem
 % by Manuel Diaz
-%---------------------------------------------
+%-----------------------_----------------------
 % Institute of Applied Mechanics
 % Aerodynamic Design and Analsis Lab
 % Laboratory 007
 % Date 03/09/2011
-%---------------------------------------------
+%------------------------_---------------------
 % NOTE:
 % 6 Possible cases of formation of shock waves 
 % and expansion fan have been considered, in-
