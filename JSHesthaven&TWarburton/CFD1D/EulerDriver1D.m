@@ -2,10 +2,10 @@
 Globals1D;
 
 % Polynomial order used for approximation 
-N = 1;
+N = 4;
 
 % Generate simple mesh
-[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 40);
+[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 60);
 
 % Initialize solver and construct grid and metric
 StartUp1D;
@@ -25,6 +25,7 @@ FinalTime = 0.2;
 snapnow;
 
 % Figures
-subplot(1,3,1); plot(x,rho,'-o'); title('\rho');
-subplot(1,3,2); plot(x,rhou,'-o'); title('\rho u');
-subplot(1,3,3); plot(x,Ener,'-o'); title('Energy');
+plotrange=[0,1,0,max(max(u))+0.2];
+subplot(1,3,1); plot(x,rho,'linewidth',2); axis([0,1,0,1.1]); ylabel('\rho'); xlabel('x');
+subplot(1,3,2); plot(x,rhou,'linewidth',2); axis([0,1,-0.05,0.45]); ylabel('\rho u'); xlabel('x');
+subplot(1,3,3); plot(x,Ener,'linewidth',2); axis([0,1,0,3]); ylabel('Energy'); xlabel('x');

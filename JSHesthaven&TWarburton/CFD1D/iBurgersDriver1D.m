@@ -5,7 +5,7 @@ Globals1D;
 N = 4;
 
 % Generate simple mesh
-[Nv, VX, K, EToV] = MeshGen1D(0.0, 1.0, 50);
+[Nv, VX, K, EToV] = MeshGen1D(0, 2*pi, 80);
 
 % Initialize solver and construct grid and metric
 StartUp1D;
@@ -15,12 +15,13 @@ MassMatrix = inv(V')/V;
 %cx = ones(Np,1)*sum(MassMatrix*x,1)/2; 
 
 %u = ones(Np,K).*( sin(2*pi*cx) );
-u = sin(2*pi*x);
-FinalTime = 0.12;
+u0 = 0.5 + sin(x);
+FinalTime = 1.5;
 
 % Solve Problem
-[u] = iBurgers1D(u,FinalTime);
+[u] = iBurgers1D(u0,FinalTime);
 snapnow;
 
 % Plot Figure
-plot(x,u,'-o'); grid on;
+plotrange=[0,2*pi,min(min(u0))-0.2,max(max(u0))+0.2];
+plot(x,u,x,u0,'-+'); axis(plotrange); ylabel('u(x)'); xlabel('x');

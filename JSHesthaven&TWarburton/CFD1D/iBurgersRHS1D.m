@@ -12,7 +12,7 @@ lm = abs(u);
 uf = u.^2/2; 
 
 % compute source term
-us = u.^2;
+us = zeros(size(u)); %u.^2;
 
 % Compute jumps at internal faces
 du  =zeros(Nfp*Nfaces,K);  du(:)  =  u(vmapM) -  u(vmapP); 

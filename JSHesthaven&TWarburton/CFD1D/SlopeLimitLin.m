@@ -15,6 +15,6 @@ hN = ones(Np,1)*h;
 % Limit function
 ux = (2./hN).*(Dr*ul);
 
-%ulimit = ones(Np,1)*v0+(xl-x0).*(ones(Np,1)*minmod([ux(1,:);(vp1-v0)./h;(v0-vm1)./h]));
-ulimit = ones(Np,1)*v0+(xl-x0).*(ones(Np,1)*minmodB([ux(1,:);(vp1-v0)./h;(v0-vm1)./h],0.2,h));
+ulimit = ones(Np,1)*v0+(xl-x0).*(ones(Np,1)*minmod([ux(1,:);(vp1-v0)./h;(v0-vm1)./h]));
+%ulimit = ones(Np,1)*v0+(xl-x0).*(ones(Np,1)*minmodB([ux(1,:);(vp1-v0)./h;(v0-vm1)./h],1e-2,h));
 return

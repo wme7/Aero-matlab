@@ -7,7 +7,7 @@ function [u] = iBurgers1D(u, FinalTime)
 Globals1D;
 
 % Parameters
-CFL = 1.0; time = 0;
+CFL = 1; time = 0;
 
 % Prepare for adaptive time stepping
 mindx = min(x(2,:)-x(1,:));
