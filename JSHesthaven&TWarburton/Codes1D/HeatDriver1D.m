@@ -12,8 +12,8 @@ N = 8;
 StartUp1D;
 
 % Set initial conditions
-u = sin(x);
+u0 = sin(x);
 
 % Solve Problem
 FinalTime = 0.8;
-[u,time] = Heat1D(u,FinalTime);
+[u,time] = Heat1D(u0,FinalTime);
