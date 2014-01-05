@@ -9,8 +9,10 @@ Globals1D;
 du = zeros(Nfp*Nfaces,K); du(:) = u(vmapM)-u(vmapP);
 
 % impose boundary condition at x=0
-uin =-tanh((xL+0.5-time)/(2*epsilon))+1.0; du(mapI) = 2.0*(u(vmapI)-uin);
-uout=-tanh((xR+0.5-time)/(2*epsilon))+1.0; du(mapO) = 2.0*(u(vmapO)-uout);
+uin = 0;%-tanh((xL+0.5-time)/(2*epsilon))+1.0; 
+du(mapI) = 2.0*(u(vmapI)-uin);
+uout=- 0;%tanh((xR+0.5-time)/(2*epsilon))+1.0; 
+du(mapO) = 2.0*(u(vmapO)-uout);
 
 % Compute q and jumps
 q = sqrt(epsilon)*(rx.*(Dr*u) - LIFT*(Fscale.*(nx.*du/2.0)));
@@ -36,7 +38,7 @@ tau=0;
 flux = nx.*(du2/2.0 - sqrt(epsilon)*dq) - maxvel/2.0.*du - sqrt(epsilon)*tau.*du;
 
 % local derivatives of field
-dfdr = Dr*(u.^2/2 - sqrt(epsilon)*q); 
+dfdr = Dr*(u.^2/2 - sqrt(epsilon)*q);
 
 % compute right hand sides of the semi-discrete PDE
 rhsu = -(rx.*dfdr - LIFT*(Fscale.*flux));

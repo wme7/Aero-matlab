@@ -2,7 +2,7 @@
 Globals1D;
 
 % Order of polymomials used for approximation 
-N = 4;
+N = 8;
 
 % Generate simple mesh
 xL = -0.0; xR = 2.0*pi;
@@ -12,13 +12,13 @@ xL = -0.0; xR = 2.0*pi;
 StartUp1D;
 
 % Set initial conditions
-epsilon = 0.03;
+epsilon = 0.1;
 %u = -tanh((x+0.5)/(2*epsilon)) + 1.0;
 u=2*sin(x);
 %xmid=(x(end)-x(1))/2; x1=x<xmid; x2=x>=xmid; u=1*x1+0*x2;
 
 % Solve Problem
-FinalTime = 1.5;%0.75;
+FinalTime = 2.0;%0.75;
 [u] = Burgers1D(u,epsilon,xL,xR,FinalTime);
 
 plot(x,u,'-+'); grid on;
