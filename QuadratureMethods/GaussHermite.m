@@ -8,7 +8,7 @@ function [x, w] = GaussHermite(n)
     % will be real.
     
     
-% � Geert Van Damme
+%  Geert Van Damme
 % geert@vandamme-iliano.be
 % February 21, 2010    
 
@@ -26,8 +26,7 @@ CM  = diag(a,1) + diag(a,-1);
     % - since det(xI-CM)=L_n(x), the abscissas are the roots of the
     %   characteristic polynomial, i.d. the eigenvalues of CM;
     % - the weights can be derived from the corresponding eigenvectors.
-%[V L]   = eig(CM);
-[V L]   = trideigs(diag(CM,0),diag(CM,1),1e-12,100);
+[V L]   = eig(CM);
 [x ind] = sort(diag(L));
 V       = V(:,ind)';
 w       = sqrt(pi) * V(:,1).^2;

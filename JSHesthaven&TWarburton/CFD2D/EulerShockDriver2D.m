@@ -2,13 +2,13 @@
 Globals2D;
 
 % Order of polynomial approximation (N) 
-N = 1;
+N = 3;
 
 fluxtype = 'HLL';
 % set up simulation type
 %sim = 'IsentropicVortex'; 
 %sim = 'Cylinder';
-sim = 'ForwardStep'
+sim = 'Cylinder'
 switch sim
 case {'IsentropicVortex'}
   filename = 'vortexA04.neu';
