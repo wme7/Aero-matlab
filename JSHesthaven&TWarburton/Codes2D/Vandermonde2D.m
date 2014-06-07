@@ -1,4 +1,4 @@
-function [V2D] = Vandermonde2D(N, r, s);
+function [V2D] = Vandermonde2D(N,r,s)
 
 % function [V2D] = Vandermonde2D(N, r, s);
 % Purpose : Initialize the 2D Vandermonde Matrix,  V_{ij} = phi_j(r_i, s_i);

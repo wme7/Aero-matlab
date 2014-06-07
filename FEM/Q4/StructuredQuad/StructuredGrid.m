@@ -5,7 +5,7 @@ clf;
  x=[0 2 2 0];
  y=[0 0.5 1 1];
  
-a = 2;
+a = 3;
 %mesh number in one side
 n=2^(a-1);%(nxn)
 % numberElements: number of elements
@@ -41,5 +41,4 @@ for i=1:n
             j+n+1+(n+1)*(i-1)];
     end
 end
-
 drawingMesh(nodeCoordinates,elementNodes,'Q4','k-');

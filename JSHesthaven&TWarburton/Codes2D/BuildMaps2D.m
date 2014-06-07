@@ -7,8 +7,10 @@ Globals2D;
 
 % number volume nodes consecutively
 nodeids = reshape(1:K*Np, Np, K);
-vmapM   = zeros(Nfp, Nfaces, K); vmapP   = zeros(Nfp, Nfaces, K); 
-mapM    = (1:K*Nfp*Nfaces)';     mapP    = reshape(mapM, Nfp, Nfaces, K);
+vmapM   = zeros(Nfp, Nfaces, K); 
+vmapP   = zeros(Nfp, Nfaces, K); 
+mapM    = (1:K*Nfp*Nfaces)';     
+mapP    = reshape(mapM, Nfp, Nfaces, K);
  
 % find index of face nodes with respect to volume node ordering
 for k1=1:K

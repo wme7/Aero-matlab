@@ -32,8 +32,8 @@ SpFToF = SpFToV*SpFToV' - 2*speye(TotalFaces);
 [faces1, faces2] = find(SpFToF==2);
 
 % Convert face global number to element and face numbers
-element1 = floor( (faces1-1)/Nfaces )  + 1; face1    =   mod( (faces1-1), Nfaces ) + 1;
-element2 = floor( (faces2-1)/Nfaces )  + 1; face2    =   mod( (faces2-1), Nfaces ) + 1;
+element1 = floor( (faces1-1)/Nfaces ) + 1; face1 = mod( (faces1-1), Nfaces ) + 1;
+element2 = floor( (faces2-1)/Nfaces ) + 1; face2 = mod( (faces2-1), Nfaces ) + 1;
 
 % Rearrange into Nelements x Nfaces sized arrays
 ind = sub2ind([K, Nfaces], element1, face1);

@@ -11,8 +11,14 @@ u = rhou./rho; v = rhov./rho; p = (gamma-1)*(Ener - 0.5*(rhou.*u + rhov.*v));
 
 % compute flux functions
 F = zeros(size(Q)); 
-F(:,:,1) = rhou; F(:,:,2) = rhou.*u + p; F(:,:,3) = rhov.*u; F(:,:,4) = u.*(Ener+p);
+F(:,:,1) = rhou; 
+F(:,:,2) = rhou.*u + p; 
+F(:,:,3) = rhov.*u; 
+F(:,:,4) = u.*(Ener+p);
 
 G = zeros(size(Q));
-G(:,:,1) = rhov; G(:,:,2) = rhou.*v; G(:,:,3) = rhov.*v + p; G(:,:,4) = v.*(Ener+p);
+G(:,:,1) = rhov; 
+G(:,:,2) = rhou.*v; 
+G(:,:,3) = rhov.*v + p; 
+G(:,:,4) = v.*(Ener+p);
 return;

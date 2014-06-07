@@ -16,7 +16,7 @@ x = 0.5*(-(r+s)*VX(va)+(1+r)*VX(vb)+(1+s)*VX(vc));
 y = 0.5*(-(r+s)*VY(va)+(1+r)*VY(vb)+(1+s)*VY(vc));
 
 % find all the nodes that lie on each edge
-fmask1   = find( abs(s+1) < NODETOL)'; 
+fmask1   = find( abs(s+1) < NODETOL)';
 fmask2   = find( abs(r+s) < NODETOL)';
 fmask3   = find( abs(r+1) < NODETOL)';
 Fmask  = [fmask1;fmask2;fmask3]';
@@ -34,6 +34,7 @@ Fscale = sJ./(J(Fmask,:));
 
 % Build connectivity matrix
 [EToE, EToF] = tiConnect2D(EToV);
+%[EToE, EToF] = Connect2D(EToV);
 
 % Build connectivity maps
 BuildMaps2D;

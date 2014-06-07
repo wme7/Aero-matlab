@@ -2,10 +2,11 @@
 Globals2D;
 
 % Order of polynomials used for approximation 
-N = 9;
+N = 4;
 
 % Read in Mesh
-sim = 'IsentropicVortex';
+%sim = 'IsentropicVortex';
+sim = 'ChannelFlow';
 switch sim
 case {'IsentropicVortex'}
   filename = 'vortexA04.neu';
