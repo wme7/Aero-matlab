@@ -30,7 +30,11 @@ for tstep=1:Nsteps
     % update fields
     u = u+rk4b(INTRK)*resu;
   end;
-  % Increment time
-  time = time+dt;
+    % Increment time
+    time = time+dt;
+  
+    % plot every time step
+    plot(x,u); axis([-1,1,0,1]); drawnow;
+    
 end
 return

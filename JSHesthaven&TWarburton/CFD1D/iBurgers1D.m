@@ -49,5 +49,8 @@ while(time<FinalTime)
   
   % Increment time and adapt timestep
   time = time+dt;
+  
+  % plot every time step
+  plot(x,u); axis([0,2*pi,-0.5,1.5]); drawnow;
 end
 return

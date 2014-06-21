@@ -16,7 +16,7 @@ CFL=0.75; dt = CFL/(2*pi)*xmin; dt = .5*dt;
 Nsteps = ceil(FinalTime/dt); dt = FinalTime/Nsteps; 
 
 % advection speed
-a = 1;
+a = 0.5;
 
 % outer time step loop 
 for tstep=1:Nsteps
@@ -28,6 +28,9 @@ for tstep=1:Nsteps
     end;
     % Increment time
     time = time+dt;
+    
+    % plot solution every time step
+    plot(x,u); drawnow;
 end;
 
 return

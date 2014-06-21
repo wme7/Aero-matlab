@@ -12,7 +12,7 @@ clear all; close all; clc; Globals1D;
 
 %% Routine main parameters
       a = 0.5;    % advection speed
-     Nv = 10;     % Number of elements en V_h space
+     Nv = 4;     % Number of elements en V_h space
       k = 5;      % order of polynomial used for approximation
     CFL = 0.6;    % Courant Number
   t_end = 0.5;    % Final time
@@ -23,7 +23,7 @@ NODETOL = 1e-10;  % Node Tolerance
     
 %% Discretization of Domain
 % Grid Parameters:
-      v = [0, 2];         % Domain range
+      v = [-1,1];         % Domain range
      dv = (v(2)-v(1))/Nv; % Spatial step size
      dt = CFL*dv/abs(a);  % Time step size
    dtdx = dt/dv;          % precomputed to save some flops
@@ -84,14 +84,16 @@ Fscale = 1./(J(Fmask,:));
 %% IC
 % Initial Condition
 u_0 = zeros(1,Nv*Np);
-jump = [0.9 1.1];
-for i = 1:Nv*Np
-    if jump(1) <= x(i) && x(i) <= jump(2)
-        u_0(i) = 2;
-    else
-        u_0(i) = 1;
-    end
-end
+% jump = [0.9 1.1];
+% for i = 1:Nv*Np
+%     if jump(1) <= x(i) && x(i) <= jump(2)
+%         u_0(i) = 2;
+%     else
+%         u_0(i) = 1;
+%     end
+% end
+% Gaussian Jump
+u0 = 0.1 + 0.5*exp(-20*x.^2);
 % Load Initial Condition
 u = reshape(u_0,Np,Nv);
 %u = sin(x);

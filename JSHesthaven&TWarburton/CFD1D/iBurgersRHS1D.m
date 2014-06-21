@@ -43,4 +43,5 @@ duf (mapO) = 0;
 
 % compute right hand sides of the PDE's
 rhsu  = -rx.*(Dr*uf)  + LIFT*(Fscale.*duf) + ((MassMatrix^-1)*us);
+
 return

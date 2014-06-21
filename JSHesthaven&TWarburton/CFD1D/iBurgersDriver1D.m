@@ -23,5 +23,5 @@ FinalTime = 1.5;
 snapnow;
 
 % Plot Figure
-plotrange=[0,2*pi,min(min(u0))-0.2,max(max(u0))+0.2];
-plot(x,u,x,u0,'-+'); axis(plotrange); ylabel('u(x)'); xlabel('x');
+%plotrange=[0,2*pi,min(min(u0))-0.2,max(max(u0))+0.2];
+%plot(x,u,x,u0,'-+'); axis(plotrange); ylabel('u(x)'); xlabel('x');
