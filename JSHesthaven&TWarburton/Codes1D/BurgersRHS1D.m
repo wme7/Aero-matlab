@@ -19,13 +19,15 @@ q = sqrt(epsilon)*(rx.*(Dr*u) - LIFT*(Fscale.*(nx.*du/2.0)));
 dq = zeros(Nfaces,K); dq(:) = (q(vmapM)-q(vmapP))/2.0;
 
 % impose boundary condition - Dirichlet conditions
-dq(mapI) = 0.0; dq(mapO) = 0.0;
+dq(mapI) = 0.0; 
+dq(mapO) = 0.0;
 
 % Evaluate nonlinear flux
 du2 = zeros(Nfp*Nfaces,K); du2(:) = (u(vmapM).^2-u(vmapP).^2)/2.0;
 
 % impose boundary condition
-du2(mapI)=(u(vmapI).^2-uin.^2); du2(mapO)=(u(vmapO).^2-uout.^2);
+du2(mapI)=(u(vmapI).^2-uin.^2); 
+du2(mapO)=(u(vmapO).^2-uout.^2);
 
 % Compute flux
 maxvel = max(max(abs(u)));
