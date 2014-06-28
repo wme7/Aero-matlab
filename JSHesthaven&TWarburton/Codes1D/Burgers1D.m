@@ -14,7 +14,7 @@ resu = zeros(Np,K);
 
 % compute time step size
 xmin = min(abs(x(1,:)-x(2,:)));
-CFL=0.25; umax = max(max(abs(u)));
+CFL=1.00; umax = max(max(abs(u)));
 dt = CFL* min(xmin/umax,xmin^2/sqrt(epsilon));
 Nsteps = ceil(FinalTime/dt); dt = FinalTime/Nsteps; 
 
@@ -24,13 +24,17 @@ for tstep=1:Nsteps
     for INTRK = 1:5
         timelocal = time + rk4c(INTRK)*dt;
         [rhsu] = BurgersRHS1D(u,epsilon,xL,xR,timelocal);
-        resu = rk4a(INTRK)*resu + dt*rhsu;
-        u = u+rk4b(INTRK)*resu;
+        resu =  rk4a(INTRK)*resu + dt*rhsu;
+        u = u + rk4b(INTRK)*resu;
     end;
     % Increment time
-    time = time+dt
+    time = time+dt;
+    
+    % plot
+    plot(x,u,'-+'); grid on; drawnow;
+    
 end;
 
-time
+disp(time);
 
 return

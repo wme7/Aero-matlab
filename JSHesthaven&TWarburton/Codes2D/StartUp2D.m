@@ -12,8 +12,8 @@ MassMatrix = invV'*invV;
 
 % build coordinates of all the nodes
 va = EToV(:,1)'; vb = EToV(:,2)'; vc = EToV(:,3)';
-x = 0.5*(-(r+s)*VX(va)+(1+r)*VX(vb)+(1+s)*VX(vc));
-y = 0.5*(-(r+s)*VY(va)+(1+r)*VY(vb)+(1+s)*VY(vc));
+x = 0.5*(-(r+s)*VX(va)'+(1+r)*VX(vb)'+(1+s)*VX(vc)');
+y = 0.5*(-(r+s)*VY(va)'+(1+r)*VY(vb)'+(1+s)*VY(vc)');
 
 % find all the nodes that lie on each edge
 fmask1   = find( abs(s+1) < NODETOL)';

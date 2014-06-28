@@ -120,7 +120,7 @@ for i = 2:Na-1
         yn(i,j) = (y(i+1,j)-y(i-1,j))/(2*dn);
         xe(i,j) = (x(i,j+1)-x(i,j-1))/(2*de);
         ye(i,j) = (y(i,j+1)-y(i,j-1))/(2*de);
-        J(i,j) = xn(i,j)*ye(i,j)-yn(i,j)*xe(i,j); % Jacobian
+        J(i,j) = yn(i,j)*xe(i,j)-xn(i,j)*ye(i,j); % Jacobian
     end
 end
 figure(2)
@@ -144,5 +144,5 @@ colormap([0 0 0])
 figure(3)
 x=2:30; y=2:50; [X,Y]=meshgrid(x,y);
 surf(X,Y,J);
-view(150,30)
+view(-45,45)
 title('Jacobian ','FontSize',18);
