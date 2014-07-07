@@ -2,7 +2,7 @@
 Globals2D;
 
 % Polynomial order used for approximation 
-N = 5;
+N = 8;
 
 % Read in Mesh
 [Nv, VX, VY, K, EToV] = MeshReaderGambitBC2D('circA01.neu');
