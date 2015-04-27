@@ -1,5 +1,14 @@
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                           NACA airfoil generator
+%                   coded by Manuel Diaz, NTU, 2015.04.27
+%
+% Refs:
+% [1] Geometry for Aerodynamicists, Appendix A. Accessible online at:
+%     http://www.dept.aoe.vt.edu/~mason/Mason_f/CAtxtAppA.pdf 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 close all;
-clear all;
  
 %-------------------------------------------------------------------------% 
 % Define all the parameters 

@@ -1,59 +1,70 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% cylinder.m: Channel flow past a cylinderical        
-%             obstacle, using a LB method            
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Lattice Boltzmann sample in Matlab
-% Copyright (C) 2006-2008 Jonas Latt
-% Address: EPFL, 1015 Lausanne, Switzerland
-% E-mail: jonas@lbmethod.org
-% Get the most recent version of this file on LBMethod.org:
-%   http://www.lbmethod.org/_media/numerics:cylinder.m
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% Original implementaion of Zou/He boundary condition by
-% Adriano Sciacovelli (see example "cavity.m")
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This program is free software; you can redistribute it and/or
-% modify it under the terms of the GNU General Public License
-% as published by the Free Software Foundation; either version 2
-% of the License, or (at your option) any later version.
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-% You should have received a copy of the GNU General Public 
-% License along with this program; if not, write to the Free 
-% Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-% Boston, MA  02110-1301, USA.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   Channel Flow Past an Obstacle
+%                         using a LB Method      
+%
+%   Modifications and Extentions by Manuel Diaz, NTU, 2012.05.30.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   Boundary Conditions original implementaion of Zou/He boundary 
+%   condition by Adriano Sciacovelli (see example "cavity.m")
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear
 
 % GENERAL FLOW CONSTANTS
-lx     = 200;      % number of cells in x-direction
-ly     = 100;      % number of cells in y-direction
-obst_x = lx/5+1;   % position of the cylinder; (exact
-obst_y = ly/2+3;   % y-symmetry is avoided)
-obst_r = ly/10+1;  % radius of the cylinder
-uMax   = 0.1;      % maximum velocity of Poiseuille inflow
-Re     = 100;      % Reynolds number
+lx     = 600;       % number of cells in x-direction
+ly     = 300;       % number of cells in y-direction
+obstcl = 'cylinder'; % 'cylinder' / 'airfoil'
+obst_x = lx/5+1;    % position of the cylinder; (exact
+obst_y = ly/2+3;    % y-symmetry is avoided)
+obst_r = ly/10+1;   % radius of the cylinder
+uMax   = 0.15;      % maximum velocity of Poiseuille inflow
+Re     = 200;       % Reynolds number
 nu     = uMax * 2.*obst_r / Re;  % kinematic viscosity
 omega  = 1. / (3*nu+1./2.);      % relaxation parameter
-maxT   = 400000;  % total number of iterations
-tPlot  = 50;      % cycles
+maxT   = 15000;     % total number of iterations
+tPlot  = 50;        % cycles
+
+%  c9  c5   c8  Using D2Q9 model. At each timestep, particle densities propagate
+%    \  |  /    outwards in the directions indicated in the figure. An
+%  c2 -c1 - c4  equivalent 'equilibrium' density is found, and the densities
+%    /  |  \    relax towards that state, in a proportion governed by omega.
+%  c6  c3   c7  Based on Iain Haslam, March 2006 and Jonas Latt 2008.
+%               Modified by Manuel Diaz, May 2012.
 
 % D2Q9 LATTICE CONSTANTS
 t   = [4/9,1/9,1/9,1/9,1/9,1/36,1/36,1/36,1/36];
 cx  = [  0,  1,  0, -1,  0,   1,  -1,  -1,   1];
 cy  = [  0,  0,  1,  0, -1,   1,   1,  -1,  -1];
 opp = [  1,  4,  5,  2,  3,   8,   9,   6,   7];
-col = [2:(ly-1)];
+col = 2:(ly-1);
 in  = 1;   % position of inlet
 out = lx;  % position of outlet
 
+% DEFINE GRID
 [y,x] = meshgrid(1:ly,1:lx); % get coordinate of matrix indices
-  
-obst = ...                   % Location of cylinder
-    (x-obst_x).^2 + (y-obst_y).^2 <= obst_r.^2;
+
+% DEFINE MOVIE PARAMETERS
+nframe = maxT/tPlot; % total number of frames
+mov(1:nframe)=struct('cdata',[],'colormap',[]);
+k = 0; % frame counter
+set(gca,'nextplot','replacechildren')
+
+% DEFINE STREAMLINES STARTING POINTS
+xstart = 2:2.5:ly; ystart = ones(size(xstart));
+
+% Set obstacle
+
+switch obstcl
+    case 'cylinder'
+        obst = (x-obst_x).^2 + (y-obst_y).^2 <= obst_r.^2; % Location of cylinder
+    case 'airfoil'
+        [vy,vx]=NacaAirfoil('0012'); 
+        scale=100; p=[(scale*vx+obst_x),(scale*(-vy)+obst_y)]; % scale and translate points
+        phi=-20; A=[cosd(phi),-sind(phi);sind(phi),cosd(phi)]; p=p*A; % rotate points
+        [inside,on]=inpolygon(x,y,p(:,1),p(:,2)); obst=inside+on;
+end
 obst(:,[1,ly]) = 1;    % Location of top/bottom boundary
 bbRegion = find(obst); % Boolean mask for bounce-back cells
 
@@ -73,8 +84,8 @@ for cycle = 1:maxT
 
     % MACROSCOPIC VARIABLES
     rho = sum(fIn);
-    ux  = reshape ( (cx * reshape(fIn,9,lx*ly)), 1,lx,ly) ./rho;
-    uy  = reshape ( (cy * reshape(fIn,9,lx*ly)), 1,lx,ly) ./rho;
+    ux  = reshape( (cx * reshape(fIn,9,lx*ly)), 1,lx,ly) ./rho;
+    uy  = reshape( (cy * reshape(fIn,9,lx*ly)), 1,lx,ly) ./rho;
 	  
     % MACROSCOPIC (DIRICHLET) BOUNDARY CONDITIONS
       % Inlet: Poiseuille profile
@@ -127,9 +138,18 @@ for cycle = 1:maxT
 
     % VISUALIZATION
     if (mod(cycle,tPlot)==1)
-        u = reshape(sqrt(ux.^2+uy.^2),lx,ly);
-        u(bbRegion) = nan;
+        Ux = reshape(ux,lx,ly);
+        Uy = reshape(uy,lx,ly);
+        u = sqrt(Ux.^2+Uy.^2);
+        r = reshape(rho,lx,ly);
+        u(bbRegion) = 0.60;
+        r(bbRegion) = 1.10;
         imagesc(u');
         axis equal off; drawnow
+        k=k+1; mov(k)=getframe(gcf);
     end
+    
 end
+
+% CREATE MOVIE
+movie2avi(mov, 'moviename.avi', 'compression', 'None');
