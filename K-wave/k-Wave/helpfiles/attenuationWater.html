@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>attenuationWater :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="attenComp.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="beamPlot.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">attenuationWater</h1>
+<p class="purpose">Calculate ultrasound attenuation in distilled water</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+att = attenuationWater(f, T)
+</pre>
+
+<h2>Description</h2>
+<p><code>attenuationWater</code> calculates the ultrasonic absorption in distilled 
+water at a given temperature and frequency using a 7th order 
+polynomial fitted to the data given by Pinkerton (1949, The Absorption of Ultrasonic Waves in Liquids and 
+its Relation to Molecular Constitution, Proceedings of the Physical Society. Section B, 2, 129-141). A plot of the absorption at 20degC returned by <code>attenuationWater</code> along with the absorption calculated by the corresponding power law given by Szabo (2004, Diagnostic Ultrasound Imaging) is given below.</p>
+
+<pre class="programlisting">
+f = 0:2:50;                     % [MHz]
+att = attenuationWater(f, 20);  % [dB/cm]
+figure;
+plot(f, att, 'k-', f, 2.17e-3*f.^2, 'bx');
+xlabel('frequency [MHz]');
+ylabel('attenuation coefficient [dB/cm]');
+</pre>
+
+<p>
+<img src="images/attenuationWater_image_01.png" height="420" width="561">
+</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td><p><code>f</code></p></td>
+        <td><p>array of frequency values [MHz]</p></td>
+    </tr>
+    <tr valign="top">
+        <td  width = "150"><p><code>T</code></p></td>
+        <td><p>water temperature [degC]</p></td>        
+    </tr>         
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>att</code></p></td>
+        <td><p>attenuation [dB/cm]</p></td>
+    </tr>
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="speedSoundWater.html">speedSoundWater</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="attenComp.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">attenComp</td>
+        <td>&nbsp;</td>
+        <td align="right">beamPlot</td>
+        <td align="right" width="20"><a href="beamPlot.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>makeLine :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="makeGrid.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="makeSphere.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">makeLine</h1>
+<p class="purpose">Create a binary map of a line within a 2D grid</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+line = makeLine(Nx, Ny, startpoint, endpoint)
+line = makeLine(Nx, Ny, startpoint, angle, length)
+</pre>
+
+<h2>Description</h2>
+
+<p><code>makeLine</code> creates a binary map of a line within a two-dimensional grid (the line is denoted by 1's in the matrix with 0's elsewhere). The line can be defined either by its endpoints or by a starting point, an angle (direction), and a length.
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>Nx, Ny</code></p></td>
+        <td><p>size of the 2D grid [grid points]</p></td>
+    </tr>     
+    
+    <tr valign="top">
+        <td  width = "150"><p><code>startpoint</code></p></td>
+        <td><p>two-element vector identifying the start point for the line [grid points]</p></td>
+    </tr>    
+    
+    <tr valign="top">
+        <td  width = "150"><p><code>endpoint</code></p></td>
+        <td><p>two-element vector identifying the end point for the line [grid points]</p></td>
+    </tr>    
+
+    <tr valign="top">
+        <td  width = "150"><p><code>angle</code></p></td>
+        <td><p>the direction of the line [radians]</p></td>
+    </tr>     
+    
+    <tr valign="top">
+        <td  width = "150"><p><code>length</code></p></td>
+        <td><p>the length of the line [grid points]</p></td>
+    </tr>     
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>line</code></p></td>
+        <td><p>2D binary map of a line</p></td>
+    </tr>
+</table>
+
+
+<h2>See Also</h2>
+
+<code><a href="makeCircle.html">makeCircle</a></code>, <code><a href="makeDisc.html">makeDisc</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="makeGrid.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">makeGrid</td>
+        <td>&nbsp;</td>
+        <td align="right">makeSphere</td>
+        <td align="right" width="20"><a href="makeSphere.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

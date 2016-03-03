@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>toneBurst :: Functions (k-Wave)</title>
+    <link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="timeShift.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="unmaskSensorData.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">toneBurst</h1>
+<p class="purpose">Create an enveloped single frequency tone burst</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+signal = toneBurst(sample_freq, signal_freq, num_cycles)
+signal = toneBurst(sample_freq, signal_freq, num_cycles, ...)
+</pre>
+
+<h2>Description</h2>
+<p><code>toneBurst</code> creates an enveloped single frequency tone burst for use in ultrasound simulations. If an array is given for the optional input <code>'SignalOffset'</code>, a matrix of tone bursts is created where each row corresponds to a tone burst for particular value of the <code>'SignalOffset'</code>. If a value for the optional input <code>'SignalLength'</code> is given, the tone burst/s are zero padded to this length (in samples). For example, running</p>
+
+<pre class="programlisting">
+toneBurst(20e6, 1e6, 10, 'Plot', true);
+</pre>
+
+<p>will return and plot a 1 MHz tone burst with 10 cycles and a Gaussian envelope sampled at 20 MHz.</p>
+
+<p><img src="images/toneBurst_image_01.png" height="420" width="561"></p>
+    
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>sample_freq</code></p></td>
+        <td><p>sampling frequency [Hz]</p></td>
+    </tr>     
+    
+    <tr valign="top">
+        <td><p><code>signal_freq</code></p></td>
+        <td><p>signal frequency [Hz]</p></td>
+    </tr> 
+    
+    <tr valign="top">
+        <td><p><code>num_cycles</code></p></td>
+        <td><p>number of sinusoidal oscillations</p></td>
+    </tr>      
+</table>
+
+<h2>Optional Inputs</h2>
+
+<p>Optional 'string', value pairs that may be used to modify the default computational settings.</p>
+
+<table cellspacing="0" class="body" cellpadding="4" border="2">
+    <colgroup>
+        <col width="18%"><col width="18%"><col width="18%"><col width="46%">
+    </colgroup>
+    
+    <thead>
+        <tr valign="top">
+            <th bgcolor="#B2B2B2">Input</th>
+            <th bgcolor="#B2B2B2">Valid Settings</th>
+            <th bgcolor="#B2B2B2">Default</th>
+            <th bgcolor="#B2B2B2">Description</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Envelope'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><code>'Gaussian'</code><br><code>'Rectangular'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><code>'Gaussian'</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Envelope used to taper the tone burst.</p></td>
+        </tr>     
+        
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Plot'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(Boolean scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>false</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Boolean controlling whether the created tone burst is plotted.</p></td>
+        </tr>   
+        
+        <td bgcolor="#F2F2F2"><p><code>'SignalLength'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(integer)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>'auto'</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Signal length in number of samples. If longer than the tone burst length, the signal is appended with zeros.</p></td>
+        </tr> 
+        
+        <td bgcolor="#F2F2F2"><p><code>'SignalOffset'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(integer)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>0</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Signal offset before the tone burst starts in number of samples.</p></td>
+        </tr>         
+    </tbody>
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>signal</code></p></td>
+        <td><p>created tone burst</p></td>
+    </tr>     
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_tvsp_steering_linear_array.html">Steering A Linear Array</a></li>
+<li><a href="example_tvsp_snells_law.html">Snell's Law And Critical Angle Reflection</a></li> 
+</ul>
+
+<h2>See Also</h2>
+<code><a href="gaussian.html">gaussian</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="timeShift.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">timeShift</td>
+        <td>&nbsp;</td>
+        <td align="right">unmaskSensorData</td>
+        <td align="right" width="20"><a href="unmaskSensorData.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

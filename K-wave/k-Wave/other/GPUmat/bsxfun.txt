@@ -1,0 +1,22 @@
+function y = bsxfun(f,a,b)
+% Replacement bsxfun for the GPUmat toolbox. This function should be
+% renamed to bsxfun.m and placed in the /@GPUtype folder within the GPUmat
+% toolbox directory. This allows k-Wave to work with the option 'DataCast'
+% set to 'GPUsingle' or 'GPUdouble'. The .txt extension is used by default
+% to prevent errors if users install the toolbox using the add subfolders
+% option. 
+%
+% author: Bradley Treeby
+% date: 15th December 2011
+% last update: 15th December 2011
+
+% get size of the input matrix
+sz_a = size(a);
+sz_b = size(b);
+
+% expand smaller input using repmat and evaluate using feval
+if length(sz_a) ~= length(sz_b)
+    y = feval(f, repmat(a, sz_b./[sz_a, 1]), b);
+else
+    y = feval(f, repmat(a, sz_b./sz_a), b);
+end

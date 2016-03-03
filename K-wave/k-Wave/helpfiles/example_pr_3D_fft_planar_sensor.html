@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>3D FFT Reconstruction For A Planar Sensor Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="3D FFT Reconstruction For A Planar Sensor Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="example_pr_2D_fft_line_sensor.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="example_pr_2D_tr_line_sensor.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">3D FFT Reconstruction For A Planar Sensor Example </h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>        
+            <p><a href="#heading2">Simulating the sensor data</a></p>
+            <p><a href="#heading3">Performing the reconstruction</a></p>
+            <p><a href="#heading4">Visualisation of three-dimensional data</a></p>
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example demonstrates the use of k-Wave for the reconstruction of a three-dimensional photoacoustic wave-field recorded over a planar array of sensor elements. The sensor data is simulated using <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code> and reconstructed using <code><a href="kspacePlaneRecon.html">kspacePlaneRecon</a></code>. It builds on the <a href="example_ivp_3D_simulation.html">Simulations In Three Dimensions</a> and <a href="example_pr_2D_fft_line_sensor.html">2D FFT Reconstruction For A Line Sensor</a> examples.</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_pr_3D_FFT_planar_sensor.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_pr_3D_FFT_planar_sensor']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Simulating the sensor data</h3>
+
+<p>The sensor data is simulated using <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code> in the same way as in the preceding simulation examples. The initial pressure is created using <code><a href="makeBall.html">makeBall</a></code> and is again smoothed prior to invoking the simulation. The sensor mask is defined to be a planar sensor array (over a plane x = const). A visualisation of the initial pressure distribution and the sensor mask using <code><a href="voxelPlot.html">voxelPlot</a></code> is given below.</p>
+
+<pre class="programlisting">
+% smooth the initial pressure distribution and restore the magnitude
+source.p0 = smooth(kgrid, p0, true);
+
+% define a binary planar sensor
+sensor.mask = zeros(kgrid.Nx, kgrid.Ny, kgrid.Nz);
+sensor.mask(1, :, :) = 1;
+</pre>
+
+<p><img src="images/example_pr_3D_fft_planar_sensor_01.png" height="300" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Performing the reconstruction</h3>
+
+<p>The reconstruction is invoked by calling <code><a href="kspacePlaneRecon.html">kspacePlaneRecon</a></code> with the sensor data (recorded over a planar sensor array), as well as the properties of the acoustic medium and the sampling parameters. By default, the sensor data input must be indexed as <code>p_tyz(time, sensor_y_position, sensor_z_position)</code>. Alternatively, the optional input parameter <code>'DataOrder'</code> can be set to <code>'yzt'</code> (the default setting is <code>'tyz'</code>). In both cases, the simulated <code>sensor_data</code> returned by <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code> must first be reshaped. </p>
+
+<pre class="programlisting">
+% reshape sensor data to y, z, t
+sensor_data_rs = reshape(sensor_data, Ny, Nz, kgrid.Nt);
+
+% reconstruct the initial pressure
+p_xyz = kspacePlaneRecon(sensor_data_rs, kgrid.dy, kgrid.dz, dt, medium.sound_speed,...
+    'DataOrder', 'yzt', 'PosCond', true, 'Plot', true);
+</pre>
+
+<p>The size of the recorded data and the time to compute the reconstruction are both printed to the command line.</p>
+
+<pre class="programlisting">
+Running k-Wave planar reconstruction...
+  grid size: 212 by 44 by 44 grid points
+  interpolation mode: *nearest
+  applying positivity condition...
+  computation completed in 0.25149s
+</pre>
+
+<p>A plot of the initial pressure distribution and the reconstructed initial pressure distribution with a positivity condition (interpolated onto a k-space grid with the same dimensions) are shown below. The three displayed image planes intersect at the centre of ball shown above.</p>
+
+<p>Initial pressure distribution:</p>
+<p><img src="images/example_pr_3D_fft_planar_sensor_02.png" height="420" width="561"></p>
+
+<p>Reconstructed initial pressure distribution:</p>
+<p><img src="images/example_pr_3D_fft_planar_sensor_03.png" height="420" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading4"></a>
+<h3 class="title">Visualisation of three-dimensional data</h3>
+
+<p>The effective visualisation of three-dimensional matrix data remains an important part of data exploration and presentation. An animated slice-by-slice visualisation of the reconstructed initial pressure distribution can be viewed using <code><a href="flyThrough.html">flyThrough</a></code>.</p>
+
+<pre class="programlisting">
+% view reconstruction slice by slice
+flyThrough(p_xyz_rs);
+</pre>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="example_pr_2D_fft_line_sensor.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">2D FFT Reconstruction For A Line Sensor</td>
+        <td>&nbsp;</td>
+        <td align="right">2D Time Reversal Reconstruction For A Line Sensor</td>
+        <td align="right" width="20"><a href="example_pr_2D_tr_line_sensor.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

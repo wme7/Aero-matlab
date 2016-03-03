@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Setting An Initial Pressure Gradient Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Setting An Initial Pressure Gradient Example">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="example_ivp_comparison_modelling_functions.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="example_ivp_1D_simulation.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Setting An Initial Pressure Gradient Example</h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Defining the source properties</a></p>
+        </td>
+    </tr>
+</table>
+
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example demonstrates how to set an initial pressure gradient using <code><a href="kspaceSecondOrder.html">kspaceSecondOrder</a></code>. It builds on the <a href="example_ivp_comparison_modelling_functions.html">Comparison Of Modelling Functions Example</a>.</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_ivp_setting_initial_gradient.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_ivp_setting_initial_gradient']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Defining the source properties</h3>
+
+<p>The function <code><a href="kspaceSecondOrder.html">kspaceSecondOrder</a></code> allows initial conditions for both the initial pressure and its temporal gradient to be  defined. The initial conditions are defined as a matrix of numeric values the same size as the computational grid. The initial pressure is assigned to <code>source.p0</code>, while the initial pressure gradient is assigned to <code>source.dp0dt</code>.</p> 
+
+<p>In this example, <code><a href="makeDisc.html">makeDisc</a></code> is used to create an initial source distribution of two small discs with different diameters. This is first assigned to the <code>p0</code> field of the <code>source</code> structure, then to the <code>dp0dt</code> field, and then to both fields. The optional input <code>'MeshPlot'</code> is set to <code>true</code> to allow a 3D visualisation of the pressure field. If <code>'PlotFrames'</code> is set to <code>true</code> the individual frames are spawned in new figures. A plot of the pressure field at two different values of t is shown below. </p>
+
+<p></p>
+<p><img src="images/example_ivp_setting_initial_gradient_01.png" height="433" width="620"></p>
+<p></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="example_ivp_comparison_modelling_functions.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Comparison Of Modelling Functions</td>
+        <td>&nbsp;</td>
+        <td align="right">Simulations In One Dimension</td>
+        <td align="right" width="20"><a href="example_ivp_1D_simulation.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

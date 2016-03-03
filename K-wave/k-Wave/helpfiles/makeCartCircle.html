@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>makeCartCircle :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="makeBall.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="makeCartSphere.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">makeCartCircle</h1>
+<p class="purpose">Create a 2D Cartesian circle or arc</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+circle = makeCartCircle(radius, num_points)
+circle = makeCartCircle(radius, num_points, center_pos)
+circle = makeCartCircle(radius, num_points, center_pos, arc_angle)
+circle = makeCartCircle(radius, num_points, center_pos, arc_angle, plot_circle)
+</pre>
+
+<h2>Description</h2>
+
+<p><code>makeCartCircle</code> creates a 2 x <code>num_points</code> array of the Cartesian coordinates of points evenly distributed over a circle or arc (if <code>arc_angle</code> is given). The plot that is displayed after calling <code>makeCartCircle(10, 100, [0,0], (215/180)*pi, true)</code> is given below.</p>
+
+<img src="images/makeCartCircle_image_01.png" height="420" width="561">
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>radius</code></p></td>
+        <td><p>circle radius [m]</p></td>
+    </tr>     
+    <tr valign="top">
+        <td  width = "150"><p><code>num_points</code></p></td>
+        <td><p>number of points on the circle</p></td>        
+    </tr>           
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>center_pos</code></p></td>
+        <td><p>[x, y] position of the circle center [m] (default = [0, 0])</p></td>        
+    </tr>  
+    <tr valign="top">
+        <td  width = "150"><p><code>arc_angle</code></p></td>
+        <td><p>arc angle for incomplete circle [radians] (default = 2*pi)</p></td>
+    </tr>     
+    <tr valign="top">
+        <td  width = "150"><p><code>plot_circle</code></p></td>
+        <td><p>Boolean controlling whether the Cartesian points are plotted using <code><a href="matlab: doc plot">plot</a></code> (default = false)</p></td>
+    </tr>     
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>circle</code></p></td>
+        <td><p>2 x <code>num_points</code> array of Cartesian points</p></td>
+    </tr>
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_ivp_homogeneous_medium.html">Homogenous Propagation Medium</a></li>
+<li><a href="example_ivp_loading_external_image.html">Loading External Image Maps</a></li> 
+<li><a href="example_ivp_heterogeneous_medium.html">Heterogeneous Propagation Medium</a></li>
+<li><a href="example_ivp_saving_movie_files.html">Saving Movie Files</a></li>   
+<li><a href="example_ivp_sensor_frequency_response.html">Defining A Gaussian Sensor Frequency Response</a></li> 
+<li><a href="example_ivp_comparison_modelling_functions.html">Comparison Of Modelling Functions</a></li>   
+<li><a href="example_sd_directivity_modelling_2D.html">Modelling Sensor Directivity in 2D</a></li>  
+<li><a href="example_sd_directivity_modelling_3D.html">Modelling Sensor Directivity in 3D</a></li> 
+<li><a href="example_pr_2D_tr_circular_sensor.html">2D Time Reversal For A Circular Sensor</a></li>
+<li><a href="example_pr_2D_tr_absorption_compensation.html">Image Reconstruction With Compensation For Acoustic Absorption</a></li> 
+<li><a href="example_na_controlling_the_pml.html">Controlling The Absorbing Boundary Layer</a></li>
+<li><a href="example_na_optimising_performance.html">Optimising k-Wave Performance</a></li> 
+</ul>
+
+<h2>See Also</h2>
+
+<code><a href="cart2grid.html">cart2grid</a></code>, <code><a href="makeCartSphere.html">makeCartSphere</a></code>, <code><a href="makeCircle.html">makeCircle</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="makeBall.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">makeBall</td>
+        <td>&nbsp;</td>
+        <td align="right">makeCartSphere</td>
+        <td align="right" width="20"><a href="makeCartSphere.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

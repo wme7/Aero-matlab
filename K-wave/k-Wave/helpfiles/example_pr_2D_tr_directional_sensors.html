@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Image Reconstruction With Directional Sensors Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Image Reconstruction With Directional Sensors Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="example_pr_3D_tr_spherical_sensor.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="example_pr_2D_tr_bandlimited_sensors.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Image Reconstruction With Directional Sensors Example</h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Running the simulation</a></p>
+            <p><a href="#heading3">Time-reversal image reconstruction</a></p>
+
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p> This example demonstrates how the directionality of sensor elements can give rise to artefacts in time reversal photoacoustic image reconstruction. 
+It builds on the <a href="example_sd_sensor_directivity_2D.html">Sensor Element Directivity in 2D</a> and <a href="example_pr_2D_tr_line_sensor.html">2D Time Reversal Reconstruction For A Line Sensor</a> examples.</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_pr_2D_TR_directional_sensors.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_pr_2D_TR_directional_sensors']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p>For a more detailed discussion of this example and the underlying techniques, see B. T. Cox and B. E. Treeby, "Effect of sensor directionality on photoacoustic imaging: A study using the k-Wave toolbox," in <em>Proc. SPIE</em> 7564, p. 75640I, 2010.</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Running the simulation</h3>
+
+<p>The simulation is first invoked using a rectangular binary sensor mask with omnidirectional elements in the same way as previous examples. Directionality is then added to the sensor elements by assigning an angle to the corresponding elements in an Nx by Ny matrix passed to <code>sensor.directivity_angle</code>. These are assigned such that the maximum sensitivity of each sensor face faces inward.</p>
+
+<pre class="programlisting">
+% define a four-sided, square sensor
+sensor.mask = zeros(kgrid.Nx, kgrid.Ny);
+sensor.mask(1, :) = 1;
+sensor.mask(end, :) = 1;
+sensor.mask(:, 1) = 1;
+sensor.mask(:, end) = 1;
+
+% run the simulation for omnidirectional detector elements
+sensor_data = kspaceFirstOrder2D(kgrid, medium, source, sensor, input_args{:});
+
+% define the directionality of the sensor elements
+sensor.directivity_angle = zeros(kgrid.Nx, kgrid.Ny);
+sensor.directivity_angle(1, :) = 0;      % max sensitivity in x direction
+sensor.directivity_angle(end, :) = 0;    % max sensitivity in x direction
+sensor.directivity_angle(:, 1) = pi/2;   % max sensitivity in y direction
+sensor.directivity_angle(:, end) = pi/2; % max sensitivity in y direction
+
+% define the directivity size
+sensor.directivity_size = 20*kgrid.dx;
+
+% run the simulation with directional elements
+sensor_data_directional = kspaceFirstOrder2D(kgrid, medium, source, sensor, input_args{:});
+</pre>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Time-reversal image reconstruction</h3>
+
+<p>To examine the effect of sensor directionality on time reversal image reconstruction, the sensor data 
+recorded from both the omni-directional and directional sensor elements is used to reconstruct the initial photoacoustic 
+pressure distribution. 
+</p>
+
+<pre class="programlisting">
+% reset the initial pressure
+source.p0 = 0;
+ 
+% assign the time reversal data for the omnidirectional case
+sensor.time_reversal_boundary_data = sensor_data;
+ 
+% run the time reversal reconstruction
+p0_recon = kspaceFirstOrder2D(kgrid, medium, source, sensor, input_args{:});
+ 
+% assign the time reversal data for the directional case
+sensor.time_reversal_boundary_data = sensor_data_directional;
+ 
+% run the time reversal reconstruction with directional elements
+p0_recon_directional = kspaceFirstOrder2D(kgrid, medium, source, sensor, input_args{:});
+</pre>
+
+<p>The reconstructed pressure distributions are shown below. For the omni-directional sensor, the initial pressure is reconstructed almost exactly (note, the inverse crime in which the same simulation parameters are used in both simulation and reconstruction has been committed). However, when using the directional sensor, image artefacts are introduced into the reconstruction.</p>
+
+<p><img src="images/example_pr_2D_tr_directional_sensors_01.png" height="240" width="561">
+<img src="images/example_pr_2D_tr_directional_sensors_02.png" height="240" width="561">
+<img src="images/example_pr_2D_tr_directional_sensors_03.png" height="420" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="example_pr_3D_tr_spherical_sensor.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">3D Time Reversal Reconstruction For A Spherical Sensor</td>
+        <td>&nbsp;</td>
+        <td align="right">Image Reconstruction With Bandlimited Sensors</td>
+        <td align="right" width="20"><a href="example_pr_2D_tr_bandlimited_sensors.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

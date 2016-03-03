@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Modelling Power Law Absorption Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Modelling Power Law Absorption Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="example_na_filtering.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="example_na_modelling_nonlinearity.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Modelling Power Law Absorption Example</h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Absorption and dispersion characteristics</a></p>
+            <p><a href="#heading3">Numerical errors</a></p>
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example describes the characteristics of the absorption and dispersion encapsulated by the k-Wave simulation functions.</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_na_modelling_absorption.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_na_modelling_absorption']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p>For a more detailed discussion of the absorption model used in k-Wave, see Treeby, B. E. and Cox, B. T., "Modeling power law absorption and dispersion for acoustic propagation using the fractional Laplacian," <em>J. Acoust. Soc. Am.</em>, vol. 127, no. 5, pp. 2741-2748, 2010.</p>
+
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Absorption and dispersion characteristics</h3>
+
+<p>The acoustic absorption within k-Wave is modelled using two phenomenological loss terms. These separately account for absorption that follows a frequency power law in addition to the associated dispersion (dependence of the sound speed on frequency) required by the Kramers-Kronig relations. Under the smallness approximation that the total absorption is much less than the acoustic wavenumber (a condition satisfied for almost all cases of interest in biomedical ultrasound and photoacoustics), these terms allow a wide range of power law absorption characteristics to be accurately modelled. This particular form of absorption is of practical relevance in a number of acoustic applications. For example, the absorption in soft biological tissue over diagnostic ultrasound frequencies has been experimentally shown to follow a frequency power law in which the exponent is between 1 and 2. Similarly, the absorption in marine sediments follows a power law where the exponent is close to 1. </p>
+
+<p>Within the k-Wave simulation functions, the power law absorption is specified by two parameters, <code>medium.alpha_coeff</code> and <code>medium.alpha_power</code>. These correspond to the power law pre-factor and exponent, respectively, where the pre-factor is given in units of dB / (MHz^y cm). To illustrate the characteristics of the absorption model, the encapsulated absorption and dispersion for a range of different power absorption parameters are shown below (open circles). These are extracted from the amplitude and phase spectrums of the signals recorded at two different sensor positions in an absorbing medium in 1D using <code><a href="kspaceSecondOrder.html">kspaceSecondOrder</a></code> (set <code>example_number = 1</code> within the example m-file). The theoretical curves for absorption and dispersion (calculated using <code><a href="powerLawKramersKronig.html">powerLawKramersKronig</a></code>) are also shown for comparison (solid line). There is a close agreement between the theoretical and numerical results which demonstrates that the desired absorption characteristics have been correctly modelled.</p>
+
+<p><img src="images/example_na_modelling_absorption_01.png" height="420" width="561">
+<img src="images/example_na_modelling_absorption_02.png" height="420" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Numerical errors</h3>
+
+<p>If the same example is calculated using <code><a href="kspaceFirstOrder1D.html">kspaceFirstOrder1D</a></code> (set <code>example_number = 2</code> within the example m-file), at higher frequencies there is a small deviation from the theoretical absorption curve and a noticeable deviation from the theoretical dispersion curve. 
+This is due to the dependence of the loss terms on acoustical quantities in addition to their temporal gradients which are calculated at different stages within the model. 
+This introduces small phase errors which are accentuated as the absolute absorption level is increased.</p>
+
+<p><img src="images/example_na_modelling_absorption_03.png" height="420" width="561">
+<img src="images/example_na_modelling_absorption_04.png" height="420" width="561"></p>  
+
+<p>These errors can be minimised by reducing the time step used in the simulation (set <code>example_number = 3</code> within the example m-file). 
+In the limit, the encapsulated absorption and dispersion properties approach those modelled by <code><a href="kspaceSecondOrder.html">kspaceSecondOrder</a></code>.</p>
+
+<p><img src="images/example_na_modelling_absorption_05.png" height="420" width="561">
+<img src="images/example_na_modelling_absorption_06.png" height="420" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+    
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="example_na_filtering.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Filtering A Delta Function Input Signal</td>
+        <td>&nbsp;</td>
+        <td align="right">Modelling Nonlinear Wave Propagation Example</td>
+        <td align="right" width="20"><a href="example_na_modelling_nonlinearity.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

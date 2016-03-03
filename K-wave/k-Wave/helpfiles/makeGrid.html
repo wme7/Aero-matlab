@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>makeGrid :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="makeDisc.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="makeLine.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">makeGrid</h1>
+<p class="purpose">Create k-Wave grid structure</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+kgrid = makeGrid(Nx, dx)
+kgrid = makeGrid(Nx, dx, Ny, dy)
+kgrid = makeGrid(Nx, dx, Ny, dy, Nz, dz)
+</pre>
+
+<h2>Description</h2>
+
+<code>makeGrid</code> creates an object of the <code>kWaveGrid</code> class containing the grid coordinates and wavenumber matrices used in k-Wave simulations. The grid structures are indexed as: (x, 1) in 1D; (x, y) in 2D; (x, y, z) in 3D.</p>
+
+<ul>
+    <table cellspacing="0" class="note" summary="Note" cellpadding="5" border="1">
+        <tr width="90%">
+            <td><p><b>Note</b>&nbsp;&nbsp;For older versions of MATLAB in which custom class definitions are not supported, <code>makeGrid</code> returns a MATLAB grid structure with the same fields. This structure requires additional memory compared to an object of the <code>kWaveGrid</code> class.</p></td>
+        </tr>
+    </table>
+</ul>
+
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>Nx, Ny, Nz</code></p></td>
+        <td><p>number of grid points in each Cartesian direction</p></td>
+    </tr>     
+    <tr valign="top">
+        <td  width = "150"><p><code>dx, dy, dz</code></p></td>
+        <td><p>grid point spacing in each Cartesian direction [m]</p></td>        
+    </tr>     
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>kgrid</code></p></td>
+        <td><p>k-Wave grid structure used by the simulation and reconstructions functions within k-Wave</p></td>
+    </tr>
+</table>
+
+<p>The structure <code>kgrid</code> has the following fields:</p>
+
+<table cellspacing="0" class="body" cellpadding="4" border="2">
+    <colgroup>
+        <col width="25%"><col width="75%">
+    </colgroup>
+    
+    <thead>
+        <tr valign="top">
+            <th bgcolor="#B2B2B2">Fieldname</th>
+            <th bgcolor="#B2B2B2">Description</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.k</code></p></td>
+            <td bgcolor="#F2F2F2"><p>ND grid of the scalar wavenumber</p></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.k_max</code></p></td>
+            <td bgcolor="#F2F2F2"><p>maximum spatial frequency supported by the grid</p></td>
+        </tr>
+    </tbody>      
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.t_array</code></p></td>
+            <td bgcolor="#F2F2F2"><p>evenly spaced array of time values [s] (set to 'auto' by <code>makeGrid</code>)</p></td>
+        </tr>
+    </tbody>     
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.Nt</code></p></td>
+            <td bgcolor="#F2F2F2"><p>number of time steps (set to 'auto' by <code>makeGrid</code>)</p></td>
+        </tr>
+    </tbody>  
+
+	<tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.dt</code></p></td>
+            <td bgcolor="#F2F2F2"><p>time step [s] (set to 'auto' by <code>makeGrid</code>)</p></td>
+        </tr>
+    </tbody>  
+	
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.dim</code></p></td>
+            <td bgcolor="#F2F2F2"><p>number of spatial dimensions</p></td>
+        </tr>
+    </tbody>  
+	
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.total_grid_points</code></p></td>
+            <td bgcolor="#F2F2F2"><p>total number of grid points</p></td>
+        </tr>
+    </tbody>	
+    
+</table>
+
+<p>And for each spatial dimension x, y, z:</p>
+
+<table cellspacing="0" class="body" cellpadding="4" border="2">
+    <colgroup>
+        <col width="25%"><col width="75%">
+    </colgroup>
+    
+    <thead>
+        <tr valign="top">
+            <th bgcolor="#B2B2B2">Fieldname</th>
+            <th bgcolor="#B2B2B2">Description</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.Nx</code></p></td>
+            <td bgcolor="#F2F2F2"><p>number of grid points</p></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.dx</code></p></td>
+            <td bgcolor="#F2F2F2"><p>grid point spacing [m]</p></td>
+        </tr>
+    </tbody>    
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.x</code></p></td>
+            <td bgcolor="#F2F2F2"><p>plaid ND grid of the x coordinate centered about 0 [m]</p></td>
+        </tr>
+    </tbody> 
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.x_vec</code></p></td>
+            <td bgcolor="#F2F2F2"><p>1D vector of the x coordinate [m]</p></td>
+        </tr>
+    </tbody> 
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.x_size</code></p></td>
+            <td bgcolor="#F2F2F2"><p>length of grid dimension [m]</p></td>
+        </tr>
+    </tbody> 
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.kx</code></p></td>
+            <td bgcolor="#F2F2F2"><p>plaid ND grid of the wavenumber components centered about 0</p></td>
+        </tr>
+    </tbody>   
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.kx_vec</code></p></td>
+            <td bgcolor="#F2F2F2"><p>1D vector of the wavenumber components</p></td>
+        </tr>
+    </tbody>	
+	
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>kgrid.kx_max</code></p></td>
+            <td bgcolor="#F2F2F2"><p>maximum spatial frequency supported by the grid in the x direction</p></td>
+        </tr>
+    </tbody> 
+ 
+</table>
+
+<p>For example, running <code>kgrid = makeGrid(128, 0.1, 128, 0.1)</code> at the command line will return:</p>
+
+<pre class="programlisting">
+kgrid = makeGrid(128, 0.1, 128, 0.1)
+
+kgrid = 
+
+  kWaveGrid
+
+  Properties:
+                   Nx: 128
+                   Ny: 128
+                   Nz: 0
+                   dx: 0.1000
+                   dy: 0.1000
+                   dz: 0
+               kx_vec: [128x1 double]
+               ky_vec: [128x1 double]
+               kz_vec: 0
+                    k: [128x128 double]
+               kx_max: 31.4159
+               ky_max: 31.4159
+               kz_max: 0
+                k_max: 31.4159
+              t_array: 'auto'
+                  dim: 2
+                    x: [128x128 double]
+                    y: [128x128 double]
+                    z: 0
+                   kx: [128x128 double]
+                   ky: [128x128 double]
+                   kz: 0
+                x_vec: [128x1 double]
+                y_vec: [128x1 double]
+                z_vec: 0
+               x_size: 12.8000
+               z_size: 0
+               y_size: 12.8000
+                   dt: 'auto'
+                   Nt: 'auto'
+    total_grid_points: 16384
+</pre>
+
+<h2>See Also</h2>
+
+<code><a href="cart2grid.html">cart2grid</a></code>, <code><a href="interpCartData.html">interpCartData</a></code>, <code><a href="kspaceFirstOrder1D.html">kspaceFirstOrder1D</a></code>, <code><a href="kspaceFirstOrder2D.html">kspaceFirstOrder2D</a></code>, <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code>, <code><a href="matlab: doc ndgrid">ndgrid</a></code>, <code><a href="makeTime.html">makeTime</a></code>, <code><a href="smooth.html">smooth</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="makeDisc.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">makeDisc</td>
+        <td>&nbsp;</td>
+        <td align="right">makeLine</td>
+        <td align="right" width="20"><a href="makeLine.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

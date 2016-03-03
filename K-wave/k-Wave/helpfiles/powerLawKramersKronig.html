@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>powerLawKramersKronig :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="overlayPlot.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="pstdElastic2D.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">powerLawKramersKronig</h1>
+<p class="purpose">Calculate dispersion for power law absorption</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+c_kk = powerLawKramersKronig(w, w0, c0, a0, y)
+</pre>
+
+<h2>Description</h2>
+<p><code>powerLawKramersKronig</code> computes the variation in sound speed for an attenuating medium using the Kramers-Kronig for power law attenuation where <code>att = a0*w^y</code>. The power law parameters must be in Nepers / m, with the frequency in rad/s. The variation is given about the sound speed <code>c0</code> at a reference frequency <code>w0</code>.</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>w</code></p></td>
+        <td><p>input frequency array [rad/s]</p></td>
+    </tr>
+    
+    <tr valign="top">
+        <td><p><code>w0</code></p></td>
+        <td><p>reference frequency [rad/s]</p></td>
+    </tr>
+    
+    <tr valign="top">
+        <td><p><code>c0</code></p></td>
+        <td><p>sound speed at w0 [m/s]</p></td>
+    </tr>    
+    
+    <tr valign="top">
+        <td><p><code>a0</code></p></td>
+        <td><p>power law coefficient [Nepers/((rad/s)^y m)]</p></td>
+    </tr>    
+    
+    <tr valign="top">
+        <td><p><code>y</code></p></td>
+        <td><p>power law exponent</p></td>
+    </tr>    
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>c_kk</code></p></td>
+        <td><p>variation of sound speed with w [m/s]</p></td>
+    </tr>
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_na_modelling_absorption.html">Modelling Power Law Absorption</a></li> 
+</ul>
+
+<h2>See Also</h2>
+<code><a href="db2neper.html">db2neper</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="overlayPlot.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">overlayPlot</td>
+        <td>&nbsp;</td>
+        <td align="right">pstdElastic2D</td>
+        <td align="right" width="20"><a href="pstdElastic2D.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

@@ -1,0 +1,12 @@
+function output = fftn(input)
+% Wrapper function for fft3 for the GPUmat toolbox. This function should be
+% renamed to fftn.m and placed in the /@GPUtype folder within the GPUmat
+% toolbox directory. This allows k-Wave to work with the option 'DataCast'
+% set to 'GPUsingle' or 'GPUdouble'. The .txt extension is used by default
+% to prevent errors if users install the toolbox using the add subfolders
+% option. 
+%
+% author: Bradley Treeby
+% date: 24th May 2010
+% last update: 24th May 2010
+output = fft3(input);

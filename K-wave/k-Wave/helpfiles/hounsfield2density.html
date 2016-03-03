@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>hounsfield2density :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="h5compare.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="interpCartData.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">hounsfield2density</h1>
+<p class="purpose">Convert Hounsfield units to density</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+density = hounsfield2density(ct_data)
+density = hounsfield2density(ct_data, plot_fitting)
+[density, sound_speed] = hounsfield2density(ct_data)
+[density, sound_speed] = hounsfield2density(ct_data, plot_fitting)
+</pre>
+
+<h2>Description</h2>
+<p><code>hounsfield2density</code> converts Hounsfield units to units of density [kg/m^3] based on the experimental data given by Schneider, U., Pedroni, E., and Lomax A., "The calibration of CT Hounsfield units for radiotherapy treatment planning," Phys. Med. Biol., 41, pp. 111-124 (1996). The conversion is made using a four-part piece-wise linear fit to the data (see figure below). For soft-tissue, the approximate sound speed can also be returned using the empirical relationship given by Mast, T. D., "Empirical relationships between acoustic parameters in human soft tissues," Acoust. Res. Lett. Online, 1(2), pp. 37-42 (2000).</p>
+
+<p>
+<img src="images/hounsfield2density_image_01.png" height="420" width="561">
+</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>ct_data</code></p></td>
+        <td><p>CT data in Hounsfield units to convert to density</p></td>
+    </tr>    
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>plot_fitting</code></p></td>
+        <td><p>Boolean controlling whether the original data points and fitting is plotted (default = false)</p></td>        
+    </tr>     
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>density</code></p></td>
+        <td><p>density in kg/m^3</p></td>
+    </tr>
+    <tr valign="top">
+        <td><p><code>sound_speed</code></p></td>
+        <td><p>sound speed in m/s</p></td>
+    </tr>	
+</table>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="h5compare.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">h5compare</td>
+        <td>&nbsp;</td>
+        <td align="right">interpCartData</td>
+        <td align="right" width="20"><a href="interpCartData.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

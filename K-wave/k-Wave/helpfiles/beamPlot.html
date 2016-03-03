@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>beamPlot :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="attenuationWater.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="benchmark.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">beamPlot</h1>
+<p class="purpose">Plot volumetric data using intersecting planes</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+beamPlot(mat)
+beamPlot(mat, plot_yz)
+beamPlot(xy_slice, xz_slice)
+</pre>
+
+<h2>Description</h2>
+<p><code>beamPlot</code> plots 3D volumetric data as intersecting planes using
+<code><a href="matlab: doc slice">slice</a></code>. The data is assumed to be indexed as (x, y, z). The central x-y and x-z planes are extracted and plotted as intersecting planes. The first y-z plane can also be plotted by setting the optional input <code>plot_yz</code> to true. This orientation is useful for plotting the beam patterns produced by ultrasound transducers facing in the x-direction.</p>
+
+<p><code>beamPlot</code> can alternatively be called with two 2D slices which are plotted as intersecting planes indexed as (x, y) and (x, z). The slices must have the same size in the x-direction.</p>
+
+<p>Examples:</p>
+
+<pre class="programlisting">
+beamPlot(makeBall(30, 30, 30, 15, 15, 15, 12));
+beamPlot(makeDisc(40, 30, 20, 15, 10), makeDisc(40, 20, 20, 10, 5)); 
+</pre>
+
+<p><img src="images/beamPlot_image_01.png" height="420" width="561"></p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>mat</code></p></td>
+        <td><p>3D matrix to plot</p></td>
+    </tr>    
+    <tr valign="top">
+        <td><p><code>plot_yz</code></p></td>
+        <td><p>Boolean controlling whether the first y-z plane is displayed</p></td>
+    </tr> 
+    <tr valign="top">
+        <td><p><code>xy_slice</code></p></td>
+        <td><p>slice to plot in the x-y plane</p></td>
+    </tr> 
+    <tr valign="top">
+        <td><p><code>xz_slice</code></p></td>
+        <td><p>slice to plot in the x-z plane</p></td>
+    </tr> 
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="matlab: doc slice">slice</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="attenuationWater.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">attenuationWater</td>
+        <td>&nbsp;</td>
+        <td align="right">benchmark</td>
+        <td align="right" width="20"><a href="benchmark.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

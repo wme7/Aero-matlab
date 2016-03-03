@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>sharpness :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="scanConversion.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="smooth.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">sharpness</h1>
+<p class="purpose">Calculate image sharpness metric</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+s = sharpness(im)
+s = sharpness(im, metric)
+</pre>
+
+<h2>Description</h2>
+<p><code>sharpness</code> returns a scalar metric related the sharpness of the 2D or 3D image matrix defined by <code>im</code>. By default, the metric is based on the Brenner gradient which returns the sum of the centered finite-difference at each matrix element in each Cartesian direction. Metrics calculated using the Sobel operator or the normalised variance can also be returned by setting the input paramater <code>metric</code>.</p>
+
+<p>For further details, see B. E. Treeby, T. K. Varslot, E. Z. Zhang, J. G. Laufer, and P. C. Beard, "Automatic sound speed selection in photoacoustic image reconstruction using an autofocus approach," J. Biomed. Opt., vol. 16, no. 9, p. 090501, 2011.</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>im</code></p></td>
+        <td><p>2D or 3D image data to evaluate</p></td>
+    </tr>       
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>metric</code></p></td>
+         <td>
+            <p>sharpness metric. Supported values are</p>
+            <p>
+<code>'Brenner'</code> (default)<br/>
+<code>'Tenenbaum'</code><br/>
+<code>'NormVariance'</code><br/></p>
+        </td>
+    </tr>       
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>s</code></p></td>
+        <td><p>computed sharpness metric</p></td>
+    </tr>       
+</table>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="scanConversion.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">scanConversion</td>
+        <td>&nbsp;</td>
+        <td align="right">smooth</td>
+        <td align="right" width="20"><a href="smooth.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

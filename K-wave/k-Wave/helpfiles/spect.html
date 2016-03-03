@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>spect :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="smooth.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="speedSoundWater.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">spect</h1>
+<p class="purpose">Compute the single sided amplitude and phase spectrums</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+func_as = spect(func, Fs)
+func_as = spect(func, Fs, ...)
+[f, func_as] = spect(func, Fs)
+[f, func_as] = spect(func, Fs, ...)
+[f, func_as, func_ps] = spect(func, Fs)
+[f, func_as, func_ps] = spect(func, Fs, ...)
+</pre>
+
+<h2>Description</h2>
+<p><code>spect</code> computes the single-sided amplitude and phase spectrums of a 1, 2, or 3 dimensional input signal. If the optional input <code>'Dim'</code> is not specified, the spectrum is computed along the first non-singleton dimension. For example, running the commands</p>
+
+<pre class="programlisting">
+Fs = 10e6;          % [Hz]
+dt = 1/Fs;          % [s]
+t = 0:dt:1000*dt;   % [s]
+signal = 10*sin(0.5e6*2*pi*t) + 5*sin(1e6*2*pi*t) + 2*sin(2.5e6*2*pi*t);
+spect(signal, Fs, 'Plot', [true false]);
+</pre>
+
+<p>will produce the following amplitude spectrum.</p>
+
+<img src="images/spectrum_image_01.png" height="420" width="561">
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>func</code></p></td>
+        <td><p>signal to analyse</p></td>
+    </tr>     
+    
+    <tr valign="top">
+        <td><p><code>Fs</code></p></td>
+        <td><p>sampling frequency [Hz]</p></td>
+    </tr>  
+</table>
+
+<h2>Optional Inputs</h2>
+
+<p>Optional 'string', value pairs that may be used to modify the default computational settings.</p>
+
+<table cellspacing="0" class="body" cellpadding="4" border="2">
+    <colgroup>
+        <col width="18%"><col width="18%"><col width="18%"><col width="46%">
+    </colgroup>
+    
+    <thead>
+        <tr valign="top">
+            <th bgcolor="#B2B2B2">Input</th>
+            <th bgcolor="#B2B2B2">Valid Settings</th>
+            <th bgcolor="#B2B2B2">Default</th>
+            <th bgcolor="#B2B2B2">Description</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+		<tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Dim'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(integer scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><em>first non-singleton dimension</em></p></td>            
+            <td bgcolor="#F2F2F2"><p>Dimension over which the spectrum is computed.</p></td>
+        </tr>      
+    
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'FFTLength'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(integer scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><em>signal length</em></p></td>            
+            <td bgcolor="#F2F2F2"><p>Length of the FFT. If the set length is larger than the signal length, the signal is zero padded. If the set length is smaller than the signal length, the default value is used instead.</p></td>
+        </tr>   
+
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'PowerTwo'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(Boolean scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>false</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Boolean controlling whether the FFT length is forced to be the next highest power of 2.</p></td>
+        </tr>     
+        
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Plot'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(Boolean scalar or two element vector)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>false</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Boolean controlling whether the amplitude and phase spectrums are plotted. Can be given as a two element array to control the display of the amplitude and phase spectrums, respectively.</p></td>
+        </tr>         
+               
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Unwrap'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(Boolean scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>false</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Boolean controlling whether the phase spectrum is unwrapped.</p></td>
+        </tr>         
+        
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Window'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(string)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>'Rectangular'</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Parameter string controlling the window type used to filter the signal before the FFT is taken. Any valid input types for <code><a href="getWin.html">getWin</a></code> may be used.</p></td>
+        </tr>        
+    </tbody>
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>f</code></p></td>
+        <td><p>frequency array</p></td>
+    </tr>
+    
+    <tr valign="top">
+        <td><p><code>func_as</code></p></td>
+        <td><p>single sided amplitude spectrum</p></td>
+    </tr>    
+    
+    <tr valign="top">
+        <td><p><code>func_ps</code></p></td>
+        <td><p>single sided phase spectrum</p></td>
+    </tr>      
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_ivp_sensor_frequency_response.html">Defining A Gaussian Sensor Frequency Response</a></li> 
+<li><a href="example_tvsp_doppler_effect.html">The Doppler Effect</a></li> 
+<li><a href="example_na_filtering.html">Filtering A Delta Function Input Signal</a></li>
+<li><a href="example_pr_2D_tr_absorption_compensation.html">Image Reconstruction With Compensation For Acoustic Absorption</a></li> 
+<li><a href="example_na_source_smoothing.html">Source Smoothing</a></li> 
+<li><a href="example_na_filtering.html">Filtering A Delta Function Input Signal</a></li> 
+<li><a href="example_na_modelling_absorption.html">Modelling Power Law Absorption</a></li>
+</ul>
+<h2>See Also</h2>
+
+<code><a href="smooth.html">smooth</a></code>, <code><a href="filterTimeSeries.html">filterTimeSeries</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="smooth.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">smooth</td>
+        <td>&nbsp;</td>
+        <td align="right">speedSoundWater</td>
+        <td align="right" width="20"><a href="speedSoundWater.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

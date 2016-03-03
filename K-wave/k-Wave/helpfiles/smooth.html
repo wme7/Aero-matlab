@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>smooth :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="sharpness.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="spect.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">smooth</h1>
+<p class="purpose">Smooth a matrix</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+mat_sm = smooth(kgrid, mat)
+mat_sm = smooth(kgrid, mat, restore_max)
+mat_sm = smooth(kgrid, mat, [], window_type)
+mat_sm = smooth(kgrid, mat, restore_max, window_type)
+</pre>
+
+<h2>Description</h2>
+
+<p><code>smooth</code> filters an input matrix using an n-dimensional frequency domain window created using <code><a href="getWin.html">getWin</a></code>. If no window type is specified, a Blackman window is used.</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td><p><code>kgrid</code></p></td>
+        <td><p>k-Wave grid structure returned by <code><a href="makeGrid.html">makeGrid</a></code></p></td>
+    </tr>
+    <tr valign="top">
+        <td width = "150"><p><code>mat</code></p></td>
+        <td><p>spatial distribution to smooth</p></td>
+    </tr>
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>restore_max</code></p></td>
+        <td><p>Boolean controlling whether the maximum value is restored after smoothing (default = <code>false</code>)</p></td>
+    </tr>
+    <tr valign="top">
+        <td width = "150"><p><code>window_type</code></p></td>
+        <td><p>shape of the smoothing window; any valid inputs to <code><a href="getWin.html">getWin</a></code> are supported (default = <code>'Blackman'</code>)</p></td>
+    </tr>
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>mat_sm</code></p></td>
+        <td><p>smoothed spatial distribution</p></td>
+    </tr>
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_pr_2D_fft_line_sensor.html">2D FFT Reconstruction For A Line Sensor</a></li>   
+<li><a href="example_pr_3D_fft_planar_sensor.html">3D FFT Reconstruction For A Planar Sensor</a></li>   
+<li><a href="example_pr_2D_tr_line_sensor.html">2D Time Reversal For A Line Sensor</a></li>
+<li><a href="example_pr_2D_tr_circular_sensor.html">2D Time Reversal For A Circular Sensor</a></li>
+<li><a href="example_pr_3D_tr_planar_sensor.html">3D Time Reversal For A Planar Sensor</a></li> 
+<li><a href="example_pr_3D_tr_spherical_sensor.html">3D Time Reversal For A Spherical Sensor</a></li>              
+<li><a href="example_pr_2D_tr_directional_sensors.html">Image Reconstruction With Directional Sensors</a></li>       
+<li><a href="example_pr_2D_tr_bandlimited_sensors.html">Image Reconstruction With Bandlimited Sensors</a></li>
+<li><a href="example_pr_2D_tr_absorption_compensation.html">Image Reconstruction With Compensation For Acoustic Absorption</a></li> 
+<li><a href="example_na_source_smoothing.html">Source Smoothing</a></li>             
+<li><a href="example_na_filtering.html">Filtering A Delta Function Input Signal</a></li>   
+<li><a href="example_na_modelling_absorption.html">Modelling Power Law Absorption</a></li>
+</ul>
+
+<h2>See Also</h2>
+
+<code><a href="matlab: doc fft">fft</a></code>, <code><a href="matlab: doc ifft">ifft</a></code>, <code><a href="matlab: doc fft2">fft2</a></code>, <code><a href="matlab: doc ifft2">ifft2</a></code>, <code><a href="matlab: doc fftn">fftn</a></code>, <code><a href="matlab: doc ifftn">ifftn</a></code>, <code><a href="makeGrid.html">makeGrid</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="sharpness.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">sharpness</td>
+        <td>&nbsp;</td>
+        <td align="right">spectrum</td>
+        <td align="right" width="20"><a href="spect.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

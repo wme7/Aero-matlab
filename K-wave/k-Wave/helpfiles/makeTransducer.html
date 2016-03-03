@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>makeTransducer :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="makeTime.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="maxND.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">makeTransducer</h1>
+<p class="purpose">Create k-Wave ultrasound transducer</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+transducer = makeTransducer(kgrid, settings)
+</pre>
+
+<h2>Description</h2>
+
+<code>makeTransducer</code> creates an object of the <code>kWaveTransducer</code> class which can be substituted for the source or sensor inputs when using <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code>. For additional information, see the <a href="example_us_defining_transducer.html">Defining An Ultrasound Transducer Example</a>.</p>
+
+<ul>
+    <table cellspacing="0" class="note" summary="Note" cellpadding="5" border="1">
+        <tr width="90%">
+            <td><p><b>Note:</b>&nbsp;&nbsp;This function will not work with older versions of MATLAB in which custom class definitions are not supported.</p></td>
+        </tr>
+    </table>
+</ul>
+
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>kgrid</code></p></td>
+        <td><p>k-Wave grid structure returned by <code><a href="makeGrid.html">makeGrid</a></code></p></td>
+    </tr>     
+    <tr valign="top">
+        <td  width = "150"><p><code>settings</code></p></td>
+        <td><p>input structure used to define the properties of the transducer (see below)</p></td>        
+    </tr>     
+</table>
+
+<p>The following parameters can be appended as fields to the <code>settings</code> input structure. These parameters are fixed when the transducer is initialised (they cannot be changed without re-creating the transducer). All the settings are optional and are given their default values if not defined by the user.</p>
+
+<table cellspacing="0" class="body" cellpadding="4" border="2">
+    <colgroup>
+        <col width="25%"><col width="60%"><col width="15%">
+    </colgroup>
+    
+    <thead>
+        <tr valign="top">
+            <th bgcolor="#B2B2B2">Property</th>
+            <th bgcolor="#B2B2B2">Description</th>
+            <th bgcolor="#B2B2B2">Default</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>number_elements</code></p></td>
+            <td bgcolor="#F2F2F2"><p>total number of transducer elements</p></td>
+            <td bgcolor="#F2F2F2"><p><code>128</code></p></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>element_width</code></p></td>
+            <td bgcolor="#F2F2F2"><p>width of each element in grid points</p></td>
+            <td bgcolor="#F2F2F2"><p><code>1</code></p></td>
+        </tr>
+    </tbody>      
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>element_length</code></p></td>
+            <td bgcolor="#F2F2F2"><p>length of each element in grid points</p></td>
+            <td bgcolor="#F2F2F2"><p><code>10</code></p></td>
+        </tr>
+    </tbody>     
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>element_spacing</code></p></td>
+            <td bgcolor="#F2F2F2"><p>spacing (kerf width) between the transducer elements in grid points</p></td>
+            <td bgcolor="#F2F2F2"><p><code>0</code></p></td>
+        </tr>
+    </tbody>  
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>position</code></p></td>
+            <td bgcolor="#F2F2F2"><p>position of the corner of the transducer within the grid in grid points</p></td>
+            <td bgcolor="#F2F2F2"><p><code>[1, 1, 1]</code></p></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>radius</code></p></td>
+            <td bgcolor="#F2F2F2"><p>radius of curvature of the transducer [m] (currently only <code>inf</code> is supported)</p></td>
+            <td bgcolor="#F2F2F2"><p><code>inf</code></p></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>input_signal</code></p></td>
+            <td bgcolor="#F2F2F2"><p>signal used to drive the ultrasound transducer (where the sampling rate is defined by <code>kgrid.dt</code> or <code>kgrid.t_array</code>)</p></td>
+            <td bgcolor="#F2F2F2"><p><code>[]</code></p></td>
+        </tr>
+    </tbody>
+    
+</table>    
+    
+<p>The following parameters can also be appended as fields to the <code>settings</code> input structure, and can additionally be modified after the transducer has been initialised.</p>
+
+<table cellspacing="0" class="body" cellpadding="4" border="2">
+    <colgroup>
+        <col width="25%"><col width="60%"><col width="15%">
+    </colgroup>
+
+    <thead>
+        <tr valign="top">
+            <th bgcolor="#B2B2B2">Property</th>
+            <th bgcolor="#B2B2B2">Description</th>
+            <th bgcolor="#B2B2B2">Default</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>active_elements</code></p></td>
+            <td bgcolor="#F2F2F2"><p>transducer elements that are currently active elements</p></td>
+            <td bgcolor="#F2F2F2"><p><em>(all elements)</em></p></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>beamforming_delay_offset</code></p></td>
+            <td bgcolor="#F2F2F2"><p>beamforming delay offset (used to force beamforming delays to be positive)</p></td>
+            <td bgcolor="#F2F2F2"><p><code>'auto'</code></p></td>
+        </tr>
+    </tbody>    
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>elevation_focus_distance</code></p></td>
+            <td bgcolor="#F2F2F2"><p>focus depth in the elevation direction [m]</p></td>
+            <td bgcolor="#F2F2F2"><p><code>inf</code></p></td>
+        </tr>
+    </tbody>
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>focus_distance</code></p></td>
+            <td bgcolor="#F2F2F2"><p>focus distance used to calculate beamforming delays [m]</p></td>
+            <td bgcolor="#F2F2F2"><p><code>inf</code></p></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>receive_apodization</code></p></td>
+            <td bgcolor="#F2F2F2"><p>receive apodization - can be set to any of the window shapes supported by <code><a href="getWin.html">getWin</a></code>, or given as a vector the same length as <code>number_elements</code></p></td>
+            <td bgcolor="#F2F2F2"><p><code>'Rectangular'</code></p></td>
+        </tr>
+    </tbody>
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>sound_speed</code></p></td>
+            <td bgcolor="#F2F2F2"><p>sound speed used to calculate beamforming delays [m/s]</p></td>
+            <td bgcolor="#F2F2F2"><p><code>1540</code></p></td>
+        </tr>
+    </tbody>
+        
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>steering_angle</code></p></td>
+            <td bgcolor="#F2F2F2"><p>steering angle used to calculate beamforming delays [deg]</p></td>
+            <td bgcolor="#F2F2F2"><p><code>0</code></p></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>transmit_apodization</code></p></td>
+            <td bgcolor="#F2F2F2"><p>transmit apodization - can be set to any of the window shapes supported by <code><a href="getWin.html">getWin</a></code>, or given as a vector the same length as <code>number_elements</code></p></td>
+            <td bgcolor="#F2F2F2"><p><code>'Rectangular'</code></p></td>
+        </tr>
+    </tbody>    
+    
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>transducer</code></p></td>
+        <td><p>k-Wave transducer object which can be used to replace the <code>source</code> or <code>sensor</code> inputs of <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code></p></td>
+    </tr>
+</table>
+
+<p>In addition to the input parameters given above (which are also accessible after the transducer has been created), the <code>kWaveTransducer</code> object has a number dependent properties and methods.</p>
+
+<table cellspacing="0" class="body" cellpadding="4" border="2">
+    <colgroup>
+        <col width="25%"><col width="75%">
+    </colgroup>
+    
+    <thead>
+        <tr valign="top">
+            <th bgcolor="#B2B2B2">Property</th>
+            <th bgcolor="#B2B2B2">Description</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>input_signal</code></p></td>
+            <td bgcolor="#F2F2F2"><p>user defined input signal appended and prepended with additional zeros depending on the values of <code>focus_distance</code>, <code>elevation_focus_distance</code>, and <code>steering_angle</code></p></td>
+        </tr>
+    </tbody>      
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>mask</code></p></td>
+            <td bgcolor="#F2F2F2"><p>binary mask of the active transducer elements</p></td>
+        </tr>
+    </tbody>
+        
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>number_active_elements</code></p></td>
+            <td bgcolor="#F2F2F2"><p>current number of active transducer elements</p></td>
+        </tr>
+    </tbody>     
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>transducer_width</code></p></td>
+            <td bgcolor="#F2F2F2"><p>total width of the transducer in grid points</p></td>
+        </tr>
+    </tbody>  
+    
+    <thead>
+        <tr valign="top">
+            <th bgcolor="#B2B2B2">Method</th>
+            <th bgcolor="#B2B2B2">Description</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>active_elements_mask</code></p></td>
+            <td bgcolor="#F2F2F2"><p>return a binary mask of the active transducer elements (identical to <code>mask</code>)</p></td>
+        </tr>
+    </tbody>    
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>all_elements_mask</code></p></td>
+            <td bgcolor="#F2F2F2"><p>return a binary mask of all the transducer elements (both active and inactive)</p></td>
+        </tr>
+    </tbody>
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>beamforming_delays</code></p></td>
+            <td bgcolor="#F2F2F2"><p>return a vector of the beam forming delays (in units of time samples) for each active element based on the focus and steering angle settings</p></td>
+        </tr>
+    </tbody>
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>combine_sensor_data(sensor_data)</code></p></td>
+            <td bgcolor="#F2F2F2"><p>combine the sensor data returned by <code>kspaceFirstOrder3D-OMP</code> and <code>kspaceFirstOrder3D-CUDA</code> to give a single time series per active transducer element (anlogous to the output from the MATLAB code), rather than a single time series per grid point</p></td>
+        </tr>
+    </tbody>
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>delay_mask</code></p></td>
+            <td bgcolor="#F2F2F2"><p>return a mask of the active transducer elements, where the mask values contain the beamforming delays (an integer input can also be given to control the beamforming delays used, where 1: both delays, 2: elevation only, 3: azimuth only)</p></td>
+        </tr>
+    </tbody>
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>elevation_beamforming_delays</code></p></td>
+            <td bgcolor="#F2F2F2"><p>return a vector of the elevation beam forming delays (in units of time samples) for each active element based on the elevation focus setting</p></td>
+        </tr>
+    </tbody>
+
+	<tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>get_receive_apodization</code></p></td>
+            <td bgcolor="#F2F2F2"><p>return the receive apodization</p></td>
+        </tr>
+    </tbody>
+	
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>get_transmit_apodization</code></p></td>
+            <td bgcolor="#F2F2F2"><p>return the transmit apodization</p></td>
+        </tr>
+    </tbody>
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>indexed_active_elements_mask</code></p></td>
+            <td bgcolor="#F2F2F2"><p>return a mask of the active transducer elements, where the mask values indicate which transducer element each grid point corresponds to</p></td>
+        </tr>
+    </tbody>
+
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>indexed_elements_mask</code></p></td>
+            <td bgcolor="#F2F2F2"><p>return a mask of all the transducer elements (both active and inactive), where the mask values indicate which transducer element each grid point corresponds to</p></td>
+        </tr>
+    </tbody>
+	
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>plot</code></p></td>
+            <td bgcolor="#F2F2F2"><p>plot the transducer using <code><a href="voxelPlot.html">voxelPlot</a></code></p></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>properties</code></p></td>
+            <td bgcolor="#F2F2F2"><p>print a list of the transducer properties to the command line</p></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>scan_line(sensor_data)</code></p></td>
+            <td bgcolor="#F2F2F2"><p>combine the input sensor data using the current apodization and beamforming setting to generate a single scan line</p></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>transmit_apodization_mask</code></p></td>
+            <td bgcolor="#F2F2F2"><p>return a mask of the active transducer elements, where the mask values contain the apodization weights</p></td>
+        </tr>
+    </tbody>    
+    
+</table>
+
+<p>For example, running the following commands at the command line</p>
+
+<pre class="programlisting">
+kgrid = makeGrid(128, 1e-3, 128, 1e-3, 128, 1e-3);
+kgrid.t_array = makeTime(kgrid, 1500);
+settings.number_elements = 72;
+settings.active_elements = zeros(72, 1);
+settings.active_elements(1:16) = 1;
+transducer = makeTransducer(kgrid, settings);
+transducer.properties
+</pre>
+
+<p>will produce the following output:</p>
+
+<pre class="programlisting">
+k-Wave Transducer Properties
+  transducer position: [1  1  1]
+  transducer width: 72mm (72 grid points)
+  number of elements: 72
+  number of active elements: 16 (elements 1 to 16)
+  element width: 1mm (1 grid points)
+  element spacing (kerf): 0ym (0 grid points)
+  element pitch: 1mm (1 grid points)
+  element length: 20mm (20 grid points)
+  sound speed: 1540m/s
+  focus distance: infinite
+  elevation focus distance: infinite
+  steering angle: 0 degrees
+</pre>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_us_defining_transducer.html">Defining An Ultrasound Transducer</a></li> 
+<li><a href="example_us_beam_patterns.html">Simulating Ultrasound Beam Patterns</a></li> 
+<li><a href="example_us_transducer_as_sensor.html">Using An Ultrasound Transducer As A Sensor</a></li> 
+<li><a href="example_us_bmode_linear_transducer.html">Simulating B-mode Ultrasound Images</a></li> 
+                      
+</ul>
+
+<h2>See Also</h2>
+
+<code><a href="makeGrid.html">makeGrid</a></code>, <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="makeTime.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">makeTime</td>
+        <td>&nbsp;</td>
+        <td align="right">maxND</td>
+        <td align="right" width="20"><a href="maxND.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

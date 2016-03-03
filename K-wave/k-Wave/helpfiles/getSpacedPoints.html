@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>getSpacedPoints :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="getkWavePath.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="getWin.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">getSpacedPoints</h1>
+<p class="purpose">Create vector of log or linear spaced points</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+points = getSpacedPoints(X1, X2)
+points = getSpacedPoints(X1, X2, N)
+points = getSpacedPoints(X1, X2, N, spacing)
+</pre>
+
+<h2>Description</h2>
+<p><code>getSpacedPoints</code> generates a row vector of either logarithmically or linearly spaced points between <code>X1</code> and <code>X2</code>. When <code>spacing</code> is set to <code>'linear'</code>, the function is identical to the inbuilt <code><a href="matlab: doc linspace">linspace</a></code> function. When <code>spacing</code> is set to <code>'log'</code>, the function is similar to the inbuilt <code><a href="matlab: doc logspace">logspace</a></code> function, except that <code>X1</code> and <code>X2</code> define the start and end numbers, not decades. For logarithmically spaced points, <code>X1</code> must be > 0. If <code>N</code> < 2, <code>X2</code> is returned. </p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>X1</code></p></td>
+        <td><p>starting points value</p></td>
+    </tr>
+    <tr valign="top">
+        <td><p><code>X2</code></p></td>
+        <td><p>ending points value (where <code>X2</code> > <code>X1</code>)</p></td>        
+    </tr>         
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>N</code></p></td>
+        <td><p>number of points in the vector (default = 100)</p></td>        
+    </tr>  
+    <tr valign="top">
+        <td><p><code>spacing</code></p></td>
+        <td><p><code>'log'</code> or <code>'linear'</code> spaced values (default = <code>'linear'</code>)</p></td>        
+    </tr>    
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>points</code></p></td>
+        <td><p>row vector of equally spaced points</p></td>
+    </tr>
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="matlab: doc linspace">linspace</a></code>, <code><a href="matlab: doc logspace">logspace</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="getkWavePath.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">getkWavePath</td>
+        <td>&nbsp;</td>
+        <td align="right">getWin</td>
+        <td align="right" width="20"><a href="getWin.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

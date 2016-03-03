@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Explosive Source In A Layered Medium Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Explosive Source In A Layered Medium Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="k-wave_elastic_wave_propagation.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="example_ewp_plane_wave_absorption.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Explosive Source In A Layered Medium Example</h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Defining the medium and source properties</a></p>
+            <p><a href="#heading3">Running the simulation</a></p>
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example provides a simple demonstration of using k-Wave for the simulation and detection of compressional and shear waves in elastic and viscoelastic media within a two-dimensional heterogeneous medium. It builds on the <a href="example_ivp_homogeneous_medium.html">Homogenous Propagation Medium</a> and <a href="example_ivp_heterogeneous_medium.html">Heterogeneous Propagation Medium</a> examples.</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_ewp_layered_medium.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_ewp_layered_medium']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Defining the medium and source properties</h3>
+
+<p>In addition to the simulation functions for modelling compressional waves in fluid media (<code><a href="kspaceFirstOrder1D.html">kspaceFirstOrder1D</a></code>, <code><a href="kspaceFirstOrder2D.html">kspaceFirstOrder2D</a></code>, and <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code>), k-Wave also includes functions for simulating the propagation of compressional and shear waves in isotropic elastic and viscoelastic media. These functions are based on the pseudospectral time domain (PSTD) method, and are called <code><a href="pstdElastic2D.html">pstdElastic2D</a></code>, <code><a href="pstdElastic3D.html">pstdElastic3D</a></code>. These are used in a very similar fashion to the fluid codes, and require four input structures which define the properties of the computational grid, the material properties of the medium, the properties and locations of any acoustic sources, and the properties and locations of the sensor points used to record the evolution of the wavefield over time. The <code>kgrid</code> and <code>sensor</code> inputs are defined in an identical fashion to the fluid code, while the <code>medium</code> and <code>source</code> input structures have slightly different field names to reflect the nature of solid materials.</p>
+
+<p>In an isotropic elastic medium, the material properties can be characterised by the shear and compressional sound speeds, and the mass density. These are assigned to the <code>medium</code> structure as the fields <code>sound_speed_compression</code>, <code>sound_speed_shear</code>, and <code>density</code>. In a homogeneous medium, the material parameters are set as scalar values in SI units. In a heterogeneous medium, these are instead given as matrices with the same dimensions as the computational grid. In this example, a heterogeneous medium is created with two material layers.</p>
+
+<pre class="programlisting">
+% define the properties of the upper layer of the propagation medium
+medium.sound_speed_compression = 1500*ones(Nx, Ny); % [m/s]
+medium.sound_speed_shear       = zeros(Nx, Ny);     % [m/s]
+medium.density                 = 1000*ones(Nx, Ny); % [kg/m^3]
+
+% define the properties of the lower layer of the propagation medium
+medium.sound_speed_compression(Nx/2:end, :) = 2000; % [m/s]
+medium.sound_speed_shear(Nx/2:end, :)       = 800;  % [m/s]
+medium.density(Nx/2:end, :)                 = 1200; % [kg/m^3]
+</pre>
+
+<p>For viscoelastic media, the absorption coefficient in units of dB/(MHz^2 cm) can also be defined for both compressional and shear waves. The elastic codes are based on the classical Kelvin-Voigt absorption model, which gives absorption proportional to frequency squared in the low frequency limit.</p>
+
+<pre class="programlisting">
+% define the absorption properties
+medium.alpha_coeff_compression = 0.1;   % [dB/(MHz^2 cm)]
+medium.alpha_coeff_shear       = 0.5;   % [dB/(MHz^2 cm)]
+</pre>
+
+<p>The elastic codes support three types of sources: (1) an initial pressure distribution, (2) time varying velocity sources, and (3) time varying stress sources. These are used in an analogous fashion to the fluid codes. In this example, an explosive source is assigned to <code>source.p0</code>. Within the simulation function, this is then assigned to the normal components of the stress.</p>
+
+<pre class="programlisting">
+% create initial pressure distribution using makeDisc
+disc_magnitude = 5; % [Pa]
+disc_x_pos = 30;    % [grid points]
+disc_y_pos = 64;    % [grid points]
+disc_radius = 5;    % [grid points]
+source.p0 = disc_magnitude*makeDisc(Nx, Ny, disc_x_pos, disc_y_pos, disc_radius);
+</pre>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Running the simulation</h3>
+
+<p>The elastic codes are based on the pseudospectral time domain method. This does not use a k-space corrected scheme for time integration like the fluid codes, which means smaller time steps are typically required for stable and accurate simulations. In this example, the Courant-Friedrichs-Lewy (CFL) number is set to 0.1.</p>
+
+<pre class="programlisting">
+% create the time array
+cfl   = 0.1;    % Courant-Friedrichs-Lewy number
+t_end = 8e-6;   % [s]
+kgrid.t_array = makeTime(kgrid, max(medium.sound_speed_compression(:)), cfl, t_end);
+</pre>
+
+<p>The simulation is then started by calling <code><a href="pstdElastic2D.html">pstdElastic2D</a></code> with the four input structures analogous to <code><a href="kspaceFirstOrder2D.html">kspaceFirstOrder2D</a></code>. Optional inputs can similarly be defined as <code>'string', value</code> pairs after the main inputs. By default, as the simulation runs, a visualisation of the propagating wave field and a status bar are displayed with frame updates every ten time steps. Both the normal and shear components of the stress are displayed. The plot scales for these can be defined individually using the <code>'PlotScale'</code> input. This is defined as <code>[sii_min, sii_max, sij_min, sij_max]</code>, where <code>sii</code> and <code>sij</code> denote the plot scales for the normal and shear stress.</p>
+
+<pre class="programlisting">
+% define input arguments
+input_args = {'PlotScale', [-0.75, 0.75, -0.15, 0.15], 'PlotPML', false, 'DisplayMask', display_mask};
+
+% run the simulation
+sensor_data = pstdElastic2D(kgrid, medium, source, sensor, input_args{:});
+</pre>
+
+<p>A visualisation of the running simulation and the recorded sensor data are given below. Both compressional and shear waves in the lower layer of the medium are clearly visible.</p>
+
+<p><img src="images/example_ewp_layered_medium_01.png" height="420" width="841">
+<img src="images/example_ewp_layered_medium_02.png" height="419" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="k-wave_elastic_wave_propagation.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Elastic Wave Propagation</td>
+        <td>&nbsp;</td>
+        <td align="right">Plane Wave Absorption</td>
+        <td align="right" width="20"><a href="example_ewp_plane_wave_absorption.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

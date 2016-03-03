@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Diffraction Through A Slit Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Diffraction Through A Slit Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="example_tvsp_doppler_effect.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="example_tvsp_3D_simulation.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Diffraction Through A Slit Example</h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Defining the medium properties</a></p>
+            <p><a href="#heading3">Running the simulation</a></p>
+            <p><a href="#heading4">Diffraction through a double slit</a></p>
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example illustrates the diffraction of a plane acoustic wave through a slit. It builds on the <a href="example_tvsp_homogeneous_medium_monopole.html">Monopole Point Source In A Homogeneous Propagation Medium</a> and <a href="example_tvsp_transducer_field_patterns.html">Simulating Transducer Field Patterns</a> examples.</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_tvsp_slit_diffraction.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_tvsp_slit_diffraction']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Defining the medium properties</h3>
+
+<p>The current version of k-Wave cannot explicitly enforce impedance boundary conditions. However, rigid boundaries can still be modelled by assigning a boundary with a large sound speed and density compared to the rest of the propagation medium. As this impedance difference is increased, the behaviour of the interface will approach that of a rigid boundary. Note, increasing the sound speed of the boundary will similarly increase the computational requirements (the time step required for a stable simulation is dependent on the maximum sound speed within the medium).</p>
+
+<p>Here, a diffraction slit is created by defining a thin layer with a significantly different sound speed and density to the background medium such that most of the incident wave is reflected. (Note, using <code>barrier_scale = 20</code>, some of the incident wave will still be transmitted through the barrier causing additional interference fringes. These can be reduced by increasing the barrier scale.)</p>
+
+<pre class="programlisting">
+% define the ratio between the barrier and background sound speed and density
+barrier_scale = 20;
+
+% create the time array using the barrier sound speed
+t_end = 40e-6;                % [s]
+CFL = 0.5;                    % Courant–Friedrichs–Lewy number
+kgrid.t_array = makeTime(kgrid, c0*barrier_scale, CFL, t_end);
+
+% create a mask of a barrier with a slit
+slit_thickness = 2;                     % [grid points]
+slit_width = 10;                        % [grid points]
+slit_x_pos = Nx - Nx/4;                 % [grid points]
+slit_offset = Ny/2 - slit_width/2 - 1;  % [grid points]
+slit_mask = zeros(Nx, Ny);
+slit_mask(slit_x_pos:slit_x_pos + slit_thickness, 1:1 + slit_offset) = 1;
+slit_mask(slit_x_pos:slit_x_pos + slit_thickness, end - slit_offset:end) = 1;
+
+% assign the slit to the properties of the propagation medium
+medium.sound_speed = c0*ones(Nx, Ny);
+medium.density = rho0*ones(Nx, Ny);
+medium.sound_speed(slit_mask == 1) = barrier_scale*c0;
+medium.density(slit_mask == 1) = barrier_scale*rho0;
+</pre>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Running the simulation</h3>
+
+<p>In the first example (set <code>example_number = 1</code> within the example m-file), a sinusoidal plane wave source is created with a wavelength equal to the slit width. A visualisation of the barrier is also produced by assigning the <code>slit_mask</code> created above to the optional input parameter <code>'DisplayMask'</code>. The size and location of the perfectly matched layer are explicitly defined (see <a href="example_na_controlling_the_pml.html">Controlling The Absorbing Boundary Layer Example</a>), the simulation is run in <code>single</code> precision to reduce the computation time (see <a href="example_na_optimising_performance.html">Optimising k-Wave Performance Example</a>), and the final pressure and velocity fields are returned by <code>sensor.record</code> to <code>{'p_final', 'u_final'}</code> (see <a href="example_ivp_recording_particle_velocity.html">Recording The Particle Velocity Example</a>).</p>
+
+<pre class="programlisting">
+% set the input options
+input_args = {'PMLInside', false, 'PMLSize', PML_size, 'PlotPML', false, ...
+    'DisplayMask', slit_mask, 'DataCast', 'single'};
+
+% run the simulation
+sensor_data = kspaceFirstOrder2D(kgrid, medium, source, sensor, input_args{:});
+</pre>
+
+<p>A visualisation of the pressure field is given below. The wave field on the far side of the slit appears reasonably omni-directional.</p>
+
+<p><img src="images/example_tvsp_slit_diffraction_01.png" height="420" width="561"></p>
+
+<p>In the second example (set <code>example_number = 2</code> within the example m-file), the slit size is increased and the wavelength is reduced to be a quarter of the slit width. A visualisation of the pressure field is given below. In this case, the directionality of the wavefield is increased, and interference fringes are visible.</p> 
+
+<p><img src="images/example_tvsp_slit_diffraction_02.png" height="420" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading4"></a>
+<h3 class="title">Diffraction through a double slit</h3>
+
+<p>In the third example (set <code>example_number = 3</code> within the example m-file), a double slit is used and the wavelength set equal to the slit width. The final velocity fields are also displayed.</p> 
+
+<p><img src="images/example_tvsp_slit_diffraction_03.png" height="420" width="561">
+<img src="images/example_tvsp_slit_diffraction_04.png" height="420" width="561">
+<img src="images/example_tvsp_slit_diffraction_05.png" height="420" width="561"></p>
+
+<p>Note, the pictures shown here were computed using <code>barrier_scale = 50</code> and <code>scale = 2</code> within the example m-file.</p>
+
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="example_tvsp_doppler_effect.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">The Doppler Effect</td>
+        <td>&nbsp;</td>
+        <td align="right">Simulations In Three Dimensions</td>
+        <td align="right" width="20"><a href="example_tvsp_3D_simulation.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>getBLI :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="getAlphaFilter.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="getColorMap.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">getBLI</h1>
+<p class="purpose">Compute underlying Fourier band-limited interpolant (BLI)</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+BLI = getBLI(func)
+BLI = getBLI(func, dx)
+BLI = getBLI(func, dx, sampling_factor)
+BLI = getBLI(func, dx, sampling_factor, plot_BLI)
+BLI = getBLI(func, [], [], plot_BLI)
+[x_fine, BLI] = getBLI(func, dx, sampling_factor, plot_BLI)
+...
+</pre>
+
+<h2>Description</h2>
+<p><code>getBLI</code> computes the underlying band-limited interpolant (BLI) of a discretely sampled 1D function assuming a Fourier basis. The example below shows the BLI of a discrete spatial delta function.</p>
+
+<pre class="programlisting">
+delta = zeros(20, 1);
+delta(end/2) = 1;
+getBLI(delta, 0.001, 10, true);
+</pre>
+
+<p>
+<img src="images/getBLI_image_01.png" height="420" width="561">
+</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>func</code></p></td>
+        <td><p>1D input function</p></td>
+    </tr> 
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>dx</code></p></td>
+        <td><p>spatial sampling [m] (default = 1)</p></td>        
+    </tr>     
+	<tr valign="top">
+        <td><p><code>upsampling_factor</code></p></td>
+        <td><p>spatial sampling used to sample the underlying BLI (default = 20)</p></td>        
+    </tr>     
+	<tr valign="top">
+        <td><p><code>plot_BLI</code></p></td>
+        <td><p>Boolean controlling whether the discrete input function and its BLI are displayed (default = false)</p></td>        
+    </tr>     
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>BLI</code></p></td>
+        <td><p>band-limited interpolant</p></td>
+    </tr>
+    <tr valign="top">
+        <td><p><code>x_fine</code></p></td>
+        <td><p>x-grid for BLI</p></td>
+    </tr>    
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="spect.html">spect</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="getAlphaFilter.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">getAlphaFilter</td>
+        <td>&nbsp;</td>
+        <td align="right">getColorMap</td>
+        <td align="right" width="20"><a href="getColorMap.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

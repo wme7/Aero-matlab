@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>writeFlags :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="writeAttributes.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="writeGrid.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">writeFlags</h1>
+<p class="purpose">Write input flags to a k-Wave HDF5 file</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+writeFlags(filename)
+</pre>
+
+<h2>Description</h2>
+<p><code>writeFlags</code> reads the input HDF5 file and derives and writes the required source and medium flags based on the datasets present in the file. For example, if the file contains a data set named <code>'BonA'</code>, the <code>nonlinear_flag</code> will be written as true. Conditional flags are also written. The source mode flags are written when appropriate if they are not already present in the file. The default source mode is <code>'additive'</code>.</p>
+
+<p>List of flags that are always written</p>
+<ul>
+<li><code>ux_source_flag</li></code>
+<li><code>uy_source_flag</li></code>
+<li><code>uz_source_flag</li></code>
+<li><code>p_source_flag</li></code>
+<li><code>p0_source_flag</li></code>
+<li><code>transducer_source_flag</li></code>
+<li><code>nonuniform_grid_flag</li></code>
+<li><code>nonlinear_flag</li></code>
+<li><code>absorbing_flag</li></code>
+<li><code>sensor_mask_type</li></code>
+</ul>
+
+<p>List of conditional flags</p>
+<ul>
+<li><code>u_source_mode</li></code>
+<li><code>u_source_many</li></code>
+<li><code>p_source_mode</li></code>
+<li><code>p_source_many</li></code>
+</ul>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>filename</code></p></td>
+        <td><p>name of HDF5 file to write matrix to</p></td>
+    </tr>  
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="writeAttributes.html">writeAttributes</a></code>, <code><a href="writeGrid.html">writeGrid</a></code>, <code><a href="writeMatrix.html">writeMatrix</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="writeAttributes.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">writeAttributes</td>
+        <td>&nbsp;</td>
+        <td align="right">writeGrid</td>
+        <td align="right" width="20"><a href="writeGrid.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

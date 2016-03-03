@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>overlayPlot :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="numDim.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="powerLawKramersKronig.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">overlayPlot</h1>
+<p class="purpose">Overlay two images</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+overlayPlot(bg, fg)
+overlayPlot(bg, fg, fg_dnr)
+overlayPlot(x, y, bg, fg, fg_dnr)
+</pre>
+
+<h2>Description</h2>
+<p><code>overlayPlot</code> overlays two 2D images. The background image is displayed using a grayscale map. The foreground is first log-compressed and thresholded to a particular dynamic range, and then overlayed onto the background image using an alpha value of 0.5. If a dynamic range is not specified, a value of 30 dB is used.</p>
+
+<p>Example:</p>
+
+<pre class="programlisting">
+bg = rand(128);
+fg = peaks(128);
+overlayPlot(bg, fg);
+</pre>
+
+<p><img src="images/overlayPlot_image_01.png" height="420" width="561"></p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>x, y</code></p></td>
+        <td><p>vectors describing the position of the pixels in the image equivalent to image(x, y, c)</p></td>
+    </tr>    
+    <tr valign="top">
+        <td><p><code>bg</code></p></td>
+        <td><p>background image</p></td>
+    </tr> 
+    <tr valign="top">
+        <td><p><code>fg</code></p></td>
+        <td><p>foreground image</p></td>
+    </tr> 
+    <tr valign="top">
+        <td><p><code>fg_dbr</code></p></td>
+        <td><p>dynamic range in dB of foreground image</p></td>
+    </tr>
+    
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="beamPlot.html">beamPlot</a></code>, <code><a href="voxelPlot.html">voxelPlot</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="numDim.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">numDim</td>
+        <td>&nbsp;</td>
+        <td align="right">powerLawKramersKronig</td>
+        <td align="right" width="20"><a href="powerLawKramersKronig.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

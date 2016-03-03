@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>getWin :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="getSpacedPoints.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="gradientFD.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">getWin</h1>
+<p class="purpose">Return a frequency domain windowing function</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+win = getWin(N, type)
+win = getWin(N, type, ...)
+[win, cg] = getWin(N, type)
+[win, cg] = getWin(N, type, ...)
+</pre>
+
+<h2>Description</h2>
+<p><code>getWin</code> returns a 1D, 2D, or 3D frequency domain window of the specified type of the given dimensions. By default, higher dimensional windows are created using the outer product. The windows can alternatively be created using rotation by setting the optional input <code>'Rotation'</code> to <code>true</code>. The coherent gain of the window can also be returned. Several examples are given below.</p>
+    
+<pre class="programlisting">
+getWin(32, 'Hanning', 'Plot', true);
+</pre>
+
+<p>
+<img src="images/getWin_image_01.png" height="420" width="561">
+</p>
+
+<pre class="programlisting">
+getWin(32, 'Hanning', 'Plot', true, 'Symmetric', false);
+</pre>
+
+<p>
+<img src="images/getWin_image_02.png" height="420" width="561">
+</p>
+
+
+<pre class="programlisting">
+getWin([32, 32], 'Gaussian', 'Plot', true);
+</pre>
+
+<p>
+<img src="images/getWin_image_03.png" height="420" width="561">
+</p>
+
+<pre class="programlisting">
+getWin([30, 40], 'Gaussian', 'Plot', true, 'Rotation', true);
+</pre>
+
+<p>
+<img src="images/getWin_image_04.png" height="420" width="561">
+</p>
+
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>N</code></p></td>
+        <td>
+            <p>number of samples, use</p>
+            <p><code>N = Nx</code> for 1D<br/><code>N = [Nx Ny]</code>  for 2D<br/><code>N = [Nx Ny Nz]</code> for 3D</p>
+        </td>
+    </tr>     
+    
+    <tr valign="top">
+        <td><p><code>type</code></p></td>
+        <td>
+            <p>window type. Supported values are</p>
+            <p>
+<code>'Bartlett'</code><br/>
+<code>'Bartlett-Hanning'<br/>
+<code>'Blackman'</code><br/>
+<code>'Blackman-Harris'</code><br/>
+<code>'Blackman-Nuttall'</code><br/>
+<code>'Cosine'</code><br/>
+<code>'Flattop'</code><br/>
+<code>'Gaussian'</code><br/>
+<code>'HalfBand'</code><br/>
+<code>'Hamming'</code><br/>
+<code>'Hanning'</code><br/>
+<code>'Kaiser'</code><br/>
+<code>'Lanczos'</code><br/>
+<code>'Nuttall'</code><br/>
+<code>'Rectangular'</code><br/>
+<code>'Triangular'</code><br/>
+<code>'Tukey'</code><br/></p>
+        </td>
+    </tr>  
+          
+</table>
+
+<h2>Optional Inputs</h2>
+
+<p>Optional 'string', value pairs that may be used to modify the default computational settings.</p>
+
+<table cellspacing="0" class="body" cellpadding="4" border="2">
+    <colgroup>
+        <col width="18%"><col width="18%"><col width="18%"><col width="46%">
+    </colgroup>
+    
+    <thead>
+        <tr valign="top">
+            <th bgcolor="#B2B2B2">Input</th>
+            <th bgcolor="#B2B2B2">Valid Settings</th>
+            <th bgcolor="#B2B2B2">Default</th>
+            <th bgcolor="#B2B2B2">Description</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Plot'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(boolean scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>false</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Boolean controlling whether the window is displayed.</p></td>
+        </tr>     
+        
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Param'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(numeric scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>0.16 ('Blackman')</code><br/><code>0.5 ('Gaussian')</code><br/><code>3 ('Kaiser')</code><br/><code>0.5 ('Tukey')</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Control parameter for the Blackman, Gaussian, Kaiser, and Tukey windows.</p></td>
+        </tr>   
+
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Rotation'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(boolean scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>false</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Boolean controlling whether 2D and 3D windows are created via rotation or the outer product. Windows created via rotation will have edge values outside the window radius set to zero.</p></td>
+        </tr> 
+
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Symmetric'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(boolean scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>true</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Boolean controlling whether the window is symmetrical. If set to false, a window of length N + 1 is created and the first N points are returned.</p></td>
+        </tr> 
+
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Square'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(boolean scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>false</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Boolean controlling whether the window is forced to be square. If set to true and Nx and Nz are not equal, the window is created using the smaller variable, and then padded with zeros.</p></td>
+        </tr>             
+    </tbody>
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>win</code></p></td>
+        <td><p>window</p></td>
+    </tr>  
+
+    <tr valign="top">
+        <td><p><code>cg</code></p></td>
+        <td><p>coherent gain of the window</p></td>
+    </tr>     
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_pr_2D_tr_absorption_compensation.html">Image Reconstruction With Compensation For Acoustic Absorption</a></li>
+<li><a href="example_na_source_smoothing.html">Source Smoothing</a></li>               
+</ul>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="getSpacedPoints.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">getSpacedPoints</td>
+        <td>&nbsp;</td>
+        <td align="right">gradientFD</td>
+        <td align="right" width="20"><a href="gradientFD.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

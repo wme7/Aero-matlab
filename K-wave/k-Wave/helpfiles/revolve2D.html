@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>revolve2D :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="resize.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="saveTiffStack.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">revolve2D</h1>
+<p class="purpose">Form 3D matrix from revolution of 2D matrix</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+mat3D = revolve2D(mat2D)
+</pre>
+
+<h2>Description</h2>
+<p><code>revolve2D</code> revolves the values of a 2D matrix about the x axis (or matrix rows) to form a 3D matrix. A single point is taken as the x-axis origin, thus for an input matrix of size m by n, the output matrix will be m by (2n-1) by (2n-1). Values outside the interpolation range are set to zero. An example of revolving a 2D triangle is shown below.</p>
+
+<pre class="programlisting">
+% create a triangle in a 2D grid
+triangle = tril(ones(10, 10));
+
+% rotate in 3D
+triangle_3D = revolve2D(triangle);
+
+% plot the revolved triangle
+voxelPlot(triangle_3D);
+</pre>
+
+<p><img src="images/revolve2D_image_01.png" height="410" width="232"><img src="images/revolve2D_image_02.png" height="419" width="560"></p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>mat2D</code></p></td>
+        <td><p>2D input matrix</p></td>
+    </tr>        
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>mat3D</code></p></td>
+        <td><p>3D output matrix</p></td>
+    </tr>
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="matlab: doc interp1">interp1</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="resize.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">resize</td>
+        <td>&nbsp;</td>
+        <td align="right">saveTiffStack</td>
+        <td align="right" width="20"><a href="saveTiffStack.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

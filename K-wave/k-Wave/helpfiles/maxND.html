@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>maxND :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="makeTransducer.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="mendousse.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">maxND</h1>
+<p class="purpose">Return the value and indices of the largest value in an N-D array</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+max_val = maxND(mat)
+[max_val, ind] = maxND(mat)
+</pre>
+
+<h2>Description</h2>
+
+<p><code>maxND</code> returns the largest value in the N-D array given by <code>mat</code>. The indices of the largest value within the array can also be returned, where <code>ind = [ind_dim_1, ind_dim_2, ... , ind_dim_N]</code>. The indices can be used to directly address the largest value, i.e., <code>max_val = mat(ind)</code>. </p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>mat</code></p></td>
+        <td><p>input array</p></td>
+    </tr>  
+</table>
+    
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>max_val</code></p></td>
+        <td><p>largest value in <code>mat</code></p></td>
+    </tr>
+    <tr valign="top">
+        <td width = "150"><p><code>ind</code></p></td>
+        <td><p>array of indices corresponding to the location of the largest value in <code>mat</code></p></td>
+    </tr>    
+</table>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="makeTransducer.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">makeTransducer</td>
+        <td>&nbsp;</td>
+        <td align="right">mendousse</td>
+        <td align="right" width="20"><a href="mendousse.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

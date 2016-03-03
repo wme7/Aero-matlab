@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>makeTime :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="makeSphericalSection.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="makeTransducer.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">makeTime</h1>
+<p class="purpose">Create an evenly spaced array of time points</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+[t_array, dt] = makeTime(kgrid, c)
+[t_array, dt] = makeTime(kgrid, c, cfl)
+[t_array, dt] = makeTime(kgrid, c, cfl, t_end)
+[t_array, dt] = makeTime(kgrid, c, [], t_end)
+</pre>
+
+<h2>Description</h2>
+
+<p><code>makeTime</code> creates an evenly spaced array of time points for use with the k-Wave simulation codes based on the Courant-Friedrichs-Lewy stability level <code>cfl</code> and the grid size. The time-step <code>dt</code> is chosen based on the <code>cfl</code> level (the default setting is 0.3), and the number of time-steps is chosen based on the time it takes to travel from one corner of the grid specified by <code>kgrid</code> to the geometrically opposite corner. Note, if c is given as a matrix, the calculation for <code>dt</code> is based on the maximum value, and the calculation for <code>t_end</code>
+based on the minimum value.</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td><p><code>kgrid</code></p></td>
+        <td><p>k-Wave grid structure returned by <code><a href="makeGrid.html">makeGrid</a></code></p></td>
+    </tr>
+    <tr valign="top">
+        <td  width = "150"><p><code>c</code></p></td>
+        <td><p>maximum sound speed in the medium [m/s]</p></td>        
+    </tr>     
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>cfl</code></p></td>
+        <td><p>Courant-Friedrichs-Lewy stability criterion (default = 0.3)</p></td>        
+    </tr>   
+    <tr valign="top">
+        <td  width = "150"><p><code>t_end</code></p></td>
+        <td><p>maximum time [s]</p></td>        
+    </tr>   
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>t_array</code></p></td>
+        <td><p>array of evenly spaced time points [s]</p></td>
+    </tr>
+    <tr valign="top">
+        <td width = "150"><p><code>dt</code></p></td>
+        <td><p>time step [s]</p></td>
+    </tr>
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_ivp_recording_particle_velocity.html">Recording The Particle Velocity</a></li> 
+<li><a href="example_ivp_sensor_frequency_response.html">Defining A Gaussian Sensor Frequency Response</a></li>  
+<li><a href="example_ivp_comparison_modelling_functions.html">Comparison Of Modelling Functions</a></li>
+<li><a href="example_ivp_1D_simulation.html">Simulations In One Dimension</a></li> 
+<li><a href="example_tvsp_transducer_field_patterns.html">Simulating Transducer Field Patterns</a></li> 
+<li><a href="example_tvsp_steering_linear_array.html">Steering A Linear Array</a></li> 
+<li><a href="example_tvsp_snells_law.html">Snell's Law And Critical Angle Reflection</a></li> 
+<li><a href="example_tvsp_slit_diffraction.html">Diffraction Through A Slit</a></li> 
+<li><a href="example_sd_focussed_detector_2D.html">Focussed Detector in 2D</a></li> 
+<li><a href="example_sd_focussed_detector_3D.html">Focussed Detector in 3D</a></li>
+<li><a href="example_sd_directivity_modelling_3D.html">Modelling Sensor Directivity in 3D</a></li> 
+<li><a href="example_sd_sensor_directivity_2D.html">Sensor Element Directivity in 2D</a></li>
+<li><a href="example_sd_directional_array_elements.html">Focussed 2D Array with Directional Elements</a></li> 
+<li><a href="example_pr_2D_fft_line_sensor.html">2D FFT Reconstruction For A Line Sensor</a></li>   
+<li><a href="example_pr_3D_fft_planar_sensor.html">3D FFT Reconstruction For A Planar Sensor</a></li>   
+<li><a href="example_pr_2D_tr_line_sensor.html">2D Time Reversal For A Line Sensor</a></li>
+<li><a href="example_pr_2D_tr_circular_sensor.html">2D Time Reversal For A Circular Sensor</a></li>
+<li><a href="example_pr_3D_tr_planar_sensor.html">3D Time Reversal For A Planar Sensor</a></li> 
+<li><a href="example_pr_3D_tr_spherical_sensor.html">3D Time Reversal For A Spherical Sensor</a></li>              
+<li><a href="example_pr_2D_tr_directional_sensors.html">Image Reconstruction With Directional Sensors</a></li>       
+<li><a href="example_pr_2D_tr_bandlimited_sensors.html">Image Reconstruction With Bandlimited Sensors</a></li>
+<li><a href="example_pr_2D_tr_absorption_compensation.html">Image Reconstruction With Compensation For Acoustic Absorption</a></li> 
+<li><a href="example_na_filtering.html">Filtering A Delta Function Input Signal</a></li> 
+<li><a href="example_na_modelling_absorption.html">Modelling Power Law Absorption</a></li>
+<li><a href="example_na_optimising_performance.html">Optimising k-Wave Performance</a></li> 
+</ul>
+
+<h2>See Also</h2>
+
+<code><a href="makeGrid.html">makeGrid</a></code>, <code><a href="kspaceFirstOrder1D.html">kspaceFirstOrder1D</a></code>, <code><a href="kspaceFirstOrder2D.html">kspaceFirstOrder2D</a></code>, <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="makeSphericalSection.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">makeSphericalSection</td>
+        <td>&nbsp;</td>
+        <td align="right">makeTransducer</td>
+        <td align="right" width="20"><a href="makeTransducer.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

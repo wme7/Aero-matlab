@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>makeBall :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="logCompression.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="makeCartCircle.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">makeBall</h1>
+<p class="purpose">Create a binary map of filled ball within a 3D grid</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+ball = makeBall(Nx, Ny, Nz, cx, cy, cz, radius)
+ball = makeBall(Nx, Ny, Nz, cx, cy, cz, radius, plot_ball)
+</pre>
+
+<h2>Description</h2>
+
+<p><code>makeBall</code> creates a binary map of a filled ball within a three-dimensional grid (the ball position is denoted by 1's in the matrix with 0's elsewhere). A single grid point is taken as the disc centre thus the total diameter of the ball will always be an odd number of grid points. The plot that is displayed after calling <code>makeBall(64, 64, 64, 32, 32, 32, 20, true)</code> is given below.</p>
+
+<img src="images/makeBall_image_01.png" height="419" width="561">
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>Nx, Ny, Nz</code></p></td>
+        <td><p>size of the 3D grid [grid points]</p></td>
+    </tr>     
+    
+    <tr valign="top">
+        <td  width = "150"><p><code>cx, cy, cz</code></p></td>
+        <td><p>centre of the ball [grid points]</p></td>
+    </tr>     
+
+    <tr valign="top">
+        <td  width = "150"><p><code>radius</code></p></td>
+        <td><p>ball radius [grid points]</p></td>
+    </tr>     
+    
+</table>
+    
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>plot_ball</code></p></td>
+        <td><p>Boolean controlling whether the ball is plotted using <code><a href="voxelPlot.html">voxelPlot</a></code> (default = false)</p></td>
+    </tr>   
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>ball</code></p></td>
+        <td><p>3D binary map of a filled ball</p></td>
+    </tr>
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_ivp_3D_simulation.html">Simulations In Three Dimensions</a></li> 
+<li><a href="example_ivp_photoacoustic_waveforms.html">Photoacoustic Waveforms in 1D, 2D and 3D</a></li>
+<li><a href="example_pr_3D_fft_planar_sensor.html">3D FFT Reconstruction For A Planar Sensor</a></li>
+<li><a href="example_pr_3D_tr_planar_sensor.html">3D Time Reversal For A Planar Sensor</a></li>  
+<li><a href="example_pr_3D_tr_spherical_sensor.html">3D Time Reversal For A Spherical Sensor</a></li>
+</ul>
+
+<h2>See Also</h2>
+
+<code><a href="makeCircle.html">makeCircle</a></code>, <code><a href="makeDisc.html">makeDisc</a></code>, <code><a href="makeSphere.html">makeSphere</a></code> 
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="logCompression.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">logCompression</td>
+        <td>&nbsp;</td>
+        <td align="right">makeCartCircle</td>
+        <td align="right" width="20"><a href="makeCartCircle.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

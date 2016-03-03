@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>writeAttributes :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="voxelPlot.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="writeFlags.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">writeAttributes</h1>
+<p class="purpose">Write attributes to a k-Wave HDF5 file</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+writeAttributes(filename)
+writeAttributes(filename, file_description)
+</pre>
+
+<h2>Description</h2>
+<p><code>writeAttributes</code> writes a set of additional attributes to the HDF5 file specified by the user. These attributes specify the file version, k-Wave version, type, and so on, and are required by the k-Wave C++ simulation code. If the <code>file_description</code> is not specified, a description is generated based on computer username and MATLAB version.</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>filename</code></p></td>
+        <td><p>name of HDF5 file to write matrix to</p></td>
+    </tr>  
+    <tr valign="top">
+        <td><p><code>file_description</code></p></td>
+        <td><p>custom file description</p></td>
+    </tr>   
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="writeFlags.html">writeFlags</a></code>, <code><a href="writeGrid.html">writeGrid</a></code>, <code><a href="writeMatrix.html">writeMatrix</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="voxelPlot.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">voxelPlot</td>
+        <td>&nbsp;</td>
+        <td align="right">writeFlags</td>
+        <td align="right" width="20"><a href="writeFlags.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

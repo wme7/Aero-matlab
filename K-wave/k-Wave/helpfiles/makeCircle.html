@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>makeCircle :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="makeCartSphere.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="makeDisc.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">makeCircle</h1>
+<p class="purpose">Create a binary map of a circle within a 2D grid</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+circle = makeCircle(Nx, Ny, cx, cy, radius)
+circle = makeCircle(Nx, Ny, cx, cy, radius, arc_angle)
+circle = makeCircle(Nx, Ny, cx, cy, radius, arc_angle, plot_circle)
+</pre>
+
+<h2>Description</h2>
+
+<p><code>makeCircle</code> creates a binary map of a circle or arc (using the midpoint circle algorithm) within a two-dimensional grid (the circle position is denoted by 1's in the matrix with 0's elsewhere). A single grid point is taken as the circle centre thus the total diameter will always be an odd number of grid points. The plot that is displayed after calling <code>makeCircle(128, 128, 64, 64, 30, (215/180)*pi, true)</code> is given below.</p>
+
+<img src="images/makeCircle_image_01.png" height="420" width="561">
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>Nx, Ny</code></p></td>
+        <td><p>size of the 2D grid [grid points]</p></td>
+    </tr>     
+    
+    <tr valign="top">
+        <td  width = "150"><p><code>cx, cy</code></p></td>
+        <td><p>centre of the circle [grid points], if set to 0, the centre of the grid is used</p></td>
+    </tr>     
+
+    <tr valign="top">
+        <td  width = "150"><p><code>radius</code></p></td>
+        <td><p>circle radius [grid points]</p></td>
+    </tr>     
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>arc_angle</code></p></td>
+        <td><p>arc angle for incomplete circle [radians] (default = <code>2*pi</code>)</p></td>
+    </tr>     
+    <tr valign="top">
+        <td  width = "150"><p><code>plot_circle</code></p></td>
+        <td><p>Boolean controlling whether the circle is plotted using <code><a href="matlab: doc imagesc">imagesc</a></code> (default = false)</p></td>
+    </tr>  
+    
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>circle</code></p></td>
+        <td><p>2D binary map of a circle</p></td>
+    </tr>
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_ivp_binary_sensor_mask.html">Using A Binary Sensor Mask</a></li>    
+<li><a href="example_tvsp_transducer_field_patterns.html">Simulating Transducer Field Patterns</a></li> 
+<li><a href="example_sd_focussed_detector_2D.html">Focussed Detector in 2D</a></li>
+<li><a href="example_sd_directional_array_elements.html">Focussed 2D Array with Directional Elements</a></li> 
+<li><a href="example_pr_2D_tr_circular_sensor.html">2D Time Reversal For A Circular Sensor</a></li>
+<li><a href="example_pr_2D_tr_bandlimited_sensors.html">Image Reconstruction With Bandlimited Sensors</a></li>
+<li><a href="example_pr_2D_tr_absorption_compensation.html">Image Reconstruction With Compensation For Acoustic Absorption</a></li> 
+</ul>
+
+<h2>See Also</h2>
+
+<code><a href="makeCartCircle.html">makeCartCircle</a></code>, <code><a href="makeDisc.html">makeDisc</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="makeCartSphere.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">makeCartSphere</td>
+        <td>&nbsp;</td>
+        <td align="right">makeDisc</td>
+        <td align="right" width="20"><a href="makeDisc.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

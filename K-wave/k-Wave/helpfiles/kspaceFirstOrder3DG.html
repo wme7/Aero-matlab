@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>kspaceFirstOrder3DG :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="kspaceFirstOrder3DC.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="kspaceLineRecon.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">kspaceFirstOrder3DG</h1>
+<p class="purpose">3D time-domain simulation of wave propagation on a GPU using C++ CUDA code</p>
+
+<h2>Syntax</h2>
+
+See <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code>.
+
+<h2>Description</h2>
+<p><code>kspaceFirstOrder3DG</code> provides an blind interface to the native C++ CUDA version of <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code> (called <code>kspaceFirstOrder3D-CUDA</code>) in the same way as <code><a href="kspaceFirstOrder3DC.html">kspaceFirstOrder3DC</a></code>.</p>
+
+<p>The function works by appending the optional input <code>'SaveToDisk'</code> to the user inputs and then calling <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code> to save the input files to disk. The contents of <code>sensor.record</code> (if set) are  parsed as input flags, and the C++ code is run using the <code><a href="matlab: doc system">system</a></code> command. The output files are then automatically loaded from disk and returned in the same fashion as <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code>. The input and output files are saved to the temporary directory native to the operating system, and are deleted after the function runs.</p>
+
+<p>This function requires the C++ binary/executable of <code>kspaceFirstOrder3D-CUDA</code> to be downloaded from <a href="http://www.k-wave.org/download.php">www.k-wave.org/download.php</a> and placed in the "binaries" directory of the k-Wave toolbox.</p>
+
+<p>Note, not all input options are currently supported, and all display options are ignored (only command line outputs are given). See the k-Wave user manual for more information.</p>
+
+<h2>Optional Inputs</h2>
+
+<p>Optional 'string', value pairs that may be used to modify the default computational settings.</p>
+
+<table cellspacing="0" class="body" cellpadding="4" border="2">
+    <colgroup>
+        <col width="18%"><col width="18%"><col width="18%"><col width="46%">
+    </colgroup>
+    
+    <thead>
+        <tr valign="top">
+            <th bgcolor="#B2B2B2">Input</th>
+            <th bgcolor="#B2B2B2">Valid Settings</th>
+            <th bgcolor="#B2B2B2">Default</th>
+            <th bgcolor="#B2B2B2">Description</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'BinaryName'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(string)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>'kspaceFirstOrder3D-CUDA'</code> on linux and <code>'kspaceFirstOrder3D-CUDA.exe'</code> on windows</p></td>            
+            <td bgcolor="#F2F2F2"><p>Name of the binary file.</p></td>
+        </tr>     
+        
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'BinaryPath'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(string)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>'binaries/'</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Path of the binary file.</p></td>
+        </tr>   
+
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'DataName'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(string)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>'kwave_[input/output]_data_[date].h5'</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Prefix used to generate a custom name for the input and output data files (this is appended with <code>'_input.h5'<code> and <code>'_output.h5'<code>).</p></td>
+        </tr> 
+
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'DataPath'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(string)</em></p></td>
+            <td bgcolor="#F2F2F2"><p>path returned by <code>tempdir</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Location of the folder where the input and output HDF5 files should be stored.</p></td>
+        </tr> 
+
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'DeleteData'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(boolean scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>true</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Boolean controlling whether the input and output HDF5 files should be deleted after running the simulation.</p></td>
+        </tr>             
+    </tbody>
+</table>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="kspaceFirstOrder3DC.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">kspaceFirstOrder3DC</td>
+        <td>&nbsp;</td>
+        <td align="right">kspaceLineRecon</td>
+        <td align="right" width="20"><a href="kspaceLineRecon.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

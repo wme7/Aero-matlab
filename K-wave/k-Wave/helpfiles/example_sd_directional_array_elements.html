@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Focussed 2D Array with Directional Elements Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Focussed 2D Array with Directional Elements Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="example_sd_sensor_directivity_2D.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="k-wave_photoacoustic_image_reconstruction.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Focussed 2D Array with Directional Elements Example</h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Define a focussed array of directional elements</a></p>
+            <p><a href="#heading3">Using an infinitely wide line source</a></p>            
+            <p><a href="#heading4">Running the simulation </a></p>
+            <p><a href="#heading5">Plotting</a></p>
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example demonstrates the use of k-Wave to compute the outputs from a curved detector array which consists of several elements, each of which consists of a number of grid points.
+</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_sd_directional_array_elements.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_sd_directional_array_elements']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Define a focussed array of directional elements</h3>
+
+<p>To start with, a curved detector array is defined using the <code><a href="makeCircle.html">makeCircle</a></code> function.</p>
+
+<pre class="programlisting">
+% define a semicircular sensor centered on the grid
+semicircle_radius = 65; % [grid points]
+arc = makeCircle(Nx, Ny, Nx/2, Ny/2, semicircle_radius, pi);
+</pre>
+
+<p>The grid points making up this curved array are divided up between a number of elements. This is achieved by calculating the angles from each grid point to the focus of the array and grouping the grid points with similar angles.</p>
+
+<pre class="programlisting">
+% find total number and indices of the grid points constituting the
+% semicircle 
+arc_indices = find(arc == 1);
+Nv = length(arc_indices);
+
+% calculate angles between grid points in the arc and the centre of the grid
+arc_angles = atan((kgrid.y(arc_indices))./kgrid.x(arc_indices));
+
+% sort the angles into ascending order, and adjust the indices accordingly
+[sorted_arc_angles,sorted_index] = sort(arc_angles);
+sorted_arc_indices = arc_indices(sorted_index);
+
+% divide the semicircle into Ne separate sensor elements
+Ne = 13;
+sensor.mask = zeros(Nx,Ny);
+for loop = 1:Ne
+    
+    % the indices of the grid points belonging to one element.
+    % (There is a two grid point gap between the elements.)
+    grid point_indices = sorted_arc_indices(floor((loop-1)*Nv/Ne)+2:floor(loop*Nv/Ne)-1);
+    
+    % add the element to the sensor.mask
+    sensor.mask(grid point_indices) = 1;
+    
+end
+</pre>
+
+<img src="images/example_sd_directional_array_elements_01.png" height="420" width="561">
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Using an infinitely wide line source</h3>
+
+<p>To model a plane wave source parallel to one of the grid dimensions, two 
+steps are necessary. First, <code>source.p_mask</code> is set so that it 
+stretches across the domain.
+</p>
+
+<pre class="programlisting">
+source.p_mask = zeros(Nx,Ny);
+source.p_mask(140,:) = 1;
+</pre>
+
+<p>Secondly, the inputs to the simulation are set so that the perfectly matched 
+layer is turned off on the two sides that <code>source.p_mask</code> meets.
+</p>
+
+<pre class="programlisting">
+input_args = {'PMLAlpha', [2 0], 'DisplayMask', display_mask, 'PlotScale', [-0.75 0.75]};
+</pre>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading4"></a>
+<h3 class="title">Running the simulation</h3>
+
+<p>The simulation is run and the time series are measured for every non-zero 
+grid point in <code>sensor.mask</code>. These time series are then allocated to 
+their relevant elements, and averaged together.</p>
+
+<pre class="programlisting">
+sensor_data = kspaceFirstOrder2D(kgrid, medium, source, sensor, input_args{:});
+
+% split up the data, recorded on all the grid points, between the elements
+element_data = zeros(Ne,Nt);
+for loop = 1:Ne
+    
+    % the indices of the sensor grid points in the sensor mask
+    sensor_indices = find(sensor.mask==1);
+    
+    % the indices of the grid points belonging to one element.
+    grid point_indices = sorted_arc_indices(floor((loop-1)*Nv/Ne)+2:floor(loop*Nv/Ne)-1);
+    
+    % indices of sensor_data that refer to the data for this element
+    data_indices = zeros(length(grid point_indices),1);
+    for loop2 = 1:length(grid point_indices)
+        data_indices(loop2) = find(sensor_indices == grid point_indices(loop2));
+    end    
+
+    % for one element per loop, average the time series from each of the
+    % element's grid points to give one time series for the whole element
+    element_data(loop,:) = mean(sensor_data(data_indices,:),1);
+    
+end
+</pre>
+
+<img src="images/example_sd_directional_array_elements_02.png" height="420" width="561">
+
+<p>The time series corresponding to the different elements are plotted. The 
+directionality introduced by the large size of the detector (because it 
+averages the incoming wave over its area) is clearly seen.
+</p>
+
+<img src="images/example_sd_directional_array_elements_03.png" height="420" width="561">
+    
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="example_sd_sensor_directivity_2D.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Sensor Element Directivity in 2D</td>
+        <td>&nbsp;</td>
+        <td align="right">Photoacoustic Image Reconstruction</td>
+        <td align="right" width="20"><a href="k-wave_photoacoustic_image_reconstruction.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

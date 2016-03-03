@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>makeSphericalSection :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="makeSphere.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="makeTime.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">makeSphericalSection</h1>
+<p class="purpose">Create a binary map of a sphere segment within a 3D grid</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+ss = makeSphericalSection(radius, height)
+ss = makeSphericalSection(radius, height, width)
+ss = makeSphericalSection(radius, height, width, plot_section)
+ss = makeSphericalSection(radius, height, [], plot_section)
+ss = makeSphericalSection(radius, height, width, plot_section, binary)
+ss = makeSphericalSection(radius, height, [], [] binary)
+
+[ss, dist_map] = makeSphericalSection(radius, height)
+[ss, dist_map] = makeSphericalSection(radius, height, width)
+[ss, dist_map] = makeSphericalSection(radius, height, [], plot_section)
+[ss, dist_map] = makeSphericalSection(radius, height, width, plot_section)
+[ss, dist_map] = makeSphericalSection(radius, height, width, plot_section, binary)
+[ss, dist_map] = makeSphericalSection(radius, height, [], [] binary)
+</pre>
+
+<h2>Description</h2>
+
+<p><code>makeSphericalSection</code> creates a binary map of a section of a spherical surface within a three-dimensional matrix. The sphere is created using an extension of the midpoint circle algorithm. A single grid point is taken as the sphere center so the total diameter will always be an odd number of grid points. The sphere is then truncated based on the values for height and width (a diagram of the input sizes is given below). The face of the spherical section faces in the positive x-direction and the optional width parameter truncates the size in the y-direction.</p>
+
+<p><img src="images/makeSphericalSection_image_01.png" height="346" width="376"></p>
+
+<p>If the optional input parameter <code>binary</code> is set to <code>false</code> (the default), the section map is returned as a double precision matrix. If it is set to <code>true</code>, the map is returned as a logical matrix. The average distance between each grid point in the spherical section and its contiguous neighbours can also be returned. This is given as a ratio compared to the average neighbour distance for a flat surface.</p>
+
+<h2>Examples</h2>
+
+<pre class="programlisting">
+makeSphericalSection(25, 6, 15, true);
+</pre>
+
+<p><img src="images/makeSphericalSection_image_02.png" height="419" width="561"></p>
+
+<pre class="programlisting">
+makeSphericalSection(50, 20, [], true);
+</pre>
+
+<p><img src="images/makeSphericalSection_image_03.png" height="419" width="561">    </p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>radius</code></p></td>
+        <td><p>radius of curvature [grid points]</p></td>
+    </tr>     
+    
+    <tr valign="top">
+        <td  width = "150"><p><code>height</code></p></td>
+        <td><p>transducer height [grid points]</p></td>
+    </tr>     
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>width</code></p></td>
+        <td><p>section width (must be specified as an odd number) [grid points]</p></td>
+    </tr>
+    
+    <tr valign="top">
+        <td  width = "150"><p><code>plot_section</code></p></td>
+        <td><p>Boolean controlling whether the spherical section is plotted using <code><a href="voxelPlot.html">voxelPlot</a></code> (default = <code>false</code>)</p></td>
+    </tr>   
+    
+    <tr valign="top">
+        <td  width = "150"><p><code>binary</code></p></td>
+        <td><p>Boolean controlling whether the spherical section is returned as a double precision matrix (<code>false</code>) or a logical matrix (<code>true</code>) (default = <code>false</code>)</p></td>
+    </tr>     
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>ss</code></p></td>
+        <td><p>binary matrix containing spherical section</p></td>
+    </tr>
+    
+<tr valign="top">
+        <td width = "150"><p><code>dist_map</code></p></td>
+        <td><p>ratio of average neighbour distance for each grid point within the spherical section compared to a flat surface</p></td>
+    </tr>    
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="makeBall.html">makeBall</a></code>, <code><a href="makeSphere.html">makeSphere</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="makeSphere.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">makeSphere</td>
+        <td>&nbsp;</td>
+        <td align="right">makeTime</td>
+        <td align="right" width="20"><a href="makeTime.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

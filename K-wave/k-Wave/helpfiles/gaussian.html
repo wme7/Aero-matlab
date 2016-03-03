@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>gaussian :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="fwhm.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="gaussianFilter.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">gaussian</h1>
+<p class="purpose">Create a Gaussian distribution</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+gauss_distr = gaussian(x)
+gauss_distr = gaussian(x, magnitude)
+gauss_distr = gaussian(x, magnitude, mean)
+gauss_distr = gaussian(x, magnitude, mean, variance)
+</pre>
+
+<h2>Description</h2>
+<p><code>gaussian</code> returns a Gaussian distribution f(x) with the specified magnitude, mean, and variance. If these values are not specified, the magnitude is normalised and values of variance = 1 and mean = 0 are used. For example running</p>
+
+<pre class="programlisting">
+x = -3:0.05:3;
+plot(x, gaussian(x));
+</pre>
+
+<p>will plot a normalised Gaussian distribution.</p>
+
+<p><img src="images/gaussian_image_01.png" height="420" width="561"></p>
+
+<p>Note, the full width at half maximum of the resulting distribution can be calculated by <code>FWHM = 2 * sqrt(2 * log(2) * variance)</code>.</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>x</code></p></td>
+        <td><p>x-axis variable</p></td>
+    </tr>       
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>magnitude</code></p></td>
+        <td><p>bell height (default = normalised)</p></td>
+    </tr> 
+    <tr valign="top">
+        <td  width = "150"><p><code>mean</code></p></td>
+        <td><p>mean or expected value (default = 0)</p></td>
+    </tr> 
+    <tr valign="top">
+        <td  width = "150"><p><code>variance</code></p></td>
+        <td><p>variance ~ bell width (default = 1)</p></td>
+    </tr>     
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>gauss_distr</code></p></td>
+        <td><p>Gaussian distribution</p></td>
+    </tr>       
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="getWin.html">getWin</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="fwhm.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">fwhm</td>
+        <td>&nbsp;</td>
+        <td align="right">gaussianFilter</td>
+        <td align="right" width="20"><a href="gaussianFilter.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Attenuation Compensation Using Time Reversal Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Attenuation Compensation Using Time Reversal Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="example_pr_2D_tr_iterative.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="example_pr_2D_tr_time_variant_filtering.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Attenuation Compensation Using Time Reversal Example</h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Running the forward simulation</a></p>
+            <p><a href="#heading3">Selecting the regularisation parameters</a></p>
+			<p><a href="#heading4">Time reversal image reconstruction</a></p>
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example demonstrates how the acoustic attenuation present in photoacoustic forward problem can be compensated for using time reversal image reconstruction. It builds on the <a href="example_pr_2D_tr_circular_sensor.html">2D Time Reversal Reconstruction For A Circular Sensor Example</a>.</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_pr_2D_TR_absorption_compensation.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_pr_2D_TR_absorption_compensation']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p>For a more detailed discussion of this example and the underlying techniques, see B. E. Treeby, E. Z. Zhang, and B. T. Cox, "Photoacoustic tomography in absorbing acoustic media using time reversal," <em>Inverse Problems</em>, vol. 26, no. 11, p. 115003, 2010.</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Running the forward simulation</h3>
+
+<p>The sensor data is simulated using <code><a href="kspaceFirstOrder2D.html">kspaceFirstOrder2D</a></code> in a similar manner to previous examples. The initial pressure is set to the Shepp Logan phantom and a circular Cartesian sensor mask with 200 sensor points is used to record the data. After simulation, random Gaussian noise is added using <code><a href="addNoise.html">addNoise</a></code> to give a signal to noise ratio of 40dB (based on the peak of the recorded signal and the rms noise level).</p>
+
+<pre class="programlisting">
+% run the forward simulation
+sensor_data = kspaceFirstOrder2D(kgrid, medium, source, sensor, input_args{:});
+
+% add noise to the recorded sensor data
+signal_to_noise_ratio = 40;	% [dB]
+sensor_data = addNoise(sensor_data, signal_to_noise_ratio, 'peak');
+</pre>
+
+<a name="heading3"></a>
+<h3 class="title">Selecting the regularisation parameters</h3>
+
+<p>To compensate for the acoustic attenuation in the forward problem, the absorption parameter must be reversed in sign (the frequency content must grow rather than decay). This is achieved by setting <code>medium.alpha_sign</code> to <code>[-1, 1]</code>. The two inputs control the sign of the absorption and dispersion parameters, respectively. The dispersion parameter (which controls the dependence of the sound speed on frequency) should not be reversed because if the high frequency components of the wave field have travelled to the detector faster than the low frequency components (as is the case for photoacoustic signals in biological tissue), they again need to travel faster than the low frequency components in the time reversal reconstruction to regain their initial position within the medium.</p>
+
+<p>If a photoacoustic image is reconstructed from real or noisy data with the absorption parameter reversed, the high frequency content (where the signal to noise ratio is typically quite low) can quickly grow to mask the low frequency content, effectively obscuring the desired features within the reconstructed image. This is because, as the waves propagate, the high frequencies are increased at a much faster rate (recall the acoustic attenuation in soft biological tissue follows a frequency power law). To avoid this, the absorption and dispersion parameters are filtered using a frequency domain Tukey window. This regularises the reconstruction (in effect, stops it from 'blowing up') by restricting the range of frequencies that are allowed to grow. The filter is applied to the absorption parameters by assigning it to <code>medium.alpha_filter</code>. The filter must have the same number of dimensions and grid points as <code>kgrid.k</code>.</p>
+
+<p>To choose an appropriate filter cutoff frequency, the average power spectrum of the simulated sensor data is computed. This is plotted below (shown in black), along with the power spectrum of the signal recorded at the first sensor point (shown in red). In this example, the filter cutoff frequency (shown as the left dashed line in the figure) is chosen based on the noise floor observable in the power spectrum. The maximum frequency supported by the grid is also shown (right dashed line in the figure).</p>
+
+<p><img src="images/example_pr_2D_tr_absorption_compensation_01.png" height="420" width="561"></p>
+<p></p>
+
+<p>Here, a symmetric Tukey window (or tapered cosine window) scaled to a particular frequency cutoff is used so that the correct power law absorption and dispersion characteristics are maintained within the filter pass band. The filter is created using <code><a href="getAlphaFilter.html">getAlphaFilter</a></code> which creates the filter using <code><a href="getWin.html">getWin</a></code> via rotation.</p> 
+
+<pre class="programlisting">
+% define the cutoff frequency for the filter
+f_cutoff = 3e6;
+
+% create the filter to regularise the absorption parameters
+medium.alpha_filter = getAlphaFilter(kgrid_recon, medium, f_cutoff);
+
+% reverse the sign of the absorption proportionality coefficient
+medium.alpha_sign = [-1, 1];        % [absorption, dispersion];
+</pre>
+
+<p>A visualisation of the filter is given below.</p>
+
+<p><img src="images/example_pr_2D_tr_absorption_compensation_02.png" height="420" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading4"></a>
+<h3 class="title">Time reversal image reconstruction</h3>
+
+<p>The initial pressure distribution, and the reconstructions with and without compensation for acoustic attenuation are shown below. Profiles through x = 0 are also shown for comparison. Without correction for attenuation, the edges of the reconstructed pressure become blurred, and the overall magnitude is reduced. When compensation for acoustic attenuation is included into the reconstruction, the sharpness and magnitude of the reconstructed pressure is considerably improved. Due to the band-limited frequency response of the sensors (high frequencies are not detected because their magnitudes are below the noise floor of the added noise), the reconstruction is unable to completely recover the frequency content of the initial pressure distribution. This results in Gibbs phenomenon appearing in the reconstruction where there are sharp changes in gradient.</p>
+
+<p><img src="images/example_pr_2D_tr_absorption_compensation_03.png" height="577" width="606">
+<img src="images/example_pr_2D_tr_absorption_compensation_04.png" height="419" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="example_pr_2D_tr_iterative.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Iterative Image Improvement Using Time Reversal</td>
+        <td>&nbsp;</td>
+        <td align="right">Attenuation Compensation Using Time Variant Filtering</td>
+        <td align="right" width="20"><a href="example_pr_2D_tr_time_variant_filtering.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

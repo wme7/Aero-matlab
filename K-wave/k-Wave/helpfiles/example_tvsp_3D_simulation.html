@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Simulations In Three Dimensions Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Simulations In Three Dimensions Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="example_tvsp_slit_diffraction.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="k-wave_sensor_directivity.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Simulations In Three Dimensions Example</h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Defining the time varying pressure source</a></p>
+            <p><a href="#heading3">Running the simulation</a></p>
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example provides a simple demonstration of using k-Wave for the simulation and detection of a time varying pressure source within a three-dimensional heterogeneous propagation medium. It builds on the <a href="example_tvsp_homogeneous_medium_monopole.html">Monopole Point Source In A Homogeneous Propagation Medium Example</a>  and <a href="example_ivp_3D_simulation.html">Simulations In Three Dimensions</a> examples.</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_tvsp_3D_simulation.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_tvsp_3D_simulation']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Defining the time varying pressure source</h3>
+
+<p>As in one and two dimensions, a time varying pressure source is defined by assigning a binary matrix (i.e., a matrix of 1's and 0's with the same dimensions as the computational grid) to <code>source.p_mask</code>, where the 1's represent the grid points that form part of the source. The time varying input signal is then assigned to <code>source.p</code>. This can have any number of time points (it doesn't need to be the same length as <code>kgrid.t_array</code>) and can be defined as either a single time series (in which case it is applied to all of the source points), or a matrix of time series following the source points using MATLAB's standard column-wise linear matrix index ordering. Here a sinusoidal input is assigned to a square source element. To avoid aliasing, the input should first be filtered using <code><a href="filterTimeSeries.html">filterTimeSeries</a></code> (see the <a href="example_na_filtering.html">Filtering A Delta Function Input Signal Example</a> for more information).</p>
+
+<pre class="programlisting">
+% define a square source element
+source_radius = 5;  % [grid points]
+source.p_mask = zeros(Nx, Ny, Nz);
+source.p_mask(Nx/4, Ny/2 - source_radius:Ny/2 + source_radius, Nz/2 - source_radius:Nz/2 + source_radius) = 1;
+
+% define a time varying sinusoidal source
+source_freq = 2e6;  % [Hz]
+source_mag = 1;     % [Pa]
+source.p = source_mag*sin(2*pi*source_freq*kgrid.t_array);
+
+% smooth the source
+source.p = filterTimeSeries(kgrid, medium, source.p);
+</pre>
+
+<p>A plot of the source and sensor masks using <code><a href="voxelPlot.html">voxelPlot</a></code> is shown below.</p>
+
+<p><img src="images/example_tvsp_3D_simulation_01.png" height="420" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Running the simulation</h3>
+
+<p>To allow visualisation of the source elements within the grid, the source mask is assigned to the optional input parameter <code>'DisplayMask'</code>. This mask is overlaid onto the plot during the simulation. The optional input <code>'DataCast'</code> is also set to <code>'single'</code> to reduce the computation time.</p>
+
+<pre class="programlisting">
+% input arguments
+input_args = {'DisplayMask', source.p_mask, 'DataCast', 'single'};
+
+% run the simulation
+sensor_data = kspaceFirstOrder3D(kgrid, medium, source, sensor, input_args{:});
+</pre>
+
+<p>A plot of the display during simulation is shown below.</p>
+
+<p><img src="images/example_tvsp_3D_simulation_02.png" height="420" width="561"></p>
+
+<p>The effective visualisation of three-dimensional matrix data remains an important part of data exploration and presentation. An animated slice-by-slice visualisation of the final pressure field can be viewed using <code><a href="flyThrough.html">flyThrough</a></code>.</p>
+
+<pre class="programlisting">
+% view final pressure field slice by slice
+flyThrough(p_final);
+</pre>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="example_tvsp_slit_diffraction.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Diffraction Through A Slit</td>
+        <td>&nbsp;</td>
+        <td align="right">Sensor Directivity</td>
+        <td align="right" width="20"><a href="k-wave_sensor_directivity.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

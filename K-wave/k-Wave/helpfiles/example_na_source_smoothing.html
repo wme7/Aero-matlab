@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Source Smoothing Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Source Smoothing Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="example_na_controlling_the_pml.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="example_na_filtering.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Source Smoothing Example</h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Bandlimited interpolation</a></p>
+            <p><a href="#heading3">Reducing visible oscillations via source smoothing</a></p>
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example illustrates how spatial smoothing can be used to reduce discrete sampling artifacts.</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_na_source_smoothing.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_na_source_smoothing']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p>For a more detailed discussion of this example, see Treeby, B. E. and Cox, B. T., "A k-space Green's function solution for acoustic initial value problems in homogeneous media with power law absorption," <em>J. Acoust. Soc. Am.</em>, vol. 129, no. 6, pp. 3652-3660, 2011.</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Bandlimited interpolation</h3>
+
+<p>When an initial pressure distribution with sharp gradients is used within k-Wave, oscillations that are not intuitively expected can appear in the numerical solution for the pressure field. The occurrence of these oscillations can be understood by considering the initial pressure distribution as the discrete sampling of a truncated Fourier series with a finite number of expansion coefficients (this continuous distribution is often called the band limited interpolant). It is this band-limited interpolant that is propagated in Fourier space, thus when the function is discretely sampled at the grid nodes, oscillations can appear in the solution. This is illustrated below where the discrete pressure is shown with a stem plot and the band limited interpolant overlaid with a solid line.</p>
+
+<p><img src="images/example_na_source_smoothing_01.png" height="420" width="561"></p>
+
+<p>Oscillations of this type are not unique to the solution method used in k-Wave. They are similarly encountered in other spectral methods in which the discretisation of the computational domain causes the corresponding Fourier space to become discrete and bounded (i.e., there is a finite number of spatial wavenumbers the computational grid can support).</p>  
+    
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Reducing visible oscillations via source smoothing</h3>
+<p>The occurrence of oscillations is deterministic and intrinsic to the representation of the wavefield in a truncated Fourier basis. However, in some situations a practical method of reducing the visible oscillations may be desirable. For example, in many cases the discrete initial conditions represent an approximation to a continuous function for which the analogous pressure field does not contain any oscillations. The oscillations can be reduced by changing the characteristics of the band-limited interpolant by applying a window in the spatial frequency domain. This modifies the properties of the bounded Fourier space by forcing the expansion coefficients to decay. Selecting the most appropriate window requires a trade off between maintaining an acceptable main lobe width (which affects the amount of smoothing) whilst minimising the side lobe levels (which affects the observable oscillations). Note, the rectangular window is equivalent to the unwindowed case and produces the smallest possible main lobe width.</p>
+
+<p>The figure below illustrates the initial pressure distribution, recorded time series, and the corresponding amplitude spectrum for the propagation of a spatial impulse in one dimension. The middle and lower panels show the same example with the initial pressure smoothed using frequency domain Hanning and Blackman windows, respectively. The magnitudes of the smoothed initial pressure distributions have been corrected by the corresponding coherent gain of the windows. The Blackman window has a lower side lobe level and thus the oscillations are less apparent. However, it also has a larger main lobe width and thus the spatial delta function appears more heavily smoothed. Both windows have high side-lobe roll-off rates so the oscillations decay quickly away from the peak. A large number of other variations are also possible by choosing from the families of existing window functions. For minimising oscillations, the Blackman family of windows is a good choice. This is the default window used by <code><a href="smooth.html">smooth</a></code> which is used by default on <code>source.p0</code> within the k-Wave simulation functions.</p>
+
+<p><img src="images/example_na_source_smoothing_02.png" height="803" width="972"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+    
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="example_na_controlling_the_pml.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Controlling The Absorbing Boundary Layer</td>
+        <td>&nbsp;</td>
+        <td align="right">Filtering A Delta Function Input Signal</td>
+        <td align="right" width="20"><a href="example_na_filtering.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

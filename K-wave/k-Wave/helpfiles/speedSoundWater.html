@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>speedSoundWater :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="spect.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="stackedPlot.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">speedSoundWater</h1>
+<p class="purpose">Calculate the speed of sound in water with temperature</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+c = speedSoundWater(T)
+</pre>
+
+<h2>Description</h2>
+<p><code>speedSoundWater</code> calculates the speed of sound in distilled water at a given temperature using the 5th order polynomial given by Marczak (1997, Water as a standard in the measurements of speed of sound in liquids, J. Acoust. Soc. Am., 102, 2776-2779).</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>T</code></p></td>
+        <td><p>water temperature [degC]</p></td>        
+    </tr>         
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>c</code></p></td>
+        <td><p>speed of sound [m/s]</p></td>
+    </tr>
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="attenuationWater.html">attenuationWater</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="spect.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">spectrum</td>
+        <td>&nbsp;</td>
+        <td align="right">stackedPlot</td>
+        <td align="right" width="20"><a href="stackedPlot.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

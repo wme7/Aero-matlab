@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>fitPowerLawParams :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="findClosest.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="flyThrough.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">fitPowerLawParams</h1>
+<p class="purpose">Fit power law absorption parameters for highly absorbing media</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+[a0_fit, y_fit] = fitAbsorptionValues(a0, y, c0, f_min, f_max)
+[a0_fit, y_fit] = fitAbsorptionValues(a0, y, c0, f_min, f_max, plot_fit)
+</pre>
+
+<h2>Description</h2>
+
+<p><code>fitPowerLawParams</code> calculates the absorption parameters that
+should be defined in the simulation functions given the desired power law absorption behaviour defined by <code>a0</code> and <code>y</code>. This takes into account the actual absorption behaviour exhibited by the fractional Laplacian wave equation.</p>
+
+<p>This fitting is required when using large absorption values or high frequencies, as the fractional Laplacian wave equation solved in <code><a href="kspaceFirstOrder1D.html">kspaceFirstOrder1D</a></code>, <code><a href="kspaceFirstOrder2D.html">kspaceFirstOrder2D</a></code>, <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code>, and <code><a href="kspaceSecondOrder.html">kspaceSecondOrder</a></code> no longer encapsulates absorption of the form a = a0*f^y.</p>
+
+<p>The returned values should be used to define the <code>medium.alpha_coeff</code> and <code>medium.alpha_power</code> within the simulation functions. The absorption behaviour over the frequency range <code>f_min:f_max</code> will then follow the power law defined by <code>a0</code> and <code>y</code>.</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>a0</code></p></td>
+        <td><p>desired power law absorption prefactor [dB/(MHz^y cm)]</code></p></td>
+    </tr>    
+
+    <tr valign="top">
+        <td width = "150"><p><code>y</code></p></td>
+        <td><p>desired power law exponent</p></td>
+    </tr> 
+	
+	<tr valign="top">
+        <td width = "150"><p><code>c0</code></p></td>
+        <td><p>medium sound speed [m/s]</p></td>
+    </tr>  
+	
+	<tr valign="top">
+        <td width = "150"><p><code>f_min</code></p></td>
+        <td><p>minimum frequency of interest [Hz]</p></td>
+    </tr>  
+    
+	<tr valign="top">
+        <td width = "150"><p><code>f_max</code></p></td>
+        <td><p>maximum frequency of interest [Hz]</p></td>
+    </tr>    
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>plot_fit</code></p></td>
+        <td><p>boolean controlling whether the final fit is displayed (default = false)</p></td>
+    </tr>    
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>a0_fit</code></p></td>
+        <td><p>power law absorption prefactor that should be used to define <code>medium.alpha_coeff</code> in the simulation functions</p></td>
+    </tr>
+    <tr valign="top">
+        <td width = "150"><p><code>y_fit</code></p></td>
+        <td><p>power law exponent that should be used to define <code>medium.alpha_power</code> in the simulation functions</p></td>
+    </tr>    
+</table>		
+
+<h2>See Also</h2>
+
+<p><code><a href="kspaceFirstOrder1D.html">kspaceFirstOrder1D</a></code>, <code><a href="kspaceFirstOrder2D.html">kspaceFirstOrder2D</a></code>, <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="findClosest.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">findClosest</td>
+        <td>&nbsp;</td>
+        <td align="right">flyThrough</td>
+        <td align="right" width="20"><a href="flyThrough.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

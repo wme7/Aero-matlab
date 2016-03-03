@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>getColorMap :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="getBLI.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="getDateString.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">getColorMap</h1>
+<p class="purpose">Return default k-Wave color map</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+cm = getColorMap()
+cm = getColorMap(num_colors)
+</pre>
+
+<h2>Description</h2>
+<p><code>getColorMap</code> returns the default color map used for display and visualisation across the k-Wave Toolbox. Zero values are displayed as white, positive values are displayed as yellow through red to black, and negative values are displayed as light to dark blue-greys. If no value for <code>num_colors</code> is provided, <code>cm</code> will have 256 colors.</p>
+
+<img src="images/getColorMap_image_01.png" height="70" width="561">
+<p></p>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>num_colors</code></p></td>
+        <td><p>number of colors in the color map (default = <code>256</code>)</p></td>
+    </tr>
+</table>
+    
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>cm</code></p></td>
+        <td><p>three column color map matrix which can be applied using <code><a href="matlab: doc colormap">colormap</a></code></p></td>
+    </tr>
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="matlab: doc colormap">colormap</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="getBLI.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">getBLI</td>
+        <td>&nbsp;</td>
+        <td align="right">getDateString</td>
+        <td align="right" width="20"><a href="getDateString.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

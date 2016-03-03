@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Saving Movie Files Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Saving Movie Files Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="example_ivp_heterogeneous_medium.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="example_ivp_recording_particle_velocity.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Saving Movie Files Example</h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Setting the 'RecordMovie' flag</a></p>
+            <p><a href="#heading3">Controlling the movie settings</a></p>
+	    	<p><a href="#heading4">Changing additional display settings</a></p>
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example demonstrates how to save the simulation animations as a movie. It builds on the <a href="example_ivp_heterogeneous_medium.html">Heterogeneous Propagation Medium Example</a>.</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_ivp_saving_movie_files.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_ivp_saving_movie_files']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Setting the 'RecordMovie' flag</h3>
+
+<p>In the preceding example, the optional inputs <code>'PlotLayout'</code> and <code>'PlotPML'</code> were used to change the default behaviour of <code><a href="kspaceFirstOrder2D.html">kspaceFirstOrder2D</a></code>. 
+Here several other optional inputs are used to save the simulation animation to a movie file. 
+By setting <code>'RecordMovie'</code> to <code>true</code>, the displayed image frames are saved and exported as a movie with a date and time stamped filename. 
+A user defined filename can also be given by setting the <code>'MovieName'</code> input to a string. 
+The movie frames are captured using <code><a href="matlab: doc getframe">getframe</a></code> and converted to an avi file using <code><a href="matlab: doc movie2avi">movie2avi</a></code>. 
+In 2D, the movie frames can alternatively be captured using <code><a href="matlab: doc im2frame">im2frame</a></code> by setting the optional input <code>'MovieType'</code> to <code>'image'</code> (the default setting is <code>'frame'</code>). 
+In this case, the size of the movie will depend on the size of the simulation grid. Note, when using <code><a href="matlab: doc getframe">getframe</a></code> (the default setting), if other windows are moved in front of the simulation window, these will also be captured!</p>
+
+<pre class="programlisting">
+% set the input arguments
+input_args = {'RecordMovie', true, 'MovieType', 'image', 'MovieName', 'example_movie'};
+
+% run the simulation
+sensor_data = kspaceFirstOrder2D(kgrid, medium, source, sensor, input_args{:});
+</pre>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Controlling the movie settings</h3>
+
+<p>As the movie frames mimic the frames used for the simulation animation, the properties of the movie can be controlled by changing the animation settings. For example, the image scaling can be set using <code>'PlotScale'</code>, and the number of iterations which must pass before the simulation plot is updated can be controlled via <code>'PlotFreq'</code>. Note, the default color map used for the animation has zero set to white (see <code><a href="getColorMap.html">getColorMap</a></code>), thus using a scaling parameter set to [-a, a] will give the best visual results. </p>
+    
+<pre class="programlisting">
+% set the input arguments
+input_args = {..., 'PlotScale', [-2, 2], 'PlotFreq', 5, ...};
+</pre>
+
+<p>Optional inputs can also be passed directly to <code><a href="matlab: doc movie2avi">movie2avi</a></code> via <code>'MovieArgs'</code>. An example of changing the default frame rate is given below.</p>
+
+<pre class="programlisting">
+% set the input arguments
+input_args = {..., 'MovieArgs', {'fps', 30}, ...};
+</pre>
+
+<p>The movies are saved in the same directory as the example m-file.</p> 
+
+<p>Note, by default, k-Wave sets <code>'Compression'</code> to <code>'Cinepak'</code> for 32-bit Windows, and <code>'None'</code> for 64-bit Windows and Unix. However, if the compression is set to <code>'None'</code>, the generated video files can become very large. To reduce the size after the movie is created, the open source package <a href="http://handbrake.fr/">Hand Brake</a> can be used to compress and covert the files.</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading4"></a>
+<h3 class="title">Changing additional display settings</h3>
+
+<p>A wide range of different visualisations can be produced by modifying additional input parameters. 
+For example, a mesh plot can be produced instead of an image plot by setting <code>'MeshPlot'</code> to <code>true</code> (supported in 2D only), the display mask can be customised or switched off using <code>'DisplayMask'</code>, and the visibility of the PML can be controlled using <code>'PlotPML'</code>. 
+If no sensor output is required, the sensor input can also be left blank using an empty array.</p> 
+
+<pre class="programlisting">
+% set the input arguments
+input_args = {..., 'MeshPlot', true, 'DisplayMask', 'off', 'PlotPML', false, ...};
+
+% run the simulation without a sensor input
+kspaceFirstOrder2D(kgrid, medium, source, [], input_args{:});
+</pre>
+
+<p>Note, if you see a blank movie when using the option <code>'MeshPlot'</code> set to  <code>true</code>, this can sometimes be solved by running the command <code>opengl('software')</code>. This forces MATLAB to use software OpenGL rendering instead of hardware OpenGL.</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="example_ivp_heterogeneous_medium.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Heterogeneous Propagation Medium</td>
+        <td>&nbsp;</td>
+        <td align="right">Recording The Particle Velocity</td>
+        <td align="right" width="20"><a href="example_ivp_recording_particle_velocity.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

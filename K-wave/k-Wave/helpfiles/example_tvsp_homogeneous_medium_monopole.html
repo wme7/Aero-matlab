@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Monopole Point Source In A Homogeneous Propagation Medium Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Monopole Point Source In A Homogeneous Propagation Medium Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="k-wave_time_varying_source_problems.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="example_tvsp_homogeneous_medium_dipole.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Monopole Point Source In A Homogeneous Propagation Medium Example</h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Defining the time varying pressure source</a></p>
+            <p><a href="#heading3">Source filtering</a></p>
+            <p><a href="#heading4">Running the simulation</a></p>
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example provides a simple demonstration of using k-Wave for the simulation and detection of a time varying pressure source within a two-dimensional homogeneous propagation medium. It builds on the <a href="example_ivp_homogeneous_medium.html">Homogeneous Propagation Medium</a> and <a href="example_ivp_recording_particle_velocity.html">Recording The Particle Velocity</a> examples.</p> 
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_tvsp_homogeneous_medium_monopole.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_tvsp_homogeneous_medium_monopole']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+
+<a name="heading2"></a>
+<h3 class="title">Defining the time varying pressure source</h3>
+
+<p>In the <a href="k-wave_initial_value_problems.html">Initial Value Problem</a> examples, the initial pressure distribution is defined by assigning the source values to <code>source.p0</code>. To define a time varying pressure source, both a source mask (which defines which grid points belong to the source) and a time varying source input must be assigned. The source mask is defined by assigning a binary matrix (i.e., a matrix of 1's and 0's with the same dimensions as the computational grid) to <code>source.p_mask</code>, where the 1's represent the grid points that form part of the source. The time varying input signal is then assigned to <code>source.p</code> which is indexed as <code>source.p(source_point_index, time_index)</code>. The source can have any number of time points (it doesn't need to be the same length as <code>kgrid.t_array</code>) and can be defined as either a single time series (in which case the same time series is applied to all of the source points), or a matrix of time series following the source points using MATLAB's column-wise linear matrix index ordering. For example, if <code>source.p_mask</code> is defined as</p>
+
+<pre class="programlisting">
+source.p_mask =
+     0     1     0
+     1     0     1
+     1     0     1
+     0     1     0
+</pre>
+<p>the ordering of the source points within <code>source.p(source_point_index, time_index)</code> would follow</p>
+<pre class="programlisting">
+     0     3     0
+     1     0     5
+     2     0     6
+     0     4     0
+</pre>
+
+<p>In this example a sinusoidal input is assigned to a single source element to create an acoustic monopole.  The remaining input structures are defined in the same way as in previous examples.</p>
+
+<pre class="programlisting">
+% define a single source point
+source.p_mask = zeros(Nx, Ny);
+source.p_mask(end - Nx/4, Ny/2) = 1;
+
+% define a time varying sinusoidal source
+source_freq = 0.25e6;   % [Hz]
+source_mag = 2;         % [Pa]
+source.p = source_mag*sin(2*pi*source_freq*kgrid.t_array);
+</pre>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Source filtering</h3>
+<p>The temporal sampling frequency of the input and output signals is dictated by the size of the time step, <code>kgrid.dt</code>. This means the highest frequency that can be represented in a time varying pressure or velocity input is the Nyquist limit of <code>1/(2*kgrid.dt)</code>. However, the highest temporal frequency that can be represented on the spatial grid is given by the Nyquist limit of <code>medium.sound_speed/(2*dx)</code> or <code>CFL/(2*kgrid.dt)</code>. For most simulations, the CFL number will be less than 1 (<code><a href="makeTime.html">makeTime</a></code> uses a CFL of 0.3 by default). This means it is possible to define time varying pressure or velocity input signals that contain frequencies that cannot be represented on the grid. In this case, the high frequency components that are not supported by the grid are immediately aliased to lower frequencies. This can cause large unwanted errors in the simulation, so care must be taken that maximum frequency supported by the grid is not exceeded.</p>
+
+<p>The maximum frequency supported by the grid is reported on the command line at the beginning of each simulation. Input signals can be automatically restricted to the range of supported frequencies by using the function <code><a href="filterTimeSeries.html">filterTimeSeries</a></code>. This applies a finite impulse response (FIR) filter designed using the Kaiser windowing method. The filter can be set to either zero or linear phase as required. 
+
+<pre class="programlisting">
+% filter the source to remove high frequencies not supported by the grid
+source.p = filterTimeSeries(kgrid, medium, source.p);
+</pre>
+
+<a name="heading4"></a>
+<h3 class="title">Running the simulation</h3>
+
+<p>In the <a href="example_ivp_recording_particle_velocity.html">Recording The Particle Velocity Example</a>, an input for <code>sensor.record</code> was defined to record both the pressure and velocity fields at the sensor points defined by <code>sensor.mask</code>. In this example, the final pressure field within the computational domain is also returned by setting <code>sensor.record</code> to <code>{'p', 'p_final'}</code>. Unlike the outputs for pressure and velocity, the outputs for <code>'p_final'</code> and <code>'u_final'</code> are returned over the complete computational grid. In 2D they are indexed as <code>(nx, ny)</code>. A plot of the input time series driving the source point along with the acoustic pressure recorded at the sensor point and the final pressure field is given below. </p>
+
+<pre class="programlisting">
+% define the acoustic parameters to record
+sensor.record = {'p', 'p_final'};
+
+% run the simulation
+sensor_data = kspaceFirstOrder2D(kgrid, medium, source, sensor);
+</pre>
+
+<p><img src="images/example_tvsp_homogeneous_medium_monopole_01.png" height="420" width="561">
+<img src="images/example_tvsp_homogeneous_medium_monopole_02.png" height="420" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="k-wave_time_varying_source_problems.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Time Varying Source Problems</td>
+        <td>&nbsp;</td>
+        <td align="right">Dipole Point Source In A Homogeneous Propagation Medium</td>
+        <td align="right" width="20"><a href="example_tvsp_homogeneous_medium_dipole.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>cart2grid :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="benchmark.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="checkFactors.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">cart2grid</h1>
+<p class="purpose">Interpolate a set of Cartesian points onto a binary grid</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+[grid_data, order_index, reorder_index] = cart2grid(kgrid, cart_data)
+</pre>
+
+<h2>Description</h2>
+<p><code>cart2grid</code> interpolates the set of Cartesian points defined by <code>cart_data</code> onto a binary matrix defined by the k-Wave grid structure <code>kgrid</code> using nearest neighbour interpolation. An error is returned if the Cartesian points are outside the computational domain defined by kgrid.</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td><p><code>kgrid</code></p></td>
+        <td><p>k-Wave grid structure returned by <code><a href="makeGrid.html">makeGrid</a></code></p></td>
+    </tr>    
+    
+    <tr valign="top">
+        <td width = "150"><p><code>cart_data</code></p></td>
+        <td><p>1 x N, 2 x N, or 3 x N (for 1, 2, and 3 dimensions) array of Cartesian sensor points </p></td>
+    </tr>
+</table>
+    
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>grid_data</code></p></td>
+        <td><p>binary grid with the same dimensions as the k-Wave input grid <code>kgrid</code></p></td>
+    </tr>
+
+    <tr valign="top">
+        <td><p><code>order_index</code></p></td>
+        <td><p>the order that the Cartesian points appear in <code>grid_data</code> according to MATLAB's standard column-wise linear matrix index ordering</p></td>
+    </tr>  
+    
+    <tr valign="top">
+        <td><p><code>reorder_index</code></p></td>
+        <td><p>the order that the binary points in <code>grid_data</code> (according to MATLAB's standard column-wise linear matrix index ordering) appear in the original Cartesian data</p></td>
+    </tr>    
+    
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_ivp_homogeneous_medium.html">Homogenous Propagation Medium</a></li>
+<li><a href="example_ivp_loading_external_image.html">Loading External Image Maps</a></li> 
+<li><a href="example_ivp_comparison_modelling_functions.html">Comparison Of Modelling Functions</a></li> 
+<li><a href="example_ivp_3D_simulation.html">Simulations In Three Dimensions</a></li>      
+<li><a href="example_sd_directivity_modelling_2D.html">Modelling Sensor Directivity in 2D</a></li>
+<li><a href="example_sd_directivity_modelling_3D.html">Modelling Sensor Directivity in 3D</a></li> 
+<li><a href="example_pr_2D_tr_circular_sensor.html">2D Time Reversal For A Circular Sensor</a></li>
+</ul>
+
+<h2>See Also</h2>
+
+<code><a href="grid2cart.html">grid2cart</a></code>, <code><a href="interpCartData.html">interpCartData</a></code>, <code><a href="makeGrid.html">makeGrid</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="benchmark.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">benchmark</td>
+        <td>&nbsp;</td>
+        <td align="right">checkFactors</td>
+        <td align="right" width="20"><a href="checkFactors.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

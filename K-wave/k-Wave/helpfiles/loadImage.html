@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>loadImage :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="kspaceSecondOrder.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="logCompression.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">loadImage</h1>
+<p class="purpose">Load an image file</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+im = loadImage()
+im = loadImage(filename)
+</pre>
+
+<h2>Description</h2>
+
+<p><code>loadImage</code> loads an external image file using <code><a href="matlab: doc imread">imread</a></code> and returns a two-dimensional image matrix scaled between 0 and 1. If a colour image is loaded, the colour channels are summed before scaling. If no input is given for <code>filename</code>, a selection dialog is invoked.</p>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>filename</code></p></td>
+        <td><p> filename (and pathname if not in the same directory) of the image to load</p></td>
+    </tr>     
+    
+</table>
+    
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>im</code></p></td>
+        <td><p>scaled image matrix</p></td>
+    </tr>
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_ivp_loading_external_image.html">Loading External Image Maps</a></li> 
+<li><a href="example_pr_2D_tr_circular_sensor.html">2D Time Reversal For A Circular Sensor</a></li>
+<li><a href="example_na_optimising_performance.html">Optimising k-Wave Performance</a></li> 
+</ul>
+<h2>See Also</h2>
+
+<code><a href="matlab: doc imread">imread</a></code>, <code><a href="resize.html">resize</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="kspaceSecondOrder.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">kspaceSecondOrder</td>
+        <td>&nbsp;</td>
+        <td align="right">logCompression</td>
+        <td align="right" width="20"><a href="logCompression.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

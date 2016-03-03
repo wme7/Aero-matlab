@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>applyFilter :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="addNoise.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="attenComp.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">applyFilter</h1>
+<p class="purpose">Filter input with high or low pass filter</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+filtered_signal = applyFilter(signal, Fs, cutoff_f, filter_type)
+filtered_signal = applyFilter(signal, Fs, cutoff_f, filter_type, ...)
+</pre>
+
+<h2>Description</h2>
+<p><code>applyFilter</code> filters an input signal using <code><a href="matlab: doc filter">filter</a></code>. The FIR filter coefficients are based on a Kaiser window with the specified cut-off frequency and filter type (<code>'HighPass'</code>,  <code>'LowPass'</code> or <code>'BandPass'</code>). Both causal and zero phase filters can be applied. An example of using <code>applyFilter</code> is given below.</p>
+    
+<pre class="programlisting">
+% create a time series with a single monopolar pulse
+N = 100;
+dt = 1e-3;
+t = 0:dt:dt*(N-1);
+pulse = zeros(length(t), 1);
+pulse(25) = 1;
+    
+% filter using applyFilter
+pulse_filtered_lp = applyFilter(pulse, 1/dt, 100, 'LowPass', 'Plot', true, 'ZeroPhase', true);
+pulse_filtered_hp = applyFilter(pulse, 1/dt, 100, 'HighPass', 'Plot', true);
+pulse_filtered_bp = applyFilter(pulse, 1/dt, [50, 250], 'BandPass', 'Plot', true, 'ZeroPhase', true);
+
+% plot the filtered time series
+figure;
+[~, scale, prefix] = scaleSI(max(t));
+plot(t*scale, pulse, 'k-', t*scale, pulse_filtered_lp, 'r-', t*scale, pulse_filtered_hp, 'b-', t*scale, pulse_filtered_bp, 'g-');
+xlabel(['Time [' prefix 's]']);
+ylabel('Signal Amplitude [au]');
+legend('Original Signal', 'Zero Phase Low Pass Filter', 'Causal High Pass Filter', 'Zero Phase Band Pass Filter');
+</pre>
+
+<p>
+<img src="images/applyFilter_image_01.png" height="420" width="561">
+<img src="images/applyFilter_image_02.png" height="420" width="561">
+</p>
+
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td  width = "150"><p><code>func</code></p></td>
+        <td>
+            <p>signal to filter</p>
+        </td>
+    </tr>     
+    
+    <tr valign="top">
+        <td><p><code>Fs</code></p></td>
+        <td>
+            <p>sampling frequency [Hz]</p>
+        </td>
+    </tr>  
+
+    <tr valign="top">
+        <td><p><code>cutoff_f</code></p></td>
+        <td>
+            <p>filter cutoff frequency/s [Hz]</p>
+        </td>
+    </tr>  
+          
+    <tr valign="top">
+        <td><p><code>filter_type</code></p></td>
+        <td>
+            <p><code>'HighPass'</code>, <code>'LowPass'</code> or <code>'BandPass'</code></p>
+        </td>
+    </tr> 
+
+</table>
+
+<h2>Optional Inputs</h2>
+
+<p>Optional 'string', value pairs that may be used to modify the default computational settings.</p>
+
+<table cellspacing="0" class="body" cellpadding="4" border="2">
+    <colgroup>
+        <col width="18%"><col width="18%"><col width="18%"><col width="46%">
+    </colgroup>
+    
+    <thead>
+        <tr valign="top">
+            <th bgcolor="#B2B2B2">Input</th>
+            <th bgcolor="#B2B2B2">Valid Settings</th>
+            <th bgcolor="#B2B2B2">Default</th>
+            <th bgcolor="#B2B2B2">Description</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'Plot'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(boolean scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>false</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Boolean controlling whether the amplitude spectrum is displayed before and after filtering.</p></td>
+        </tr>     
+        
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'StopBandAtten'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(numeric scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>60</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Attenuation in decibels in the stop band.</p></td>
+        </tr>   
+
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'TransitionWidth'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(numeric scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>0.1</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>Size of the transition based on the temporal sampling frequency.</p></td>
+        </tr>   
+
+        <tr valign="top">
+            <td bgcolor="#F2F2F2"><p><code>'ZeroPhase'</code></p></td>
+            <td bgcolor="#F2F2F2"><p><em>(boolean scalar)</em></p></td>
+            <td bgcolor="#F2F2F2"><p><code>false</code></p></td>            
+            <td bgcolor="#F2F2F2"><p>boolean controlling whether a zero phase filter is used.</p></td>
+        </tr>            
+    </tbody>
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>filtered_signal</code></p></td>
+        <td><p>the filtered signal</p></td>
+    </tr>      
+</table>
+
+<h2>Examples</h2>
+<ul>
+<li><a href="example_pr_2D_tr_bandlimited_sensors.html">Image Reconstruction With Bandlimited Sensors</a></li>      
+</ul>
+
+<h2>See Also</h2>
+
+<code><a href="matlab: doc filter">filter</a></code>, <code><a href="filterTimeSeries.html">filterTimeSeries</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="addNoise.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">addNoise</td>
+        <td>&nbsp;</td>
+        <td align="right">attenComp</td>
+        <td align="right" width="20"><a href="attenComp.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

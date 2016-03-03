@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Photoacoustic Waveforms in 1D, 2D and 3D Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Photoacoustic Waveforms in 1D, 2D and 3D.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="example_ivp_3D_simulation.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="k-wave_time_varying_source_problems.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Photoacoustic Waveforms in 1D, 2D and 3D Example </h2>
+
+<table border="0" cellpadding="4" cellspacing="0" class="pagenavtable">
+    <tr>
+        <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+        <td>
+            <p><a href="#heading1">Overview</a></p>
+            <p><a href="#heading2">Waves in 1D, 2D and 3D</a></p>	    
+            <p><a href="#heading3">Running the simulation in 1D</a></p>
+            <p><a href="#heading4">Running the simulation in 2D</a></p>
+            <p><a href="#heading5">Running the simulation in 3D</a></p>
+            <p><a href="#heading6">Plotting the waveforms</a></p>
+        </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>The time-varying pressure signals recorded from a photoacoustic source look different depending on the number of dimensions used in the simulation. This difference occurs because a point source in 1D corresponds to a plane wave in 3D, and a point source in 2D corresponds to an infinite line source in 3D. This examples shows the difference between the signals recorded in each dimension. It builds on the <a href="example_ivp_1D_simulation.html">Simulations in One Dimension</a>, <a href="example_ivp_homogeneous_medium.html">Homogeneous Propagation Medium</a>, and <a href="example_ivp_3D_simulation.html">Simulations in Three Dimensions</a> examples.</p>
+
+<p>
+    <ul>
+        <li><a href="matlab:edit([getkWavePath('examples') 'example_ivp_photoacoustic_waveforms.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+        <li><a href="matlab:run([getkWavePath('examples') 'example_ivp_photoacoustic_waveforms']);" target="_top">run the file</a> in MATLAB</li>
+    </ul>
+</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Waves in 1D, 2D and 3D</h3>
+
+<p>The fact that the characteristics of plane (1D), cylindrical (2D), and spherical (3D) wave propagation are different in some fundamental ways is often overlooked. This can lead to incorrect insight into the results from photoacoustic simulations. In particular, three key differences between 1D, 2D and 3D propagation are:</p>
+<ul>
+    <li>Photoacoustic waves in 1D and 3D are compactly supported. This means they are zero outside some finite region (they "end"), whereas a waveform in 2D has an infinitely long tail. This can be understood by considering a 2D point source as an infinitely long line source in 3D. This means there will always be some signal arriving at the detector from some (increasingly distant) part of the line source. One implication for photoacoustics is that time reversal image reconstruction is not exact in 2D.</li>
+    <li>There is no geometrical spreading in 1D, so wave amplitudes do not decay (unless there is absorption). In 2D, the waves undergo cylindrical spreading in which the acoustic energy is spread out over the growing wavefront. This means the acoustic energy is inversely proportional to radius and the acoustic pressure decays as 1/sqrt(radius). In 3D, the spreading is over a spherical wavefront, so the energy is spread over radius^2, and the pressure decays as 1/radius.</li>
+    <li>In 1D, the shape of the initial pressure distribution will be retained in the shape of the propagating pulse. This is not true in 2D and 3D.</li>
+</ul>
+
+<p>Note that 1D, 2D, and 3D are used here to refer to the Cartesian coordinate systems in which the variables are (x), (x, y), and (x, y, z). Other cases that could be described as 1D (such as spherically-symmetric with just a radial coordinate) or 2D (such as cylindrically-symmetric with (r, theta) as the coordinates) are not considered.
+</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Running the simulation in 1D</h3>
+
+<p>First, the common settings for all three examples are set, including the grid size, properties of the medium, size of the initial pressure distribution, source-receiver separation, time step, and length of time to run the simulation.</p>
+
+<pre class="programlisting">
+% size of the computational grid
+Nx = 64;    % number of grid points in the x (row) direction
+x = 1e-3;   % size of the domain in the x direction [m]
+dx = x/Nx;  % grid point spacing in the x direction [m]
+
+% define the properties of the propagation medium
+medium.sound_speed = 1500;      % [m/s]
+
+% size of the initial pressure distribution
+source_radius = 2;              % [grid points]
+
+% distance between the centre of the source and the sensor
+source_sensor_distance = 10;    % [grid points]
+
+% time array
+dt = 2e-9;                      % [s]
+t_end = 300e-9;                 % [s]
+
+% computation settings
+input_args = {'DataCast', 'single'};
+</pre>
+
+<p>The final line above sets MATLAB to run the simulations in single precision arithmetic, which is faster than double precision and more than sufficient for most simulations. The next set of commands create the k-Wave grid, the array of time points, the initial pressure distribution (source), and the sensor mask used to record the wavefield.</p>
+
+<pre class="programlisting">
+% create the computational grid
+kgrid = makeGrid(Nx, dx);
+
+% create the time array
+kgrid.t_array = 0:dt:t_end;
+
+% create initial pressure distribution
+source.p0 = zeros(Nx, 1);
+source.p0(Nx/2 - source_radius:Nx/2 + source_radius) = 1;
+
+% define a single sensor point
+sensor.mask = zeros(Nx, 1);
+sensor.mask(Nx/2 + source_sensor_distance) = 1;	
+</pre>
+
+<p>Finally, the 1D example is run.</p>
+
+<pre class="programlisting">
+% run the simulation
+sensor_data_1D = kspaceFirstOrder1D(kgrid, medium, source, sensor, input_args{:});
+</pre>
+
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading4"></a>
+<h3 class="title">Running the simulation in 2D</h3>
+
+<p>Running the simulation in 2D is very similar, except the initial pressure distribution is defined as a disc (filled circle) using <code><a href="makeDisc.html">makeDisc</a></code>, and the sensor mask is defined as a single pixel in two-dimensions.</p>
+
+<pre class="programlisting">
+% create the computational grid
+kgrid = makeGrid(Nx, dx, Nx, dx);
+
+% create initial pressure distribution
+source.p0 = makeDisc(Nx, Nx, Nx/2, Nx/2, source_radius);
+
+% define a single sensor point
+sensor.mask = zeros(Nx, Nx);
+sensor.mask(Nx/2 - source_sensor_distance, Nx/2) = 1;
+
+% run the simulation
+sensor_data_2D = kspaceFirstOrder2D(kgrid, medium, source, sensor, input_args{:});
+</pre>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading5"></a>
+<h3 class="title">Running the simulation in 3D</h3>
+
+<p>The 3D example follows the same pattern, except now the source is defined as a ball (filled sphere) using <code><a href="makeBall.html">makeBall</a></code>.</p>
+
+<pre class="programlisting">
+% create the computational grid
+kgrid = makeGrid(Nx, dx, Nx, dx, Nx, dx);
+
+% create initial pressure distribution
+source.p0 = makeBall(Nx, Nx, Nx, Nx/2, Nx/2, Nx/2, source_radius);
+
+% define a single sensor point
+sensor.mask = zeros(Nx, Nx, Nx);
+sensor.mask(Nx/2 - source_sensor_distance, Nx/2, Nx/2) = 1;
+
+% run the simulation
+sensor_data_3D = kspaceFirstOrder3D(kgrid, medium, source, sensor, input_args{:});
+</pre>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading6"></a>
+<h3 class="title">Plotting the waveforms</h3>
+
+<p>The three recorded time series for 1D, 2D and 3D are shown below (the magnitudes have been normalised). The fact that the 1D and 3D waveforms are compactly supported can be clearly seen.</p>
+
+<p><img src="images/example_ivp_photoacoustic_waveforms_01.png" height="420" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="example_ivp_3D_simulation.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Simulations In Three Dimensions</td>
+        <td>&nbsp;</td>
+        <td align="right">Time Varying Source Problems</td>
+        <td align="right" width="20"><a href="k-wave_time_varying_source_problems.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

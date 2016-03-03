@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>getkWavePath :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="getFDMatrix.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="getSpacedPoints.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">getkWavePath</h1>
+<p class="purpose">Return pathname to the k-Wave Toolbox</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+path = getkWavePath()
+path = getkWavePath(folder_name)
+</pre>
+
+<h2>Description</h2>
+<p><code>getkWavePath</code> returns the full pathname to the root directory in the k-Wave Toolbox using the slash direction native to the users operating system. If a <code>folder_name</code> string is provided, this is appended to the pathname.</p>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>folder_name</code></p></td>
+        <td><p>folder name string to append to the pathname</p></td>
+    </tr>
+</table>
+    
+<ul>
+    <table cellspacing="0" class="note" summary="Note" cellpadding="5" border="1">
+        <tr width="90%">
+            <td><p><b>Note</b>&nbsp;&nbsp;<code>folder_name</code> is not checked for existence, the string is simply appended to the pathname with a trailing slash.</p></td>
+        </tr>
+    </table>
+</ul>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>path</code></p></td>
+        <td><p>full pathname to the root directory in the k-Wave Toolbox</p></td>
+    </tr>
+</table>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="getFDMatrix.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">getFDMatrix</td>
+        <td>&nbsp;</td>
+        <td align="right">getSpacedPoints</td>
+        <td align="right" width="20"><a href="getSpacedPoints.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

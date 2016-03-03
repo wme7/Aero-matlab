@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>logCompression :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="loadImage.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="makeBall.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">logCompression</h1>
+<p class="purpose">Log compress an input signal</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+signal = logCompression(signal, a)
+signal = logCompression(signal, a, normalise)
+</pre>
+
+<h2>Description</h2>
+
+<p><code>logCompression</code> compresses the input signal using the expression <code>signal = log10(1 + a*signal)./log10(1 + a)</code>.</p>
+
+<h2>Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>signal</code></p></td>
+        <td><p>input signal</p></td>
+    </tr>    
+
+    <tr valign="top">
+        <td width = "150"><p><code>a</code></p></td>
+        <td><p>compression factor</p></td>
+    </tr>  
+</table>
+
+<h2>Optional Inputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>normalise</code></p></td>
+        <td><p>Boolean controlling whether the maximum of the input signal is normalised to unity before compression (default = false). If set to true, the original magnitude is restored after compression.</p></td>
+    </tr>    
+</table>
+
+<h2>Outputs</h2>
+
+<table cellspacing="0" class="body" cellpadding="4" border="0">
+    <tr valign="top">
+        <td width = "150"><p><code>signal</code></p></td>
+        <td><p>log compressed signal</p></td>
+    </tr>
+</table>
+
+<h2>See Also</h2>
+
+<code><a href="matlab: doc log10">log10</a></code>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="loadImage.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">loadImage</td>
+        <td>&nbsp;</td>
+        <td align="right">makeBall</td>
+        <td align="right" width="20"><a href="makeBall.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

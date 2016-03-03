@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Focussed Detector in 2D Example (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Focussed Detector in 2D Example.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="k-wave_sensor_directivity.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="example_sd_focussed_detector_3D.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Focussed Detector in 2D Example</h2>
+
+<table class="pagenavtable" border="0" cellpadding="4" cellspacing="0">
+    <tr>
+      <th>On this page&#8230;</th>
+    </tr>
+    <tr>
+      <td>
+        <p><a href="#heading1">Overview</a></p>
+        <p><a href="#heading2">Defining the sensor geometry</a></p>
+        <p><a href="#heading3">Running the simulation</a></p>
+      </td>
+    </tr>
+</table>
+
+<a name="heading1"></a>
+<h3 class="title">Overview</h3>
+
+<p>This example shows how k-Wave can be used to model the output of a focussed semicircular detector where the directionality arises from spatially averaging across the detector surface. It builds on the <a href="example_ivp_homogeneous_medium.html">Homogeneous Propagation Medium</a> and <a href="example_ivp_binary_sensor_mask.html">Using A Binary Sensor Mask</a> examples.</p>
+
+<p></p>
+
+<ul>
+  <li><a href="matlab:edit([getkWavePath('examples') 'example_sd_focussed_detector_2D.m']);" target="_top">open the file</a> in the MATLAB Editor</li>
+  <li><a href="matlab:run([getkWavePath('examples') 'example_sd_focussed_detector_2D']);" target="_top">run the file</a> in MATLAB</li>
+</ul>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<a name="heading2"></a>
+<h3 class="title">Defining the sensor geometry</h3>
+
+<p>For large single element detectors, the directionality arises because the output is spatially averaged across the pressure field on the transducer surface. Here this effect is simulated using a focussed semicircular detector (defined using a binary sensor mask) created with <code><a href="makeCircle.html">makeCircle</a></code>.</p>
+
+<pre class="programlisting">
+% define a sensor as part of a circle centred on the grid
+sensor_radius = 65; % [grid points]
+arc_angle = pi;     % [rad]
+sensor.mask = makeCircle(Nx, Ny, Nx/2, Ny/2, sensor_radius, arc_angle);
+<br></pre>
+
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back
+to Top</a></p>
+
+<a name="heading3"></a>
+<h3 class="title">Running the simulation</h3>
+
+<p>To illustrate the directionality of the simulated detector, a disc shaped source (created using <code><a href="makeDisc.html">makeDisc</a></code>) is first placed at the focus of the detector and then horizontally offset. A visualisation of the two simulations is given below.</p>
+
+<p><img src="images/example_sd_focussed_detector_2D_01.png" height="420" width="561">
+<img src="images/example_sd_focussed_detector_2D_02.png" height="420" width="561"></p>
+
+<p>The output from the simulated single element detector is then obtained by averaging the time signals recorded at each grid point within the <code>sensor.mask</code> giving a single time series output. The resulting time series for both source positions are shown below. It is clear that the detector produces a larger output for the source nearer the focus of the detector. Note, this example uses an initial value as the source of the wave, but this averaging effect will also be seen for time-varying sources. </p>
+
+<p><img src="images/example_sd_focussed_detector_2D_03.png" height="420" width="561"></p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="k-wave_sensor_directivity.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Sensor Directivity</td>
+        <td>&nbsp;</td>
+        <td align="right">Focussed Detector in 3D</td>
+        <td align="right" width="20"><a href="example_sd_focussed_detector_3D.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

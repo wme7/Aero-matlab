@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Troubleshooting (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+	<meta name="description" content="Troubleshooting.">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="k-wave_gs_build_simulation.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="k-wave_gs_reference_list.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h2 class="title">Troubleshooting</h2>
+
+<p>If you are unable to run the examples or see the help files included within the k-Wave Toolbox, first check that the k-Wave Toolbox has been added to the MATLAB path. To add a directory to the MATLAB path, either use the <a href="matlab: doc addpath" target="_top"><code>addpath</code></a> command or go to File/Set Path/Add Folder on the dropdown menus in the main MATLAB window and select the root k-Wave Toolbox folder. You will need to restart MATLAB before the help files will appear in the help browser.</p>
+
+<p>If you are encountering problems using specific combinations of inputs using Octave or older versions of MATLAB, try turning the display off by setting the optional input parameter <code>'PlotSim'</code> to <code>false</code>, using a binary sensor mask or setting <code>'CartInterp'</code> to <code>'nearest'</code>, and using the default settings for <code>'DataCast'</code> (optional inputs are given as <code>'string', value</code> pairs following the <code>kgrid</code>, <code>medium</code>, <code>source</code>, and <code>sensor</code> inputs).</p>
+
+<p>If you are still having problems go to the online <a href="http://www.k-wave.org/forum/">k-Wave User Forum</a> and search for an answer or post a question.</p>
+    
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<h2 class="title">Compatability with earlier MATLAB versions</h2>
+
+<p>To use k-Wave for 3D simulations with MATLAB versions prior to 2008a, open <code>kspaceFirstOrder3D</code> from the main toolbox folder and replace <code>catch ME</code> on line 955 with <code>catch</code>. For some versions of MATLAB, the linear interpolation functions are also not supported. In this case, use a binary sensor mask, or set the optional input <code>'CartInterp'</code> to <code>'nearest'</code>. The ultrasound simulation examples will only work in versions of MATLAB recent enough to support user defined classes. The <code>'SaveToDisk'</code> option used by <code><a href="writeMatrix.html">writeMatrix</a></code> and <code><a href="kspaceFirstOrder3DC.html">kspaceFirstOrder3DC</a></code> requires MATLAB 2011a or later (for <code><a href="matlab: doc h5create" target="_top">h5create</a></code>).</p>
+
+<p></p>
+<p><img src="images/doc_to_top_up.gif">&nbsp;<a href="#top_of_page">Back to Top</a></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="k-wave_gs_build_simulation.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">Build Your Own Simulation</td>
+        <td>&nbsp;</td>
+        <td align="right">Reference List</td>
+        <td align="right" width="20"><a href="k-wave_gs_reference_list.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>

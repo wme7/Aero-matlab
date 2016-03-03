@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>benchmark :: Functions (k-Wave)</title>
+	<link rel="stylesheet" href="docstyle.css" type="text/css">
+</head>
+
+<body>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr>
+        <td valign="baseline">
+            <b>k-Wave Toolbox</b>
+        </td>
+        <td valign="baseline" align="right">
+            <a href="beamPlot.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;&nbsp;&nbsp;<a href="cart2grid.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a>
+        </td>
+    </tr>
+</table>
+
+<a name="top_of_page"></a>
+<h1 class="reftitle">benchmark</h1>
+<p class="purpose">Run performance benchmark</p>
+
+<h2>Syntax</h2>
+
+<pre class="programlisting">
+benchmark
+</pre>
+
+<h2>Description</h2>
+<p><code>benchmark</code> performs an analysis of the time taken to run simulations using <code><a href="kspaceFirstOrder3D.html">kspaceFirstOrder3D</a></code> with increasing grid sizes. The default simulation uses a heterogeneous absorbing medium, a binary sensor mask with 100 points, 1000 time steps, <code>'PlotSim'</code> set to false, and grid sizes varying from 32^3 to 256^3. The times are computed from 3 averages and the function stops when memory errors are encountered or the benchmarking is complete. The computational times and settings are stored in a MATLAB formatted binary file using <code>save</code>.</p>
+<p>The computation times and relative speed running <code>benchmark</code> using a Quad-Core CPU compared to using an NVIDIA Tesla C2070 GPU (graphics processing unit) are shown below. For the GPU computations, the maximum possible grid size is limited by the memory available on the GPU. Note, before running, the MATLAB workspace is cleared and any open MATLAB windows are closed.</p>
+
+<p><img src="images/benchmark_image_01.png" height="420" width="561"></p>
+
+<p></p>
+<table class="nav" summary="Navigation aid" border="0" width="100%" cellpadding="0" cellspacing="0" bgcolor="#e7ebf7">
+    <tr valign="top">
+        <td align="left" width="20"><a href="beamPlot.html"><img src="images/b_prev.gif" border="0" align="bottom" alt="Previous"></a>&nbsp;</td>
+        <td align="left">beamPlot</td>
+        <td>&nbsp;</td>
+        <td align="right">cart2grid</td>
+        <td align="right" width="20"><a href="cart2grid.html"><img src="images/b_next.gif" border="0" align="bottom" alt="Next"></a></td>
+    </tr>
+</table>
+
+<br>
+<p class="copy">&copy; 2009-2014 Bradley Treeby and Ben Cox.</p>
+</body></html>
